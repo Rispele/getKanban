@@ -1,6 +1,6 @@
 ﻿namespace Domain.Game;
 
-public enum Role
+public enum ParticipantRole
 {
 	Creator,
 	Angel,

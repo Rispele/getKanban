@@ -1,28 +1,27 @@
-﻿using Domain.Game.Days;
-using Domain.Users;
+﻿using Domain.Users;
 
 namespace Domain.Game.Teams;
 
 public class Team
 {
-	public Guid Id { get; }
-
-	public string Name { get; private set; }
-
 	private readonly List<Participant> participants;
 
-	private readonly DayContainer dayContainer;
+	private readonly TeamSession teamSession;
 
 	public Team(string name)
 	{
 		Id = Guid.NewGuid();
 		Name = name;
+		teamSession = new TeamSession();
 		participants = new List<Participant>();
-		dayContainer = new DayContainer();
 	}
+
+	public Guid Id { get; }
+
+	public string Name { get; private set; }
 
 	public void AddPlayer(User user)
 	{
-		participants.Add(new Participant(user, Role.Player));
+		participants.Add(new Participant(user, ParticipantRole.Player));
 	}
 }
