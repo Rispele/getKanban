@@ -12,6 +12,7 @@ public class Day
 	private readonly bool anotherTeamAppeared;
 
 	private readonly List<DayEvent> events;
+	private readonly List<ExpectedEvent> expectedEvents;
 	private readonly int programmersCount;
 	private readonly bool shouldRelease;
 	private readonly bool shouldUpdateSprintBacklog;
@@ -35,43 +36,66 @@ public class Day
 		Number = number;
 
 		events = new List<DayEvent>();
+		expectedEvents = new List<ExpectedEvent>();
+
+		if (anotherTeamAppeared)
+		{
+			expectedEvents.Add(new ExpectedEvent(DayEventType.WorkAnotherTeam));
+		}
+		else
+		{
+			AppendFirstStepEvents();
+		}
+	}
+
+	private void AppendFirstStepEvents()
+	{
+		expectedEvents.Add(new ExpectedEvent(DayEventType.UpdateTeamRoles));
+		expectedEvents.Add(new ExpectedEvent(DayEventType.RollDice));
 	}
 
 	private int LastEventId => events.Max(t => t.Id);
 
 	public long Number { get; }
 
+	private ExpectedEvent GetExpectedEventOrThrow(DayEventType type, string errorMessage)
+	{
+		var expectedEvent = expectedEvents
+			.Where(@event => !@event.Removed)
+			.SingleOrDefault(@event => @event.EventType == type);
+
+		return expectedEvent ?? throw new DayEventNotExpectedException(errorMessage);
+	}
+
 	public int RollDiceForAnotherTeam()
 	{
-		var isNotExpected = events.Any(e => e.Type is DayEventType.WorkAnotherTeam or DayEventType.UpdateTeamRoles);
-		if (!anotherTeamAppeared || isNotExpected)
-		{
-			throw new DomainException("Roll dice for Petya is not expected this day");
-		}
+		const string notExpectedMessage = "Roll dice for Petya is not expected this day or state";
+		var workAnotherTeamEvent = GetExpectedEventOrThrow(DayEventType.WorkAnotherTeam, notExpectedMessage);
 
 		var diceRoller = new DiceRoller(new Random());
 		var diceNumber = diceRoller.RollDice();
 		var diceScores = MapAnotherTeam(diceNumber);
 		events.Add(new WorkAnotherTeamDayEvent(diceNumber, diceScores, LastEventId + 1));
+
+		workAnotherTeamEvent.MarkRemoved();
+		AppendFirstStepEvents();
+
 		return diceScores;
 	}
 
-	public void SwapRoles(TeamRole from, TeamRole to)
+	public void UpdateTeamRoles(TeamRole from, TeamRole to)
 	{
-		if (events.Any(e => e.Type == DayEventType.RollDice))
-		{
-			throw new DomainException("Could not change roles when dices rolled");
-		}
+		const string notExpectedMessage = "Update team roles is not expected this state";
+		GetExpectedEventOrThrow(DayEventType.UpdateTeamRoles, notExpectedMessage);
 
 		events.Add(new UpdateTeamRolesDayEvent(from, to, LastEventId + 1));
 	}
 
 	public void RollDice()
 	{
-		if (events.Any(e => e.Type == DayEventType.RollDice))
-		{
-			throw new DomainException("Dice rolling is not expected");
-		}
+		const string notExpectedMessage = "Dice rolling is not expected";
+		var updateTeamRolesEvent = GetExpectedEventOrThrow(DayEventType.UpdateTeamRoles, notExpectedMessage);
+		var rollDiceEvent = GetExpectedEventOrThrow(DayEventType.RollDice, notExpectedMessage);
 
 		var diceRoller = new DiceRoller(new Random());
 		var swapRoleEvents = events
@@ -109,6 +133,9 @@ public class Day
 			LastEventId + 1);
 		events.Add(@event);
 
+		updateTeamRolesEvent.MarkRemoved();
+		rollDiceEvent.MarkRemoved();
+
 		TeamRole[] GetSwaps(TeamRole teamRole)
 		{
 			return swapRoleEvents.GetValueOrDefault(teamRole, Array.Empty<TeamRole>());
@@ -129,7 +156,7 @@ public class Day
 			diceNumber[i] = diceRoller.RollDice();
 			diceScores[i] = MapAnalyst(diceNumber[i], asRole);
 		}
-		
+
 		return (diceNumber, diceScores);
 	}
 
