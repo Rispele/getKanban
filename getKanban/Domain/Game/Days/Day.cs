@@ -2,6 +2,7 @@
 using Domain.Game.Days.DayEvents;
 using Domain.Game.Days.DayEvents.ReleaseTicketDayEvent;
 using Domain.Game.Days.DayEvents.RollDiceDayEvent;
+using Domain.Game.Days.DayEvents.UpdateSprintBacklogDayEvent;
 using Domain.Game.Days.DayEvents.UpdateTeamRolesDayEvent;
 using Domain.Game.Days.DayEvents.WorkAnotherTeamDayEvent;
 
@@ -10,10 +11,9 @@ namespace Domain.Game.Days;
 public class Day
 {
 	private readonly int analystsCount;
-	private readonly bool anotherTeamAppeared;
+	private readonly List<AwaitedEvent> awaitedEvents;
 
 	private readonly List<DayEvent> events;
-	private readonly List<AwaitedEvent> awaitedEvents;
 	private readonly int programmersCount;
 	private readonly bool shouldRelease;
 	private readonly bool shouldUpdateSprintBacklog;
@@ -31,7 +31,6 @@ public class Day
 		this.analystsCount = analystsCount;
 		this.programmersCount = programmersCount;
 		this.testersCount = testersCount;
-		this.anotherTeamAppeared = anotherTeamAppeared;
 		this.shouldRelease = shouldRelease;
 		this.shouldUpdateSprintBacklog = shouldUpdateSprintBacklog;
 		Number = number;
@@ -56,7 +55,7 @@ public class Day
 	public int RollDiceForAnotherTeam()
 	{
 		const string notExpectedMessage = "Roll dice for Petya is not awaited this day or state";
-		var workAnotherTeamEvent = GetExpectedEventOrThrow(DayEventType.WorkAnotherTeam, notExpectedMessage);
+		var workAnotherTeamEvent = GetAwaitedEventOrThrow(DayEventType.WorkAnotherTeam, notExpectedMessage);
 
 		var diceRoller = new DiceRoller(new Random());
 		var diceNumber = diceRoller.RollDice();
@@ -72,7 +71,7 @@ public class Day
 	public void UpdateTeamRoles(TeamRole from, TeamRole to)
 	{
 		const string notExpectedMessage = "Update team roles is not awaited this state";
-		GetExpectedEventOrThrow(DayEventType.UpdateTeamRoles, notExpectedMessage);
+		GetAwaitedEventOrThrow(DayEventType.UpdateTeamRoles, notExpectedMessage);
 
 		events.Add(new UpdateTeamRolesDayEvent(from, to, LastEventId + 1));
 	}
@@ -80,8 +79,8 @@ public class Day
 	public void RollDices()
 	{
 		const string notExpectedMessage = "Dice rolling is not awaited";
-		var updateTeamRolesEvent = GetExpectedEventOrThrow(DayEventType.UpdateTeamRoles, notExpectedMessage);
-		var rollDiceEvent = GetExpectedEventOrThrow(DayEventType.RollDice, notExpectedMessage);
+		var updateTeamRolesEvent = GetAwaitedEventOrThrow(DayEventType.UpdateTeamRoles, notExpectedMessage);
+		var rollDiceEvent = GetAwaitedEventOrThrow(DayEventType.RollDice, notExpectedMessage);
 
 		var swapRoleEvents = events
 			.Where(@event => @event.Type == DayEventType.UpdateTeamRoles)
@@ -134,7 +133,7 @@ public class Day
 	public void ReleaseTickets(string[] ticketIds)
 	{
 		const string notExpectedMessage = "Dice rolling is not awaited";
-		var releaseTicketEvent = GetExpectedEventOrThrow(DayEventType.ReleaseTicket, notExpectedMessage);
+		var releaseTicketEvent = GetAwaitedEventOrThrow(DayEventType.ReleaseTicket, notExpectedMessage);
 
 		events.Add(new ReleaseTicketDayEvent(ticketIds, LastEventId + 1));
 
@@ -143,7 +142,21 @@ public class Day
 		AwaitEvents(shouldUpdateSprintBacklog ? DayEventType.UpdateSprintBacklog : DayEventType.UpdateCfd);
 	}
 
-	private void AwaitFirstStepEvents() => AwaitEvents(DayEventType.UpdateTeamRoles, DayEventType.RollDice);
+	public void UpdateSprintBacklog(string[] ticketIds)
+	{
+		const string notExpectedMessage = "Dice rolling is not awaited";
+		var updateSprintBacklogEvent = GetAwaitedEventOrThrow(DayEventType.UpdateSprintBacklog, notExpectedMessage);
+
+		events.Add(new UpdateSprintBacklogDayEvent(ticketIds, LastEventId + 1));
+		
+		updateSprintBacklogEvent.MarkRemoved();
+		AwaitEvents(DayEventType.UpdateCfd);
+	}
+
+	private void AwaitFirstStepEvents()
+	{
+		AwaitEvents(DayEventType.UpdateTeamRoles, DayEventType.RollDice);
+	}
 
 	private void AwaitEvents(params DayEventType[] eventTypes)
 	{
@@ -153,7 +166,7 @@ public class Day
 		}
 	}
 
-	private AwaitedEvent GetExpectedEventOrThrow(DayEventType type, string errorMessage)
+	private AwaitedEvent GetAwaitedEventOrThrow(DayEventType type, string errorMessage)
 	{
 		var expectedEvent = awaitedEvents
 			.Where(@event => !@event.Removed)
