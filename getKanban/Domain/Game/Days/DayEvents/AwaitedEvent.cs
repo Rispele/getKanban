@@ -1,8 +1,8 @@
 ﻿namespace Domain.Game.Days.DayEvents;
 
-public class ExpectedEvent
+public class AwaitedEvent
 {
-	public ExpectedEvent(DayEventType eventType)
+	public AwaitedEvent(DayEventType eventType)
 	{
 		EventType = eventType;
 	}
