@@ -2,14 +2,14 @@
 
 public class AwaitedEvent
 {
+	public bool Removed { get; private set; }
+
+	public DayEventType EventType { get; }
+
 	public AwaitedEvent(DayEventType eventType)
 	{
 		EventType = eventType;
 	}
-
-	public bool Removed { get; private set; }
-
-	public DayEventType EventType { get; }
 
 	public void MarkRemoved()
 	{

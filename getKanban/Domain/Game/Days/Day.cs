@@ -1,7 +1,9 @@
 ﻿using Domain.DomainExceptions;
 using Domain.Game.Days.DayEvents;
+using Domain.Game.Days.DayEvents.EndDayDayEvent;
 using Domain.Game.Days.DayEvents.ReleaseTicketDayEvent;
 using Domain.Game.Days.DayEvents.RollDiceDayEvent;
+using Domain.Game.Days.DayEvents.UpdateCfdDayEvent;
 using Domain.Game.Days.DayEvents.UpdateSprintBacklogDayEvent;
 using Domain.Game.Days.DayEvents.UpdateTeamRolesDayEvent;
 using Domain.Game.Days.DayEvents.WorkAnotherTeamDayEvent;
@@ -12,12 +14,17 @@ public class Day
 {
 	private readonly int analystsCount;
 	private readonly List<AwaitedEvent> awaitedEvents;
-
 	private readonly List<DayEvent> events;
 	private readonly int programmersCount;
 	private readonly bool shouldRelease;
 	private readonly bool shouldUpdateSprintBacklog;
 	private readonly int testersCount;
+
+	public long Number { get; }
+
+	private int LastEventId => events.Max(t => t.Id);
+
+	private IEnumerable<DayEvent> ExistingEvents => events.Where(@event => !@event.IsRemoved);
 
 	public Day(
 		int number,
@@ -47,10 +54,6 @@ public class Day
 			AwaitFirstStepEvents();
 		}
 	}
-
-	private int LastEventId => events.Max(t => t.Id);
-
-	public long Number { get; }
 
 	public int RollDiceForAnotherTeam()
 	{
@@ -109,7 +112,7 @@ public class Day
 
 		AwaitEvents(
 			shouldRelease
-				? DayEventType.ReleaseTicket
+				? DayEventType.ReleaseTickets
 				: shouldUpdateSprintBacklog
 					? DayEventType.UpdateSprintBacklog
 					: DayEventType.UpdateCfd);
@@ -132,8 +135,8 @@ public class Day
 
 	public void ReleaseTickets(string[] ticketIds)
 	{
-		const string notExpectedMessage = "Dice rolling is not awaited";
-		var releaseTicketEvent = GetAwaitedEventOrThrow(DayEventType.ReleaseTicket, notExpectedMessage);
+		const string notExpectedMessage = "Ticket release is not awaited";
+		var releaseTicketEvent = GetAwaitedEventOrThrow(DayEventType.ReleaseTickets, notExpectedMessage);
 
 		events.Add(new ReleaseTicketDayEvent(ticketIds, LastEventId + 1));
 
@@ -144,19 +147,51 @@ public class Day
 
 	public void UpdateSprintBacklog(string[] ticketIds)
 	{
-		const string notExpectedMessage = "Dice rolling is not awaited";
+		const string notExpectedMessage = "Sprint Backlog update is not awaited";
 		var updateSprintBacklogEvent = GetAwaitedEventOrThrow(DayEventType.UpdateSprintBacklog, notExpectedMessage);
 
 		events.Add(new UpdateSprintBacklogDayEvent(ticketIds, LastEventId + 1));
-		
+
 		updateSprintBacklogEvent.MarkRemoved();
 		AwaitEvents(DayEventType.UpdateCfd);
+	}
+
+	public void UpdateCfd(int released, int readyToDeploy, int withTesters, int withProgrammers, int withAnalysts)
+	{
+		const string notExpectedMessage = "CFD update is not awaited";
+		var updateCfdEvent = GetAwaitedEventOrThrow(DayEventType.UpdateCfd, notExpectedMessage);
+
+		var releasedThisDay = (ReleaseTicketDayEvent?)ExistingEvents
+			.SingleOrDefault(@event => @event.Type == DayEventType.ReleaseTickets);
+		var totalReleased = released + releasedThisDay?.TicketIds.Count ?? 0;
+
+		events.Add(
+			new UpdateCfdDayEvent(
+				totalReleased,
+				readyToDeploy,
+				withTesters,
+				withProgrammers,
+				withAnalysts,
+				LastEventId + 1));
+		updateCfdEvent.MarkRemoved();
+		AwaitEvents(DayEventType.EndDay);
+	}
+
+	public void EndDay()
+	{
+		const string notExpectedMessage = "End day is not awaited";
+		var endDayEvent = GetAwaitedEventOrThrow(DayEventType.EndDay, notExpectedMessage);
+
+		events.Add(new EndDayDayEvent(LastEventId + 1));
+
+		endDayEvent.MarkRemoved();
 	}
 
 	private void AwaitFirstStepEvents()
 	{
 		AwaitEvents(DayEventType.UpdateTeamRoles, DayEventType.RollDice);
 	}
+
 
 	private void AwaitEvents(params DayEventType[] eventTypes)
 	{
@@ -172,10 +207,10 @@ public class Day
 			.Where(@event => !@event.Removed)
 			.SingleOrDefault(@event => @event.EventType == type);
 
-		return expectedEvent ?? throw new DayEventNotExpectedException(errorMessage);
+		return expectedEvent ?? throw new DayEventNotAwaitedException(errorMessage);
 	}
 
-	#region mappings
+	#region Mappings
 
 #pragma warning disable CS8509
 	private static int MapAnalyst(int diceNumber, TeamRole asRole)

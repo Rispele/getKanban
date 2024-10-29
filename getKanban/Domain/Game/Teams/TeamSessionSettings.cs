@@ -4,15 +4,15 @@ namespace Domain.Game.Teams;
 
 public class TeamSessionSettings
 {
+	public bool AutoTestsAppeared { get; private set; }
+
+	public bool AutoReleaseAppeared { get; private set; }
+
 	public TeamSessionSettings()
 	{
 		AutoTestsAppeared = false;
 		AutoReleaseAppeared = false;
 	}
-
-	public bool AutoTestsAppeared { get; private set; }
-
-	public bool AutoReleaseAppeared { get; private set; }
 
 	public void ReleaseAutoTests()
 	{

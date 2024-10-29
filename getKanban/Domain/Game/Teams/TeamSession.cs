@@ -8,12 +8,12 @@ public class TeamSession
 	private readonly List<Day> days;
 	private readonly TeamSessionSettings sessionSettings;
 
+	private Day CurrentDay => days[currentDayNumber - 9];
+
 	public TeamSession()
 	{
 		sessionSettings = new TeamSessionSettings();
 		currentDayNumber = 9;
 		days = new List<Day>();
 	}
-
-	private Day CurrentDay => days[currentDayNumber - 9];
 }

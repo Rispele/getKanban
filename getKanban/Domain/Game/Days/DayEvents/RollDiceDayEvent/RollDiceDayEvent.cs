@@ -2,6 +2,13 @@
 
 public class RollDiceDayEvent : DayEvent
 {
+	public int[] AnalystsDiceNumber { get; }
+	public int[] ProgrammersDiceNumber { get; }
+	public int[] TestersDiceNumber { get; }
+	public int[] AnalystsScores { get; }
+	public int[] ProgrammersScores { get; }
+	public int[] TestersScores { get; }
+
 	public RollDiceDayEvent(
 		int[] analystsDiceNumber,
 		int[] programmersDiceNumber,
@@ -19,11 +26,4 @@ public class RollDiceDayEvent : DayEvent
 		ProgrammersScores = programmersScores;
 		TestersScores = testersScores;
 	}
-
-	public int[] AnalystsDiceNumber { get; }
-	public int[] ProgrammersDiceNumber { get; }
-	public int[] TestersDiceNumber { get; }
-	public int[] AnalystsScores { get; }
-	public int[] ProgrammersScores { get; }
-	public int[] TestersScores { get; }
 }
