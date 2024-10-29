@@ -2,9 +2,9 @@
 
 #pragma warning disable CS8509 // The switch expression does not handle all possible values of its input type (it is not exhaustive).
 
-namespace Domain.Game;
+namespace Domain.Game.Days;
 
-public class MapDiceNumberToScoreSettings
+public static class MapDiceNumberToScoreSettings
 {
 	public static int MapByRole(TeamRole role, TeamRole asRole, int diceNumber)
 	{
