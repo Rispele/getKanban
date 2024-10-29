@@ -9,10 +9,6 @@ public class GameSession
 
 	private readonly List<Team> teams;
 
-	public long Id { get; }
-
-	public string Name { get; }
-
 	public GameSession(
 		User creator,
 		string name,
@@ -29,6 +25,10 @@ public class GameSession
 
 		angels.Add(new Participant(creator, ParticipantRole.Creator, ParticipantRole.Angel));
 	}
+
+	public long Id { get; }
+
+	public string Name { get; }
 
 	public void AddAngel(User user)
 	{

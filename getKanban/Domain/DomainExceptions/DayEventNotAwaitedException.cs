@@ -2,7 +2,8 @@
 
 public class DayEventNotAwaitedException : DomainException
 {
-	public DayEventNotAwaitedException(string message) : base(message)
+	public DayEventNotAwaitedException(string message)
+		: base(message)
 	{
 	}
 }

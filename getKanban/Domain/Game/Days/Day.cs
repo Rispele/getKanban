@@ -12,114 +12,66 @@ namespace Domain.Game.Days;
 
 public class Day
 {
+	private readonly DayContext dayContext;
+
 	private readonly int analystsCount;
-	private readonly List<AwaitedEvent> awaitedEvents;
-	private readonly List<DayEvent> events;
 	private readonly int programmersCount;
-	private readonly bool shouldRelease;
-	private readonly bool shouldUpdateSprintBacklog;
 	private readonly int testersCount;
 
-	public long Number { get; }
-
-	private int LastEventId => events.Max(t => t.Id);
-
-	private IEnumerable<DayEvent> ExistingEvents => events.Where(@event => !@event.IsRemoved);
-
 	public Day(
-		int number,
+		DayContext dayContext,
 		int analystsCount,
 		int programmersCount,
-		int testersCount,
-		bool anotherTeamAppeared,
-		bool shouldRelease,
-		bool shouldUpdateSprintBacklog)
+		int testersCount)
 	{
+		this.dayContext = dayContext;
 		this.analystsCount = analystsCount;
 		this.programmersCount = programmersCount;
 		this.testersCount = testersCount;
-		this.shouldRelease = shouldRelease;
-		this.shouldUpdateSprintBacklog = shouldUpdateSprintBacklog;
-		Number = number;
-
-		events = new List<DayEvent>();
-		awaitedEvents = new List<AwaitedEvent>();
-
-		if (anotherTeamAppeared)
-		{
-			awaitedEvents.Add(new AwaitedEvent(DayEventType.WorkAnotherTeam));
-		}
-		else
-		{
-			AwaitFirstStepEvents();
-		}
 	}
 
 	public int RollDiceForAnotherTeam()
 	{
-		const string notExpectedMessage = "Roll dice for Petya is not awaited this day or state";
-		var workAnotherTeamEvent = GetAwaitedEventOrThrow(DayEventType.WorkAnotherTeam, notExpectedMessage);
+		EnsureCanPostEvent(DayEventType.WorkAnotherTeam);
 
 		var diceRoller = new DiceRoller(new Random());
 		var diceNumber = diceRoller.RollDice();
 		var diceScores = MapAnotherTeam(diceNumber);
-		events.Add(new WorkAnotherTeamDayEvent(diceNumber, diceScores, LastEventId + 1));
 
-		workAnotherTeamEvent.MarkRemoved();
-		AwaitFirstStepEvents();
+		WorkAnotherTeamDayEvent.CreateInstance(dayContext, diceNumber, diceScores);
 
 		return diceScores;
 	}
 
 	public void UpdateTeamRoles(TeamRole from, TeamRole to)
 	{
-		const string notExpectedMessage = "Update team roles is not awaited this state";
-		GetAwaitedEventOrThrow(DayEventType.UpdateTeamRoles, notExpectedMessage);
+		EnsureCanPostEvent(DayEventType.UpdateTeamRoles);
 
-		events.Add(new UpdateTeamRolesDayEvent(from, to, LastEventId + 1));
+		UpdateTeamRolesDayEvent.CreateInstance(dayContext, from, to);
 	}
 
 	public void RollDices()
 	{
-		const string notExpectedMessage = "Dice rolling is not awaited";
-		var updateTeamRolesEvent = GetAwaitedEventOrThrow(DayEventType.UpdateTeamRoles, notExpectedMessage);
-		var rollDiceEvent = GetAwaitedEventOrThrow(DayEventType.RollDice, notExpectedMessage);
-
-		var swapRoleEvents = events
-			.Where(@event => @event.Type == DayEventType.UpdateTeamRoles)
-			.Where(@event => !@event.IsRemoved)
-			.Cast<UpdateTeamRolesDayEvent>()
-			.GroupBy(@event => @event.From)
-			.ToDictionary(grouping => grouping.Key, grouping => grouping.Select(@event => @event.To).ToArray());
+		EnsureCanPostEvent(DayEventType.RollDice);
 
 		var diceRoller = new DiceRoller(new Random());
 		var (analystsDiceNumber, analystsScores) = RollDiceForRole(analystsCount, TeamRole.Analyst);
 		var (programmersDiceNumber, programmersScores) = RollDiceForRole(programmersCount, TeamRole.Programmer);
 		var (testersDiceNumber, testersScores) = RollDiceForRole(testersCount, TeamRole.Tester);
 
-		var @event = new RollDiceDayEvent(
+		RollDiceDayEvent.CreateInstance(
+			dayContext,
 			analystsDiceNumber,
 			programmersDiceNumber,
 			testersDiceNumber,
 			analystsScores,
 			programmersScores,
-			testersScores,
-			LastEventId + 1);
-		events.Add(@event);
-
-		updateTeamRolesEvent.MarkRemoved();
-		rollDiceEvent.MarkRemoved();
-
-		AwaitEvents(
-			shouldRelease
-				? DayEventType.ReleaseTickets
-				: shouldUpdateSprintBacklog
-					? DayEventType.UpdateSprintBacklog
-					: DayEventType.UpdateCfd);
+			testersScores);
+		return;
 
 		(int[] diceNumber, int[] diceScores) RollDiceForRole(int roleSize, TeamRole role)
 		{
-			var swaps = swapRoleEvents.GetValueOrDefault(role, Array.Empty<TeamRole>());
+			var swaps = dayContext.TeamRolesUpdate.Value.GetValueOrDefault(role, []);
 			var diceNumber = new int[roleSize];
 			var diceScores = new int[roleSize];
 			for (var i = 0; i < roleSize; i++)
@@ -135,79 +87,53 @@ public class Day
 
 	public void ReleaseTickets(string[] ticketIds)
 	{
-		const string notExpectedMessage = "Ticket release is not awaited";
-		var releaseTicketEvent = GetAwaitedEventOrThrow(DayEventType.ReleaseTickets, notExpectedMessage);
+		EnsureCanPostEvent(DayEventType.ReleaseTickets);
 
-		events.Add(new ReleaseTicketDayEvent(ticketIds, LastEventId + 1));
-
-		releaseTicketEvent.MarkRemoved();
-
-		AwaitEvents(shouldUpdateSprintBacklog ? DayEventType.UpdateSprintBacklog : DayEventType.UpdateCfd);
+		ReleaseTicketDayEvent.CreateInstance(dayContext, ticketIds);
 	}
 
 	public void UpdateSprintBacklog(string[] ticketIds)
 	{
-		const string notExpectedMessage = "Sprint Backlog update is not awaited";
-		var updateSprintBacklogEvent = GetAwaitedEventOrThrow(DayEventType.UpdateSprintBacklog, notExpectedMessage);
+		EnsureCanPostEvent(DayEventType.UpdateSprintBacklog);
 
-		events.Add(new UpdateSprintBacklogDayEvent(ticketIds, LastEventId + 1));
-
-		updateSprintBacklogEvent.MarkRemoved();
-		AwaitEvents(DayEventType.UpdateCfd);
+		UpdateSprintBacklogDayEvent.CreateInstance(dayContext, ticketIds);
 	}
 
-	public void UpdateCfd(int released, int readyToDeploy, int withTesters, int withProgrammers, int withAnalysts)
+	public void UpdateCfd(
+		int released,
+		int readyToDeploy,
+		int withTesters,
+		int withProgrammers,
+		int withAnalysts)
 	{
-		const string notExpectedMessage = "CFD update is not awaited";
-		var updateCfdEvent = GetAwaitedEventOrThrow(DayEventType.UpdateCfd, notExpectedMessage);
+		EnsureCanPostEvent(DayEventType.UpdateCfd);
 
-		var releasedThisDay = (ReleaseTicketDayEvent?)ExistingEvents
-			.SingleOrDefault(@event => @event.Type == DayEventType.ReleaseTickets);
-		var totalReleased = released + releasedThisDay?.TicketIds.Count ?? 0;
+		var totalReleased = released + dayContext.ReleasedThisDay.Value;
 
-		events.Add(
-			new UpdateCfdDayEvent(
-				totalReleased,
-				readyToDeploy,
-				withTesters,
-				withProgrammers,
-				withAnalysts,
-				LastEventId + 1));
-		updateCfdEvent.MarkRemoved();
-		AwaitEvents(DayEventType.EndDay);
+		UpdateCfdDayEvent.CreateInstance(
+			dayContext,
+			totalReleased,
+			readyToDeploy,
+			withTesters,
+			withProgrammers,
+			withAnalysts);
 	}
 
 	public void EndDay()
 	{
-		const string notExpectedMessage = "End day is not awaited";
-		var endDayEvent = GetAwaitedEventOrThrow(DayEventType.EndDay, notExpectedMessage);
+		EnsureCanPostEvent(DayEventType.EndDay);
 
-		events.Add(new EndDayDayEvent(LastEventId + 1));
-
-		endDayEvent.MarkRemoved();
+		EndDayDayEvent.CreateInstance(dayContext);
 	}
 
-	private void AwaitFirstStepEvents()
+	private void EnsureCanPostEvent(DayEventType eventType)
 	{
-		AwaitEvents(DayEventType.UpdateTeamRoles, DayEventType.RollDice);
-	}
-
-
-	private void AwaitEvents(params DayEventType[] eventTypes)
-	{
-		foreach (var eventType in eventTypes)
+		if (dayContext.CanPostEvent(eventType))
 		{
-			awaitedEvents.Add(new AwaitedEvent(eventType));
+			return;
 		}
-	}
 
-	private AwaitedEvent GetAwaitedEventOrThrow(DayEventType type, string errorMessage)
-	{
-		var expectedEvent = awaitedEvents
-			.Where(@event => !@event.Removed)
-			.SingleOrDefault(@event => @event.EventType == type);
-
-		return expectedEvent ?? throw new DayEventNotAwaitedException(errorMessage);
+		throw new DayEventNotAwaitedException($"{eventType} is not awaited");
 	}
 
 	#region Mappings

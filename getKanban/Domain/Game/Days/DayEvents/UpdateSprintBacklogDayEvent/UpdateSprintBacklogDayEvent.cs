@@ -2,11 +2,17 @@
 
 public class UpdateSprintBacklogDayEvent : DayEvent
 {
-	public string[] TicketIds { get; }
-
-	public UpdateSprintBacklogDayEvent(string[] ticketIds, int id)
-		: base(DayEventType.UpdateSprintBacklog, id)
+	private UpdateSprintBacklogDayEvent(int dayId, int id, string[] ticketIds)
+		: base(dayId, id, DayEventType.UpdateSprintBacklog)
 	{
 		TicketIds = ticketIds;
+	}
+
+	public string[] TicketIds { get; }
+
+	internal static void CreateInstance(DayContext dayContext, string[] ticketIds)
+	{
+		var @event = new UpdateSprintBacklogDayEvent(dayContext.DayId, dayContext.NextEventId, ticketIds);
+		dayContext.PostDayEvent(@event);
 	}
 }

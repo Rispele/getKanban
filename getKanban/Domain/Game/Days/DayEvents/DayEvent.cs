@@ -2,20 +2,23 @@
 
 public abstract class DayEvent
 {
-	public DayEventType Type { get; }
+	protected DayEvent(int dayId, int id, DayEventType type)
+	{
+		DayId = dayId;
+		Id = id;
+		Type = type;
+	}
+
+	public int DayId { get; }
 
 	public int Id { get; }
 
-	public bool IsRemoved { get; private set; }
+	public DayEventType Type { get; }
 
-	protected DayEvent(DayEventType type, int id)
-	{
-		Type = type;
-		Id = id;
-	}
+	public bool Removed { get; private set; }
 
 	public void MarkRemoved()
 	{
-		IsRemoved = true;
+		Removed = true;
 	}
 }

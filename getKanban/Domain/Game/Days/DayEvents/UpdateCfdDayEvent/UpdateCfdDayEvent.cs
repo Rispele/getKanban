@@ -2,25 +2,45 @@
 
 public class UpdateCfdDayEvent : DayEvent
 {
-	public int Released { get; }
-	public int ReadyToDeploy { get; }
-	public int WithTesters { get; }
-	public int WithProgrammers { get; }
-	public int WithAnalysts { get; }
-
-	public UpdateCfdDayEvent(
+	private UpdateCfdDayEvent(
+		int dayId,
+		int id,
 		int released,
 		int readyToDeploy,
 		int withTesters,
 		int withProgrammers,
-		int withAnalysts,
-		int id)
-		: base(DayEventType.UpdateCfd, id)
+		int withAnalysts)
+		: base(dayId, id, DayEventType.UpdateCfd)
 	{
 		Released = released;
 		ReadyToDeploy = readyToDeploy;
 		WithTesters = withTesters;
 		WithProgrammers = withProgrammers;
 		WithAnalysts = withAnalysts;
+	}
+
+	public int Released { get; }
+	public int ReadyToDeploy { get; }
+	public int WithTesters { get; }
+	public int WithProgrammers { get; }
+	public int WithAnalysts { get; }
+
+	internal static void CreateInstance(
+		DayContext dayContext,
+		int released,
+		int readyToDeploy,
+		int withTesters,
+		int withProgrammers,
+		int withAnalysts)
+	{
+		var @event = new UpdateCfdDayEvent(
+			dayContext.DayId,
+			dayContext.NextEventId,
+			released,
+			readyToDeploy,
+			withTesters,
+			withProgrammers,
+			withAnalysts);
+		dayContext.PostDayEvent(@event);
 	}
 }
