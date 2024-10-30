@@ -51,30 +51,6 @@ public class Day
 		UpdateTeamRolesDayEvent.CreateInstance(dayContext, from, to);
 	}
 
-	private void EnsureCanUpdateTeamRoles(TeamRole from)
-	{
-		var update = dayContext.TeamRolesUpdate.Value;
-
-		if (!update.TryGetValue(from, out var updates))
-		{
-			return;
-		}
-		
-		var limit = from switch
-		{
-			TeamRole.Analyst => analystsCount,
-			TeamRole.Programmer => programmersCount,
-			TeamRole.Tester => testersCount,
-			_ => throw new ArgumentOutOfRangeException()
-		};
-		
-		if (updates.Length + 1 > limit)
-		{
-			throw new DayActionIsProhibitedException(
-				$"{from } role updates count can't be more than members count{limit}");
-		}
-	}
-
 	public void RollDices()
 	{
 		EnsureCanPostEvent(DayEventType.RollDice);
@@ -149,6 +125,30 @@ public class Day
 		EnsureCanPostEvent(DayEventType.EndDay);
 
 		EndDayDayEvent.CreateInstance(dayContext);
+	}
+
+	private void EnsureCanUpdateTeamRoles(TeamRole from)
+	{
+		var update = dayContext.TeamRolesUpdate.Value;
+
+		if (!update.TryGetValue(from, out var updates))
+		{
+			return;
+		}
+
+		var limit = from switch
+		{
+			TeamRole.Analyst => analystsCount,
+			TeamRole.Programmer => programmersCount,
+			TeamRole.Tester => testersCount,
+			_ => throw new ArgumentOutOfRangeException()
+		};
+
+		if (updates.Length + 1 > limit)
+		{
+			throw new DayActionIsProhibitedException(
+				$"{from} role updates count can't be more than members count{limit}");
+		}
 	}
 
 	private void EnsureCanPostEvent(DayEventType eventType)
