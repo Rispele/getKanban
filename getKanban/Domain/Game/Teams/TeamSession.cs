@@ -8,7 +8,7 @@ namespace Domain.Game.Teams;
 
 public class TeamSession
 {
-	private readonly List<Day> days;
+	private readonly List<Day> days = null!;
 	private readonly TeamSessionSettings settings;
 
 	private int currentDayNumber;
