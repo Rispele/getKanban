@@ -18,7 +18,11 @@ public class UpdateTeamRolesDayEvent : DayEvent
 
 	internal static void CreateInstance(DayContext dayContext, TeamRole from, TeamRole to)
 	{
-		var @event = new UpdateTeamRolesDayEvent(dayContext.DayId, dayContext.NextEventId, from, to);
+		var @event = new UpdateTeamRolesDayEvent(
+			dayContext.DayId,
+			dayContext.NextEventId,
+			from,
+			to);
 		dayContext.PostDayEvent(@event);
 	}
 }

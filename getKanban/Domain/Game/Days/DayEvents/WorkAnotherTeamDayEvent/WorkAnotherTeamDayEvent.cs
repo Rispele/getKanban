@@ -22,7 +22,11 @@ public class WorkAnotherTeamDayEvent : DayEvent
 		int diceNumber,
 		int scoresNumber)
 	{
-		var @event = new WorkAnotherTeamDayEvent(dayContext.DayId, dayContext.NextEventId, diceNumber, scoresNumber);
+		var @event = new WorkAnotherTeamDayEvent(
+			dayContext.DayId,
+			dayContext.NextEventId,
+			diceNumber,
+			scoresNumber);
 		dayContext.PostDayEvent(@event);
 	}
 }

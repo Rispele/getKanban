@@ -14,21 +14,29 @@ public class GameSession
 		string name,
 		long teamsCount)
 	{
+		Id = Guid.NewGuid();
 		Name = name;
-		angels = new List<Participant>();
-		teams = new List<Team>();
+		angels = [];
+		teams = [];
 
 		for (var i = 0; i < teamsCount; i++)
 		{
-			teams.Add(new Team($"Untitled #{i + 1}"));
+			teams.Add(new Team(Id, $"Untitled #{i + 1}"));
 		}
 
-		angels.Add(new Participant(creator, ParticipantRole.Creator, ParticipantRole.Angel));
+		angels.Add(new Participant(creator, ParticipantRole.Creator | ParticipantRole.Angel));
 	}
 
-	public long Id { get; }
+	public Guid Id { get; }
 
 	public string Name { get; }
+
+	public bool HasAccess(Guid userId, Guid teamId)
+	{
+		return angels.SingleOrDefault(a => a.User.Id == userId)?.Role.Equals(ParticipantRole.Angel) 
+		       ?? teams.SingleOrDefault(t => t.Id == teamId)?.HasAccess(userId)
+		       ?? throw new InvalidOperationException("Unknown team");
+	}
 
 	public void AddAngel(User user)
 	{

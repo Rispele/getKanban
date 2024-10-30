@@ -15,7 +15,7 @@ public class TeamSession
 
 	private Day CurrentDay => days[currentDayNumber - 9];
 
-	public TeamSession()
+	private TeamSession()
 	{
 		settings = TeamSessionSettings.Default();
 		TakenTickets = new Lazy<HashSet<string>>(BuildTakenTickets);
@@ -23,16 +23,17 @@ public class TeamSession
 		AnotherTeamScores = new Lazy<int>(BuildAnotherTeamScores);
 	}
 
-	public TeamSession(long gameSessionId)
+	public TeamSession(Guid teamId)
 		: this()
 	{
-		GameSessionSessionId = gameSessionId;
+		TeamId = teamId;
 
 		currentDayNumber = 9;
 		days = [];
 	}
 
-	public long GameSessionSessionId { get; }
+	public Guid TeamId { get; }
+
 	public long Id { get; }
 
 	public Lazy<HashSet<string>> TicketsInWork { get; }
@@ -59,14 +60,14 @@ public class TeamSession
 	public void ReleaseTickets(string[] ticketIds)
 	{
 		EnsureCanReleaseTickets(ticketIds);
-		
+
 		CurrentDay.ReleaseTickets(ticketIds);
 	}
 
 	public void UpdateSprintBacklog(string[] ticketIds)
 	{
 		EnsureCanTakeTickets(ticketIds);
-		
+
 		CurrentDay.UpdateSprintBacklog(ticketIds);
 	}
 
@@ -121,14 +122,20 @@ public class TeamSession
 		var anotherTeamAppeared = currentDayNumber > 9
 		                          && AnotherTeamScores.Value < settings.UpdateSprintBacklogEveryDaySince;
 
-		var dayContext = ConfigureDayContext(dayNumber, anotherTeamAppeared, shouldRelease, shouldUpdateSpringBacklog);
+		var dayContext = ConfigureDayContext(
+			dayNumber,
+			anotherTeamAppeared,
+			shouldRelease,
+			shouldUpdateSpringBacklog);
 
 		var testersNumber = currentDayNumber >= settings.IncreaseTestersNumberSince
 			? settings.IncreasedTestersNumber
 			: settings.DefaultTestersNumber;
 
-		return new Day(dayContext, 
-			settings.AnalystsNumber, 
+		return new Day(
+			Id,
+			dayContext,
+			settings.AnalystsNumber,
 			settings.ProgrammersNumber,
 			testersNumber);
 	}

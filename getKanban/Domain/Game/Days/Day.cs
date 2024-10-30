@@ -19,16 +19,21 @@ public class Day
 	private readonly int testersNumber;
 
 	public Day(
+		long teamSessionId,
 		DayContext dayContext,
 		int analystsNumber,
 		int programmersNumber,
 		int testersNumber)
 	{
+		TeamSessionId = teamSessionId;
+
 		this.dayContext = dayContext;
 		this.analystsNumber = analystsNumber;
 		this.programmersNumber = programmersNumber;
 		this.testersNumber = testersNumber;
 	}
+
+	public long TeamSessionId { get; }
 
 	public Lazy<Dictionary<TeamRole, TeamRole[]>> TeamRolesUpdate => dayContext.TeamRolesUpdate;
 

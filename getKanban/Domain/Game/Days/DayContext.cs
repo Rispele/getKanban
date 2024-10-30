@@ -32,7 +32,7 @@ public class DayContext
 		DayId = dayId;
 
 		scenario = dayScenario;
-		awaitedEvents = initialAwaitedEvents.Select(e => new AwaitedEvent(e)).ToList();
+		awaitedEvents = initialAwaitedEvents.Select(e => new AwaitedEvent(dayId, e)).ToList();
 		events = [];
 	}
 
@@ -56,7 +56,7 @@ public class DayContext
 		var toAwait = scenario[eventType];
 
 		ExistingEvents.ForEach(e => e.MarkRemoved());
-		awaitedEvents.AddRange(toAwait.Select(e => new AwaitedEvent(e)));
+		awaitedEvents.AddRange(toAwait.Select(e => new AwaitedEvent(DayId, e)));
 	}
 
 	public bool CanPostEvent(DayEventType eventType)

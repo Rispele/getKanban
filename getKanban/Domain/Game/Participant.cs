@@ -4,12 +4,12 @@ namespace Domain.Game;
 
 public class Participant
 {
-	private readonly List<ParticipantRole> roles;
-	private readonly User user;
-
-	public Participant(User user, params ParticipantRole[] roles)
+	public Participant(User user, ParticipantRole role)
 	{
-		this.user = user;
-		this.roles = new List<ParticipantRole>(roles);
+		User = user;
+		Role = role;
 	}
+
+	public ParticipantRole Role { get; }
+	public User User { get; }
 }

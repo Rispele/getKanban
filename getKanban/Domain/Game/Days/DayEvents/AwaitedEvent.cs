@@ -2,10 +2,15 @@
 
 public class AwaitedEvent
 {
-	public AwaitedEvent(DayEventType eventType)
+	public AwaitedEvent(int dayId, DayEventType eventType)
 	{
+		DayId = dayId;
 		EventType = eventType;
 	}
+
+	public int DayId { get; }
+
+	public int Id { get; }
 
 	public bool Removed { get; private set; }
 
