@@ -42,27 +42,26 @@ public static class TicketDescriptors
 	public static readonly TicketDescriptor S35 = new(nameof(S35), 25, DefaultClientOffRate);
 	public static readonly TicketDescriptor S36 = new(nameof(S36), 24, DefaultClientOffRate);
 
-	public static readonly TicketDescriptor I01 = new(nameof(I01), 0, ZeroClientOffRate);
-	public static readonly TicketDescriptor I02 = new(nameof(I02), 0, ZeroClientOffRate);
+	public static readonly TicketDescriptor AutoRelease = new("I01", 0, ZeroClientOffRate);
+	public static readonly TicketDescriptor AutoTests = new("I02", 0, ZeroClientOffRate);
 
-	public static readonly TicketDescriptor F01 = new(nameof(F01), 0, ZeroClientOffRate);
+	public static readonly TicketDescriptor LawTask = new("F01", 0, ZeroClientOffRate);
 
-	public static readonly TicketDescriptor E01 = new(nameof(E01), 0, ZeroClientOffRate);
+	public static readonly TicketDescriptor BusinessTask = new("E01", 0, ZeroClientOffRate);
 
 	private static IReadOnlyList<TicketDescriptor> BusinessTicketDescriptors { get; } =
-		new[]
-		{
-			S01, S02, S03, S04, S05, S06, S07, S08, S09, S10,
-			S11, S12, S13, S14, S15, S16, S17, S18, S19, S20,
-			S21, S22, S23, S24, S25, S26, S27, S28, S29, S30,
-			S31, S32, S33, S34, S35, S36
-		};
+	[
+		S01, S02, S03, S04, S05, S06, S07, S08, S09, S10,
+		S11, S12, S13, S14, S15, S16, S17, S18, S19, S20,
+		S21, S22, S23, S24, S25, S26, S27, S28, S29, S30,
+		S31, S32, S33, S34, S35, S36
+	];
 
-	private static IReadOnlyList<TicketDescriptor> InfrastructureTicketDescriptors { get; } = new[] { I01, I02 };
+	private static IReadOnlyList<TicketDescriptor> InfrastructureTicketDescriptors { get; } = [AutoRelease, AutoTests];
 
 	public static IReadOnlyList<TicketDescriptor> AllTicketDescriptors { get; } =
 		BusinessTicketDescriptors
 			.Concat(InfrastructureTicketDescriptors)
-			.Concat(new[] { F01, E01 })
+			.Concat([LawTask, BusinessTask])
 			.ToArray();
 }

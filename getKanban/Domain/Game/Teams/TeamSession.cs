@@ -1,12 +1,15 @@
-﻿using Domain.Game.Days;
+﻿using Domain.DomainExceptions;
+using Domain.Game.Days;
 using Domain.Game.Days.DayEvents;
+using Domain.Game.Days.DayEvents.UpdateTeamRolesDayEvent;
+using Domain.Game.Tickets;
 
 namespace Domain.Game.Teams;
 
 public class TeamSession
 {
 	private readonly List<Day> days;
-	private readonly TeamSessionSettings sessionSettings;
+	private readonly TeamSessionSettings settings;
 
 	private int currentDayNumber;
 
@@ -14,13 +17,125 @@ public class TeamSession
 
 	public TeamSession()
 	{
-		sessionSettings = new TeamSessionSettings();
+		settings = TeamSessionSettings.Default();
+		TakenTickets = new Lazy<HashSet<string>>(BuildTakenTickets);
+		TicketsInWork = new Lazy<HashSet<string>>(BuildTicketsInWork);
+		AnotherTeamScores = new Lazy<int>(BuildAnotherTeamScores);
+	}
+
+	public TeamSession(long gameSessionId)
+		: this()
+	{
+		GameSessionSessionId = gameSessionId;
+
 		currentDayNumber = 9;
-		days = new List<Day>();
+		days = [];
+	}
+
+	public long GameSessionSessionId { get; }
+	public long Id { get; }
+
+	public Lazy<HashSet<string>> TicketsInWork { get; }
+
+	public Lazy<HashSet<string>> TakenTickets { get; }
+
+	public Lazy<int> AnotherTeamScores { get; }
+
+	public int RollDiceForAnotherTeam()
+	{
+		return CurrentDay.RollDiceForAnotherTeam();
+	}
+
+	public void UpdateTeamRoles(TeamRole from, TeamRole to)
+	{
+		CurrentDay.UpdateTeamRoles(from, to);
+	}
+
+	public void RollDices()
+	{
+		CurrentDay.RollDices();
+	}
+
+	public void ReleaseTickets(string[] ticketIds)
+	{
+		EnsureCanReleaseTickets(ticketIds);
+		
+		CurrentDay.ReleaseTickets(ticketIds);
+	}
+
+	public void UpdateSprintBacklog(string[] ticketIds)
+	{
+		EnsureCanTakeTickets(ticketIds);
+		
+		CurrentDay.UpdateSprintBacklog(ticketIds);
+	}
+
+	public void EndDay()
+	{
+		CurrentDay.EndDay();
+
+		currentDayNumber++;
+		days.Add(ConfigureDay(currentDayNumber));
+	}
+
+	private void EnsureCanTakeTickets(string[] ticketIds)
+	{
+		if (TakenTickets.Value.Overlaps(ticketIds))
+		{
+			throw new DayActionIsProhibitedException("You cannot take already taken tickets");
+		}
+	}
+
+	private void EnsureCanReleaseTickets(string[] ticketIds)
+	{
+		if (!TicketsInWork.Value.IsSupersetOf(ticketIds))
+		{
+			throw new DayActionIsProhibitedException("You cannot release not in work tickets");
+		}
+	}
+
+	private HashSet<string> BuildTakenTickets()
+	{
+		var takenTickets = days.SelectMany(t => t.TakenTickets.Value);
+		return settings.InitiallyTakenTickets.Concat(takenTickets).ToHashSet();
+	}
+
+	private HashSet<string> BuildTicketsInWork()
+	{
+		return TakenTickets.Value.Except(days.SelectMany(t => t.ReleasedTickets.Value)).ToHashSet();
+	}
+
+	private int BuildAnotherTeamScores()
+	{
+		return days.Select(d => d.AnotherTeamScores.Value).Sum();
+	}
+
+	private Day ConfigureDay(int dayNumber)
+	{
+		var takenTickets = TakenTickets.Value;
+		var endOfReleaseCycle = currentDayNumber % settings.ReleaseCycleLength == 0;
+
+		var shouldRelease = endOfReleaseCycle || takenTickets.Contains(TicketDescriptors.AutoRelease.Id);
+		var shouldUpdateSpringBacklog = endOfReleaseCycle
+		                                || currentDayNumber >= settings.UpdateSprintBacklogEveryDaySince;
+		var anotherTeamAppeared = currentDayNumber > 9
+		                          && AnotherTeamScores.Value < settings.UpdateSprintBacklogEveryDaySince;
+
+		var dayContext = ConfigureDayContext(dayNumber, anotherTeamAppeared, shouldRelease, shouldUpdateSpringBacklog);
+
+		var testersNumber = currentDayNumber >= settings.IncreaseTestersNumberSince
+			? settings.IncreasedTestersNumber
+			: settings.DefaultTestersNumber;
+
+		return new Day(dayContext, 
+			settings.AnalystsNumber, 
+			settings.ProgrammersNumber,
+			testersNumber);
 	}
 
 	//TODO: пока что так, потом мб декларативно опишем
-	private DayContext ConfigureDayContext(
+	private static DayContext ConfigureDayContext(
+		int dayNumber,
 		bool anotherTeamAppeared,
 		bool shouldRelease,
 		bool shouldUpdateSprintBacklog)
@@ -61,7 +176,7 @@ public class TeamSession
 		scenario[DayEventType.UpdateCfd] = [DayEventType.EndDay];
 
 		return new DayContext(
-			++currentDayNumber,
+			dayNumber,
 			scenario,
 			anotherTeamAppeared ? [DayEventType.WorkAnotherTeam] : [DayEventType.UpdateTeamRoles, DayEventType.RollDice]
 		);

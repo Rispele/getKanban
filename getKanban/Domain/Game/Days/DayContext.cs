@@ -1,6 +1,8 @@
 ﻿using Domain.Game.Days.DayEvents;
 using Domain.Game.Days.DayEvents.ReleaseTicketDayEvent;
+using Domain.Game.Days.DayEvents.UpdateSprintBacklogDayEvent;
 using Domain.Game.Days.DayEvents.UpdateTeamRolesDayEvent;
+using Domain.Game.Days.DayEvents.WorkAnotherTeamDayEvent;
 
 namespace Domain.Game.Days;
 
@@ -16,7 +18,9 @@ public class DayContext
 	private DayContext()
 	{
 		TeamRolesUpdate = new Lazy<Dictionary<TeamRole, TeamRole[]>>(BuildTeamRoleUpdate);
-		ReleasedThisDay = new Lazy<int>(BuildReleasedThisDay);
+		ReleasedTickets = new Lazy<IReadOnlyList<string>>(BuildReleasedTickets);
+		TakenTickets = new Lazy<IReadOnlyList<string>>(BuildTakenTickets);
+		AnotherTeamScores = new Lazy<int>(BuildAnotherTeamScores);
 	}
 
 	public DayContext(
@@ -38,7 +42,11 @@ public class DayContext
 
 	public Lazy<Dictionary<TeamRole, TeamRole[]>> TeamRolesUpdate { get; }
 
-	public Lazy<int> ReleasedThisDay { get; }
+	public Lazy<IReadOnlyList<string>> ReleasedTickets { get; }
+
+	public Lazy<IReadOnlyList<string>> TakenTickets { get; }
+
+	public Lazy<int> AnotherTeamScores { get; }
 
 	public void PostDayEvent(DayEvent dayEvent)
 	{
@@ -66,9 +74,21 @@ public class DayContext
 			.ToDictionary(grouping => grouping.Key, grouping => grouping.Select(@event => @event.To).ToArray());
 	}
 
-	private int BuildReleasedThisDay()
+	private IReadOnlyList<string> BuildReleasedTickets()
 	{
 		var @event = ExistingEvents.SingleOrDefault(@event => @event.Type == DayEventType.ReleaseTickets);
-		return ((ReleaseTicketDayEvent?)@event)?.TicketIds.Count ?? 0;
+		return ((ReleaseTicketDayEvent?)@event)?.TicketIds ?? [];
+	}
+
+	private IReadOnlyList<string> BuildTakenTickets()
+	{
+		var @event = ExistingEvents.SingleOrDefault(@event => @event.Type == DayEventType.UpdateSprintBacklog);
+		return ((UpdateSprintBacklogDayEvent?)@event)?.TicketIds ?? [];
+	}
+
+	private int BuildAnotherTeamScores()
+	{
+		var @event = ExistingEvents.SingleOrDefault(@event => @event.Type == DayEventType.WorkAnotherTeam);
+		return ((WorkAnotherTeamDayEvent?)@event)?.ScoresNumber ?? 0;
 	}
 }

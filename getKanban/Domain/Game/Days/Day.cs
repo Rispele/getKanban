@@ -14,21 +14,29 @@ public class Day
 {
 	private readonly DayContext dayContext;
 
-	private readonly int analystsCount;
-	private readonly int programmersCount;
-	private readonly int testersCount;
+	private readonly int analystsNumber;
+	private readonly int programmersNumber;
+	private readonly int testersNumber;
 
 	public Day(
 		DayContext dayContext,
-		int analystsCount,
-		int programmersCount,
-		int testersCount)
+		int analystsNumber,
+		int programmersNumber,
+		int testersNumber)
 	{
 		this.dayContext = dayContext;
-		this.analystsCount = analystsCount;
-		this.programmersCount = programmersCount;
-		this.testersCount = testersCount;
+		this.analystsNumber = analystsNumber;
+		this.programmersNumber = programmersNumber;
+		this.testersNumber = testersNumber;
 	}
+
+	public Lazy<Dictionary<TeamRole, TeamRole[]>> TeamRolesUpdate => dayContext.TeamRolesUpdate;
+
+	public Lazy<IReadOnlyList<string>> ReleasedTickets => dayContext.ReleasedTickets;
+
+	public Lazy<IReadOnlyList<string>> TakenTickets => dayContext.TakenTickets;
+
+	public Lazy<int> AnotherTeamScores => dayContext.AnotherTeamScores;
 
 	public int RollDiceForAnotherTeam()
 	{
@@ -56,9 +64,9 @@ public class Day
 		EnsureCanPostEvent(DayEventType.RollDice);
 
 		var diceRoller = new DiceRoller(new Random());
-		var (analystsDiceNumber, analystsScores) = RollDiceForRole(analystsCount, TeamRole.Analyst);
-		var (programmersDiceNumber, programmersScores) = RollDiceForRole(programmersCount, TeamRole.Programmer);
-		var (testersDiceNumber, testersScores) = RollDiceForRole(testersCount, TeamRole.Tester);
+		var (analystsDiceNumber, analystsScores) = RollDiceForRole(analystsNumber, TeamRole.Analyst);
+		var (programmersDiceNumber, programmersScores) = RollDiceForRole(programmersNumber, TeamRole.Programmer);
+		var (testersDiceNumber, testersScores) = RollDiceForRole(testersNumber, TeamRole.Tester);
 
 		RollDiceDayEvent.CreateInstance(
 			dayContext,
@@ -109,7 +117,7 @@ public class Day
 	{
 		EnsureCanPostEvent(DayEventType.UpdateCfd);
 
-		var totalReleased = released + dayContext.ReleasedThisDay.Value;
+		var totalReleased = released + dayContext.ReleasedTickets.Value.Count;
 
 		UpdateCfdDayEvent.CreateInstance(
 			dayContext,
@@ -138,9 +146,9 @@ public class Day
 
 		var limit = from switch
 		{
-			TeamRole.Analyst => analystsCount,
-			TeamRole.Programmer => programmersCount,
-			TeamRole.Tester => testersCount,
+			TeamRole.Analyst => analystsNumber,
+			TeamRole.Programmer => programmersNumber,
+			TeamRole.Tester => testersNumber,
 			_ => throw new ArgumentOutOfRangeException()
 		};
 
