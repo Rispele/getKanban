@@ -1,0 +1,7 @@
+services:
+  getkanbanweb:
+    image: getkanban-image:latest
+    restart: always
+    ports:
+      - 5000:8080
+      - 5001:8081
