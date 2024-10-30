@@ -1,5 +1,6 @@
 ﻿FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
+COPY Web/Pages/index.html Pages/index.html
 EXPOSE 8080
 EXPOSE 8081
 
@@ -11,7 +12,15 @@ COPY . .
 WORKDIR "/src/Web"
 RUN dotnet build "Web.csproj" -c Release -o /app/build
 
+WORKDIR /src
+COPY ["Domain/Domain.csproj", "Domain/"]
+RUN dotnet restore "Domain/Domain.csproj"
+COPY . .
+WORKDIR "/src/Domain"
+RUN dotnet build "Domain.csproj" -c Release -o /app/build
+
 FROM build AS publish
+WORKDIR "/src/Web"
 RUN dotnet publish "Web.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final

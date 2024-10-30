@@ -11,6 +11,6 @@ public class DiceRoller
 
 	public int RollDice()
 	{
-		return random.Next(1, 6);
+		return random.Next(1, 7);
 	}
 }
