@@ -222,14 +222,23 @@
       &lt;/Entry.SortBy&gt;
     &lt;/Entry&gt;
 
-      &lt;Entry DisplayName="Private Properties"&gt;
-          &lt;Entry.Match&gt;
-              &lt;And&gt;
-                  &lt;Kind Is="Property" /&gt;
-                  &lt;Access Is="Private"/&gt;
-              &lt;/And&gt;
-          &lt;/Entry.Match&gt;
-      &lt;/Entry&gt;
+    &lt;Entry DisplayName="Private Properties"&gt;
+      &lt;Entry.Match&gt;
+          &lt;And&gt;
+              &lt;Kind Is="Property" /&gt;
+              &lt;Access Is="Private"/&gt;
+          &lt;/And&gt;
+      &lt;/Entry.Match&gt;
+    &lt;/Entry&gt;
+
+    &lt;Entry DisplayName="Public Properties"&gt;
+      &lt;Entry.Match&gt;
+          &lt;And&gt;
+              &lt;Kind Is="Property" /&gt;
+              &lt;Access Is="Public"/&gt;
+          &lt;/And&gt;
+      &lt;/Entry.Match&gt;
+    &lt;/Entry&gt;
 
     &lt;Entry DisplayName="Constructors"&gt;
       &lt;Entry.Match&gt;
@@ -240,15 +249,6 @@
         &lt;Static/&gt;
       &lt;/Entry.SortBy&gt;
     &lt;/Entry&gt;
-
-      &lt;Entry DisplayName="Public Properties"&gt;
-          &lt;Entry.Match&gt;
-              &lt;And&gt;
-                  &lt;Kind Is="Property" /&gt;
-                  &lt;Access Is="Public"/&gt;
-              &lt;/And&gt;
-          &lt;/Entry.Match&gt;
-      &lt;/Entry&gt;
 
     &lt;Entry DisplayName="Interface Implementations" Priority="100"&gt;
       &lt;Entry.Match&gt;

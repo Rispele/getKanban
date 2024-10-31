@@ -87,7 +87,7 @@ public class TeamSession
 		var currentSumToValidate = released + readyToDeploy;
 		var previousSumToValidate = previousDayCfd.Released + previousDayCfd.ReadyToDeploy;
 		ValidateArgumentsSum(currentSumToValidate, previousSumToValidate);
-		
+
 		currentSumToValidate += withTesters;
 		previousSumToValidate += previousDayCfd.WithTesters;
 		ValidateArgumentsSum(currentSumToValidate, previousSumToValidate);
@@ -99,7 +99,7 @@ public class TeamSession
 		currentSumToValidate += withAnalysts;
 		previousSumToValidate += previousDayCfd.WithAnalysts;
 		ValidateArgumentsSum(currentSumToValidate, previousSumToValidate);
-		
+
 		CurrentDay.UpdateCfd(
 			released,
 			readyToDeploy,
@@ -235,7 +235,6 @@ public class TeamSession
 		scenario[DayEventType.UpdateCfd] = [DayEventType.EndDay];
 
 		return new DayContext(
-			dayNumber,
 			scenario,
 			anotherTeamAppeared ? [DayEventType.WorkAnotherTeam] : [DayEventType.UpdateTeamRoles, DayEventType.RollDice]
 		);

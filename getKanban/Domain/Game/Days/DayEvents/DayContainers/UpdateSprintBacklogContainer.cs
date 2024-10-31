@@ -1,6 +1,6 @@
 ﻿namespace Domain.Game.Days.DayEvents.DayContainers;
 
-public class UpdateSprintBacklogContainer 
+public class UpdateSprintBacklogContainer
 {
 	private UpdateSprintBacklogContainer(int dayId, string[] ticketIds)
 	{
@@ -14,7 +14,7 @@ public class UpdateSprintBacklogContainer
 	internal static UpdateSprintBacklogContainer CreateInstance(DayContext dayContext, string[] ticketIds)
 	{
 		dayContext.PostDayEvent(DayEventType.UpdateSprintBacklog);
-		
+
 		return new UpdateSprintBacklogContainer(dayContext.DayId, ticketIds);
 	}
 }
