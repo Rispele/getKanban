@@ -1,4 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Diagnostics;
+using System.Linq.Expressions;
+using Domain.Game.Days.DayEvents;
+using Domain.Game.Days.DayEvents.DayContainers;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Newtonsoft.Json;
@@ -11,29 +15,49 @@ public class DayEntityTypeConfiguration : IEntityTypeConfiguration<Day>
 	{
 		builder.HasKey(e => new { e.TeamSessionId, DayId = e.Id });
 
-		builder.Property(e => e.TeamSessionId)
-			.HasColumnName("team_session_id");
-
 		builder.Property(e => e.Id)
-			.HasColumnName("id");
+			.ValueGeneratedOnAdd()
+			.IsRequired();
 
-		builder.Property("dayContext")
-			.HasColumnName("day_context")
-			.HasConversion(new DayContextConversion());
+		builder.Property("scenario")
+			.HasConversion(new ScenarioConverter());
+
+		builder.Ignore("currentlyAwaitedEvents");
 
 		builder.Property("analystsNumber");
 		builder.Property("programmersNumber");
 		builder.Property("testersNumber");
 
 		builder.Property(e => e.Timestamp).IsRowVersion();
+
+		ConfigureContainerRelation<WorkAnotherTeamContainer>(builder, d => d.DayId);
+		ConfigureContainerRelation<UpdateTeamRolesContainer>(builder, d => d.DayId);
+		ConfigureContainerRelation<RollDiceContainer>(builder, d => d.DayId);
+		ConfigureContainerRelation<ReleaseTicketContainer>(builder, d => d.DayId);
+		ConfigureContainerRelation<UpdateSprintBacklogContainer>(builder, d => d.DayId);
+		ConfigureContainerRelation<UpdateCfdContainer>(builder, d => d.DayId);
+		builder
+			.HasMany<Activity>()
+			.WithOne();
 	}
 
-	private class DayContextConversion : ValueConverter<DayContext, string>
+	private static void ConfigureContainerRelation<TContainer>(
+		EntityTypeBuilder<Day> builder,
+		Expression<Func<TContainer, object?>> propertyExpression)
+		where TContainer : class
 	{
-		public DayContextConversion()
+		builder
+			.HasOne<TContainer>()
+			.WithOne()
+			.HasForeignKey(propertyExpression);
+	}
+
+	private class ScenarioConverter : ValueConverter<Dictionary<DayEventType, List<DayEventType>>, string>
+	{
+		public ScenarioConverter()
 			: base(
 				context => JsonConvert.SerializeObject(context),
-				str => JsonConvert.DeserializeObject<DayContext>(str)!)
+				str => JsonConvert.DeserializeObject<Dictionary<DayEventType, List<DayEventType>>>(str)!)
 		{
 		}
 	}

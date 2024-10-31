@@ -21,14 +21,14 @@ public class WorkAnotherTeamContainer
 	}
 
 	internal static WorkAnotherTeamContainer CreateInstance(
-		DayContext dayContext,
+		Day day,
 		int diceNumber,
 		int scoresNumber)
 	{
-		dayContext.PostDayEvent(DayEventType.WorkAnotherTeam);
+		day.PostDayEvent(DayEventType.WorkAnotherTeam);
 
 		return new WorkAnotherTeamContainer(
-			dayContext.DayId,
+			day.Id,
 			diceNumber,
 			scoresNumber);
 	}

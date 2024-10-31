@@ -29,7 +29,7 @@ public class RollDiceContainer
 	}
 
 	internal static RollDiceContainer CreateInstance(
-		DayContext dayContext,
+		Day day,
 		int[] analystsDiceNumber,
 		int[] programmersDiceNumber,
 		int[] testersDiceNumber,
@@ -37,10 +37,10 @@ public class RollDiceContainer
 		int[] programmersScores,
 		int[] testersScores)
 	{
-		dayContext.PostDayEvent(DayEventType.RollDice);
+		day.PostDayEvent(DayEventType.RollDice);
 
 		return new RollDiceContainer(
-			dayContext.DayId,
+			day.Id,
 			analystsDiceNumber,
 			programmersDiceNumber,
 			testersDiceNumber,

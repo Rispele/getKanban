@@ -174,8 +174,7 @@ public class TeamSession
 		var anotherTeamAppeared = currentDayNumber > 9
 		                          && AnotherTeamScores.Value < settings.UpdateSprintBacklogEveryDaySince;
 
-		var dayContext = ConfigureDayContext(
-			dayNumber,
+		var (scenario, initiallyAwaitedEvents) = ConfigureScenario(
 			anotherTeamAppeared,
 			shouldRelease,
 			shouldUpdateSpringBacklog);
@@ -186,15 +185,15 @@ public class TeamSession
 
 		return new Day(
 			Id,
-			dayContext,
+			scenario,
+			initiallyAwaitedEvents,
 			settings.AnalystsNumber,
 			settings.ProgrammersNumber,
 			testersNumber);
 	}
 
 	//TODO: пока что так, потом мб декларативно опишем
-	private static DayContext ConfigureDayContext(
-		int dayNumber,
+	private static (Dictionary<DayEventType, List<DayEventType>>, List<DayEventType>) ConfigureScenario(
 		bool anotherTeamAppeared,
 		bool shouldRelease,
 		bool shouldUpdateSprintBacklog)
@@ -234,7 +233,7 @@ public class TeamSession
 
 		scenario[DayEventType.UpdateCfd] = [DayEventType.EndDay];
 
-		return new DayContext(
+		return (
 			scenario,
 			anotherTeamAppeared ? [DayEventType.WorkAnotherTeam] : [DayEventType.UpdateTeamRoles, DayEventType.RollDice]
 		);

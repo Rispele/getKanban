@@ -12,10 +12,10 @@ public class ReleaseTicketContainer
 	}
 
 	internal static ReleaseTicketContainer CreateInstance(
-		DayContext dayContext,
+		Day day,
 		IReadOnlyList<string> ticketIds)
 	{
-		dayContext.PostDayEvent(DayEventType.ReleaseTickets);
-		return new ReleaseTicketContainer(dayContext.DayId, ticketIds);
+		day.PostDayEvent(DayEventType.ReleaseTickets);
+		return new ReleaseTicketContainer(day.Id, ticketIds);
 	}
 }

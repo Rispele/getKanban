@@ -6,13 +6,16 @@ namespace Domain.Game.Days;
 
 public class Day
 {
-	private readonly DayContext dayContext;
+	private readonly List<AwaitedEvent> awaitedEvents = null!;
+	private readonly Dictionary<DayEventType, List<DayEventType>> scenario = null!;
 
 	private readonly int analystsNumber;
 	private readonly int programmersNumber;
 	private readonly int testersNumber;
-	private readonly UpdateTeamRolesContainer updateTeamRolesContainer;
 
+	private IEnumerable<AwaitedEvent> currentlyAwaitedEvents => awaitedEvents.Where(@event => !@event.Removed);
+
+	private UpdateTeamRolesContainer? updateTeamRolesContainer { get; set; }
 	public WorkAnotherTeamContainer? WorkAnotherTeamContainer { get; private set; }
 	public RollDiceContainer? RollDiceContainer { get; private set; }
 	public ReleaseTicketContainer? ReleaseTicketContainer { get; private set; }
@@ -31,19 +34,20 @@ public class Day
 
 	public Day(
 		long teamSessionId,
-		DayContext dayContext,
+		Dictionary<DayEventType, List<DayEventType>> scenario,
+		List<DayEventType> initiallyAwaitedEvents,
 		int analystsNumber,
 		int programmersNumber,
 		int testersNumber)
 	{
 		TeamSessionId = teamSessionId;
 
-		this.dayContext = dayContext;
+		this.scenario = scenario;
+		awaitedEvents = initiallyAwaitedEvents.Select(t => new AwaitedEvent(t)).ToList();
+
 		this.analystsNumber = analystsNumber;
 		this.programmersNumber = programmersNumber;
 		this.testersNumber = testersNumber;
-
-		updateTeamRolesContainer = new UpdateTeamRolesContainer(dayContext.DayId);
 	}
 
 	public int RollDiceForAnotherTeam()
@@ -54,7 +58,7 @@ public class Day
 		var diceNumber = diceRoller.RollDice();
 		var diceScores = MapDiceNumberToScoreSettings.MapAnotherTeam(diceNumber);
 
-		WorkAnotherTeamContainer = WorkAnotherTeamContainer.CreateInstance(dayContext, diceNumber, diceScores);
+		WorkAnotherTeamContainer = WorkAnotherTeamContainer.CreateInstance(this, diceNumber, diceScores);
 
 		return diceScores;
 	}
@@ -64,7 +68,9 @@ public class Day
 		EnsureCanPostEvent(DayEventType.UpdateTeamRoles);
 		EnsureCanUpdateTeamRoles(from);
 
-		updateTeamRolesContainer.AddUpdate(dayContext, from, to);
+		updateTeamRolesContainer ??= new UpdateTeamRolesContainer(Id);
+
+		updateTeamRolesContainer.AddUpdate(this, from, to);
 	}
 
 	public void RollDices()
@@ -72,13 +78,13 @@ public class Day
 		EnsureCanPostEvent(DayEventType.RollDice);
 
 		var diceRoller = new DiceRoller(new Random());
-		var swapByRole = updateTeamRolesContainer.BuildTeamRolesUpdate();
+		var swapByRole = updateTeamRolesContainer?.BuildTeamRolesUpdate() ?? [];
 		var (analystsDiceNumber, analystsScores) = RollDiceForRole(analystsNumber, TeamRole.Analyst);
 		var (programmersDiceNumber, programmersScores) = RollDiceForRole(programmersNumber, TeamRole.Programmer);
 		var (testersDiceNumber, testersScores) = RollDiceForRole(testersNumber, TeamRole.Tester);
 
 		RollDiceContainer = RollDiceContainer.CreateInstance(
-			dayContext,
+			this,
 			analystsDiceNumber,
 			programmersDiceNumber,
 			testersDiceNumber,
@@ -107,14 +113,14 @@ public class Day
 	{
 		EnsureCanPostEvent(DayEventType.ReleaseTickets);
 
-		ReleaseTicketContainer = ReleaseTicketContainer.CreateInstance(dayContext, ticketIds);
+		ReleaseTicketContainer = ReleaseTicketContainer.CreateInstance(this, ticketIds);
 	}
 
 	public void UpdateSprintBacklog(string[] ticketIds)
 	{
 		EnsureCanPostEvent(DayEventType.UpdateSprintBacklog);
 
-		UpdateSprintBacklogContainer = UpdateSprintBacklogContainer.CreateInstance(dayContext, ticketIds);
+		UpdateSprintBacklogContainer = UpdateSprintBacklogContainer.CreateInstance(this, ticketIds);
 	}
 
 	public void UpdateCfd(
@@ -127,7 +133,7 @@ public class Day
 		EnsureCanPostEvent(DayEventType.UpdateCfd);
 
 		UpdateCfdContainer = UpdateCfdContainer.CreateInstance(
-			dayContext,
+			this,
 			released,
 			readyToDeploy,
 			withTesters,
@@ -139,12 +145,19 @@ public class Day
 	{
 		EnsureCanPostEvent(DayEventType.EndDay);
 
-		dayContext.PostDayEvent(DayEventType.EndDay);
+		PostDayEvent(DayEventType.EndDay);
+	}
+
+	public void PostDayEvent(DayEventType dayEventType)
+	{
+		var toAwait = scenario[dayEventType];
+		currentlyAwaitedEvents.ForEach(e => e.MarkRemoved());
+		awaitedEvents.AddRange(toAwait.Select(e => new AwaitedEvent(e)));
 	}
 
 	private void EnsureCanUpdateTeamRoles(TeamRole from)
 	{
-		var update = updateTeamRolesContainer.BuildTeamRolesUpdate();
+		var update = updateTeamRolesContainer?.BuildTeamRolesUpdate() ?? [];
 
 		if (!update.TryGetValue(from, out var updates))
 		{
@@ -168,11 +181,16 @@ public class Day
 
 	private void EnsureCanPostEvent(DayEventType eventType)
 	{
-		if (dayContext.CanPostEvent(eventType))
+		if (CanPostEvent(eventType))
 		{
 			return;
 		}
 
 		throw new DayEventNotAwaitedException($"{eventType} is not awaited");
+	}
+
+	private bool CanPostEvent(DayEventType eventType)
+	{
+		return currentlyAwaitedEvents.Any(e => e.EventType == eventType);
 	}
 }

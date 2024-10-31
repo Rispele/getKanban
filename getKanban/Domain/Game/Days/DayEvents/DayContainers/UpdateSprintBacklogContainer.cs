@@ -11,10 +11,10 @@ public class UpdateSprintBacklogContainer
 		TicketIds = ticketIds;
 	}
 
-	internal static UpdateSprintBacklogContainer CreateInstance(DayContext dayContext, string[] ticketIds)
+	internal static UpdateSprintBacklogContainer CreateInstance(Day day, string[] ticketIds)
 	{
-		dayContext.PostDayEvent(DayEventType.UpdateSprintBacklog);
+		day.PostDayEvent(DayEventType.UpdateSprintBacklog);
 
-		return new UpdateSprintBacklogContainer(dayContext.DayId, ticketIds);
+		return new UpdateSprintBacklogContainer(day.Id, ticketIds);
 	}
 }

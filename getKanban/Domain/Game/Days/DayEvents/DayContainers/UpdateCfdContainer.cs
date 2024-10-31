@@ -26,17 +26,17 @@ public class UpdateCfdContainer
 	}
 
 	internal static UpdateCfdContainer CreateInstance(
-		DayContext dayContext,
+		Day day,
 		int released,
 		int readyToDeploy,
 		int withTesters,
 		int withProgrammers,
 		int withAnalysts)
 	{
-		dayContext.PostDayEvent(DayEventType.UpdateCfd);
+		day.PostDayEvent(DayEventType.UpdateCfd);
 
 		return new UpdateCfdContainer(
-			dayContext.DayId,
+			day.Id,
 			released,
 			readyToDeploy,
 			withTesters,
