@@ -33,7 +33,7 @@ public class GameSession
 
 	public bool HasAccess(Guid userId, Guid teamId)
 	{
-		return angels.SingleOrDefault(a => a.User.Id == userId)?.Role.Equals(ParticipantRole.Angel) 
+		return angels.SingleOrDefault(a => a.User.Id == userId)?.Role.Equals(ParticipantRole.Angel)
 		       ?? teams.SingleOrDefault(t => t.Id == teamId)?.HasAccess(userId)
 		       ?? throw new InvalidOperationException("Unknown team");
 	}

@@ -1,18 +1,17 @@
-﻿namespace Domain.Game.Days.DayEvents.RollDiceDayEvent;
+﻿namespace Domain.Game.Days.DayEvents.DayContainers;
 
-public class RollDiceDayEvent : DayEvent
+public class RollDiceContainer
 {
-	private RollDiceDayEvent(
+	private RollDiceContainer(
 		int dayId,
-		int id,
 		int[] analystsDiceNumber,
 		int[] programmersDiceNumber,
 		int[] testersDiceNumber,
 		int[] analystsScores,
 		int[] programmersScores,
 		int[] testersScores)
-		: base(dayId, id, DayEventType.RollDice)
 	{
+		DayId = dayId;
 		AnalystsDiceNumber = analystsDiceNumber;
 		ProgrammersDiceNumber = programmersDiceNumber;
 		TestersDiceNumber = testersDiceNumber;
@@ -21,6 +20,7 @@ public class RollDiceDayEvent : DayEvent
 		TestersScores = testersScores;
 	}
 
+	public int DayId { get; }
 	public int[] AnalystsDiceNumber { get; }
 	public int[] ProgrammersDiceNumber { get; }
 	public int[] TestersDiceNumber { get; }
@@ -28,7 +28,7 @@ public class RollDiceDayEvent : DayEvent
 	public int[] ProgrammersScores { get; }
 	public int[] TestersScores { get; }
 
-	internal static void CreateInstance(
+	internal static RollDiceContainer CreateInstance(
 		DayContext dayContext,
 		int[] analystsDiceNumber,
 		int[] programmersDiceNumber,
@@ -37,15 +37,15 @@ public class RollDiceDayEvent : DayEvent
 		int[] programmersScores,
 		int[] testersScores)
 	{
-		var @event = new RollDiceDayEvent(
+		dayContext.PostDayEvent(DayEventType.RollDice);
+		
+		return new RollDiceContainer(
 			dayContext.DayId,
-			dayContext.NextEventId,
 			analystsDiceNumber,
 			programmersDiceNumber,
 			testersDiceNumber,
 			analystsScores,
 			programmersScores,
 			testersScores);
-		dayContext.PostDayEvent(@event);
 	}
 }

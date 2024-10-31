@@ -1,17 +1,16 @@
-﻿namespace Domain.Game.Days.DayEvents.UpdateCfdDayEvent;
+﻿namespace Domain.Game.Days.DayEvents.DayContainers;
 
-public class UpdateCfdDayEvent : DayEvent
+public class UpdateCfdContainer
 {
-	private UpdateCfdDayEvent(
+	private UpdateCfdContainer(
 		int dayId,
-		int id,
 		int released,
 		int readyToDeploy,
 		int withTesters,
 		int withProgrammers,
 		int withAnalysts)
-		: base(dayId, id, DayEventType.UpdateCfd)
 	{
+		DayId = dayId;
 		Released = released;
 		ReadyToDeploy = readyToDeploy;
 		WithTesters = withTesters;
@@ -19,13 +18,14 @@ public class UpdateCfdDayEvent : DayEvent
 		WithAnalysts = withAnalysts;
 	}
 
+	public int DayId { get; }
 	public int Released { get; }
 	public int ReadyToDeploy { get; }
 	public int WithTesters { get; }
 	public int WithProgrammers { get; }
 	public int WithAnalysts { get; }
 
-	internal static void CreateInstance(
+	internal static UpdateCfdContainer CreateInstance(
 		DayContext dayContext,
 		int released,
 		int readyToDeploy,
@@ -33,14 +33,23 @@ public class UpdateCfdDayEvent : DayEvent
 		int withProgrammers,
 		int withAnalysts)
 	{
-		var @event = new UpdateCfdDayEvent(
+		dayContext.PostDayEvent(DayEventType.UpdateCfd);
+
+		return new UpdateCfdContainer(
 			dayContext.DayId,
-			dayContext.NextEventId,
 			released,
 			readyToDeploy,
 			withTesters,
 			withProgrammers,
 			withAnalysts);
-		dayContext.PostDayEvent(@event);
 	}
+
+	internal static UpdateCfdContainer None =>
+		new(
+			0,
+			0,
+			0,
+			0,
+			0,
+			0);
 }

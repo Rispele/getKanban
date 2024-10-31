@@ -1,12 +1,7 @@
-﻿using Domain.DomainExceptions;
+﻿using System.ComponentModel.DataAnnotations;
+using Domain.DomainExceptions;
 using Domain.Game.Days.DayEvents;
-using Domain.Game.Days.DayEvents.EndDayDayEvent;
-using Domain.Game.Days.DayEvents.ReleaseTicketDayEvent;
-using Domain.Game.Days.DayEvents.RollDiceDayEvent;
-using Domain.Game.Days.DayEvents.UpdateCfdDayEvent;
-using Domain.Game.Days.DayEvents.UpdateSprintBacklogDayEvent;
-using Domain.Game.Days.DayEvents.UpdateTeamRolesDayEvent;
-using Domain.Game.Days.DayEvents.WorkAnotherTeamDayEvent;
+using Domain.Game.Days.DayEvents.DayContainers;
 
 namespace Domain.Game.Days;
 
@@ -17,6 +12,17 @@ public class Day
 	private readonly int analystsNumber;
 	private readonly int programmersNumber;
 	private readonly int testersNumber;
+	private readonly UpdateTeamRolesContainer updateTeamRolesContainer;
+
+	public WorkAnotherTeamContainer? WorkAnotherTeamContainer { get; private set; }
+	public RollDiceContainer? RollDiceContainer { get; private set; }
+	public ReleaseTicketContainer? ReleaseTicketContainer { get; private set; }
+	public UpdateSprintBacklogContainer? UpdateSprintBacklogContainer { get; private set; }
+	public UpdateCfdContainer? UpdateCfdContainer { get; private set; }
+
+	private Day()
+	{
+	}
 
 	public Day(
 		long teamSessionId,
@@ -25,23 +31,22 @@ public class Day
 		int programmersNumber,
 		int testersNumber)
 	{
+		Id = dayContext.DayId;
 		TeamSessionId = teamSessionId;
 
 		this.dayContext = dayContext;
 		this.analystsNumber = analystsNumber;
 		this.programmersNumber = programmersNumber;
 		this.testersNumber = testersNumber;
+
+		updateTeamRolesContainer = new UpdateTeamRolesContainer(dayContext.DayId);
 	}
 
 	public long TeamSessionId { get; }
 
-	public Lazy<Dictionary<TeamRole, TeamRole[]>> TeamRolesUpdate => dayContext.TeamRolesUpdate;
+	public int Id { get; }
 
-	public Lazy<IReadOnlyList<string>> ReleasedTickets => dayContext.ReleasedTickets;
-
-	public Lazy<IReadOnlyList<string>> TakenTickets => dayContext.TakenTickets;
-
-	public Lazy<int> AnotherTeamScores => dayContext.AnotherTeamScores;
+	public byte[]? Timestamp { get; set; }
 
 	public int RollDiceForAnotherTeam()
 	{
@@ -51,7 +56,7 @@ public class Day
 		var diceNumber = diceRoller.RollDice();
 		var diceScores = MapDiceNumberToScoreSettings.MapAnotherTeam(diceNumber);
 
-		WorkAnotherTeamDayEvent.CreateInstance(dayContext, diceNumber, diceScores);
+		WorkAnotherTeamContainer = WorkAnotherTeamContainer.CreateInstance(dayContext, diceNumber, diceScores);
 
 		return diceScores;
 	}
@@ -61,7 +66,7 @@ public class Day
 		EnsureCanPostEvent(DayEventType.UpdateTeamRoles);
 		EnsureCanUpdateTeamRoles(from);
 
-		UpdateTeamRolesDayEvent.CreateInstance(dayContext, from, to);
+		updateTeamRolesContainer.AddUpdate(dayContext, from, to);
 	}
 
 	public void RollDices()
@@ -69,11 +74,12 @@ public class Day
 		EnsureCanPostEvent(DayEventType.RollDice);
 
 		var diceRoller = new DiceRoller(new Random());
+		var swapByRole = updateTeamRolesContainer.BuildTeamRolesUpdate();
 		var (analystsDiceNumber, analystsScores) = RollDiceForRole(analystsNumber, TeamRole.Analyst);
 		var (programmersDiceNumber, programmersScores) = RollDiceForRole(programmersNumber, TeamRole.Programmer);
 		var (testersDiceNumber, testersScores) = RollDiceForRole(testersNumber, TeamRole.Tester);
 
-		RollDiceDayEvent.CreateInstance(
+		RollDiceContainer = RollDiceContainer.CreateInstance(
 			dayContext,
 			analystsDiceNumber,
 			programmersDiceNumber,
@@ -85,7 +91,7 @@ public class Day
 
 		(int[] diceNumber, int[] diceScores) RollDiceForRole(int roleSize, TeamRole role)
 		{
-			var swaps = dayContext.TeamRolesUpdate.Value.GetValueOrDefault(role, []);
+			var swaps = swapByRole.GetValueOrDefault(role, []);
 			var diceNumber = new int[roleSize];
 			var diceScores = new int[roleSize];
 			for (var i = 0; i < roleSize; i++)
@@ -103,14 +109,14 @@ public class Day
 	{
 		EnsureCanPostEvent(DayEventType.ReleaseTickets);
 
-		ReleaseTicketDayEvent.CreateInstance(dayContext, ticketIds);
+		ReleaseTicketContainer = ReleaseTicketContainer.CreateInstance(dayContext, ticketIds);
 	}
 
 	public void UpdateSprintBacklog(string[] ticketIds)
 	{
 		EnsureCanPostEvent(DayEventType.UpdateSprintBacklog);
 
-		UpdateSprintBacklogDayEvent.CreateInstance(dayContext, ticketIds);
+		UpdateSprintBacklogContainer = UpdateSprintBacklogContainer.CreateInstance(dayContext, ticketIds);
 	}
 
 	public void UpdateCfd(
@@ -122,11 +128,9 @@ public class Day
 	{
 		EnsureCanPostEvent(DayEventType.UpdateCfd);
 
-		var totalReleased = released + dayContext.ReleasedTickets.Value.Count;
-
-		UpdateCfdDayEvent.CreateInstance(
+		UpdateCfdContainer = UpdateCfdContainer.CreateInstance(
 			dayContext,
-			totalReleased,
+			released,
 			readyToDeploy,
 			withTesters,
 			withProgrammers,
@@ -137,12 +141,12 @@ public class Day
 	{
 		EnsureCanPostEvent(DayEventType.EndDay);
 
-		EndDayDayEvent.CreateInstance(dayContext);
+		dayContext.PostDayEvent(DayEventType.EndDay);
 	}
 
 	private void EnsureCanUpdateTeamRoles(TeamRole from)
 	{
-		var update = dayContext.TeamRolesUpdate.Value;
+		var update = updateTeamRolesContainer.BuildTeamRolesUpdate();
 
 		if (!update.TryGetValue(from, out var updates))
 		{

@@ -1,7 +1,7 @@
 ﻿using Domain.DomainExceptions;
 using Domain.Game.Days;
 using Domain.Game.Days.DayEvents;
-using Domain.Game.Days.DayEvents.UpdateTeamRolesDayEvent;
+using Domain.Game.Days.DayEvents.DayContainers;
 using Domain.Game.Tickets;
 
 namespace Domain.Game.Teams;
@@ -14,12 +14,14 @@ public class TeamSession
 	private int currentDayNumber;
 
 	private Day CurrentDay => days[currentDayNumber - 9];
+	private Day? PreviousDay => currentDayNumber - 10 < 0 ? null : days[currentDayNumber - 10];
 
 	private TeamSession()
 	{
 		settings = TeamSessionSettings.Default();
 		TakenTickets = new Lazy<HashSet<string>>(BuildTakenTickets);
 		TicketsInWork = new Lazy<HashSet<string>>(BuildTicketsInWork);
+		ReleasedTickets = new Lazy<HashSet<string>>(BuildReleasedTickets);
 		AnotherTeamScores = new Lazy<int>(BuildAnotherTeamScores);
 	}
 
@@ -39,6 +41,8 @@ public class TeamSession
 	public Lazy<HashSet<string>> TicketsInWork { get; }
 
 	public Lazy<HashSet<string>> TakenTickets { get; }
+
+	public Lazy<HashSet<string>> ReleasedTickets { get; }
 
 	public Lazy<int> AnotherTeamScores { get; }
 
@@ -71,6 +75,47 @@ public class TeamSession
 		CurrentDay.UpdateSprintBacklog(ticketIds);
 	}
 
+	public void UpdateCfd(
+		int readyToDeploy,
+		int withTesters,
+		int withProgrammers,
+		int withAnalysts)
+	{
+		var previousDayCfd = PreviousDay?.UpdateCfdContainer ?? UpdateCfdContainer.None;
+		var released = ReleasedTickets.Value.Count;
+
+		var currentSumToValidate = released + readyToDeploy;
+		var previousSumToValidate = previousDayCfd.Released + previousDayCfd.ReadyToDeploy;
+		ValidateArgumentsSum(currentSumToValidate, previousSumToValidate);
+		
+		currentSumToValidate += withTesters;
+		previousSumToValidate += previousDayCfd.WithTesters;
+		ValidateArgumentsSum(currentSumToValidate, previousSumToValidate);
+
+		currentSumToValidate += withProgrammers;
+		previousSumToValidate += previousDayCfd.WithProgrammers;
+		ValidateArgumentsSum(currentSumToValidate, previousSumToValidate);
+
+		currentSumToValidate += withAnalysts;
+		previousSumToValidate += previousDayCfd.WithAnalysts;
+		ValidateArgumentsSum(currentSumToValidate, previousSumToValidate);
+		
+		CurrentDay.UpdateCfd(
+			released,
+			readyToDeploy,
+			withTesters,
+			withProgrammers,
+			withAnalysts);
+
+		void ValidateArgumentsSum(int currentSum, int previousSum)
+		{
+			if (currentSum < previousSum)
+			{
+				throw new DomainException("Invalid cfd arguments");
+			}
+		}
+	}
+
 	public void EndDay()
 	{
 		CurrentDay.EndDay();
@@ -97,18 +142,25 @@ public class TeamSession
 
 	private HashSet<string> BuildTakenTickets()
 	{
-		var takenTickets = days.SelectMany(t => t.TakenTickets.Value);
+		var takenTickets = days.SelectMany(t => t.UpdateSprintBacklogContainer?.TicketIds ?? []);
 		return settings.InitiallyTakenTickets.Concat(takenTickets).ToHashSet();
+	}
+
+	private HashSet<string> BuildReleasedTickets()
+	{
+		return days.SelectMany(t => t.ReleaseTicketContainer?.TicketIds ?? []).ToHashSet();
 	}
 
 	private HashSet<string> BuildTicketsInWork()
 	{
-		return TakenTickets.Value.Except(days.SelectMany(t => t.ReleasedTickets.Value)).ToHashSet();
+		return TakenTickets.Value
+			.Except(days.SelectMany(t => t.ReleaseTicketContainer?.TicketIds ?? []))
+			.ToHashSet();
 	}
 
 	private int BuildAnotherTeamScores()
 	{
-		return days.Select(d => d.AnotherTeamScores.Value).Sum();
+		return days.Select(d => d.WorkAnotherTeamContainer?.ScoresNumber ?? 0).Sum();
 	}
 
 	private Day ConfigureDay(int dayNumber)
