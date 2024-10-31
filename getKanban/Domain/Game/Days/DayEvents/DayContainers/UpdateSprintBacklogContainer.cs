@@ -2,14 +2,14 @@
 
 public class UpdateSprintBacklogContainer
 {
+	public int DayId { get; }
+	public IReadOnlyList<string> TicketIds { get; }
+
 	private UpdateSprintBacklogContainer(int dayId, string[] ticketIds)
 	{
 		DayId = dayId;
 		TicketIds = ticketIds;
 	}
-
-	public int DayId { get; }
-	public IReadOnlyList<string> TicketIds { get; }
 
 	internal static UpdateSprintBacklogContainer CreateInstance(DayContext dayContext, string[] ticketIds)
 	{

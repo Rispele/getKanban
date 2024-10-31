@@ -2,6 +2,14 @@
 
 public class RollDiceContainer
 {
+	public int DayId { get; }
+	public int[] AnalystsDiceNumber { get; }
+	public int[] ProgrammersDiceNumber { get; }
+	public int[] TestersDiceNumber { get; }
+	public int[] AnalystsScores { get; }
+	public int[] ProgrammersScores { get; }
+	public int[] TestersScores { get; }
+
 	private RollDiceContainer(
 		int dayId,
 		int[] analystsDiceNumber,
@@ -19,14 +27,6 @@ public class RollDiceContainer
 		ProgrammersScores = programmersScores;
 		TestersScores = testersScores;
 	}
-
-	public int DayId { get; }
-	public int[] AnalystsDiceNumber { get; }
-	public int[] ProgrammersDiceNumber { get; }
-	public int[] TestersDiceNumber { get; }
-	public int[] AnalystsScores { get; }
-	public int[] ProgrammersScores { get; }
-	public int[] TestersScores { get; }
 
 	internal static RollDiceContainer CreateInstance(
 		DayContext dayContext,

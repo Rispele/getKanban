@@ -9,6 +9,12 @@ public class Team
 
 	private readonly TeamSession teamSession;
 
+	public Guid GameSessionId { get; }
+
+	public Guid Id { get; }
+
+	public string Name { get; private set; }
+
 	public Team(Guid gameSessionId, string name)
 	{
 		Id = Guid.NewGuid();
@@ -17,12 +23,6 @@ public class Team
 		teamSession = new TeamSession(Id);
 		participants = [];
 	}
-
-	public Guid GameSessionId { get; }
-
-	public Guid Id { get; }
-
-	public string Name { get; private set; }
 
 	public void AddPlayer(User user)
 	{

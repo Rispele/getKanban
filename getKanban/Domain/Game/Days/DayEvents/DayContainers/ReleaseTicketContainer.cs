@@ -2,14 +2,14 @@
 
 public class ReleaseTicketContainer
 {
+	public int DayId { get; }
+	public IReadOnlyList<string> TicketIds { get; }
+
 	private ReleaseTicketContainer(int dayId, IReadOnlyList<string> ticketIds)
 	{
 		DayId = dayId;
 		TicketIds = ticketIds;
 	}
-
-	public int DayId { get; }
-	public IReadOnlyList<string> TicketIds { get; }
 
 	internal static ReleaseTicketContainer CreateInstance(
 		DayContext dayContext,

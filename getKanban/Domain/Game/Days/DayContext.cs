@@ -9,6 +9,8 @@ public class DayContext
 
 	private IEnumerable<AwaitedEvent> CurrentlyAwaitedEvents => awaitedEvents.Where(@event => !@event.Removed);
 
+	public int DayId { get; }
+
 	private DayContext()
 	{
 	}
@@ -20,8 +22,6 @@ public class DayContext
 		scenario = dayScenario;
 		awaitedEvents = initialAwaitedEvents.Select(e => new AwaitedEvent(DayId, e)).ToList();
 	}
-
-	public int DayId { get; }
 
 	public void PostDayEvent(DayEventType dayEventType)
 	{

@@ -230,7 +230,7 @@
           &lt;/And&gt;
       &lt;/Entry.Match&gt;
     &lt;/Entry&gt;
-
+      
     &lt;Entry DisplayName="Public Properties"&gt;
       &lt;Entry.Match&gt;
           &lt;And&gt;
@@ -239,7 +239,7 @@
           &lt;/And&gt;
       &lt;/Entry.Match&gt;
     &lt;/Entry&gt;
-
+    
     &lt;Entry DisplayName="Constructors"&gt;
       &lt;Entry.Match&gt;
         &lt;Kind Is="Constructor" /&gt;

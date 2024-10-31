@@ -13,6 +13,18 @@ public class Day
 	private readonly int testersNumber;
 	private readonly UpdateTeamRolesContainer updateTeamRolesContainer;
 
+	public WorkAnotherTeamContainer? WorkAnotherTeamContainer { get; private set; }
+	public RollDiceContainer? RollDiceContainer { get; private set; }
+	public ReleaseTicketContainer? ReleaseTicketContainer { get; private set; }
+	public UpdateSprintBacklogContainer? UpdateSprintBacklogContainer { get; private set; }
+	public UpdateCfdContainer? UpdateCfdContainer { get; private set; }
+
+	public long TeamSessionId { get; }
+
+	public int Id { get; }
+
+	public byte[]? Timestamp { get; set; }
+
 	private Day()
 	{
 	}
@@ -33,18 +45,6 @@ public class Day
 
 		updateTeamRolesContainer = new UpdateTeamRolesContainer(dayContext.DayId);
 	}
-
-	public WorkAnotherTeamContainer? WorkAnotherTeamContainer { get; private set; }
-	public RollDiceContainer? RollDiceContainer { get; private set; }
-	public ReleaseTicketContainer? ReleaseTicketContainer { get; private set; }
-	public UpdateSprintBacklogContainer? UpdateSprintBacklogContainer { get; private set; }
-	public UpdateCfdContainer? UpdateCfdContainer { get; private set; }
-
-	public long TeamSessionId { get; }
-
-	public int Id { get; }
-
-	public byte[]? Timestamp { get; set; }
 
 	public int RollDiceForAnotherTeam()
 	{

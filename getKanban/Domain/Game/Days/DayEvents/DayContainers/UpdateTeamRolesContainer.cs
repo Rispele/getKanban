@@ -4,6 +4,8 @@ public class UpdateTeamRolesContainer
 {
 	private readonly List<TeamRoleUpdate> teamRoleUpdates = null!;
 
+	public int DayId { get; }
+
 	private UpdateTeamRolesContainer()
 	{
 	}
@@ -13,8 +15,6 @@ public class UpdateTeamRolesContainer
 		DayId = dayId;
 		teamRoleUpdates = [];
 	}
-
-	public int DayId { get; }
 
 	public void AddUpdate(DayContext dayContext, TeamRole from, TeamRole to)
 	{

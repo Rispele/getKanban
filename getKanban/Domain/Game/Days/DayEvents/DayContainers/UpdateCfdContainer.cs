@@ -2,6 +2,13 @@
 
 public class UpdateCfdContainer
 {
+	public int DayId { get; }
+	public int Released { get; }
+	public int ReadyToDeploy { get; }
+	public int WithTesters { get; }
+	public int WithProgrammers { get; }
+	public int WithAnalysts { get; }
+
 	private UpdateCfdContainer(
 		int dayId,
 		int released,
@@ -17,13 +24,6 @@ public class UpdateCfdContainer
 		WithProgrammers = withProgrammers;
 		WithAnalysts = withAnalysts;
 	}
-
-	public int DayId { get; }
-	public int Released { get; }
-	public int ReadyToDeploy { get; }
-	public int WithTesters { get; }
-	public int WithProgrammers { get; }
-	public int WithAnalysts { get; }
 
 	internal static UpdateCfdContainer CreateInstance(
 		DayContext dayContext,

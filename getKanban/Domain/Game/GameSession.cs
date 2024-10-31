@@ -9,6 +9,10 @@ public class GameSession
 
 	private readonly List<Team> teams;
 
+	public Guid Id { get; }
+
+	public string Name { get; }
+
 	public GameSession(
 		User creator,
 		string name,
@@ -26,10 +30,6 @@ public class GameSession
 
 		angels.Add(new Participant(creator, ParticipantRole.Creator | ParticipantRole.Angel));
 	}
-
-	public Guid Id { get; }
-
-	public string Name { get; }
 
 	public bool HasAccess(Guid userId, Guid teamId)
 	{

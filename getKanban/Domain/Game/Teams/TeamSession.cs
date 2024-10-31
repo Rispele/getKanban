@@ -16,6 +16,18 @@ public class TeamSession
 	private Day CurrentDay => days[currentDayNumber - 9];
 	private Day? PreviousDay => currentDayNumber - 10 < 0 ? null : days[currentDayNumber - 10];
 
+	public Guid TeamId { get; }
+
+	public long Id { get; }
+
+	public Lazy<HashSet<string>> TicketsInWork { get; }
+
+	public Lazy<HashSet<string>> TakenTickets { get; }
+
+	public Lazy<HashSet<string>> ReleasedTickets { get; }
+
+	public Lazy<int> AnotherTeamScores { get; }
+
 	private TeamSession()
 	{
 		settings = TeamSessionSettings.Default();
@@ -33,18 +45,6 @@ public class TeamSession
 		currentDayNumber = 9;
 		days = [];
 	}
-
-	public Guid TeamId { get; }
-
-	public long Id { get; }
-
-	public Lazy<HashSet<string>> TicketsInWork { get; }
-
-	public Lazy<HashSet<string>> TakenTickets { get; }
-
-	public Lazy<HashSet<string>> ReleasedTickets { get; }
-
-	public Lazy<int> AnotherTeamScores { get; }
 
 	public int RollDiceForAnotherTeam()
 	{

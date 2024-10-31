@@ -2,6 +2,14 @@
 
 public class WorkAnotherTeamContainer
 {
+	public int DayId { get; }
+
+	public int Id { get; }
+
+	public int DiceNumber { get; }
+
+	public int ScoresNumber { get; }
+
 	private WorkAnotherTeamContainer(
 		int dayId,
 		int diceNumber,
@@ -11,14 +19,6 @@ public class WorkAnotherTeamContainer
 		DiceNumber = diceNumber;
 		ScoresNumber = scoresNumber;
 	}
-
-	public int DayId { get; }
-
-	public int Id { get; }
-
-	public int DiceNumber { get; }
-
-	public int ScoresNumber { get; }
 
 	internal static WorkAnotherTeamContainer CreateInstance(
 		DayContext dayContext,
