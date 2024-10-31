@@ -72,7 +72,11 @@ public class Team
 		int withProgrammers,
 		int withAnalysts)
 	{
-		teamSession.UpdateCfd(readyToDeploy, withTesters, withProgrammers, withAnalysts);
+		teamSession.UpdateCfd(
+			readyToDeploy,
+			withTesters,
+			withProgrammers,
+			withAnalysts);
 	}
 
 	public void EndDay()

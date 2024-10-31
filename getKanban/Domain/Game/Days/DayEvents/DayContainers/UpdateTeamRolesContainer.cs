@@ -19,7 +19,7 @@ public class UpdateTeamRolesContainer
 	public void AddUpdate(DayContext dayContext, TeamRole from, TeamRole to)
 	{
 		dayContext.PostDayEvent(DayEventType.UpdateTeamRoles);
-		
+
 		teamRoleUpdates.Add(new TeamRoleUpdate { From = from, To = to });
 	}
 

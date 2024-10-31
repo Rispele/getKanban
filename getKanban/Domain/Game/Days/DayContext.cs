@@ -14,14 +14,11 @@ public class DayContext
 	}
 
 	public DayContext(
-		int dayId,
 		Dictionary<DayEventType, List<DayEventType>> dayScenario,
 		params DayEventType[] initialAwaitedEvents)
 	{
-		DayId = dayId;
-
 		scenario = dayScenario;
-		awaitedEvents = initialAwaitedEvents.Select(e => new AwaitedEvent(dayId, e)).ToList();
+		awaitedEvents = initialAwaitedEvents.Select(e => new AwaitedEvent(DayId, e)).ToList();
 	}
 
 	public int DayId { get; }

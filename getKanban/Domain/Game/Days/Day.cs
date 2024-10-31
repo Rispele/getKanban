@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Domain.DomainExceptions;
+﻿using Domain.DomainExceptions;
 using Domain.Game.Days.DayEvents;
 using Domain.Game.Days.DayEvents.DayContainers;
 
@@ -14,12 +13,6 @@ public class Day
 	private readonly int testersNumber;
 	private readonly UpdateTeamRolesContainer updateTeamRolesContainer;
 
-	public WorkAnotherTeamContainer? WorkAnotherTeamContainer { get; private set; }
-	public RollDiceContainer? RollDiceContainer { get; private set; }
-	public ReleaseTicketContainer? ReleaseTicketContainer { get; private set; }
-	public UpdateSprintBacklogContainer? UpdateSprintBacklogContainer { get; private set; }
-	public UpdateCfdContainer? UpdateCfdContainer { get; private set; }
-
 	private Day()
 	{
 	}
@@ -31,7 +24,6 @@ public class Day
 		int programmersNumber,
 		int testersNumber)
 	{
-		Id = dayContext.DayId;
 		TeamSessionId = teamSessionId;
 
 		this.dayContext = dayContext;
@@ -41,6 +33,12 @@ public class Day
 
 		updateTeamRolesContainer = new UpdateTeamRolesContainer(dayContext.DayId);
 	}
+
+	public WorkAnotherTeamContainer? WorkAnotherTeamContainer { get; private set; }
+	public RollDiceContainer? RollDiceContainer { get; private set; }
+	public ReleaseTicketContainer? ReleaseTicketContainer { get; private set; }
+	public UpdateSprintBacklogContainer? UpdateSprintBacklogContainer { get; private set; }
+	public UpdateCfdContainer? UpdateCfdContainer { get; private set; }
 
 	public long TeamSessionId { get; }
 
