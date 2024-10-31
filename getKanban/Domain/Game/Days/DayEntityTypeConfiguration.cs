@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using Domain.Game.Days.DayEvents;
 using Domain.Game.Days.DayEvents.DayContainers;
 using Microsoft.EntityFrameworkCore;
@@ -37,7 +36,7 @@ public class DayEntityTypeConfiguration : IEntityTypeConfiguration<Day>
 		ConfigureContainerRelation<UpdateSprintBacklogContainer>(builder, d => d.DayId);
 		ConfigureContainerRelation<UpdateCfdContainer>(builder, d => d.DayId);
 		builder
-			.HasMany<Activity>()
+			.HasMany<AwaitedEvent>()
 			.WithOne();
 	}
 
