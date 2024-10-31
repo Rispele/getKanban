@@ -2,10 +2,13 @@
 using Domain.Game.Days;
 using Domain.Game.Days.DayEvents;
 using Domain.Game.Days.DayEvents.DayContainers;
+using Domain.Game.Teams.Configurations;
 using Domain.Game.Tickets;
+using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Game.Teams;
 
+[EntityTypeConfiguration(typeof(TeamSessionEntityTypeConfiguration))]
 public class TeamSession
 {
 	private readonly List<Day> days = null!;
@@ -13,8 +16,8 @@ public class TeamSession
 
 	private int currentDayNumber;
 
-	private Day CurrentDay => days[currentDayNumber - 9];
-	private Day? PreviousDay => currentDayNumber - 10 < 0 ? null : days[currentDayNumber - 10];
+	private Day currentDay => days[currentDayNumber - 9];
+	private Day? previousDay => currentDayNumber - 10 < 0 ? null : days[currentDayNumber - 10];
 
 	public Guid TeamId { get; }
 
@@ -48,31 +51,31 @@ public class TeamSession
 
 	public int RollDiceForAnotherTeam()
 	{
-		return CurrentDay.RollDiceForAnotherTeam();
+		return currentDay.RollDiceForAnotherTeam();
 	}
 
 	public void UpdateTeamRoles(TeamRole from, TeamRole to)
 	{
-		CurrentDay.UpdateTeamRoles(from, to);
+		currentDay.UpdateTeamRoles(from, to);
 	}
 
 	public void RollDices()
 	{
-		CurrentDay.RollDices();
+		currentDay.RollDices();
 	}
 
 	public void ReleaseTickets(string[] ticketIds)
 	{
 		EnsureCanReleaseTickets(ticketIds);
 
-		CurrentDay.ReleaseTickets(ticketIds);
+		currentDay.ReleaseTickets(ticketIds);
 	}
 
 	public void UpdateSprintBacklog(string[] ticketIds)
 	{
 		EnsureCanTakeTickets(ticketIds);
 
-		CurrentDay.UpdateSprintBacklog(ticketIds);
+		currentDay.UpdateSprintBacklog(ticketIds);
 	}
 
 	public void UpdateCfd(
@@ -81,7 +84,7 @@ public class TeamSession
 		int withProgrammers,
 		int withAnalysts)
 	{
-		var previousDayCfd = PreviousDay?.UpdateCfdContainer ?? UpdateCfdContainer.None;
+		var previousDayCfd = previousDay?.UpdateCfdContainer ?? UpdateCfdContainer.None;
 		var released = ReleasedTickets.Value.Count;
 
 		var currentSumToValidate = released + readyToDeploy;
@@ -100,7 +103,7 @@ public class TeamSession
 		previousSumToValidate += previousDayCfd.WithAnalysts;
 		ValidateArgumentsSum(currentSumToValidate, previousSumToValidate);
 
-		CurrentDay.UpdateCfd(
+		currentDay.UpdateCfd(
 			released,
 			readyToDeploy,
 			withTesters,
@@ -118,7 +121,7 @@ public class TeamSession
 
 	public void EndDay()
 	{
-		CurrentDay.EndDay();
+		currentDay.EndDay();
 
 		currentDayNumber++;
 		days.Add(ConfigureDay(currentDayNumber));

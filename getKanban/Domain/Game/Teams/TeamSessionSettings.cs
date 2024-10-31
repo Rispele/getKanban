@@ -1,7 +1,10 @@
-﻿using Domain.Game.Tickets;
+﻿using Domain.Game.Teams.Configurations;
+using Domain.Game.Tickets;
+using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Game.Teams;
 
+[EntityTypeConfiguration(typeof(TeamSessionSettingsEntityTypeConfiguration))]
 public class TeamSessionSettings
 {
 	public IReadOnlyList<string> InitiallyTakenTickets { get; set; } = null!;
