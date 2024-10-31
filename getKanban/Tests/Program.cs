@@ -1,1 +1,4 @@
-﻿Console.WriteLine("temp");
+﻿using Domain;
+
+var db = new TeamDbContext();
+db.Database.EnsureCreated();

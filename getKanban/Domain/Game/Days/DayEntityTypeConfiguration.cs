@@ -29,12 +29,12 @@ public class DayEntityTypeConfiguration : IEntityTypeConfiguration<Day>
 
 		builder.Property(e => e.Timestamp).IsRowVersion();
 
-		ConfigureContainerRelation<WorkAnotherTeamContainer>(builder, d => d.DayId);
-		ConfigureContainerRelation<UpdateTeamRolesContainer>(builder, d => d.DayId);
-		ConfigureContainerRelation<RollDiceContainer>(builder, d => d.DayId);
-		ConfigureContainerRelation<ReleaseTicketContainer>(builder, d => d.DayId);
-		ConfigureContainerRelation<UpdateSprintBacklogContainer>(builder, d => d.DayId);
-		ConfigureContainerRelation<UpdateCfdContainer>(builder, d => d.DayId);
+		ConfigureContainerRelation<WorkAnotherTeamContainer>(builder, d => d.WorkAnotherTeamContainer!, c => c.DayId);
+		ConfigureContainerRelation<UpdateTeamRolesContainer>(builder, d => d.updateTeamRolesContainer!, d => d.DayId);
+		ConfigureContainerRelation<RollDiceContainer>(builder, d => d.RollDiceContainer!, d => d.DayId);
+		ConfigureContainerRelation<ReleaseTicketContainer>(builder, d => d.ReleaseTicketContainer!, d => d.DayId);
+		ConfigureContainerRelation<UpdateSprintBacklogContainer>(builder, d => d.UpdateSprintBacklogContainer!, d => d.DayId);
+		ConfigureContainerRelation<UpdateCfdContainer>(builder, d => d.UpdateCfdContainer!, d => d.DayId);
 		builder
 			.HasMany<AwaitedEvent>()
 			.WithOne();
@@ -42,13 +42,14 @@ public class DayEntityTypeConfiguration : IEntityTypeConfiguration<Day>
 
 	private static void ConfigureContainerRelation<TContainer>(
 		EntityTypeBuilder<Day> builder,
+		Expression<Func<Day, TContainer>> expression,
 		Expression<Func<TContainer, object?>> propertyExpression)
 		where TContainer : class
 	{
 		builder
-			.HasOne<TContainer>()
+			.HasOne(expression)
 			.WithOne()
-			.HasForeignKey(propertyExpression);
+			.HasPrincipalKey(propertyExpression);
 	}
 
 	private class ScenarioConverter : ValueConverter<Dictionary<DayEventType, List<DayEventType>>, string>

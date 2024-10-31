@@ -1,8 +1,11 @@
 ﻿using Domain.Game.Days.DayEvents.DayContainers;
+using Domain.Game.Teams.Configurations;
 using Domain.Users;
+using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Game.Teams;
 
+[EntityTypeConfiguration(typeof(TeamEntityTypeConfiguration))]
 public class Team
 {
 	private readonly List<Participant> participants;
@@ -14,6 +17,10 @@ public class Team
 	public Guid Id { get; }
 
 	public string Name { get; private set; }
+
+	private Team()
+	{
+	}
 
 	public Team(Guid gameSessionId, string name)
 	{

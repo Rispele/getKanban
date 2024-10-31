@@ -9,15 +9,15 @@ public class GameSessionEntityTypeConfiguration : IEntityTypeConfiguration<GameS
 	public void Configure(EntityTypeBuilder<GameSession> builder)
 	{
 		builder.HasKey(x => x.Id);
-		
+
 		builder.Property(x => x.Id).ValueGeneratedOnAdd();
-		
+
 		builder.Property(x => x.Name).IsRequired();
 
 		builder
 			.HasMany<Team>()
 			.WithOne();
-		
+
 		builder
 			.HasMany<Participant>()
 			.WithMany();

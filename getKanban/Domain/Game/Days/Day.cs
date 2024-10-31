@@ -17,7 +17,7 @@ public class Day
 
 	private IEnumerable<AwaitedEvent> currentlyAwaitedEvents => awaitedEvents.Where(@event => !@event.Removed);
 
-	private UpdateTeamRolesContainer? updateTeamRolesContainer { get; set; }
+	public UpdateTeamRolesContainer? updateTeamRolesContainer { get; set; }
 	public WorkAnotherTeamContainer? WorkAnotherTeamContainer { get; private set; }
 	public RollDiceContainer? RollDiceContainer { get; private set; }
 	public ReleaseTicketContainer? ReleaseTicketContainer { get; private set; }
@@ -26,7 +26,7 @@ public class Day
 
 	public long TeamSessionId { get; }
 
-	public int Id { get; }
+	public long Id { get; }
 
 	public byte[]? Timestamp { get; set; }
 

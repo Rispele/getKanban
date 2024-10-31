@@ -1,15 +1,27 @@
-﻿namespace Domain.Game.Days.DayEvents.DayContainers;
+﻿using Domain.Game.Days.DayEvents.Configurations;
+using JetBrains.Annotations;
+using Microsoft.EntityFrameworkCore;
 
+namespace Domain.Game.Days.DayEvents.DayContainers;
+
+[EntityTypeConfiguration(typeof(WorkAnotherTeamContainerEntityTypeConfiguration))]
 public class WorkAnotherTeamContainer
 {
-	public int DayId { get; }
+	public long Id { get; }
+	
+	public long DayId { get; }
 
 	public int DiceNumber { get; }
 
 	public int ScoresNumber { get; }
 
+	[UsedImplicitly]
+	private WorkAnotherTeamContainer()
+	{
+	}
+
 	private WorkAnotherTeamContainer(
-		int dayId,
+		long dayId,
 		int diceNumber,
 		int scoresNumber)
 	{

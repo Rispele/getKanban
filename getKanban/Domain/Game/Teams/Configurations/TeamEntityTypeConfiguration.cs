@@ -8,13 +8,14 @@ public class TeamEntityTypeConfiguration : IEntityTypeConfiguration<Team>
 	public void Configure(EntityTypeBuilder<Team> builder)
 	{
 		builder.HasKey(x => new { x.GameSessionId, x.Id });
-		
+
 		builder.Property(x => x.GameSessionId).IsRequired();
 
 		builder
 			.HasOne<TeamSession>()
-			.WithOne();
-		
+			.WithOne()
+			.HasPrincipalKey<TeamSession>(s => s.TeamId);
+
 		builder
 			.HasMany<Participant>()
 			.WithMany();

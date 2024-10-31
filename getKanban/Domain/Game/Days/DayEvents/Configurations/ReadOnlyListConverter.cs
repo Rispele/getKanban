@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Newtonsoft.Json;
 
-namespace Domain.Game.Days.DayEvents.DayContainers.Configurations;
+namespace Domain.Game.Days.DayEvents.Configurations;
 
 public class ReadOnlyListConverter<T> : ValueConverter<IReadOnlyList<T>, string>
 {

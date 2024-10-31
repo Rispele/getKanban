@@ -1,4 +1,5 @@
-﻿using Domain.Game.Days.DayEvents.DayContainers.Configurations;
+﻿using Domain.Game.Days.DayEvents.Configurations;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Game.Days.DayEvents.DayContainers;
@@ -6,10 +7,16 @@ namespace Domain.Game.Days.DayEvents.DayContainers;
 [EntityTypeConfiguration(typeof(ReleaseTicketContainerEntityTypeConfiguration))]
 public class ReleaseTicketContainer
 {
-	public int DayId { get; }
-	public IReadOnlyList<string> TicketIds { get; }
+	public long Id { get; }
+	public long DayId { get; }
+	public IReadOnlyList<string> TicketIds { get; } = null!;
 
-	private ReleaseTicketContainer(int dayId, IReadOnlyList<string> ticketIds)
+	[UsedImplicitly]
+	private ReleaseTicketContainer()
+	{
+	}
+
+	private ReleaseTicketContainer(long dayId, IReadOnlyList<string> ticketIds)
 	{
 		DayId = dayId;
 		TicketIds = ticketIds;

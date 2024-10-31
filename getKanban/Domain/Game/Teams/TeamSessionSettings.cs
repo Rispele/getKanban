@@ -5,8 +5,11 @@ using Microsoft.EntityFrameworkCore;
 namespace Domain.Game.Teams;
 
 [EntityTypeConfiguration(typeof(TeamSessionSettingsEntityTypeConfiguration))]
+[PrimaryKey(nameof(Id))]
 public class TeamSessionSettings
 {
+	public long Id { get; }
+	
 	public IReadOnlyList<string> InitiallyTakenTickets { get; set; } = null!;
 
 	public int ReleaseCycleLength { get; init; }

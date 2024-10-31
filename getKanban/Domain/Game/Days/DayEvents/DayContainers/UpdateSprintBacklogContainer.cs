@@ -1,4 +1,5 @@
-﻿using Domain.Game.Days.DayEvents.DayContainers.Configurations;
+﻿using Domain.Game.Days.DayEvents.Configurations;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Game.Days.DayEvents.DayContainers;
@@ -6,10 +7,16 @@ namespace Domain.Game.Days.DayEvents.DayContainers;
 [EntityTypeConfiguration(typeof(UpdateSprintBacklogContainerEntityTypeConfiguration))]
 public class UpdateSprintBacklogContainer
 {
-	public int DayId { get; }
-	public IReadOnlyList<string> TicketIds { get; }
+	public long Id { get; set; }
+	public long DayId { get; }
+	public IReadOnlyList<string> TicketIds { get; } = null!;
 
-	private UpdateSprintBacklogContainer(int dayId, string[] ticketIds)
+	[UsedImplicitly]
+	private UpdateSprintBacklogContainer()
+	{
+	}
+
+	private UpdateSprintBacklogContainer(long dayId, string[] ticketIds)
 	{
 		DayId = dayId;
 		TicketIds = ticketIds;

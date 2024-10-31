@@ -9,14 +9,14 @@ public class TeamSessionEntityTypeConfiguration : IEntityTypeConfiguration<TeamS
 	public void Configure(EntityTypeBuilder<TeamSession> builder)
 	{
 		builder.HasKey(e => new { e.TeamId, e.Id });
-		
+
 		builder.Property(e => e.Id).ValueGeneratedOnAdd();
 
 		builder.Property("currentDayNumber");
-		
+
 		builder.Ignore("currentDay");
 		builder.Ignore("previousDay");
-		
+
 		builder.Ignore(e => e.TakenTickets);
 		builder.Ignore(e => e.ReleasedTickets);
 		builder.Ignore(e => e.TicketsInWork);
@@ -28,6 +28,7 @@ public class TeamSessionEntityTypeConfiguration : IEntityTypeConfiguration<TeamS
 
 		builder
 			.HasOne<TeamSessionSettings>()
-			.WithOne();
+			.WithOne()
+			.HasForeignKey<TeamSessionSettings>();
 	}
 }

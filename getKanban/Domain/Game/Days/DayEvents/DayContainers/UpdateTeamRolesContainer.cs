@@ -1,4 +1,5 @@
-﻿using Domain.Game.Days.DayEvents.DayContainers.Configurations;
+﻿using Domain.Game.Days.DayEvents.Configurations;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Game.Days.DayEvents.DayContainers;
@@ -8,15 +9,17 @@ public class UpdateTeamRolesContainer
 {
 	private readonly List<TeamRoleUpdate> teamRoleUpdates = null!;
 
-	public int DayId { get; }
-	
+	public long Id { get; }
+	public long DayId { get; }
+
 	public byte[]? Timestamp { get; set; }
 
+	[UsedImplicitly]
 	private UpdateTeamRolesContainer()
 	{
 	}
 
-	public UpdateTeamRolesContainer(int dayId)
+	public UpdateTeamRolesContainer(long dayId)
 	{
 		DayId = dayId;
 		teamRoleUpdates = [];
