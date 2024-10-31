@@ -2,8 +2,6 @@
 
 public class AwaitedEvent
 {
-	public int Id { get; }
-
 	public bool Removed { get; private set; }
 
 	public DayEventType EventType { get; }
