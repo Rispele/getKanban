@@ -1,0 +1,32 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<!DOCTYPE html>
+<script>
+    let i = 1;
+    async function sendRequest() {
+        document.getElementById("diceValue").innerText = await (await fetch('http://localhost:5000/team-selection/Roll', { })).text();
+    }
+    async function sendRequestTeams() {
+        document.getElementById("teamsValue").innerText = await (await fetch('http://localhost:5000/team-selection/Add?count=' + i, { })).text();
+        i = i + 1;
+    }
+</script>
+<html>
+<body>
+<div>
+    <p>Dice:</p>
+    <p id="diceValue">-</p>
+    <button onclick="sendRequest()">Roll</button>
+</div>
+<div>
+    <p>Teams:</p>
+    <p id="teamsValue">No teams</p>
+    <button onclick="sendRequestTeams()">Add</button>
+</div>
+<div>
+    <form>
+        <button asp-area="" asp-controller="TeamsCreation" asp-action="Menu">Создание команд</button>
+    </form>
+</div>
+</body>
+</html>

@@ -1,0 +1,23 @@
+﻿<script>
+    function addTeam() {
+        const teamName = document.getElementById("teamName").value;
+        if (teamName.length > 0) {
+            const currText = document.getElementById("teamsValue").innerText;
+            document.getElementById("teamsValue").innerText = currText + (currText.length === 0 ? '' : '\n') + teamName;
+            document.getElementById("teamName").value = null;
+        }
+    }
+</script>
+
+<div>
+    <p>Имя команды:</p>
+    <input id="teamName">
+</div>
+<div>
+    <p>Teams:</p>
+    <p id="teamsValue"></p>
+    <button onclick="addTeam()">Добавить команду</button>
+</div>
+<div>
+    <button>Далее</button>
+</div>

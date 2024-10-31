@@ -1,6 +1,5 @@
 ﻿FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
-COPY Web/Pages/index.html Pages/index.html
 EXPOSE 8080
 EXPOSE 8081
 
