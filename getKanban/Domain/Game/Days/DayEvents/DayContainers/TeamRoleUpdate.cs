@@ -1,5 +1,9 @@
-﻿namespace Domain.Game.Days.DayEvents.DayContainers;
+﻿using Domain.Game.Days.DayEvents.DayContainers.Configurations;
+using Microsoft.EntityFrameworkCore;
 
+namespace Domain.Game.Days.DayEvents.DayContainers;
+
+[EntityTypeConfiguration(typeof(TeamRoleUpdateEntityTypeConfiguration))]
 public class TeamRoleUpdate
 {
 	public long Id { get; }

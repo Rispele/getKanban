@@ -1,9 +1,11 @@
 ﻿using Domain.DomainExceptions;
 using Domain.Game.Days.DayEvents;
 using Domain.Game.Days.DayEvents.DayContainers;
+using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Game.Days;
 
+[EntityTypeConfiguration(typeof(DayEntityTypeConfiguration))]
 public class Day
 {
 	private readonly List<AwaitedEvent> awaitedEvents = null!;

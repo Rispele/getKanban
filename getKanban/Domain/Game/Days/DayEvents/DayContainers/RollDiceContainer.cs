@@ -3,21 +3,21 @@
 public class RollDiceContainer
 {
 	public int DayId { get; }
-	public int[] AnalystsDiceNumber { get; }
-	public int[] ProgrammersDiceNumber { get; }
-	public int[] TestersDiceNumber { get; }
-	public int[] AnalystsScores { get; }
-	public int[] ProgrammersScores { get; }
-	public int[] TestersScores { get; }
+	public IReadOnlyList<int> AnalystsDiceNumber { get; }
+	public IReadOnlyList<int> ProgrammersDiceNumber { get; }
+	public IReadOnlyList<int> TestersDiceNumber { get; }
+	public IReadOnlyList<int> AnalystsScores { get; }
+	public IReadOnlyList<int> ProgrammersScores { get; }
+	public IReadOnlyList<int> TestersScores { get; }
 
 	private RollDiceContainer(
 		int dayId,
-		int[] analystsDiceNumber,
-		int[] programmersDiceNumber,
-		int[] testersDiceNumber,
-		int[] analystsScores,
-		int[] programmersScores,
-		int[] testersScores)
+		IReadOnlyList<int> analystsDiceNumber,
+		IReadOnlyList<int> programmersDiceNumber,
+		IReadOnlyList<int> testersDiceNumber,
+		IReadOnlyList<int> analystsScores,
+		IReadOnlyList<int> programmersScores,
+		IReadOnlyList<int> testersScores)
 	{
 		DayId = dayId;
 		AnalystsDiceNumber = analystsDiceNumber;

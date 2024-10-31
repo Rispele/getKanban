@@ -1,10 +1,16 @@
-﻿namespace Domain.Game.Days.DayEvents.DayContainers;
+﻿using Domain.Game.Days.DayEvents.DayContainers.Configurations;
+using Microsoft.EntityFrameworkCore;
 
+namespace Domain.Game.Days.DayEvents.DayContainers;
+
+[EntityTypeConfiguration(typeof(UpdateTeamRolesContainerEntityTypeConfiguration))]
 public class UpdateTeamRolesContainer
 {
 	private readonly List<TeamRoleUpdate> teamRoleUpdates = null!;
 
 	public int DayId { get; }
+	
+	public byte[]? Timestamp { get; set; }
 
 	private UpdateTeamRolesContainer()
 	{

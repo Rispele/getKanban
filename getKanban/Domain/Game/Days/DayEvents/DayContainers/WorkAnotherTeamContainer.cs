@@ -4,8 +4,6 @@ public class WorkAnotherTeamContainer
 {
 	public int DayId { get; }
 
-	public int Id { get; }
-
 	public int DiceNumber { get; }
 
 	public int ScoresNumber { get; }
