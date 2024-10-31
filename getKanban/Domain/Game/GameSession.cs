@@ -1,8 +1,11 @@
-﻿using Domain.Game.Teams;
+﻿using Domain.Game.Configuration;
+using Domain.Game.Teams;
 using Domain.Users;
+using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Game;
 
+[EntityTypeConfiguration(typeof(GameSessionEntityTypeConfiguration))]
 public class GameSession
 {
 	private readonly List<Participant> angels;
