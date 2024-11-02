@@ -20,7 +20,7 @@ public class UpdateCfdContainer
 	{
 	}
 
-	private UpdateCfdContainer(
+	public UpdateCfdContainer(
 		int released,
 		int toDeploy,
 		int withTesters,
@@ -62,7 +62,7 @@ public class UpdateCfdContainer
 				throw new ArgumentOutOfRangeException(nameof(patchType), patchType, null);
 		}
 	}
-	
+
 	internal static UpdateCfdContainer CreateInstance(
 		Day day,
 		int released = 0,
@@ -71,8 +71,6 @@ public class UpdateCfdContainer
 		int withProgrammers = 0,
 		int withAnalysts = 0)
 	{
-		day.PostDayEvent(DayEventType.UpdateCfd);
-
 		return new UpdateCfdContainer(
 			released,
 			readyToDeploy,

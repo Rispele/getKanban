@@ -8,7 +8,7 @@ public class UpdateCfdContainerEntityTypeConfiguration : IEntityTypeConfiguratio
 {
 	public void Configure(EntityTypeBuilder<UpdateCfdContainer> builder)
 	{
-		builder.HasKey(t => t.Id );
+		builder.HasKey(t => t.Id);
 
 		builder.Property(t => t.Released);
 		builder.Property(t => t.ToDeploy);

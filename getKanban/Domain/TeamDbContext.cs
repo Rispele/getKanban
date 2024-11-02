@@ -1,5 +1,4 @@
 ﻿using Domain.Game;
-using Domain.Game.Teams;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain;

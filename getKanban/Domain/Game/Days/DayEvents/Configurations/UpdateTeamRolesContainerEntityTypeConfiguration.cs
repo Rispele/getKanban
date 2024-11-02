@@ -8,7 +8,7 @@ public class UpdateTeamRolesContainerEntityTypeConfiguration : IEntityTypeConfig
 {
 	public void Configure(EntityTypeBuilder<UpdateTeamRolesContainer> builder)
 	{
-		builder.HasKey(e => e.Id );
+		builder.HasKey(e => e.Id);
 		builder.Property(e => e.Timestamp).IsRowVersion();
 
 		builder

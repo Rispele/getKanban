@@ -23,7 +23,7 @@ public class Day
 	public RollDiceContainer? RollDiceContainer { get; private set; }
 	public ReleaseTicketContainer? ReleaseTicketContainer { get; private set; }
 	public UpdateSprintBacklogContainer? UpdateSprintBacklogContainer { get; private set; }
-	public UpdateCfdContainer? UpdateCfdContainer { get; private set; }
+	public UpdateCfdContainer UpdateCfdContainer { get; private set; }
 
 	public long TeamSessionId { get; }
 
@@ -54,7 +54,7 @@ public class Day
 		this.testersNumber = testersNumber;
 
 		UpdateTeamRolesContainer = new UpdateTeamRolesContainer();
- 		UpdateCfdContainer = UpdateCfdContainer.CreateInstance(this);
+		// UpdateCfdContainer = new UpdateCfdContainer();
 	}
 
 	public int RollDiceForAnotherTeam()
@@ -138,7 +138,7 @@ public class Day
 		int withAnalysts)
 	{
 		EnsureCanPostEvent(DayEventType.UpdateCfd);
-		
+
 		UpdateCfdContainer = UpdateCfdContainer.CreateInstance(
 			this,
 			released,
@@ -151,7 +151,7 @@ public class Day
 	public void EndOfUpdateCfd()
 	{
 		EnsureCanPostEvent(DayEventType.EndOfUpdateCfd);
-		
+
 		PostDayEvent(DayEventType.EndOfUpdateCfd);
 	}
 

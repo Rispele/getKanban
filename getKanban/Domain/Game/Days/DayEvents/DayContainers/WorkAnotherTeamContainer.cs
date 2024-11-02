@@ -8,7 +8,7 @@ namespace Domain.Game.Days.DayEvents.DayContainers;
 public class WorkAnotherTeamContainer
 {
 	public long Id { get; }
-	
+
 	public int DiceNumber { get; }
 
 	public int ScoresNumber { get; }

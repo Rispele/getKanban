@@ -9,7 +9,7 @@ namespace Domain.Game.Teams;
 public class TeamSessionSettings
 {
 	public long Id { get; }
-	
+
 	public IReadOnlyList<string> InitiallyTakenTickets { get; set; } = null!;
 
 	public int ReleaseCycleLength { get; init; }

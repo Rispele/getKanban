@@ -9,7 +9,7 @@ public class RollDiceContainerEntityTypeConfiguration : IEntityTypeConfiguration
 {
 	public void Configure(EntityTypeBuilder<RollDiceContainer> builder)
 	{
-		builder.HasKey(e =>  e.Id );
+		builder.HasKey(e => e.Id);
 
 		builder.Property(e => e.Id).ValueGeneratedOnAdd();
 

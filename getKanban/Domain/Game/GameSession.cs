@@ -21,7 +21,7 @@ public class GameSession
 	private GameSession()
 	{
 	}
-	
+
 	public GameSession(
 		User creator,
 		string name,
