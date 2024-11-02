@@ -8,7 +8,6 @@ namespace Domain.Game.Days.DayEvents.DayContainers;
 public class UpdateSprintBacklogContainer
 {
 	public long Id { get; set; }
-	public long DayId { get; }
 	public IReadOnlyList<string> TicketIds { get; } = null!;
 
 	[UsedImplicitly]
@@ -16,9 +15,8 @@ public class UpdateSprintBacklogContainer
 	{
 	}
 
-	private UpdateSprintBacklogContainer(long dayId, string[] ticketIds)
+	private UpdateSprintBacklogContainer(string[] ticketIds)
 	{
-		DayId = dayId;
 		TicketIds = ticketIds;
 	}
 
@@ -26,6 +24,6 @@ public class UpdateSprintBacklogContainer
 	{
 		day.PostDayEvent(DayEventType.UpdateSprintBacklog);
 
-		return new UpdateSprintBacklogContainer(day.Id, ticketIds);
+		return new UpdateSprintBacklogContainer(ticketIds);
 	}
 }

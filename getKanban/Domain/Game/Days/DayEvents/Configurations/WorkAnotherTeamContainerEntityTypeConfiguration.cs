@@ -8,6 +8,6 @@ public class WorkAnotherTeamContainerEntityTypeConfiguration : IEntityTypeConfig
 {
 	public void Configure(EntityTypeBuilder<WorkAnotherTeamContainer> builder)
 	{
-		builder.HasKey(e => new { e.DayId, e.Id });
+		builder.HasKey(e => e.Id);
 	}
 }

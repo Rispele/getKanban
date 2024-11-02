@@ -8,7 +8,6 @@ namespace Domain.Game.Days.DayEvents.DayContainers;
 public class ReleaseTicketContainer
 {
 	public long Id { get; }
-	public long DayId { get; }
 	public IReadOnlyList<string> TicketIds { get; } = null!;
 
 	[UsedImplicitly]
@@ -16,9 +15,8 @@ public class ReleaseTicketContainer
 	{
 	}
 
-	private ReleaseTicketContainer(long dayId, IReadOnlyList<string> ticketIds)
+	private ReleaseTicketContainer(IReadOnlyList<string> ticketIds)
 	{
-		DayId = dayId;
 		TicketIds = ticketIds;
 	}
 
@@ -27,6 +25,6 @@ public class ReleaseTicketContainer
 		IReadOnlyList<string> ticketIds)
 	{
 		day.PostDayEvent(DayEventType.ReleaseTickets);
-		return new ReleaseTicketContainer(day.Id, ticketIds);
+		return new ReleaseTicketContainer(ticketIds);
 	}
 }

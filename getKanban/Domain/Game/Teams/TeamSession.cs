@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Domain.Game.Teams;
 
 [EntityTypeConfiguration(typeof(TeamSessionEntityTypeConfiguration))]
-public class TeamSession
+public class  TeamSession
 {
 	private readonly List<Day> days = null!;
 	private readonly TeamSessionSettings settings;

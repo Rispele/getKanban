@@ -9,7 +9,7 @@ public class
 {
 	public void Configure(EntityTypeBuilder<UpdateSprintBacklogContainer> builder)
 	{
-		builder.HasKey(e => new { e.DayId, e.Id });
+		builder.HasKey(e => e.Id);
 
 		builder.Property(e => e.TicketIds)
 			.HasConversion(new ReadOnlyListConverter<string>());

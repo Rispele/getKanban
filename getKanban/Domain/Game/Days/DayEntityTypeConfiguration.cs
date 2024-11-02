@@ -29,17 +29,12 @@ public class DayEntityTypeConfiguration : IEntityTypeConfiguration<Day>
 
 		builder.Property(e => e.Timestamp).IsRowVersion();
 
-		ConfigureContainerRelation<WorkAnotherTeamContainer>(builder, d => d.WorkAnotherTeamContainer!, c => c.DayId);
-		ConfigureContainerRelation<UpdateTeamRolesContainer>(builder, d => d.updateTeamRolesContainer!, d => d.DayId);
-		ConfigureContainerRelation<RollDiceContainer>(builder, d => d.RollDiceContainer!, d => d.DayId);
-		ConfigureContainerRelation<ReleaseTicketContainer>(builder, d => d.ReleaseTicketContainer!, d => d.DayId);
-		ConfigureContainerRelation<UpdateSprintBacklogContainer>(builder, d => d.UpdateSprintBacklogContainer!, d => d.DayId);
-		// ConfigureContainerRelation<UpdateCfdContainer>(builder, d => d.UpdateCfdContainer!, d => d.DayId);
-
-		builder
-			.HasOne(d => d.UpdateCfdContainer)
-			.WithOne()
-			.HasForeignKey<Day>();
+		ConfigureContainerRelation<WorkAnotherTeamContainer>(builder, d => d.WorkAnotherTeamContainer!);
+		ConfigureContainerRelation<UpdateTeamRolesContainer>(builder, d => d.UpdateTeamRolesContainer!);
+		ConfigureContainerRelation<RollDiceContainer>(builder, d => d.RollDiceContainer!);
+		ConfigureContainerRelation<ReleaseTicketContainer>(builder, d => d.ReleaseTicketContainer!);
+		ConfigureContainerRelation<UpdateSprintBacklogContainer>(builder, d => d.UpdateSprintBacklogContainer!);
+		ConfigureContainerRelation<UpdateCfdContainer>(builder, d => d.UpdateCfdContainer!);
 
 		builder
 			.HasMany<AwaitedEvent>()
@@ -48,14 +43,13 @@ public class DayEntityTypeConfiguration : IEntityTypeConfiguration<Day>
 
 	private static void ConfigureContainerRelation<TContainer>(
 		EntityTypeBuilder<Day> builder,
-		Expression<Func<Day, TContainer>> expression,
-		Expression<Func<TContainer, object?>> propertyExpression)
+		Expression<Func<Day, TContainer>> expression)
 		where TContainer : class
 	{
 		builder
 			.HasOne(expression)
 			.WithOne()
-			.HasPrincipalKey(propertyExpression);
+			.HasForeignKey<Day>();
 	}
 
 	private class ScenarioConverter : ValueConverter<Dictionary<DayEventType, List<DayEventType>>, string>

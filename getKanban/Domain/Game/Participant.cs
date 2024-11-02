@@ -1,10 +1,11 @@
-﻿using Domain.Users;
+﻿using Domain.Game.Configuration;
+using Domain.Users;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Game;
 
-[PrimaryKey(nameof(Id))]
+[EntityTypeConfiguration(typeof(ParticipantEntityTypeConfiguration))]
 public class Participant
 {
 	public long Id { get; }

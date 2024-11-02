@@ -8,7 +8,7 @@ public class ReleaseTicketContainerEntityTypeConfiguration : IEntityTypeConfigur
 {
 	public void Configure(EntityTypeBuilder<ReleaseTicketContainer> builder)
 	{
-		builder.HasKey(e => new { e.DayId, e.Id });
+		builder.HasKey(e => e.Id );
 
 		builder
 			.Property(e => e.TicketIds)

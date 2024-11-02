@@ -1,6 +1,7 @@
 ﻿using Domain.Game.Configuration;
 using Domain.Game.Teams;
 using Domain.Users;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Game;
@@ -16,6 +17,11 @@ public class GameSession
 
 	public string Name { get; }
 
+	[UsedImplicitly]
+	private GameSession()
+	{
+	}
+	
 	public GameSession(
 		User creator,
 		string name,

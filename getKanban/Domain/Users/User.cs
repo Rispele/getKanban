@@ -1,5 +1,8 @@
-﻿namespace Domain.Users;
+﻿using Microsoft.EntityFrameworkCore;
 
+namespace Domain.Users;
+
+[EntityTypeConfiguration(typeof(UserEntityTypeConfiguration))]
 public class User
 {
 	public Guid Id { get; }

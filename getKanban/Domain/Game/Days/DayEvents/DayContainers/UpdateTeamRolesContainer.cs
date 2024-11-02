@@ -10,18 +10,12 @@ public class UpdateTeamRolesContainer
 	private readonly List<TeamRoleUpdate> teamRoleUpdates = null!;
 
 	public long Id { get; }
-	public long DayId { get; }
 
 	public byte[]? Timestamp { get; set; }
 
 	[UsedImplicitly]
-	private UpdateTeamRolesContainer()
+	public UpdateTeamRolesContainer()
 	{
-	}
-
-	public UpdateTeamRolesContainer(long dayId)
-	{
-		DayId = dayId;
 		teamRoleUpdates = [];
 	}
 

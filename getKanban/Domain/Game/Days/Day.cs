@@ -1,6 +1,7 @@
 ﻿using Domain.DomainExceptions;
 using Domain.Game.Days.DayEvents;
 using Domain.Game.Days.DayEvents.DayContainers;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Game.Days;
@@ -17,7 +18,7 @@ public class Day
 
 	private IEnumerable<AwaitedEvent> currentlyAwaitedEvents => awaitedEvents.Where(@event => !@event.Removed);
 
-	public UpdateTeamRolesContainer updateTeamRolesContainer { get; private set; }
+	public UpdateTeamRolesContainer UpdateTeamRolesContainer { get; private set; }
 	public WorkAnotherTeamContainer? WorkAnotherTeamContainer { get; private set; }
 	public RollDiceContainer? RollDiceContainer { get; private set; }
 	public ReleaseTicketContainer? ReleaseTicketContainer { get; private set; }
@@ -30,6 +31,7 @@ public class Day
 
 	public byte[]? Timestamp { get; set; }
 
+	[UsedImplicitly]
 	private Day()
 	{
 	}
@@ -51,7 +53,8 @@ public class Day
 		this.programmersNumber = programmersNumber;
 		this.testersNumber = testersNumber;
 
-		UpdateCfdContainer = UpdateCfdContainer.CreateInstance(this);
+		UpdateTeamRolesContainer = new UpdateTeamRolesContainer();
+ 		UpdateCfdContainer = UpdateCfdContainer.CreateInstance(this);
 	}
 
 	public int RollDiceForAnotherTeam()
@@ -72,9 +75,9 @@ public class Day
 		EnsureCanPostEvent(DayEventType.UpdateTeamRoles);
 		EnsureCanUpdateTeamRoles(from);
 
-		updateTeamRolesContainer ??= new UpdateTeamRolesContainer(Id);
+		UpdateTeamRolesContainer ??= new UpdateTeamRolesContainer();
 
-		updateTeamRolesContainer.AddUpdate(this, from, to);
+		UpdateTeamRolesContainer.AddUpdate(this, from, to);
 	}
 
 	public void RollDices()
@@ -82,7 +85,7 @@ public class Day
 		EnsureCanPostEvent(DayEventType.RollDice);
 
 		var diceRoller = new DiceRoller(new Random());
-		var swapByRole = updateTeamRolesContainer?.BuildTeamRolesUpdate() ?? [];
+		var swapByRole = UpdateTeamRolesContainer?.BuildTeamRolesUpdate() ?? [];
 		var (analystsDiceNumber, analystsScores) = RollDiceForRole(analystsNumber, TeamRole.Analyst);
 		var (programmersDiceNumber, programmersScores) = RollDiceForRole(programmersNumber, TeamRole.Programmer);
 		var (testersDiceNumber, testersScores) = RollDiceForRole(testersNumber, TeamRole.Tester);
@@ -168,7 +171,7 @@ public class Day
 
 	private void EnsureCanUpdateTeamRoles(TeamRole from)
 	{
-		var update = updateTeamRolesContainer?.BuildTeamRolesUpdate() ?? [];
+		var update = UpdateTeamRolesContainer?.BuildTeamRolesUpdate() ?? [];
 
 		if (!update.TryGetValue(from, out var updates))
 		{

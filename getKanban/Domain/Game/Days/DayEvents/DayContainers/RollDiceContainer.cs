@@ -8,7 +8,6 @@ namespace Domain.Game.Days.DayEvents.DayContainers;
 public class RollDiceContainer
 {
 	public long Id { get; }
-	public long DayId { get; }
 	public IReadOnlyList<int> AnalystsDiceNumber { get; } = null!;
 	public IReadOnlyList<int> ProgrammersDiceNumber { get; } = null!;
 	public IReadOnlyList<int> TestersDiceNumber { get; } = null!;
@@ -22,7 +21,6 @@ public class RollDiceContainer
 	}
 
 	private RollDiceContainer(
-		long dayId,
 		IReadOnlyList<int> analystsDiceNumber,
 		IReadOnlyList<int> programmersDiceNumber,
 		IReadOnlyList<int> testersDiceNumber,
@@ -30,7 +28,6 @@ public class RollDiceContainer
 		IReadOnlyList<int> programmersScores,
 		IReadOnlyList<int> testersScores)
 	{
-		DayId = dayId;
 		AnalystsDiceNumber = analystsDiceNumber;
 		ProgrammersDiceNumber = programmersDiceNumber;
 		TestersDiceNumber = testersDiceNumber;
@@ -51,7 +48,6 @@ public class RollDiceContainer
 		day.PostDayEvent(DayEventType.RollDice);
 
 		return new RollDiceContainer(
-			day.Id,
 			analystsDiceNumber,
 			programmersDiceNumber,
 			testersDiceNumber,

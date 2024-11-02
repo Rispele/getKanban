@@ -9,8 +9,6 @@ public class WorkAnotherTeamContainer
 {
 	public long Id { get; }
 	
-	public long DayId { get; }
-
 	public int DiceNumber { get; }
 
 	public int ScoresNumber { get; }
@@ -21,11 +19,9 @@ public class WorkAnotherTeamContainer
 	}
 
 	private WorkAnotherTeamContainer(
-		long dayId,
 		int diceNumber,
 		int scoresNumber)
 	{
-		DayId = dayId;
 		DiceNumber = diceNumber;
 		ScoresNumber = scoresNumber;
 	}
@@ -38,7 +34,6 @@ public class WorkAnotherTeamContainer
 		day.PostDayEvent(DayEventType.WorkAnotherTeam);
 
 		return new WorkAnotherTeamContainer(
-			day.Id,
 			diceNumber,
 			scoresNumber);
 	}
