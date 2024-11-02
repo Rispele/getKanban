@@ -17,7 +17,7 @@ public class Day
 
 	private IEnumerable<AwaitedEvent> currentlyAwaitedEvents => awaitedEvents.Where(@event => !@event.Removed);
 
-	public UpdateTeamRolesContainer? updateTeamRolesContainer { get; set; }
+	public UpdateTeamRolesContainer updateTeamRolesContainer { get; private set; }
 	public WorkAnotherTeamContainer? WorkAnotherTeamContainer { get; private set; }
 	public RollDiceContainer? RollDiceContainer { get; private set; }
 	public ReleaseTicketContainer? ReleaseTicketContainer { get; private set; }
@@ -50,6 +50,8 @@ public class Day
 		this.analystsNumber = analystsNumber;
 		this.programmersNumber = programmersNumber;
 		this.testersNumber = testersNumber;
+
+		UpdateCfdContainer = UpdateCfdContainer.CreateInstance(this);
 	}
 
 	public int RollDiceForAnotherTeam()
@@ -133,7 +135,7 @@ public class Day
 		int withAnalysts)
 	{
 		EnsureCanPostEvent(DayEventType.UpdateCfd);
-
+		
 		UpdateCfdContainer = UpdateCfdContainer.CreateInstance(
 			this,
 			released,
@@ -141,6 +143,13 @@ public class Day
 			withTesters,
 			withProgrammers,
 			withAnalysts);
+	}
+
+	public void EndOfUpdateCfd()
+	{
+		EnsureCanPostEvent(DayEventType.EndOfUpdateCfd);
+		
+		PostDayEvent(DayEventType.EndOfUpdateCfd);
 	}
 
 	public void EndDay()

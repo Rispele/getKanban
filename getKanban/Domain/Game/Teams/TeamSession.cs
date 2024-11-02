@@ -88,7 +88,7 @@ public class TeamSession
 		var released = ReleasedTickets.Value.Count;
 
 		var currentSumToValidate = released + readyToDeploy;
-		var previousSumToValidate = previousDayCfd.Released + previousDayCfd.ReadyToDeploy;
+		var previousSumToValidate = previousDayCfd.Released + previousDayCfd.ToDeploy;
 		ValidateArgumentsSum(currentSumToValidate, previousSumToValidate);
 
 		currentSumToValidate += withTesters;

@@ -1,4 +1,5 @@
-﻿using Domain.Game.Days.DayEvents.Configurations;
+﻿using Domain.DomainExceptions;
+using Domain.Game.Days.DayEvents.Configurations;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,12 +9,11 @@ namespace Domain.Game.Days.DayEvents.DayContainers;
 public class UpdateCfdContainer
 {
 	public long Id { get; }
-	public long DayId { get; }
-	public int Released { get; }
-	public int ReadyToDeploy { get; }
-	public int WithTesters { get; }
-	public int WithProgrammers { get; }
-	public int WithAnalysts { get; }
+	public int Released { get; private set; }
+	public int ToDeploy { get; private set; }
+	public int WithTesters { get; private set; }
+	public int WithProgrammers { get; private set; }
+	public int WithAnalysts { get; private set; }
 
 	[UsedImplicitly]
 	private UpdateCfdContainer()
@@ -21,33 +21,59 @@ public class UpdateCfdContainer
 	}
 
 	private UpdateCfdContainer(
-		long dayId,
 		int released,
-		int readyToDeploy,
+		int toDeploy,
 		int withTesters,
 		int withProgrammers,
 		int withAnalysts)
 	{
-		DayId = dayId;
 		Released = released;
-		ReadyToDeploy = readyToDeploy;
+		ToDeploy = toDeploy;
 		WithTesters = withTesters;
 		WithProgrammers = withProgrammers;
 		WithAnalysts = withAnalysts;
 	}
 
+	internal void Update(UpdateCfdContainerPatchType patchType, int value)
+	{
+		if (value < 0)
+		{
+			throw new DomainException("Value cannot be negative.");
+		}
+
+		switch (patchType)
+		{
+			case UpdateCfdContainerPatchType.Released:
+				Released = value;
+				break;
+			case UpdateCfdContainerPatchType.ToDeploy:
+				ToDeploy = value;
+				break;
+			case UpdateCfdContainerPatchType.WithTesters:
+				WithTesters = value;
+				break;
+			case UpdateCfdContainerPatchType.WithProgrammers:
+				WithProgrammers = value;
+				break;
+			case UpdateCfdContainerPatchType.WithAnalysts:
+				WithAnalysts = value;
+				break;
+			default:
+				throw new ArgumentOutOfRangeException(nameof(patchType), patchType, null);
+		}
+	}
+	
 	internal static UpdateCfdContainer CreateInstance(
 		Day day,
-		int released,
-		int readyToDeploy,
-		int withTesters,
-		int withProgrammers,
-		int withAnalysts)
+		int released = 0,
+		int readyToDeploy = 0,
+		int withTesters = 0,
+		int withProgrammers = 0,
+		int withAnalysts = 0)
 	{
 		day.PostDayEvent(DayEventType.UpdateCfd);
 
 		return new UpdateCfdContainer(
-			day.Id,
 			released,
 			readyToDeploy,
 			withTesters,
@@ -57,7 +83,6 @@ public class UpdateCfdContainer
 
 	internal static UpdateCfdContainer None =>
 		new(
-			0,
 			0,
 			0,
 			0,

@@ -9,5 +9,6 @@ public enum DayEventType
 	ReleaseTickets = 3,
 	UpdateSprintBacklog = 4,
 	UpdateCfd = 5,
-	EndDay = 6
+	EndOfUpdateCfd = 6,
+	EndDay = 7
 }

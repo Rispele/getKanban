@@ -34,7 +34,13 @@ public class DayEntityTypeConfiguration : IEntityTypeConfiguration<Day>
 		ConfigureContainerRelation<RollDiceContainer>(builder, d => d.RollDiceContainer!, d => d.DayId);
 		ConfigureContainerRelation<ReleaseTicketContainer>(builder, d => d.ReleaseTicketContainer!, d => d.DayId);
 		ConfigureContainerRelation<UpdateSprintBacklogContainer>(builder, d => d.UpdateSprintBacklogContainer!, d => d.DayId);
-		ConfigureContainerRelation<UpdateCfdContainer>(builder, d => d.UpdateCfdContainer!, d => d.DayId);
+		// ConfigureContainerRelation<UpdateCfdContainer>(builder, d => d.UpdateCfdContainer!, d => d.DayId);
+
+		builder
+			.HasOne(d => d.UpdateCfdContainer)
+			.WithOne()
+			.HasForeignKey<Day>();
+
 		builder
 			.HasMany<AwaitedEvent>()
 			.WithOne();
