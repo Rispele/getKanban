@@ -162,6 +162,7 @@ public partial class Team
 			: settings.DefaultTestersNumber;
 
 		return new Day(
+			dayNumber,
 			scenario,
 			initiallyAwaitedEvents,
 			settings.AnalystsNumber,

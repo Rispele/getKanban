@@ -28,6 +28,8 @@ public class Day
 
 	public long Id { get; }
 
+	public int DayNumber { get; }
+
 	public byte[]? Timestamp { get; set; }
 
 	[UsedImplicitly]
@@ -36,12 +38,14 @@ public class Day
 	}
 
 	public Day(
+		int dayNumber,
 		Scenario scenario,
 		List<DayEventType> initiallyAwaitedEvents,
 		int analystsNumber,
 		int programmersNumber,
 		int testersNumber)
 	{
+		DayNumber = dayNumber;
 		this.scenario = scenario;
 		awaitedEvents = initiallyAwaitedEvents.Select(t => new AwaitedEvent(t)).ToList();
 
