@@ -25,48 +25,48 @@ public partial class Team
 
 	public Lazy<int> AnotherTeamScores { get; }
 
-	public int RollDiceForAnotherTeam(int? dayNumber = null)
+	public int RollDiceForAnotherTeam()
 	{
 		return currentDay.RollDiceForAnotherTeam();
 	}
 
-	public void UpdateTeamRoles(TeamRole from, TeamRole to, int? dayNumber = null)
+	public void UpdateTeamRoles(TeamRole from, TeamRole to)
 	{
 		currentDay.UpdateTeamRoles(from, to);
 	}
 
-	public void RollDices(int? dayNumber = null)
+	public void RollDices()
 	{
 		currentDay.RollDices();
 	}
 
-	public void ReleaseTickets(string[] ticketIds, int? dayNumber = null)
+	public void ReleaseTickets(string[] ticketIds)
 	{
 		EnsureCanReleaseTickets(ticketIds);
 
 		currentDay.ReleaseTickets(ticketIds);
 	}
 
-	public void UpdateSprintBacklog(string[] ticketIds, int? dayNumber = null)
+	public void UpdateSprintBacklog(string[] ticketIds)
 	{
 		EnsureCanTakeTickets(ticketIds);
 
 		currentDay.UpdateSprintBacklog(ticketIds);
 	}
 
-	public void UpdateCfd(UpdateCfdContainerPatchType patchType, int value, int? dayNumber = null)
+	public void UpdateCfd(UpdateCfdContainerPatchType patchType, int value)
 	{
 		currentDay.UpdateCfd(patchType, value);
 	}
 
-	public void EndOfUpdateCfd(int? dayNumber = null)
+	public void EndOfUpdateCfd()
 	{
 		EnsureCanEndOfUpdateCfd();
 
 		currentDay.EndOfUpdateCfd();
 	}
 
-	public void EndDay(int? dayNumber = null)
+	public void EndDay()
 	{
 		currentDay.EndDay();
 
