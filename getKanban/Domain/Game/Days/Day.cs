@@ -26,9 +26,7 @@ public class Day
 	public UpdateSprintBacklogContainer? UpdateSprintBacklogContainer { get; private set; }
 	public UpdateCfdContainer UpdateCfdContainer { get; } = null!;
 
-	public Guid TeamId { get; }
-
-	public Guid Id { get; }
+	public long Id { get; }
 
 	public byte[]? Timestamp { get; set; }
 
@@ -38,15 +36,12 @@ public class Day
 	}
 
 	public Day(
-		Guid teamId,
 		Scenario scenario,
 		List<DayEventType> initiallyAwaitedEvents,
 		int analystsNumber,
 		int programmersNumber,
 		int testersNumber)
 	{
-		TeamId = teamId;
-
 		this.scenario = scenario;
 		awaitedEvents = initiallyAwaitedEvents.Select(t => new AwaitedEvent(t)).ToList();
 

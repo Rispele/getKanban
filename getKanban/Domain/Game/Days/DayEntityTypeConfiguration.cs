@@ -13,7 +13,7 @@ public class DayEntityTypeConfiguration : IEntityTypeConfiguration<Day>
 {
 	public void Configure(EntityTypeBuilder<Day> builder)
 	{
-		builder.HasKey(e => new { TeamSessionId = e.TeamId, DayId = e.Id });
+		builder.HasKey(e => e.Id );
 
 		builder.Property(e => e.Id)
 			.ValueGeneratedOnAdd()

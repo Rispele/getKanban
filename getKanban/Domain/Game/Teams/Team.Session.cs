@@ -61,6 +61,13 @@ public partial class Team
 
 	public void EndOfUpdateCfd(int? dayNumber = null)
 	{
+		EnsureCanEndOfUpdateCfd();
+
+		currentDay.EndOfUpdateCfd();
+	}
+
+	private void EnsureCanEndOfUpdateCfd()
+	{
 		var currentDayCfd = currentDay.UpdateCfdContainer;
 		var previousDayCfd = previousDay?.UpdateCfdContainer ?? UpdateCfdContainer.None;
 
@@ -79,8 +86,6 @@ public partial class Team
 		currentSumToValidate += currentDayCfd.WithAnalysts;
 		previousSumToValidate += previousDayCfd.WithAnalysts;
 		ValidateArgumentsSum(currentSumToValidate!.Value, previousSumToValidate!.Value);
-
-		currentDay.EndOfUpdateCfd();
 
 		void ValidateArgumentsSum(int currentSum, int previousSum)
 		{
@@ -157,7 +162,6 @@ public partial class Team
 			: settings.DefaultTestersNumber;
 
 		return new Day(
-			Id,
 			scenario,
 			initiallyAwaitedEvents,
 			settings.AnalystsNumber,
