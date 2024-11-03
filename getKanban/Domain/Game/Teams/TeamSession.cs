@@ -79,9 +79,7 @@ public class TeamSession
 		currentDay.UpdateSprintBacklog(ticketIds);
 	}
 
-	public void UpdateCfd(
-		UpdateCfdContainerPatchType patchType,
-		int value)
+	public void UpdateCfd(UpdateCfdContainerPatchType patchType, int value)
 	{
 		currentDay.UpdateCfd(patchType, value);
 	}
