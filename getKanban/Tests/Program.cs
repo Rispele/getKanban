@@ -1,5 +1,6 @@
 ﻿using Domain.Game.Days.DayEvents;
 using Domain.Game.Days.Scenarios;
+using Tests;
 
 var (s, _) = ConfigureScenario(true, true, true);
 var updateCfdContainer = new UpdateCfdContainer();
@@ -61,13 +62,16 @@ static (Scenario, List<DayEventType>) ConfigureScenario(
 	);
 }
 
-public class UpdateCfdContainer
+namespace Tests
 {
-	public int? Released { get; set; }
-	public int? ToDeploy { get; set; }
-	public int? WithTesters { get; set; }
-	public int? WithProgrammers { get; set; }
-	public int? WithAnalysts { get; set; }
+	public class UpdateCfdContainer
+	{
+		public int? Released { get; set; }
+		public int? ToDeploy { get; set; }
+		public int? WithTesters { get; set; }
+		public int? WithProgrammers { get; set; }
+		public int? WithAnalysts { get; set; }
+	}
 }
 
 
