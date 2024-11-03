@@ -13,10 +13,21 @@ public partial class Team
 	private readonly TeamSessionSettings settings;
 
 	private int currentDayNumber;
+	private int previousDayNumber => currentDayNumber - 1;
 
-	private Day currentDay => days[currentDayNumber - 9];
-	private Day? previousDay => currentDayNumber < 10 ? null : days[currentDayNumber - 10];
+	private Day currentDay => days.Single(d => d.Number == currentDayNumber);
+	private Day? previousDay => days.SingleOrDefault(d => d.Number == previousDayNumber);
 
+	public IReadOnlyList<TeamRoleUpdate> CurrentDayTeamRoleUpdates => currentDay.UpdateTeamRolesContainer.TeamRoleUpdates;
+	
+	public RollDiceContainer? CurrentDayRollDiceContainer => currentDay.RollDiceContainer;
+	
+	public IReadOnlyList<UpdateCfdContainer> CfdContainers => days
+		.OrderBy(d => d.Number)
+		.Select(d => d.UpdateCfdContainer)
+		.Where(c => c.Frozen)
+		.ToList();
+	
 	public Lazy<HashSet<string>> TicketsInWork { get; }
 
 	public Lazy<HashSet<string>> TakenTickets { get; }

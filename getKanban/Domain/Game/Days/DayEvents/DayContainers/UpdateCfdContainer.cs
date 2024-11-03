@@ -1,5 +1,6 @@
 ﻿using Domain.DomainExceptions;
 using Domain.Game.Days.DayEvents.Configurations;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Game.Days.DayEvents.DayContainers;
@@ -13,7 +14,10 @@ public class UpdateCfdContainer
 	public int? WithTesters { get; private set; }
 	public int? WithProgrammers { get; private set; }
 	public int? WithAnalysts { get; private set; }
-
+	public bool Frozen { get; private set; }
+	
+	public byte[]? Timestamp { get; [UsedImplicitly] private set; }
+	
 	public UpdateCfdContainer()
 	{
 	}
@@ -34,6 +38,11 @@ public class UpdateCfdContainer
 
 	internal void Update(UpdateCfdContainerPatchType patchType, int value)
 	{
+		if (Frozen)
+		{
+			throw new DomainException("Cannot update frozen container");
+		}
+		
 		if (value < 0)
 		{
 			throw new DomainException("Value cannot be negative.");
@@ -60,6 +69,8 @@ public class UpdateCfdContainer
 				throw new ArgumentOutOfRangeException(nameof(patchType), patchType, null);
 		}
 	}
+	
+	internal void Freeze() => Frozen = true;
 
 	internal static UpdateCfdContainer None =>
 		new(

@@ -28,9 +28,9 @@ public class Day
 
 	public long Id { get; }
 
-	public int DayNumber { get; }
+	public int Number { get; }
 
-	public byte[]? Timestamp { get; set; }
+	public byte[]? Timestamp { get; [UsedImplicitly] private set; }
 
 	[UsedImplicitly]
 	private Day()
@@ -38,14 +38,14 @@ public class Day
 	}
 
 	public Day(
-		int dayNumber,
+		int number,
 		Scenario scenario,
 		List<DayEventType> initiallyAwaitedEvents,
 		int analystsNumber,
 		int programmersNumber,
 		int testersNumber)
 	{
-		DayNumber = dayNumber;
+		Number = number;
 		this.scenario = scenario;
 		awaitedEvents = initiallyAwaitedEvents.Select(t => new AwaitedEvent(t)).ToList();
 
@@ -144,6 +144,8 @@ public class Day
 	{
 		EnsureCanPostEvent(DayEventType.EndOfUpdateCfd);
 
+		UpdateCfdContainer.Freeze();
+		
 		PostDayEvent(DayEventType.EndOfUpdateCfd, null);
 	}
 
