@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 using Domain.Game.Days.DayEvents;
 using Domain.Game.Days.DayEvents.DayContainers;
+using Domain.Game.Days.Scenarios;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
@@ -52,13 +53,7 @@ public class DayEntityTypeConfiguration : IEntityTypeConfiguration<Day>
 			.HasForeignKey<Day>();
 	}
 
-	private class ScenarioConverter : ValueConverter<Dictionary<DayEventType, List<DayEventType>>, string>
-	{
-		public ScenarioConverter()
-			: base(
-				context => JsonConvert.SerializeObject(context),
-				str => JsonConvert.DeserializeObject<Dictionary<DayEventType, List<DayEventType>>>(str)!)
-		{
-		}
-	}
+	private class ScenarioConverter() : ValueConverter<Scenario, string>(
+		context => JsonConvert.SerializeObject(context),
+		str => JsonConvert.DeserializeObject<Scenario>(str)!);
 }

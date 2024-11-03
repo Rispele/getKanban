@@ -1,6 +1,7 @@
 ﻿using Domain.Game.Days.DayEvents.DayContainers;
 using Domain.Game.Teams.Configurations;
 using Domain.Users;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Game.Teams;
@@ -18,6 +19,7 @@ public class Team
 
 	public string Name { get; private set; }
 
+	[UsedImplicitly]
 	private Team()
 	{
 	}

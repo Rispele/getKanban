@@ -2,4 +2,4 @@
 
 namespace Domain.Game.Days.Scenarios;
 
-public record ScenarioItem(DayEventType[] EventType, ScenarioItemCondition[] conditions);
+public record ScenarioItem(DayEventType[] EventTypes, ScenarioItemCondition[] conditions);

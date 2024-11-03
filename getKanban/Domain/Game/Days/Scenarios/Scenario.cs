@@ -16,7 +16,7 @@ public class Scenario
 		var items = scenario[dayEventType];
 		return items
 			.Where(item => MatchConditions(parameters, item.conditions))
-			.Select(item => item.EventType)
+			.SelectMany(item => item.EventTypes)
 			.Distinct(); //TODO (d.smirnov): сделать залупку, ака OR для ScenarioItemCondition чтобы не делать этот убогий дистинкт, когда для нескольких вариантов под операцией ИЛИ нужно писать несколько ScenarioItems. Опять же, не уверен что буду этим заниматься
 	}
 
