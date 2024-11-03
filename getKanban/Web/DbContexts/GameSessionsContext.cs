@@ -1,7 +1,7 @@
 ﻿using Domain.Game;
 using Microsoft.EntityFrameworkCore;
 
-namespace Domain.DbContexts;
+namespace Web.DbContexts;
 
 public class GameSessionsContext : DbContext
 {
@@ -9,6 +9,8 @@ public class GameSessionsContext : DbContext
 
 	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 	{
-		optionsBuilder.UseNpgsql("Host=localhost;Port=5432;Database=db;Username=usr;Password=pwd");
+		optionsBuilder
+			.UseNpgsql("Host=localhost;Port=5432;Database=db;Username=usr;Password=pwd")
+			.UseSnakeCaseNamingConvention();
 	}
 }
