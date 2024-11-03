@@ -9,15 +9,15 @@ namespace Domain.Game.Teams;
 [EntityTypeConfiguration(typeof(TeamEntityTypeConfiguration))]
 public class Team
 {
-	private readonly List<Participant> participants;
+	private readonly List<Participant> participants = null!;
 
-	private readonly TeamSession teamSession;
+	private readonly TeamSession teamSession = null!;
 
 	public Guid GameSessionId { get; }
 
 	public Guid Id { get; }
 
-	public string Name { get; private set; }
+	public string Name { get; private set; } = null!;
 
 	[UsedImplicitly]
 	private Team()

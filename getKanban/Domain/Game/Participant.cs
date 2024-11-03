@@ -8,7 +8,7 @@ namespace Domain.Game;
 [EntityTypeConfiguration(typeof(ParticipantEntityTypeConfiguration))]
 public class Participant
 {
-	public long Id { get; }
+	[UsedImplicitly] public long Id { get; }
 	public ParticipantRole Role { get; }
 	public User User { get; } = null!;
 
