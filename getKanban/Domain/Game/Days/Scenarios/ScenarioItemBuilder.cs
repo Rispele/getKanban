@@ -4,12 +4,12 @@ namespace Domain.Game.Days.Scenarios;
 
 public class ScenarioItemBuilder
 {
+	private readonly List<DayEventType> eventTypes = new();
 	private readonly List<ScenarioItemCondition> itemConditions = new();
-	private DayEventType? eventType;
 
-	public ScenarioItemBuilder ForEventType(DayEventType eventType)
+	public ScenarioItemBuilder ForEventType(params DayEventType[] eventTypes)
 	{
-		this.eventType = eventType;
+		this.eventTypes.AddRange(eventTypes);
 		return this;
 	}
 
@@ -21,7 +21,14 @@ public class ScenarioItemBuilder
 
 	public ScenarioItem Build()
 	{
-		return new ScenarioItem(eventType ?? throw new ArgumentNullException(), itemConditions.ToArray());
+		if (eventTypes.Count == 0)
+		{
+			throw new ArgumentException("No event types defined.");
+		}
+		
+		return new ScenarioItem(
+			eventTypes.ToArray(),
+			itemConditions.ToArray());
 	}
 
 	public static implicit operator ScenarioItem(ScenarioItemBuilder builder)

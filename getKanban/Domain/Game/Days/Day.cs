@@ -55,7 +55,7 @@ public class Day
 		this.testersNumber = testersNumber;
 
 		UpdateTeamRolesContainer = new UpdateTeamRolesContainer();
-		// UpdateCfdContainer = new UpdateCfdContainer();
+		UpdateCfdContainer = new UpdateCfdContainer();
 	}
 
 	public int RollDiceForAnotherTeam()
@@ -122,6 +122,7 @@ public class Day
 		EnsureCanPostEvent(DayEventType.ReleaseTickets);
 
 		ReleaseTicketContainer = ReleaseTicketContainer.CreateInstance(this, ticketIds);
+		UpdateCfdContainer.Update(UpdateCfdContainerPatchType.Released, ticketIds.Length);
 	}
 
 	public void UpdateSprintBacklog(string[] ticketIds)
@@ -132,21 +133,12 @@ public class Day
 	}
 
 	public void UpdateCfd(
-		int released,
-		int readyToDeploy,
-		int withTesters,
-		int withProgrammers,
-		int withAnalysts)
+		UpdateCfdContainerPatchType patchType,
+		int value)
 	{
 		EnsureCanPostEvent(DayEventType.UpdateCfd);
 
-		UpdateCfdContainer = UpdateCfdContainer.CreateInstance(
-			this,
-			released,
-			readyToDeploy,
-			withTesters,
-			withProgrammers,
-			withAnalysts);
+		UpdateCfdContainer.Update(patchType, value);
 	}
 
 	public void EndOfUpdateCfd()

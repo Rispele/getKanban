@@ -9,18 +9,17 @@ namespace Domain.Game.Days.DayEvents.DayContainers;
 public class UpdateCfdContainer
 {
 	public long Id { get; }
-	public int Released { get; private set; }
-	public int ToDeploy { get; private set; }
-	public int WithTesters { get; private set; }
-	public int WithProgrammers { get; private set; }
-	public int WithAnalysts { get; private set; }
+	public int? Released { get; private set; }
+	public int? ToDeploy { get; private set; }
+	public int? WithTesters { get; private set; }
+	public int? WithProgrammers { get; private set; }
+	public int? WithAnalysts { get; private set; }
 
-	[UsedImplicitly]
-	private UpdateCfdContainer()
+	public UpdateCfdContainer()
 	{
 	}
 
-	public UpdateCfdContainer(
+	private UpdateCfdContainer(
 		int released,
 		int toDeploy,
 		int withTesters,
@@ -61,22 +60,6 @@ public class UpdateCfdContainer
 			default:
 				throw new ArgumentOutOfRangeException(nameof(patchType), patchType, null);
 		}
-	}
-
-	internal static UpdateCfdContainer CreateInstance(
-		Day day,
-		int released = 0,
-		int readyToDeploy = 0,
-		int withTesters = 0,
-		int withProgrammers = 0,
-		int withAnalysts = 0)
-	{
-		return new UpdateCfdContainer(
-			released,
-			readyToDeploy,
-			withTesters,
-			withProgrammers,
-			withAnalysts);
 	}
 
 	internal static UpdateCfdContainer None =>

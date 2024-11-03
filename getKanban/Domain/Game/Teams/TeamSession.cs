@@ -80,37 +80,35 @@ public class TeamSession
 	}
 
 	public void UpdateCfd(
-		int readyToDeploy,
-		int withTesters,
-		int withProgrammers,
-		int withAnalysts)
+		UpdateCfdContainerPatchType patchType,
+		int value)
 	{
+		currentDay.UpdateCfd(patchType, value);
+	}
+
+	public void EndOfUpdateCfd()
+	{
+		var currentDayCfd = currentDay.UpdateCfdContainer;
 		var previousDayCfd = previousDay?.UpdateCfdContainer ?? UpdateCfdContainer.None;
-		var released = ReleasedTickets.Value.Count;
-
-		var currentSumToValidate = released + readyToDeploy;
+		
+		var currentSumToValidate = currentDayCfd.Released + currentDayCfd.ToDeploy;
 		var previousSumToValidate = previousDayCfd.Released + previousDayCfd.ToDeploy;
-		ValidateArgumentsSum(currentSumToValidate, previousSumToValidate);
-
-		currentSumToValidate += withTesters;
+		ValidateArgumentsSum(currentSumToValidate!.Value, previousSumToValidate!.Value);
+		
+		currentSumToValidate += currentDayCfd.WithTesters;
 		previousSumToValidate += previousDayCfd.WithTesters;
-		ValidateArgumentsSum(currentSumToValidate, previousSumToValidate);
-
-		currentSumToValidate += withProgrammers;
+		ValidateArgumentsSum(currentSumToValidate!.Value, previousSumToValidate!.Value);
+		
+		currentSumToValidate += currentDayCfd.WithProgrammers;
 		previousSumToValidate += previousDayCfd.WithProgrammers;
-		ValidateArgumentsSum(currentSumToValidate, previousSumToValidate);
-
-		currentSumToValidate += withAnalysts;
+		ValidateArgumentsSum(currentSumToValidate!.Value, previousSumToValidate!.Value);
+		
+		currentSumToValidate += currentDayCfd.WithAnalysts;
 		previousSumToValidate += previousDayCfd.WithAnalysts;
-		ValidateArgumentsSum(currentSumToValidate, previousSumToValidate);
-
-		currentDay.UpdateCfd(
-			released,
-			readyToDeploy,
-			withTesters,
-			withProgrammers,
-			withAnalysts);
-
+		ValidateArgumentsSum(currentSumToValidate!.Value, previousSumToValidate!.Value);
+		
+		currentDay.EndOfUpdateCfd();
+		
 		void ValidateArgumentsSum(int currentSum, int previousSum)
 		{
 			if (currentSum < previousSum)
@@ -223,7 +221,7 @@ public class TeamSession
 				builder => builder.ForEventType(DayEventType.UpdateCfd).WithCondition("WithTesters", null),
 				builder => builder.ForEventType(DayEventType.UpdateCfd).WithCondition("WithProgrammers", null),
 				builder => builder.ForEventType(DayEventType.UpdateCfd).WithCondition("WithAnalysts", null),
-				builder => builder.ForEventType(DayEventType.EndOfUpdateCfd)
+				builder => builder.ForEventType(DayEventType.UpdateCfd, DayEventType.EndOfUpdateCfd)
 					.WithCondition("Released", ScenarioItemConditions.NotNull)
 					.WithCondition("ToDeploy", ScenarioItemConditions.NotNull)
 					.WithCondition("WithTesters", ScenarioItemConditions.NotNull)

@@ -73,17 +73,14 @@ public class Team
 		teamSession.UpdateSprintBacklog(ticketIds);
 	}
 
-	public void UpdateCfd(
-		int readyToDeploy,
-		int withTesters,
-		int withProgrammers,
-		int withAnalysts)
+	public void UpdateCfd(UpdateCfdContainerPatchType patchType, int value)
 	{
-		teamSession.UpdateCfd(
-			readyToDeploy,
-			withTesters,
-			withProgrammers,
-			withAnalysts);
+		teamSession.UpdateCfd(patchType, value);
+	}
+
+	public void EndOfUpdateCfd()
+	{
+		teamSession.EndOfUpdateCfd();
 	}
 
 	public void EndDay()

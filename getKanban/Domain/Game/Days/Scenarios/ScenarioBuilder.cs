@@ -30,7 +30,7 @@ public class ScenarioBuilder
 		params DayEventType[] eventTypes)
 	{
 		scenario[eventType] = eventTypes
-			.Select(b => new ScenarioItem(b, []))
+			.Select(b => new ScenarioItem([b], []))
 			.ToArray();
 		return this;
 	}
