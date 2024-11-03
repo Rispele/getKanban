@@ -24,11 +24,11 @@ public class Day
 	public RollDiceContainer? RollDiceContainer { get; private set; }
 	public ReleaseTicketContainer? ReleaseTicketContainer { get; private set; }
 	public UpdateSprintBacklogContainer? UpdateSprintBacklogContainer { get; private set; }
-	public UpdateCfdContainer UpdateCfdContainer { get; private set; } = null!;
+	public UpdateCfdContainer UpdateCfdContainer { get; } = null!;
 
-	public long TeamSessionId { get; }
+	public Guid TeamId { get; }
 
-	public long Id { get; }
+	public Guid Id { get; }
 
 	public byte[]? Timestamp { get; set; }
 
@@ -38,14 +38,14 @@ public class Day
 	}
 
 	public Day(
-		long teamSessionId,
+		Guid teamId,
 		Scenario scenario,
 		List<DayEventType> initiallyAwaitedEvents,
 		int analystsNumber,
 		int programmersNumber,
 		int testersNumber)
 	{
-		TeamSessionId = teamSessionId;
+		TeamId = teamId;
 
 		this.scenario = scenario;
 		awaitedEvents = initiallyAwaitedEvents.Select(t => new AwaitedEvent(t)).ToList();

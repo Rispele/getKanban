@@ -1,6 +1,5 @@
 ﻿using Domain.DomainExceptions;
 using Domain.Game.Days.DayEvents.Configurations;
-using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Game.Days.DayEvents.DayContainers;

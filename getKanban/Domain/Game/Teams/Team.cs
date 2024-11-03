@@ -1,5 +1,4 @@
-﻿using Domain.Game.Days.DayEvents.DayContainers;
-using Domain.Game.Teams.Configurations;
+﻿using Domain.Game.Teams.Configurations;
 using Domain.Users;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
@@ -7,11 +6,9 @@ using Microsoft.EntityFrameworkCore;
 namespace Domain.Game.Teams;
 
 [EntityTypeConfiguration(typeof(TeamEntityTypeConfiguration))]
-public class Team
+public partial class Team
 {
 	private readonly List<Participant> participants = null!;
-
-	private readonly TeamSession teamSession = null!;
 
 	public Guid GameSessionId { get; }
 
@@ -22,6 +19,11 @@ public class Team
 	[UsedImplicitly]
 	private Team()
 	{
+		settings = TeamSessionSettings.Default();
+		TakenTickets = new Lazy<HashSet<string>>(BuildTakenTickets);
+		TicketsInWork = new Lazy<HashSet<string>>(BuildTicketsInWork);
+		ReleasedTickets = new Lazy<HashSet<string>>(BuildReleasedTickets);
+		AnotherTeamScores = new Lazy<int>(BuildAnotherTeamScores);
 	}
 
 	public Team(Guid gameSessionId, string name)
@@ -29,8 +31,9 @@ public class Team
 		Id = Guid.NewGuid();
 		GameSessionId = gameSessionId;
 		Name = name;
-		teamSession = new TeamSession(Id);
 		participants = [];
+		currentDayNumber = 9;
+		days = [];
 	}
 
 	public void AddPlayer(User user)
@@ -48,45 +51,5 @@ public class Team
 
 		return (participant.Role & ParticipantRole.Player) != 0
 		       || (participant.Role & ParticipantRole.Angel) != 0;
-	}
-
-	public int RollDiceForAnotherTeam()
-	{
-		return teamSession.RollDiceForAnotherTeam();
-	}
-
-	public void UpdateTeamRoles(TeamRole from, TeamRole to)
-	{
-		teamSession.UpdateTeamRoles(from, to);
-	}
-
-	public void RollDices()
-	{
-		teamSession.RollDices();
-	}
-
-	public void ReleaseTickets(string[] ticketIds)
-	{
-		teamSession.ReleaseTickets(ticketIds);
-	}
-
-	public void UpdateSprintBacklog(string[] ticketIds)
-	{
-		teamSession.UpdateSprintBacklog(ticketIds);
-	}
-
-	public void UpdateCfd(UpdateCfdContainerPatchType patchType, int value)
-	{
-		teamSession.UpdateCfd(patchType, value);
-	}
-
-	public void EndOfUpdateCfd()
-	{
-		teamSession.EndOfUpdateCfd();
-	}
-
-	public void EndDay()
-	{
-		teamSession.EndDay();
 	}
 }

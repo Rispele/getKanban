@@ -25,7 +25,7 @@ public class ScenarioItemBuilder
 		{
 			throw new ArgumentException("No event types defined.");
 		}
-		
+
 		return new ScenarioItem(
 			eventTypes.ToArray(),
 			itemConditions.ToArray());

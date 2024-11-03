@@ -12,4 +12,7 @@ db.Model
 	.Select(DropTableSql)
 	.ForEach(sql => db.Database.ExecuteSqlRaw(sql));
 
-string DropTableSql(string tableName) => $"""DROP TABLE public."{tableName}" CASCADE;""";
+string DropTableSql(string tableName)
+{
+	return $"""DROP TABLE public."{tableName}" CASCADE;""";
+}

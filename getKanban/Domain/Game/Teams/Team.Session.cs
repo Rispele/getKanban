@@ -3,14 +3,11 @@ using Domain.Game.Days;
 using Domain.Game.Days.DayEvents;
 using Domain.Game.Days.DayEvents.DayContainers;
 using Domain.Game.Days.Scenarios;
-using Domain.Game.Teams.Configurations;
 using Domain.Game.Tickets;
-using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Game.Teams;
 
-[EntityTypeConfiguration(typeof(TeamSessionEntityTypeConfiguration))]
-public class TeamSession
+public partial class Team
 {
 	private readonly List<Day> days = null!;
 	private readonly TeamSessionSettings settings;
@@ -20,10 +17,6 @@ public class TeamSession
 	private Day currentDay => days[currentDayNumber - 9];
 	private Day? previousDay => currentDayNumber - 10 < 0 ? null : days[currentDayNumber - 10];
 
-	public Guid TeamId { get; }
-
-	public long Id { get; }
-
 	public Lazy<HashSet<string>> TicketsInWork { get; }
 
 	public Lazy<HashSet<string>> TakenTickets { get; }
@@ -32,59 +25,41 @@ public class TeamSession
 
 	public Lazy<int> AnotherTeamScores { get; }
 
-	private TeamSession()
-	{
-		settings = TeamSessionSettings.Default();
-		TakenTickets = new Lazy<HashSet<string>>(BuildTakenTickets);
-		TicketsInWork = new Lazy<HashSet<string>>(BuildTicketsInWork);
-		ReleasedTickets = new Lazy<HashSet<string>>(BuildReleasedTickets);
-		AnotherTeamScores = new Lazy<int>(BuildAnotherTeamScores);
-	}
-
-	public TeamSession(Guid teamId)
-		: this()
-	{
-		TeamId = teamId;
-
-		currentDayNumber = 9;
-		days = [];
-	}
-
-	public int RollDiceForAnotherTeam()
+	public int RollDiceForAnotherTeam(int? dayNumber = null)
 	{
 		return currentDay.RollDiceForAnotherTeam();
 	}
 
-	public void UpdateTeamRoles(TeamRole from, TeamRole to)
+	public void UpdateTeamRoles(TeamRole from, TeamRole to, int? dayNumber = null)
 	{
 		currentDay.UpdateTeamRoles(from, to);
 	}
 
-	public void RollDices()
+	public void RollDices(int? dayNumber = null)
 	{
 		currentDay.RollDices();
 	}
 
-	public void ReleaseTickets(string[] ticketIds)
+	public void ReleaseTickets(string[] ticketIds, int? dayNumber = null)
 	{
 		EnsureCanReleaseTickets(ticketIds);
 
 		currentDay.ReleaseTickets(ticketIds);
 	}
 
-	public void UpdateSprintBacklog(string[] ticketIds)
+	public void UpdateSprintBacklog(string[] ticketIds, int? dayNumber = null)
 	{
 		EnsureCanTakeTickets(ticketIds);
 
 		currentDay.UpdateSprintBacklog(ticketIds);
 	}
 
-	public void UpdateCfd(UpdateCfdContainerPatchType patchType, int value)
+	public void UpdateCfd(UpdateCfdContainerPatchType patchType, int value, int? dayNumber = null)
 	{
 		currentDay.UpdateCfd(patchType, value);
 	}
 
-	public void EndOfUpdateCfd()
+	public void EndOfUpdateCfd(int? dayNumber = null)
 	{
 		var currentDayCfd = currentDay.UpdateCfdContainer;
 		var previousDayCfd = previousDay?.UpdateCfdContainer ?? UpdateCfdContainer.None;
@@ -116,7 +91,7 @@ public class TeamSession
 		}
 	}
 
-	public void EndDay()
+	public void EndDay(int? dayNumber = null)
 	{
 		currentDay.EndDay();
 
