@@ -90,25 +90,25 @@ public class TeamSession
 	{
 		var currentDayCfd = currentDay.UpdateCfdContainer;
 		var previousDayCfd = previousDay?.UpdateCfdContainer ?? UpdateCfdContainer.None;
-		
+
 		var currentSumToValidate = currentDayCfd.Released + currentDayCfd.ToDeploy;
 		var previousSumToValidate = previousDayCfd.Released + previousDayCfd.ToDeploy;
 		ValidateArgumentsSum(currentSumToValidate!.Value, previousSumToValidate!.Value);
-		
+
 		currentSumToValidate += currentDayCfd.WithTesters;
 		previousSumToValidate += previousDayCfd.WithTesters;
 		ValidateArgumentsSum(currentSumToValidate!.Value, previousSumToValidate!.Value);
-		
+
 		currentSumToValidate += currentDayCfd.WithProgrammers;
 		previousSumToValidate += previousDayCfd.WithProgrammers;
 		ValidateArgumentsSum(currentSumToValidate!.Value, previousSumToValidate!.Value);
-		
+
 		currentSumToValidate += currentDayCfd.WithAnalysts;
 		previousSumToValidate += previousDayCfd.WithAnalysts;
 		ValidateArgumentsSum(currentSumToValidate!.Value, previousSumToValidate!.Value);
-		
+
 		currentDay.EndOfUpdateCfd();
-		
+
 		void ValidateArgumentsSum(int currentSum, int previousSum)
 		{
 			if (currentSum < previousSum)
@@ -168,20 +168,18 @@ public class TeamSession
 	private Day ConfigureDay(int dayNumber)
 	{
 		var takenTickets = TakenTickets.Value;
-		var endOfReleaseCycle = currentDayNumber % settings.ReleaseCycleLength == 0;
+		var endOfReleaseCycle = dayNumber % settings.ReleaseCycleLength == 0;
 
 		var shouldRelease = endOfReleaseCycle || takenTickets.Contains(TicketDescriptors.AutoRelease.Id);
-		var shouldUpdateSpringBacklog = endOfReleaseCycle
-		                                || currentDayNumber >= settings.UpdateSprintBacklogEveryDaySince;
-		var anotherTeamAppeared = currentDayNumber > 9
-		                          && AnotherTeamScores.Value < settings.UpdateSprintBacklogEveryDaySince;
+		var shouldUpdateSpringBacklog = endOfReleaseCycle || dayNumber >= settings.UpdateSprintBacklogEveryDaySince;
+		var anotherTeamAppeared = dayNumber > 9 && AnotherTeamScores.Value < settings.UpdateSprintBacklogEveryDaySince;
 
 		var (scenario, initiallyAwaitedEvents) = ConfigureScenario(
 			anotherTeamAppeared,
 			shouldRelease,
 			shouldUpdateSpringBacklog);
 
-		var testersNumber = currentDayNumber >= settings.IncreaseTestersNumberSince
+		var testersNumber = dayNumber >= settings.IncreaseTestersNumberSince
 			? settings.IncreasedTestersNumber
 			: settings.DefaultTestersNumber;
 
