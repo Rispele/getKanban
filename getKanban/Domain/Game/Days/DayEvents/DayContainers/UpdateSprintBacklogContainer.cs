@@ -22,7 +22,7 @@ public class UpdateSprintBacklogContainer
 
 	internal static UpdateSprintBacklogContainer CreateInstance(Day day, string[] ticketIds)
 	{
-		day.PostDayEvent(DayEventType.UpdateSprintBacklog);
+		day.PostDayEvent(DayEventType.UpdateSprintBacklog, null);
 
 		return new UpdateSprintBacklogContainer(ticketIds);
 	}

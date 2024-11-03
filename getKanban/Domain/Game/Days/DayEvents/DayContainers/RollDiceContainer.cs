@@ -45,7 +45,7 @@ public class RollDiceContainer
 		int[] programmersScores,
 		int[] testersScores)
 	{
-		day.PostDayEvent(DayEventType.RollDice);
+		day.PostDayEvent(DayEventType.RollDice, null);
 
 		return new RollDiceContainer(
 			analystsDiceNumber,

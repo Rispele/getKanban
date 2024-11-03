@@ -1,6 +1,7 @@
 ﻿using Domain.DomainExceptions;
 using Domain.Game.Days.DayEvents;
 using Domain.Game.Days.DayEvents.DayContainers;
+using Domain.Game.Days.Scenarios;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,7 +11,7 @@ namespace Domain.Game.Days;
 public class Day
 {
 	private readonly List<AwaitedEvent> awaitedEvents = null!;
-	private readonly Dictionary<DayEventType, List<DayEventType>> scenario = null!;
+	private readonly Scenario scenario = null!;
 
 	private readonly int analystsNumber;
 	private readonly int programmersNumber;
@@ -38,7 +39,7 @@ public class Day
 
 	public Day(
 		long teamSessionId,
-		Dictionary<DayEventType, List<DayEventType>> scenario,
+		Scenario scenario,
 		List<DayEventType> initiallyAwaitedEvents,
 		int analystsNumber,
 		int programmersNumber,
@@ -152,19 +153,19 @@ public class Day
 	{
 		EnsureCanPostEvent(DayEventType.EndOfUpdateCfd);
 
-		PostDayEvent(DayEventType.EndOfUpdateCfd);
+		PostDayEvent(DayEventType.EndOfUpdateCfd, null);
 	}
 
 	public void EndDay()
 	{
 		EnsureCanPostEvent(DayEventType.EndDay);
 
-		PostDayEvent(DayEventType.EndDay);
+		PostDayEvent(DayEventType.EndDay, null);
 	}
 
-	public void PostDayEvent(DayEventType dayEventType)
+	public void PostDayEvent(DayEventType dayEventType, object? parameters)
 	{
-		var toAwait = scenario[dayEventType];
+		var toAwait = scenario.GetNextAwaited(dayEventType, parameters);
 		currentlyAwaitedEvents.ForEach(e => e.MarkRemoved());
 		awaitedEvents.AddRange(toAwait.Select(e => new AwaitedEvent(e)));
 	}

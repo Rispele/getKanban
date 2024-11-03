@@ -2,6 +2,7 @@
 using Domain.Game.Days;
 using Domain.Game.Days.DayEvents;
 using Domain.Game.Days.DayEvents.DayContainers;
+using Domain.Game.Days.Scenarios;
 using Domain.Game.Teams.Configurations;
 using Domain.Game.Tickets;
 using Microsoft.EntityFrameworkCore;
@@ -196,48 +197,42 @@ public class TeamSession
 	}
 
 	//TODO: пока что так, потом мб декларативно опишем
-	private static (Dictionary<DayEventType, List<DayEventType>>, List<DayEventType>) ConfigureScenario(
+	private static (Scenario, List<DayEventType>) ConfigureScenario(
 		bool anotherTeamAppeared,
 		bool shouldRelease,
 		bool shouldUpdateSprintBacklog)
 	{
-		var scenario = new Dictionary<DayEventType, List<DayEventType>>();
-
-		if (anotherTeamAppeared)
-		{
-			scenario[DayEventType.WorkAnotherTeam] =
-			[
-				DayEventType.UpdateTeamRoles,
-				DayEventType.RollDice
-			];
-		}
-
-		scenario[DayEventType.UpdateTeamRoles] = [DayEventType.UpdateTeamRoles];
-		if (shouldRelease && shouldUpdateSprintBacklog)
-		{
-			scenario[DayEventType.RollDice] = [DayEventType.ReleaseTickets];
-			scenario[DayEventType.ReleaseTickets] = [DayEventType.UpdateSprintBacklog];
-			scenario[DayEventType.UpdateSprintBacklog] = [DayEventType.UpdateCfd];
-		}
-		else if (shouldRelease)
-		{
-			scenario[DayEventType.RollDice] = [DayEventType.ReleaseTickets];
-			scenario[DayEventType.ReleaseTickets] = [DayEventType.UpdateCfd];
-		}
-		else if (shouldUpdateSprintBacklog)
-		{
-			scenario[DayEventType.RollDice] = [DayEventType.UpdateSprintBacklog];
-			scenario[DayEventType.UpdateSprintBacklog] = [DayEventType.UpdateCfd];
-		}
-		else
-		{
-			scenario[DayEventType.RollDice] = [DayEventType.UpdateCfd];
-		}
-
-		scenario[DayEventType.UpdateCfd] = [DayEventType.EndDay];
-
+		var scenarioBuilder = ScenarioBuilder.Create()
+			.For(DayEventType.WorkAnotherTeam, DayEventType.UpdateTeamRoles, DayEventType.RollDice)
+			.For(DayEventType.UpdateTeamRoles, DayEventType.UpdateTeamRoles)
+			.For(
+				DayEventType.RollDice,
+				shouldRelease
+					? DayEventType.ReleaseTickets
+					: shouldUpdateSprintBacklog
+						? DayEventType.UpdateSprintBacklog
+						: DayEventType.UpdateCfd)
+			.For(
+				DayEventType.ReleaseTickets,
+				shouldUpdateSprintBacklog ? DayEventType.UpdateSprintBacklog : DayEventType.UpdateCfd)
+			.For(DayEventType.UpdateSprintBacklog, DayEventType.UpdateCfd)
+			.For(
+				DayEventType.UpdateCfd,
+				builder => builder.ForEventType(DayEventType.UpdateCfd).WithCondition("Released", null),
+				builder => builder.ForEventType(DayEventType.UpdateCfd).WithCondition("ToDeploy", null),
+				builder => builder.ForEventType(DayEventType.UpdateCfd).WithCondition("WithTesters", null),
+				builder => builder.ForEventType(DayEventType.UpdateCfd).WithCondition("WithProgrammers", null),
+				builder => builder.ForEventType(DayEventType.UpdateCfd).WithCondition("WithAnalysts", null),
+				builder => builder.ForEventType(DayEventType.EndOfUpdateCfd)
+					.WithCondition("Released", ScenarioItemConditions.NotNull)
+					.WithCondition("ToDeploy", ScenarioItemConditions.NotNull)
+					.WithCondition("WithTesters", ScenarioItemConditions.NotNull)
+					.WithCondition("WithProgrammers", ScenarioItemConditions.NotNull)
+					.WithCondition("WithAnalysts", ScenarioItemConditions.NotNull))
+			.For(DayEventType.EndOfUpdateCfd, DayEventType.EndDay)
+			.For(DayEventType.EndDay, Array.Empty<DayEventType>());
 		return (
-			scenario,
+			scenarioBuilder,
 			anotherTeamAppeared ? [DayEventType.WorkAnotherTeam] : [DayEventType.UpdateTeamRoles, DayEventType.RollDice]
 		);
 	}

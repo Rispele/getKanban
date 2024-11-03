@@ -31,7 +31,7 @@ public class WorkAnotherTeamContainer
 		int diceNumber,
 		int scoresNumber)
 	{
-		day.PostDayEvent(DayEventType.WorkAnotherTeam);
+		day.PostDayEvent(DayEventType.WorkAnotherTeam, null);
 
 		return new WorkAnotherTeamContainer(
 			diceNumber,

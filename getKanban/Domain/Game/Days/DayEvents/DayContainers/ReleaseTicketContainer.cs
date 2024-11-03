@@ -24,7 +24,7 @@ public class ReleaseTicketContainer
 		Day day,
 		IReadOnlyList<string> ticketIds)
 	{
-		day.PostDayEvent(DayEventType.ReleaseTickets);
+		day.PostDayEvent(DayEventType.ReleaseTickets, null);
 		return new ReleaseTicketContainer(ticketIds);
 	}
 }
