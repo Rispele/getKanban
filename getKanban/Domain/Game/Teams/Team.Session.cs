@@ -66,6 +66,14 @@ public partial class Team
 		currentDay.EndOfUpdateCfd();
 	}
 
+	public void EndDay(int? dayNumber = null)
+	{
+		currentDay.EndDay();
+
+		currentDayNumber++;
+		days.Add(ConfigureDay(currentDayNumber));
+	}
+
 	private void EnsureCanEndOfUpdateCfd()
 	{
 		var currentDayCfd = currentDay.UpdateCfdContainer;
@@ -94,14 +102,6 @@ public partial class Team
 				throw new DomainException("Invalid cfd arguments");
 			}
 		}
-	}
-
-	public void EndDay(int? dayNumber = null)
-	{
-		currentDay.EndDay();
-
-		currentDayNumber++;
-		days.Add(ConfigureDay(currentDayNumber));
 	}
 
 	private void EnsureCanTakeTickets(string[] ticketIds)
