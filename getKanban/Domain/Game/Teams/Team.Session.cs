@@ -15,7 +15,7 @@ public partial class Team
 	private int currentDayNumber;
 
 	private Day currentDay => days[currentDayNumber - 9];
-	private Day? previousDay => currentDayNumber - 10 < 0 ? null : days[currentDayNumber - 10];
+	private Day? previousDay => currentDayNumber < 10 ? null : days[currentDayNumber - 10];
 
 	public Lazy<HashSet<string>> TicketsInWork { get; }
 

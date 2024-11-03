@@ -27,6 +27,7 @@ public partial class Team
 	}
 
 	public Team(Guid gameSessionId, string name)
+	 : this()
 	{
 		Id = Guid.NewGuid();
 		GameSessionId = gameSessionId;
