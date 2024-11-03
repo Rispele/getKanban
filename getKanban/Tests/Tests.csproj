@@ -20,6 +20,11 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Domain\Domain.csproj"/>
+        <ProjectReference Include="..\Web\Web.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="DbContexts\" />
     </ItemGroup>
 
 </Project>
