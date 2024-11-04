@@ -24,7 +24,7 @@ public class DayEntityTypeConfiguration : IEntityTypeConfiguration<Day>
 		builder.Property("testersNumber");
 
 		builder.Property(e => e.Number);
-		
+
 		builder.Property(e => e.Timestamp).ConfigureAsRowVersion();
 
 		ConfigureContainerRelation<WorkAnotherTeamContainer>(builder, d => d.WorkAnotherTeamContainer!);
@@ -38,7 +38,7 @@ public class DayEntityTypeConfiguration : IEntityTypeConfiguration<Day>
 			.HasMany<AwaitedEvent>("awaitedEvents")
 			.WithOne()
 			.OnDelete(DeleteBehavior.Cascade);
-		
+
 		builder.Navigation("awaitedEvents").AutoInclude();
 	}
 

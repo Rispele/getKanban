@@ -142,7 +142,7 @@ public class Day
 		EnsureCanPostEvent(DayEventType.EndOfUpdateCfd);
 
 		UpdateCfdContainer.Freeze();
-		
+
 		PostDayEvent(DayEventType.EndOfUpdateCfd, null);
 	}
 
