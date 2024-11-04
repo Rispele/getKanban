@@ -16,7 +16,8 @@ public class GameSessionEntityTypeConfiguration : IEntityTypeConfiguration<GameS
 
 		builder
 			.HasMany<Team>()
-			.WithOne();
+			.WithOne()
+			.HasForeignKey(t => t.GameSessionId);
 
 		builder
 			.HasMany<Participant>()
