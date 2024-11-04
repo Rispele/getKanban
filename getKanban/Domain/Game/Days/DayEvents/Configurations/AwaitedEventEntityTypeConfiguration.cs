@@ -8,5 +8,7 @@ public class AwaitedEventEntityTypeConfiguration : IEntityTypeConfiguration<Awai
 	public void Configure(EntityTypeBuilder<AwaitedEvent> builder)
 	{
 		builder.HasKey(x => x.Id);
+
+		builder.Property(t => t.EventType);
 	}
 }

@@ -17,22 +17,26 @@ public class TeamEntityTypeConfiguration : IEntityTypeConfiguration<Team>
 		builder.Ignore("currentDay");
 		builder.Ignore("previousDay");
 
-		builder.Ignore(e => e.TakenTickets);
-		builder.Ignore(e => e.ReleasedTickets);
-		builder.Ignore(e => e.TicketsInWork);
-		builder.Ignore(e => e.AnotherTeamScores);
+		builder.Ignore(e => e.CurrentDayTeamRoleUpdates);
+		builder.Ignore(e => e.CfdContainers);
+
+		builder.Property(e => e.RowVersions).ConfigureAsRowVersion();
 
 		builder
-			.HasMany<Day>()
+			.HasMany<Day>("days")
 			.WithOne();
 
 		builder
-			.HasOne<TeamSessionSettings>()
+			.HasOne<TeamSessionSettings>("settings")
 			.WithOne()
 			.HasForeignKey<TeamSessionSettings>();
 
 		builder
-			.HasMany<Participant>()
+			.HasMany<Participant>("participants")
 			.WithMany();
+
+		builder.Navigation("days").AutoInclude();
+		builder.Navigation("settings").AutoInclude();
+		builder.Navigation("participants").AutoInclude();
 	}
 }

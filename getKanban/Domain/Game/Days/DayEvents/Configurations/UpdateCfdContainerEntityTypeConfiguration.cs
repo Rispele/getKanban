@@ -17,6 +17,6 @@ public class UpdateCfdContainerEntityTypeConfiguration : IEntityTypeConfiguratio
 		builder.Property(t => t.WithAnalysts);
 		builder.Property(t => t.Frozen);
 
-		builder.Property(t => t.Timestamp).IsRowVersion();
+		builder.Property(t => t.Timestamp).ConfigureAsRowVersion();
 	}
 }

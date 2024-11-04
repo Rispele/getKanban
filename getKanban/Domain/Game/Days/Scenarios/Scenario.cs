@@ -1,9 +1,11 @@
 ﻿using Domain.Game.Days.DayEvents;
+using Newtonsoft.Json;
 
 namespace Domain.Game.Days.Scenarios;
 
 public class Scenario
 {
+	[JsonProperty]
 	private readonly Dictionary<DayEventType, ScenarioItem[]> scenario;
 
 	public Scenario(Dictionary<DayEventType, ScenarioItem[]> scenario)

@@ -15,12 +15,7 @@ public class DayEntityTypeConfiguration : IEntityTypeConfiguration<Day>
 	{
 		builder.HasKey(e => e.Id);
 
-		builder.Property(e => e.Id)
-			.ValueGeneratedOnAdd()
-			.IsRequired();
-
-		builder.Property("scenario")
-			.HasConversion(new ScenarioConverter());
+		builder.Property("scenario").HasConversion(new ScenarioConverter());
 
 		builder.Ignore("currentlyAwaitedEvents");
 
@@ -28,7 +23,9 @@ public class DayEntityTypeConfiguration : IEntityTypeConfiguration<Day>
 		builder.Property("programmersNumber");
 		builder.Property("testersNumber");
 
-		builder.Property(e => e.Timestamp).IsRowVersion();
+		builder.Property(e => e.Number);
+		
+		builder.Property(e => e.Timestamp).ConfigureAsRowVersion();
 
 		ConfigureContainerRelation<WorkAnotherTeamContainer>(builder, d => d.WorkAnotherTeamContainer!);
 		ConfigureContainerRelation<UpdateTeamRolesContainer>(builder, d => d.UpdateTeamRolesContainer!);
@@ -38,19 +35,25 @@ public class DayEntityTypeConfiguration : IEntityTypeConfiguration<Day>
 		ConfigureContainerRelation<UpdateCfdContainer>(builder, d => d.UpdateCfdContainer!);
 
 		builder
-			.HasMany<AwaitedEvent>()
-			.WithOne();
+			.HasMany<AwaitedEvent>("awaitedEvents")
+			.WithOne()
+			.OnDelete(DeleteBehavior.Cascade);
+		
+		builder.Navigation("awaitedEvents").AutoInclude();
 	}
 
 	private static void ConfigureContainerRelation<TContainer>(
 		EntityTypeBuilder<Day> builder,
-		Expression<Func<Day, TContainer>> expression)
+		Expression<Func<Day, TContainer?>> expression)
 		where TContainer : class
 	{
 		builder
 			.HasOne(expression)
 			.WithOne()
-			.HasForeignKey<Day>();
+			.HasForeignKey<TContainer>("day_id")
+			.OnDelete(DeleteBehavior.Cascade);
+
+		builder.Navigation(expression).AutoInclude();
 	}
 
 	private class ScenarioConverter() : ValueConverter<Scenario, string>(

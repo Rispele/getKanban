@@ -18,8 +18,7 @@ public class Day
 	private readonly int testersNumber;
 
 	private IEnumerable<AwaitedEvent> currentlyAwaitedEvents => awaitedEvents.Where(@event => !@event.Removed);
-
-	public UpdateTeamRolesContainer UpdateTeamRolesContainer { get; private set; } = null!;
+	public UpdateTeamRolesContainer UpdateTeamRolesContainer { get; } = null!;
 	public WorkAnotherTeamContainer? WorkAnotherTeamContainer { get; private set; }
 	public RollDiceContainer? RollDiceContainer { get; private set; }
 	public ReleaseTicketContainer? ReleaseTicketContainer { get; private set; }
@@ -30,7 +29,7 @@ public class Day
 
 	public int Number { get; }
 
-	public byte[]? Timestamp { get; [UsedImplicitly] private set; }
+	public long Timestamp { get; [UsedImplicitly] private set; }
 
 	[UsedImplicitly]
 	private Day()
@@ -74,8 +73,6 @@ public class Day
 	{
 		EnsureCanPostEvent(DayEventType.UpdateTeamRoles);
 		EnsureCanUpdateTeamRoles(from);
-
-		UpdateTeamRolesContainer ??= new UpdateTeamRolesContainer();
 
 		UpdateTeamRolesContainer.AddUpdate(this, from, to);
 	}

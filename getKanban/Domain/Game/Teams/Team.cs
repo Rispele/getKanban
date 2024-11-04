@@ -1,4 +1,6 @@
-﻿using Domain.Game.Teams.Configurations;
+﻿using System.Text.RegularExpressions;
+using Domain.DomainExceptions;
+using Domain.Game.Teams.Configurations;
 using Domain.Users;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
@@ -8,22 +10,40 @@ namespace Domain.Game.Teams;
 [EntityTypeConfiguration(typeof(TeamEntityTypeConfiguration))]
 public partial class Team
 {
-	private readonly List<Participant> participants = null!;
+	private List<Participant> participants { get; } = null!;
 
 	public Guid GameSessionId { get; }
 
 	public Guid Id { get; }
 
-	public string Name { get; private set; } = null!;
+	private string name = null!;
+	
+	public long RowVersions { get; [UsedImplicitly] private set; }
+	
+	public string Name
+	{
+		get => name;
+		set
+		{
+			if (string.IsNullOrWhiteSpace(value))
+			{
+				throw new DomainException("Name cannot be empty");
+			}
+
+			var regex = NameRegexValidation();
+			if (!regex.IsMatch(value))
+			{
+				throw new DomainException("Invalid name");
+			}
+			
+			name = value;
+		}
+	}
 
 	[UsedImplicitly]
 	private Team()
 	{
 		settings = TeamSessionSettings.Default();
-		TakenTickets = new Lazy<HashSet<string>>(BuildTakenTickets);
-		TicketsInWork = new Lazy<HashSet<string>>(BuildTicketsInWork);
-		ReleasedTickets = new Lazy<HashSet<string>>(BuildReleasedTickets);
-		AnotherTeamScores = new Lazy<int>(BuildAnotherTeamScores);
 	}
 
 	public Team(Guid gameSessionId, string name)
@@ -31,10 +51,10 @@ public partial class Team
 	{
 		Id = Guid.NewGuid();
 		GameSessionId = gameSessionId;
-		Name = name;
+		this.name = name;
 		participants = [];
 		currentDayNumber = 9;
-		days = [];
+		days = [ConfigureDay(currentDayNumber, [])];
 	}
 
 	public void AddPlayer(User user)
@@ -53,4 +73,7 @@ public partial class Team
 		return (participant.Role & ParticipantRole.Player) != 0
 		       || (participant.Role & ParticipantRole.Angel) != 0;
 	}
+
+    [GeneratedRegex(@"[\w-!.]+")]
+    private static partial Regex NameRegexValidation();
 }

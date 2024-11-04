@@ -14,13 +14,17 @@ public class GameSessionEntityTypeConfiguration : IEntityTypeConfiguration<GameS
 
 		builder.Property(x => x.Name).IsRequired();
 
+		builder.Ignore(t => t.Teams);
+		
 		builder
-			.HasMany<Team>()
+			.HasMany<Team>("teams")
 			.WithOne()
 			.HasForeignKey(t => t.GameSessionId);
 
 		builder
 			.HasMany<Participant>()
 			.WithMany();
+
+		builder.Navigation("teams").AutoInclude();
 	}
 }

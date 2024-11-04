@@ -9,7 +9,7 @@ namespace Domain.Game.Teams;
 
 public partial class Team
 {
-	private readonly List<Day> days = null!;
+	private List<Day> days { get; } = null!;
 	private readonly TeamSessionSettings settings;
 
 	private int currentDayNumber;
@@ -28,14 +28,6 @@ public partial class Team
 		.Where(c => c.Frozen)
 		.ToList();
 	
-	public Lazy<HashSet<string>> TicketsInWork { get; }
-
-	public Lazy<HashSet<string>> TakenTickets { get; }
-
-	public Lazy<HashSet<string>> ReleasedTickets { get; }
-
-	public Lazy<int> AnotherTeamScores { get; }
-
 	public int RollDiceForAnotherTeam()
 	{
 		return currentDay.RollDiceForAnotherTeam();
@@ -82,7 +74,7 @@ public partial class Team
 		currentDay.EndDay();
 
 		currentDayNumber++;
-		days.Add(ConfigureDay(currentDayNumber));
+		days.Add(ConfigureDay(currentDayNumber, days));
 	}
 
 	private void EnsureCanEndOfUpdateCfd()
@@ -127,7 +119,7 @@ public partial class Team
 
 	private void EnsureCanTakeTickets(string[] ticketIds)
 	{
-		if (TakenTickets.Value.Overlaps(ticketIds))
+		if (BuildTakenTickets(days).Overlaps(ticketIds))
 		{
 			throw new DayActionIsProhibitedException("You cannot take already taken tickets");
 		}
@@ -135,43 +127,43 @@ public partial class Team
 
 	private void EnsureCanReleaseTickets(string[] ticketIds)
 	{
-		if (!TicketsInWork.Value.IsSupersetOf(ticketIds))
+		if (!BuildTicketsInWork(days).IsSupersetOf(ticketIds))
 		{
 			throw new DayActionIsProhibitedException("You cannot release not in work tickets");
 		}
 	}
 
-	private HashSet<string> BuildTakenTickets()
+	private HashSet<string> BuildTakenTickets(List<Day> daysToProcess)
 	{
-		var takenTickets = days.SelectMany(t => t.UpdateSprintBacklogContainer?.TicketIds ?? []);
+		var takenTickets = daysToProcess.SelectMany(t => t.UpdateSprintBacklogContainer?.TicketIds ?? []);
 		return settings.InitiallyTakenTickets.Concat(takenTickets).ToHashSet();
 	}
 
-	private HashSet<string> BuildReleasedTickets()
+	private HashSet<string> BuildReleasedTickets(List<Day> daysToProcess)
 	{
-		return days.SelectMany(t => t.ReleaseTicketContainer?.TicketIds ?? []).ToHashSet();
+		return daysToProcess.SelectMany(t => t.ReleaseTicketContainer?.TicketIds ?? []).ToHashSet();
 	}
 
-	private HashSet<string> BuildTicketsInWork()
+	private HashSet<string> BuildTicketsInWork(List<Day> daysToProcess)
 	{
-		return TakenTickets.Value
+		return BuildTakenTickets(daysToProcess)
 			.Except(days.SelectMany(t => t.ReleaseTicketContainer?.TicketIds ?? []))
 			.ToHashSet();
 	}
 
-	private int BuildAnotherTeamScores()
+	private int BuildAnotherTeamScores(List<Day> daysToProcess)
 	{
-		return days.Select(d => d.WorkAnotherTeamContainer?.ScoresNumber ?? 0).Sum();
+		return daysToProcess.Select(d => d.WorkAnotherTeamContainer?.ScoresNumber ?? 0).Sum();
 	}
 
-	private Day ConfigureDay(int dayNumber)
+	private Day ConfigureDay(int dayNumber, List<Day> daysToProcess)
 	{
-		var takenTickets = TakenTickets.Value;
+		var takenTickets = BuildTakenTickets(daysToProcess);
 		var endOfReleaseCycle = dayNumber % settings.ReleaseCycleLength == 0;
 
 		var shouldRelease = endOfReleaseCycle || takenTickets.Contains(TicketDescriptors.AutoRelease.Id);
 		var shouldUpdateSpringBacklog = endOfReleaseCycle || dayNumber >= settings.UpdateSprintBacklogEveryDaySince;
-		var anotherTeamAppeared = dayNumber > 9 && AnotherTeamScores.Value < settings.UpdateSprintBacklogEveryDaySince;
+		var anotherTeamAppeared = dayNumber > 9 && BuildAnotherTeamScores(daysToProcess) < settings.UpdateSprintBacklogEveryDaySince;
 
 		var (scenario, initiallyAwaitedEvents) = ConfigureScenario(
 			anotherTeamAppeared,

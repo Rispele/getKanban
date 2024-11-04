@@ -16,7 +16,7 @@ public class UpdateCfdContainer
 	public int? WithAnalysts { get; private set; }
 	public bool Frozen { get; private set; }
 	
-	public byte[]? Timestamp { get; [UsedImplicitly] private set; }
+	public long Timestamp { get; [UsedImplicitly] private set; }
 	
 	public UpdateCfdContainer()
 	{
