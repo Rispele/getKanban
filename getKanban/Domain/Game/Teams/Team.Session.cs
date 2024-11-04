@@ -9,25 +9,26 @@ namespace Domain.Game.Teams;
 
 public partial class Team
 {
-	private List<Day> days { get; } = null!;
 	private readonly TeamSessionSettings settings;
 
 	private int currentDayNumber;
+	private List<Day> days { get; } = null!;
 	private int previousDayNumber => currentDayNumber - 1;
 
 	private Day currentDay => days.Single(d => d.Number == currentDayNumber);
 	private Day? previousDay => days.SingleOrDefault(d => d.Number == previousDayNumber);
 
-	public IReadOnlyList<TeamRoleUpdate> CurrentDayTeamRoleUpdates => currentDay.UpdateTeamRolesContainer.TeamRoleUpdates;
-	
+	public IReadOnlyList<TeamRoleUpdate> CurrentDayTeamRoleUpdates =>
+		currentDay.UpdateTeamRolesContainer.TeamRoleUpdates;
+
 	public RollDiceContainer? CurrentDayRollDiceContainer => currentDay.RollDiceContainer;
-	
+
 	public IReadOnlyList<UpdateCfdContainer> CfdContainers => days
 		.OrderBy(d => d.Number)
 		.Select(d => d.UpdateCfdContainer)
 		.Where(c => c.Frozen)
 		.ToList();
-	
+
 	public int RollDiceForAnotherTeam()
 	{
 		return currentDay.RollDiceForAnotherTeam();
@@ -163,7 +164,8 @@ public partial class Team
 
 		var shouldRelease = endOfReleaseCycle || takenTickets.Contains(TicketDescriptors.AutoRelease.Id);
 		var shouldUpdateSpringBacklog = endOfReleaseCycle || dayNumber >= settings.UpdateSprintBacklogEveryDaySince;
-		var anotherTeamAppeared = dayNumber > 9 && BuildAnotherTeamScores(daysToProcess) < settings.UpdateSprintBacklogEveryDaySince;
+		var anotherTeamAppeared = dayNumber > 9 &&
+		                          BuildAnotherTeamScores(daysToProcess) < settings.UpdateSprintBacklogEveryDaySince;
 
 		var (scenario, initiallyAwaitedEvents) = ConfigureScenario(
 			anotherTeamAppeared,

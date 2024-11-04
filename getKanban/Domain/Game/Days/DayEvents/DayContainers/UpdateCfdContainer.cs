@@ -15,9 +15,9 @@ public class UpdateCfdContainer
 	public int? WithProgrammers { get; private set; }
 	public int? WithAnalysts { get; private set; }
 	public bool Frozen { get; private set; }
-	
+
 	public long Timestamp { get; [UsedImplicitly] private set; }
-	
+
 	public UpdateCfdContainer()
 	{
 	}
@@ -42,7 +42,7 @@ public class UpdateCfdContainer
 		{
 			throw new DomainException("Cannot update frozen container");
 		}
-		
+
 		if (value < 0)
 		{
 			throw new DomainException("Value cannot be negative.");
@@ -69,8 +69,11 @@ public class UpdateCfdContainer
 				throw new ArgumentOutOfRangeException(nameof(patchType), patchType, null);
 		}
 	}
-	
-	internal void Freeze() => Frozen = true;
+
+	internal void Freeze()
+	{
+		Frozen = true;
+	}
 
 	internal static UpdateCfdContainer None =>
 		new(

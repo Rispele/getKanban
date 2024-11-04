@@ -10,16 +10,15 @@ namespace Domain.Game.Teams;
 [EntityTypeConfiguration(typeof(TeamEntityTypeConfiguration))]
 public partial class Team
 {
+	private string name = null!;
 	private List<Participant> participants { get; } = null!;
 
 	public Guid GameSessionId { get; }
 
 	public Guid Id { get; }
 
-	private string name = null!;
-	
 	public long RowVersions { get; [UsedImplicitly] private set; }
-	
+
 	public string Name
 	{
 		get => name;
@@ -35,7 +34,7 @@ public partial class Team
 			{
 				throw new DomainException("Invalid name");
 			}
-			
+
 			name = value;
 		}
 	}
@@ -47,7 +46,7 @@ public partial class Team
 	}
 
 	public Team(Guid gameSessionId, string name)
-	 : this()
+		: this()
 	{
 		Id = Guid.NewGuid();
 		GameSessionId = gameSessionId;
@@ -74,6 +73,6 @@ public partial class Team
 		       || (participant.Role & ParticipantRole.Angel) != 0;
 	}
 
-    [GeneratedRegex(@"[\w-!.]+")]
-    private static partial Regex NameRegexValidation();
+	[GeneratedRegex(@"[\w-!.]+")]
+	private static partial Regex NameRegexValidation();
 }

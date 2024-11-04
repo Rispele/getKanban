@@ -5,8 +5,7 @@ namespace Domain.Game.Days.Scenarios;
 
 public class Scenario
 {
-	[JsonProperty]
-	private readonly Dictionary<DayEventType, ScenarioItem[]> scenario;
+	[JsonProperty] private readonly Dictionary<DayEventType, ScenarioItem[]> scenario;
 
 	public Scenario(Dictionary<DayEventType, ScenarioItem[]> scenario)
 	{

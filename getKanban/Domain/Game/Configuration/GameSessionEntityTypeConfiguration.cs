@@ -15,7 +15,7 @@ public class GameSessionEntityTypeConfiguration : IEntityTypeConfiguration<GameS
 		builder.Property(x => x.Name).IsRequired();
 
 		builder.Ignore(t => t.Teams);
-		
+
 		builder
 			.HasMany<Team>("teams")
 			.WithOne()

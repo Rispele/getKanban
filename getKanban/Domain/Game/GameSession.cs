@@ -10,13 +10,13 @@ namespace Domain.Game;
 public class GameSession
 {
 	private List<Participant> angels { get; } = null!;
-	
-	private List<Team> teams { get; set; } = null!;
+
+	private List<Team> teams { get; } = null!;
 
 	public Guid Id { get; }
 
 	public string Name { get; } = null!;
-	
+
 	public IReadOnlyList<Team> Teams => teams;
 
 	[UsedImplicitly]

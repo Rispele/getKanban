@@ -1,6 +1,4 @@
-﻿using Domain;
-using Domain.Game;
-using Domain.Game.Teams;
+﻿using Domain.Game;
 using Domain.Users;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
@@ -21,18 +19,18 @@ public class Concurrency_Test
 		var session1 = await SetupSessionAsync(context1);
 		var session2 = await context2.GameSessions
 			.SingleOrDefaultAsync(s => s.Id == session1.Id);
-		
+
 		var (team1, team2) = (session1.Teams.Single(), session2.Teams.Single());
 		team1.Name = "name1";
 		team2.Name = "name2";
-		
+
 		var save1 = () => context1.SaveChangesAsync();
 		var save2 = () => context2.SaveChangesAsync();
-		
+
 		await save1.Should().NotThrowAsync();
 		await save2.Should().ThrowAsync<DbUpdateConcurrencyException>();
 	}
-	
+
 	[Test]
 	public async Task Day_ConcurrentUpdate_ShouldThrowOnConflict()
 	{
@@ -41,14 +39,14 @@ public class Concurrency_Test
 		var session1 = await SetupSessionAsync(context1);
 		var session2 = await context2.GameSessions
 			.SingleOrDefaultAsync(s => s.Id == session1.Id);
-		
+
 		var (team1, team2) = (session1.Teams.Single(), session2.Teams.Single());
 		team1.RollDices();
 		team2.RollDices();
-		
+
 		var save1 = () => context1.SaveChangesAsync();
 		var save2 = () => context2.SaveChangesAsync();
-		
+
 		await save1.Should().NotThrowAsync();
 		await save2.Should().ThrowAsync<DbUpdateException>();
 	}
@@ -60,7 +58,7 @@ public class Concurrency_Test
 		await context.SaveChangesAsync();
 		return session.Entity;
 	}
-	
+
 	private static GameSessionsContext ConfigureDbContext()
 	{
 		var context = new GameSessionsContext();
