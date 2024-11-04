@@ -11,8 +11,6 @@ public class UpdateTeamRolesContainer
 
 	public long Id { get; }
 
-	public long Timestamp { get; set; }
-
 	public IReadOnlyList<TeamRoleUpdate> TeamRoleUpdates => teamRoleUpdates;
 
 	[UsedImplicitly]

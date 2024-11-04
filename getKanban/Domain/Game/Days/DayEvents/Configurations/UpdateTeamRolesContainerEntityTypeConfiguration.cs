@@ -9,10 +9,11 @@ public class UpdateTeamRolesContainerEntityTypeConfiguration : IEntityTypeConfig
 	public void Configure(EntityTypeBuilder<UpdateTeamRolesContainer> builder)
 	{
 		builder.HasKey(e => e.Id);
-		builder.Property(e => e.Timestamp).ConfigureAsRowVersion();
 
 		builder
-			.HasMany<TeamRoleUpdate>()
+			.HasMany<TeamRoleUpdate>("teamRoleUpdates")
 			.WithOne();
+
+		builder.Navigation("teamRoleUpdates").AutoInclude();
 	}
 }
