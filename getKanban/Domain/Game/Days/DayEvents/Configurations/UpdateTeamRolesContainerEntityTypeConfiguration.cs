@@ -14,6 +14,8 @@ public class UpdateTeamRolesContainerEntityTypeConfiguration : IEntityTypeConfig
 			.HasMany<TeamRoleUpdate>("teamRoleUpdates")
 			.WithOne();
 
+		builder.Ignore(t => t.TeamRoleUpdates);
+
 		builder.Navigation("teamRoleUpdates").AutoInclude();
 	}
 }
