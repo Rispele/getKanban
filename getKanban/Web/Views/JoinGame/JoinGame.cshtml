@@ -1,0 +1,19 @@
+﻿<script>
+    async function join() {
+        const id = document.getElementById("gameId").value;
+        if (id.length > 0) {
+            const isGameOpened = await fetch('http://localhost:5000/join/game?id=' + id, { });
+            if (isGameOpened) {
+                window.location.replace('http://localhost:5000/lobby?id=' + id);
+            } else {
+                @* отрисовка блока с ошибкой *@
+            }
+        }
+    }
+</script>
+
+<div>
+    <p>ID сессии</p>
+    <input id="gameId">
+    <button onclick="join()">Присоединиться</button>
+</div>
