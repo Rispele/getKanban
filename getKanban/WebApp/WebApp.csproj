@@ -16,10 +16,12 @@
     </ItemGroup>
 
     <ItemGroup>
-      <AdditionalFiles Include="Views\GameLobby\Lobby.cshtml" />
-      <AdditionalFiles Include="Views\Home\Index.cshtml" />
-      <AdditionalFiles Include="Views\JoinGame\JoinGame.cshtml" />
-      <AdditionalFiles Include="Views\TeamsCreation\Menu.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\GameLobby\Lobby.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Home\Index.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\JoinGame\JoinGame.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\TeamsCreation\Menu.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\TeamsCreation\Menu.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\JoinGame\JoinGame.cshtml" />
     </ItemGroup>
 
 </Project>
