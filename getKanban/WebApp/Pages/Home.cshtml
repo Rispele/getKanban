@@ -12,10 +12,16 @@
     </div>
 
     <div class="authorizationButtons">
-        <input type="text" class="text-center authorizationButtonsTemplate authorizationCommandName"/>
+        @* <input type="text" class="text-center authorizationButtonsTemplate authorizationCommandName"/> *@
 
-        <button class="authorizationButtonsTemplate authorizationButton" asp-area="" asp-controller="TeamsCreation" asp-action="Menu">Создать игру</button>
+        @* asp-controller="TeamsCreation" asp-action="Menu" *@
+        <form>
+            <button class="authorizationButtonsTemplate authorizationButton" asp-area="" asp-page="/Shared/Menu">Создать игру</button>
+        </form>
 
-        <button class="authorizationButtonsTemplate authorizationButton" asp-area="" asp-controller="JoinGame" asp-action="JoinGame">Присоединиться к игре</button>
+        <form>
+            @* asp-controller="JoinGame" asp-action="JoinGame" *@
+            <button class="authorizationButtonsTemplate authorizationButton" asp-area="" asp-page="/Shared/JoinGame">Присоединиться к игре</button>
+        </form>
     </div>
 </div>

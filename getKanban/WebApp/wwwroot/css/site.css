@@ -71,6 +71,10 @@ body {
   margin: 100px auto;
 }
 
+.centered-50 {
+  margin: 50px auto;
+}
+
 .centered {
   margin: auto;
 }

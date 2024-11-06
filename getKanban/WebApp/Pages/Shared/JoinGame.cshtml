@@ -13,8 +13,20 @@
     }
 </script>
 
-<div>
-    <p>ID сессии</p>
-    <input id="gameId">
-    <button onclick="join()">Присоединиться</button>
+<div class="text-center authorizationContainer centered-100">
+    <div class="authorizationHeader">
+        <h1 class="fs-2 fw-normal">ID сессии</h1>
+    </div>
+    
+    <div class="authorizationButtons">
+        <input type="text" id="gameId" class="text-center authorizationButtonsTemplate authorizationCommandName">
+        @* <div> *@
+        @*     <p>Teams:</p> *@
+        @*     <p id="teamsValue"></p> *@
+        @*     <button onclick="addTeam()">Добавить команду</button> *@
+        @* </div> *@
+        <form>
+            <button onclick="join()" class="authorizationButtonsTemplate authorizationButton">Присоединиться</button>
+        </form>
+    </div>
 </div>
