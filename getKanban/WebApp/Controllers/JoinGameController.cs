@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace Web.Controllers;
+namespace WebApp.Controllers;
 
 [Route("join")]
 public class JoinGameController : Controller

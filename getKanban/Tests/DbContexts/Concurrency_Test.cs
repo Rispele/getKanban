@@ -5,7 +5,7 @@ using Domain.Users;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
-using Web.DbContexts;
+using WebApp.DbContexts;
 
 namespace Tests.DbContexts;
 

@@ -1,7 +1,7 @@
 ﻿using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 
-namespace Web.DbContexts;
+namespace WebApp.DbContexts;
 
 public class UsersContext : DbContext
 {

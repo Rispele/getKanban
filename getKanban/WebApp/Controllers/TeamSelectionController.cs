@@ -1,7 +1,7 @@
 ﻿using Domain.Game;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Web.Controllers;
+namespace WebApp.Controllers;
 
 [Route("team-selection")]
 public class TeamSelectionController : Controller

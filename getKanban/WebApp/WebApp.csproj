@@ -6,4 +6,20 @@
         <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="EFCore.NamingConventions" Version="8.0.3" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.10" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Domain\Domain.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="Views\GameLobby\Lobby.cshtml" />
+      <AdditionalFiles Include="Views\Home\Index.cshtml" />
+      <AdditionalFiles Include="Views\JoinGame\JoinGame.cshtml" />
+      <AdditionalFiles Include="Views\TeamsCreation\Menu.cshtml" />
+    </ItemGroup>
+
 </Project>

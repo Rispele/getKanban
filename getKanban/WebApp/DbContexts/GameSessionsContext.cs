@@ -1,11 +1,11 @@
-﻿using Domain.Game.Teams;
+﻿using Domain.Game;
 using Microsoft.EntityFrameworkCore;
 
-namespace Web.DbContexts;
+namespace WebApp.DbContexts;
 
-public class TeamsContext : DbContext
+public class GameSessionsContext : DbContext
 {
-	public DbSet<Team> Teams { get; set; }
+	public DbSet<GameSession> GameSessions { get; set; }
 
 	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 	{
