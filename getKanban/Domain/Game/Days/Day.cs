@@ -36,7 +36,7 @@ public class Day
 	{
 	}
 
-	public Day(
+	internal Day(
 		int number,
 		Scenario scenario,
 		List<DayEventType> initiallyAwaitedEvents,
@@ -56,7 +56,7 @@ public class Day
 		UpdateCfdContainer = new UpdateCfdContainer();
 	}
 
-	public int RollDiceForAnotherTeam()
+	internal int RollDiceForAnotherTeam()
 	{
 		EnsureCanPostEvent(DayEventType.WorkAnotherTeam);
 
@@ -69,7 +69,7 @@ public class Day
 		return diceScores;
 	}
 
-	public void UpdateTeamRoles(TeamRole from, TeamRole to)
+	internal void UpdateTeamRoles(TeamRole from, TeamRole to)
 	{
 		EnsureCanPostEvent(DayEventType.UpdateTeamRoles);
 		EnsureCanUpdateTeamRoles(from);
@@ -77,7 +77,7 @@ public class Day
 		UpdateTeamRolesContainer.AddUpdate(this, from, to);
 	}
 
-	public void RollDices()
+	internal void RollDices()
 	{
 		EnsureCanPostEvent(DayEventType.RollDice);
 
@@ -113,7 +113,7 @@ public class Day
 		}
 	}
 
-	public void ReleaseTickets(string[] ticketIds)
+	internal void ReleaseTickets(string[] ticketIds)
 	{
 		EnsureCanPostEvent(DayEventType.ReleaseTickets);
 
@@ -121,14 +121,14 @@ public class Day
 		UpdateCfdContainer.Update(UpdateCfdContainerPatchType.Released, ticketIds.Length);
 	}
 
-	public void UpdateSprintBacklog(string[] ticketIds)
+	internal void UpdateSprintBacklog(string[] ticketIds)
 	{
 		EnsureCanPostEvent(DayEventType.UpdateSprintBacklog);
 
 		UpdateSprintBacklogContainer = UpdateSprintBacklogContainer.CreateInstance(this, ticketIds);
 	}
 
-	public void UpdateCfd(
+	internal void UpdateCfd(
 		UpdateCfdContainerPatchType patchType,
 		int value)
 	{
@@ -137,7 +137,7 @@ public class Day
 		UpdateCfdContainer.Update(patchType, value);
 	}
 
-	public void EndOfUpdateCfd()
+	internal void EndOfUpdateCfd()
 	{
 		EnsureCanPostEvent(DayEventType.EndOfUpdateCfd);
 
@@ -146,14 +146,14 @@ public class Day
 		PostDayEvent(DayEventType.EndOfUpdateCfd, null);
 	}
 
-	public void EndDay()
+	internal void EndDay()
 	{
 		EnsureCanPostEvent(DayEventType.EndDay);
 
 		PostDayEvent(DayEventType.EndDay, null);
 	}
 
-	public void PostDayEvent(DayEventType dayEventType, object? parameters)
+	internal void PostDayEvent(DayEventType dayEventType, object? parameters)
 	{
 		var toAwait = scenario.GetNextAwaited(dayEventType, parameters);
 		currentlyAwaitedEvents.ForEach(e => e.MarkRemoved());

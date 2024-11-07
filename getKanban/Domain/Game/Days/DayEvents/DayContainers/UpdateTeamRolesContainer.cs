@@ -19,7 +19,7 @@ public class UpdateTeamRolesContainer
 		teamRoleUpdates = [];
 	}
 
-	public void AddUpdate(Day day, TeamRole from, TeamRole to)
+	internal void AddUpdate(Day day, TeamRole from, TeamRole to)
 	{
 		day.PostDayEvent(DayEventType.UpdateTeamRoles, null);
 

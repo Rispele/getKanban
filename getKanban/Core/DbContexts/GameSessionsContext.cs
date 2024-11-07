@@ -1,7 +1,7 @@
 ﻿using Domain.Game;
 using Microsoft.EntityFrameworkCore;
 
-namespace WebApp.DbContexts;
+namespace Core.DbContexts;
 
 public class GameSessionsContext : DbContext
 {
