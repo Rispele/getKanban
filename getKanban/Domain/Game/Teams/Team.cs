@@ -52,8 +52,7 @@ public partial class Team
 		GameSessionId = gameSessionId;
 		this.name = name;
 		participants = [];
-		currentDayNumber = 9;
-		days = [ConfigureDay(currentDayNumber, [])];
+		days = [];
 	}
 
 	public void AddPlayer(User user)
@@ -71,6 +70,12 @@ public partial class Team
 
 		return (participant.Role & ParticipantRole.Player) != 0
 		       || (participant.Role & ParticipantRole.Angel) != 0;
+	}
+
+	public void StartSession()
+	{
+		currentDayNumber = 9;
+		days.Add(ConfigureDay(currentDayNumber, []));
 	}
 
 	[GeneratedRegex(@"[\w-!.]+")]
