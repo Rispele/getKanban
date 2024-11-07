@@ -1,27 +1,28 @@
-﻿using Domain.Game.Days.DayEvents.Configurations;
-using JetBrains.Annotations;
+﻿using Domain.Game.Days.Configurations;
 using Microsoft.EntityFrameworkCore;
 
-namespace Domain.Game.Days.DayEvents.DayContainers;
+namespace Domain.Game.Days.DayContainers;
 
 [EntityTypeConfiguration(typeof(UpdateTeamRolesContainerEntityTypeConfiguration))]
 public class UpdateTeamRolesContainer
 {
-	private readonly List<TeamRoleUpdate> teamRoleUpdates = null!;
+	private readonly List<TeamRoleUpdate> teamRoleUpdates = [];
 
 	public long Id { get; }
 
 	public IReadOnlyList<TeamRoleUpdate> TeamRoleUpdates => teamRoleUpdates;
 
-	[UsedImplicitly]
-	public UpdateTeamRolesContainer()
-	{
-		teamRoleUpdates = [];
-	}
-
 	internal void AddUpdate(TeamRole from, TeamRole to)
 	{
 		teamRoleUpdates.Add(new TeamRoleUpdate { From = from, To = to });
+	}
+
+	internal void Remove(long updateId)
+	{
+		if (teamRoleUpdates.Any(t => t.Id == updateId))
+		{
+			teamRoleUpdates.Remove(teamRoleUpdates.Single(t => t.Id == updateId));
+		}
 	}
 
 	public Dictionary<TeamRole, TeamRole[]> BuildTeamRolesUpdate()

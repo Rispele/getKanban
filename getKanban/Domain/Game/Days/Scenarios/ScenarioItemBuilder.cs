@@ -1,15 +1,14 @@
-﻿using Domain.Game.Days.DayEvents;
-
-namespace Domain.Game.Days.Scenarios;
+﻿namespace Domain.Game.Days.Scenarios;
 
 public class ScenarioItemBuilder
 {
-	private readonly List<DayEventType> eventTypes = new();
-	private readonly List<ScenarioItemCondition> itemConditions = new();
+	private readonly List<DayCommandType> commandTypesAwaited = [];
+	private readonly List<ScenarioItemCondition> itemConditions = [];
+	private readonly List<DayCommandType> commandTypesAwaitedToRemove = [];
 
-	public ScenarioItemBuilder ForEventType(params DayEventType[] eventTypes)
+	public ScenarioItemBuilder AwaitCommands(params DayCommandType[] eventTypes)
 	{
-		this.eventTypes.AddRange(eventTypes);
+		commandTypesAwaited.AddRange(eventTypes);
 		return this;
 	}
 
@@ -19,16 +18,25 @@ public class ScenarioItemBuilder
 		return this;
 	}
 
+	public ScenarioItemBuilder RemoveAwaited(params DayCommandType[] eventTypes)
+	{
+		commandTypesAwaitedToRemove.AddRange(eventTypes);
+		return this;
+	}
+
+	public ScenarioItemBuilder ReAwaitCommand(DayCommandType commandType)
+	{
+		commandTypesAwaited.Add(commandType);
+		commandTypesAwaitedToRemove.Add(commandType);
+		return this;
+	}
+
 	public ScenarioItem Build()
 	{
-		if (eventTypes.Count == 0)
-		{
-			throw new ArgumentException("No event types defined.");
-		}
-
 		return new ScenarioItem(
-			eventTypes.ToArray(),
-			itemConditions.ToArray());
+			commandTypesAwaited.ToArray(),
+			itemConditions.ToArray(),
+			commandTypesAwaitedToRemove.ToArray());
 	}
 
 	public static implicit operator ScenarioItem(ScenarioItemBuilder builder)

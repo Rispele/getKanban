@@ -1,5 +1,5 @@
 ﻿using Domain.Game.Days;
-using Domain.Game.Days.DayEvents.DayContainers;
+using Domain.Game.Days.DayContainers;
 
 namespace Core.Dtos;
 

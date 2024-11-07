@@ -1,8 +1,8 @@
 ﻿using Domain.DomainExceptions;
-using Domain.Game.Days.DayEvents.Configurations;
+using Domain.Game.Days.Configurations;
 using Microsoft.EntityFrameworkCore;
 
-namespace Domain.Game.Days.DayEvents.DayContainers;
+namespace Domain.Game.Days.DayContainers;
 
 [EntityTypeConfiguration(typeof(UpdateSprintBacklogContainerEntityTypeConfiguration))]
 public class UpdateSprintBacklogContainer

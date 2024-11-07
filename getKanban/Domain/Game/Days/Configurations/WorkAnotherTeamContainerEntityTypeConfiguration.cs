@@ -1,8 +1,8 @@
-﻿using Domain.Game.Days.DayEvents.DayContainers;
+﻿using Domain.Game.Days.DayContainers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Domain.Game.Days.DayEvents.Configurations;
+namespace Domain.Game.Days.Configurations;
 
 public class WorkAnotherTeamContainerEntityTypeConfiguration : IEntityTypeConfiguration<WorkAnotherTeamContainer>
 {

@@ -1,9 +1,9 @@
 ﻿using Domain.DomainExceptions;
-using Domain.Game.Days.DayEvents.Configurations;
+using Domain.Game.Days.Configurations;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 
-namespace Domain.Game.Days.DayEvents.DayContainers;
+namespace Domain.Game.Days.DayContainers;
 
 [EntityTypeConfiguration(typeof(UpdateCfdContainerEntityTypeConfiguration))]
 public class UpdateCfdContainer

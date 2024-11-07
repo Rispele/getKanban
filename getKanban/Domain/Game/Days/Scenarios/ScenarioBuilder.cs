@@ -1,10 +1,8 @@
-﻿using Domain.Game.Days.DayEvents;
-
-namespace Domain.Game.Days.Scenarios;
+﻿namespace Domain.Game.Days.Scenarios;
 
 public class ScenarioBuilder
 {
-	private readonly Dictionary<DayEventType, ScenarioItem[]> scenario = new();
+	private readonly Dictionary<DayCommandType, ScenarioItem[]> scenario = new();
 
 	private ScenarioBuilder()
 	{
@@ -16,21 +14,11 @@ public class ScenarioBuilder
 	}
 
 	public ScenarioBuilder For(
-		DayEventType eventType,
+		DayCommandType commandType,
 		params Func<ScenarioItemBuilder, ScenarioItemBuilder>[] builders)
 	{
-		scenario[eventType] = builders
+		scenario[commandType] = builders
 			.Select(b => b(new ScenarioItemBuilder()).Build())
-			.ToArray();
-		return this;
-	}
-
-	public ScenarioBuilder For(
-		DayEventType eventType,
-		params DayEventType[] eventTypes)
-	{
-		scenario[eventType] = eventTypes
-			.Select(b => new ScenarioItem([b], []))
 			.ToArray();
 		return this;
 	}

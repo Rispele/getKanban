@@ -1,4 +1,4 @@
-﻿using Domain.Game.Days.DayEvents.Configurations;
+﻿using Domain.Game.Days.Configurations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
