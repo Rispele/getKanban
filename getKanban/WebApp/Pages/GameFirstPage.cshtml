@@ -1,0 +1,33 @@
+﻿@page
+@model WebApp.Pages.GameFirstPage
+
+@{
+    ViewData["Title"] = "Game";
+}
+
+<div class="text-center gameLoadingContainer">
+    <div class="visible">
+        <h1 class="display-4">Игра скоро начнется</h1>
+
+        <div id="floatingCirclesG">
+            <div class="f_circleG" id="frotateG_01"></div>
+            <div class="f_circleG" id="frotateG_02"></div>
+            <div class="f_circleG" id="frotateG_03"></div>
+            <div class="f_circleG" id="frotateG_04"></div>
+            <div class="f_circleG" id="frotateG_05"></div>
+            <div class="f_circleG" id="frotateG_06"></div>
+            <div class="f_circleG" id="frotateG_07"></div>
+            <div class="f_circleG" id="frotateG_08"></div>
+        </div>
+    </div>
+    
+    <div class="visible">
+        <h1 class="text-center display-4">Выберите имя вашей команды:</h1>
+        
+        <input type="text" class="authorizationCommandName authorizationButtonsTemplate text-center"/>
+
+        <form>
+            <button class="text-center authorizationButtonsTemplate authorizationButton">Подтвердить</button>
+        </form>
+    </div>
+</div>
