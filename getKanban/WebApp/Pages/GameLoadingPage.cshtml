@@ -1,5 +1,5 @@
 ﻿@page
-@model WebApp.Pages.GameFirstPage
+@model WebApp.Pages.GameLoadingPage
 
 @{
     ViewData["Title"] = "Game";
@@ -27,7 +27,9 @@
         <input type="text" class="authorizationCommandName authorizationButtonsTemplate text-center"/>
 
         <form>
-            <button class="text-center authorizationButtonsTemplate authorizationButton">Подтвердить</button>
+            <button class="text-center authorizationButtonsTemplate authorizationButton" asp-area="" asp-page="/FirstStepPage">
+                Подтвердить
+            </button>
         </form>
     </div>
 </div>

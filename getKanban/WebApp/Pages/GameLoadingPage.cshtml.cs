@@ -2,7 +2,7 @@
 
 namespace WebApp.Pages;
 
-public class GameFirstPage : PageModel
+public class GameLoadingPage : PageModel
 {
 	public void OnGet()
 	{

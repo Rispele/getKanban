@@ -1,0 +1,90 @@
+﻿.stepHeader {
+    position: fixed;
+    
+    left: 0;
+    top: 0;
+    
+    width: 100%;
+    height: 50px;
+    
+    border-bottom: 1px solid black;
+}
+
+.infoContainer {
+    width: 800px;
+    
+    background-color: darkgrey;
+    
+    border-color: black;
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 50px;
+}
+@media (max-width: 900px) {
+    .infoContainer {
+        width: 500px;
+    }
+}
+
+@media (max-width: 600px) {
+    .infoContainer {
+        width: 400px;
+    }
+}
+
+.info {
+    width: 600px;
+}
+@media (max-width: 900px) {
+    .info {
+        width: 300px;
+    }
+}
+
+.stepControlButtons {
+    position: fixed;
+
+    bottom: 100px;
+    
+    width: 150px;
+    height: 40px;
+    
+    border-radius: 15px;
+    
+    background-color: black;
+    
+    color: white;
+}
+
+.leftButton {
+    left: 70px;
+}
+@media (max-width: 900px) {
+    .leftButton {
+        left: 30px;
+    }
+}
+
+.rightButton {
+    right: 50px;
+}
+@media (max-width: 900px) {
+    .rightButton {
+        right: 30px;
+    }
+}
+
+.height-large {
+    min-height: 400px;
+    height: fit-content;
+}
+
+.height-medium {
+    min-height: 300px;
+    height: fit-content;
+}
+
+.height-small {
+    min-height: 100px;
+    height: fit-content;
+}
