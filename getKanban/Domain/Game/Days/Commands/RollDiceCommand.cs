@@ -24,7 +24,7 @@ public class RollDiceCommand : DayCommand
 			analystsScores,
 			programmersScores,
 			testersScores);
-		
+
 		day.PostDayEvent(CommandType, null);
 		return;
 

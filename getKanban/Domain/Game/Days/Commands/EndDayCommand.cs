@@ -13,8 +13,13 @@ public class EndDayCommand : DayCommand
 		day.EnsureCanPostEvent(CommandType);
 		EnsureCfdIsValid(team);
 		
-		day.PostDayEvent(CommandType, null);
 		team.AddNextDay();
+		
+		day.ReleaseTicketContainer.Freeze();
+		day.UpdateSprintBacklogContainer.Freeze();
+		day.UpdateCfdContainer.Freeze();
+		
+		day.PostDayEvent(CommandType, null);
 	}
 	
 	private void EnsureCfdIsValid(Team team)
