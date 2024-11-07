@@ -1,5 +1,5 @@
-﻿using Domain.Game.Days.DayEvents.Configurations;
-using JetBrains.Annotations;
+﻿using Domain.DomainExceptions;
+using Domain.Game.Days.DayEvents.Configurations;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Game.Days.DayEvents.DayContainers;
@@ -7,23 +7,51 @@ namespace Domain.Game.Days.DayEvents.DayContainers;
 [EntityTypeConfiguration(typeof(UpdateSprintBacklogContainerEntityTypeConfiguration))]
 public class UpdateSprintBacklogContainer
 {
-	public long Id { get; set; }
-	public IReadOnlyList<string> TicketIds { get; } = null!;
+	private readonly List<string> ticketIds;
 
-	[UsedImplicitly]
-	private UpdateSprintBacklogContainer()
+	public long Id { get; private set; }
+	
+	public bool Frozen { get; private set; }
+
+	public IReadOnlyList<string> TicketIds => ticketIds;
+		
+	internal UpdateSprintBacklogContainer()
 	{
+		ticketIds = [];
 	}
-
-	private UpdateSprintBacklogContainer(string[] ticketIds)
+	
+	internal void Update(string ticketId)
 	{
-		TicketIds = ticketIds;
+		if (Frozen)
+		{
+			throw new DomainException("Cannot update frozen container");
+		}
+
+		if (ticketIds.Contains(ticketId))
+		{
+			return;
+		}
+		
+		ticketIds.Add(ticketId);
 	}
-
-	internal static UpdateSprintBacklogContainer CreateInstance(Day day, string[] ticketIds)
+	
+	internal void Remove(string ticketId)
 	{
-		day.PostDayEvent(DayEventType.UpdateSprintBacklog, null);
+		if (Frozen)
+		{
+			throw new DomainException("Cannot update frozen container");
+		}
 
-		return new UpdateSprintBacklogContainer(ticketIds);
+		if (!ticketIds.Contains(ticketId))
+		{
+			return;
+		}
+		
+		ticketIds.Remove(ticketId);
+	}
+	
+	internal void Freeze()
+	{
+		Frozen = true;
 	}
 }

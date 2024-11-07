@@ -13,16 +13,16 @@ public class Day
 	private readonly List<AwaitedEvent> awaitedEvents = null!;
 	private readonly Scenario scenario = null!;
 
-	private readonly int analystsNumber;
-	private readonly int programmersNumber;
-	private readonly int testersNumber;
+	public int AnalystsNumber { get; }
+	public int ProgrammersNumber { get; }
+	public int TestersNumber { get; }
 
 	private IEnumerable<AwaitedEvent> currentlyAwaitedEvents => awaitedEvents.Where(@event => !@event.Removed);
-	public UpdateTeamRolesContainer UpdateTeamRolesContainer { get; } = null!;
 	public WorkAnotherTeamContainer? WorkAnotherTeamContainer { get; private set; }
+	public UpdateTeamRolesContainer UpdateTeamRolesContainer { get; } = null!;
 	public RollDiceContainer? RollDiceContainer { get; private set; }
-	public ReleaseTicketContainer? ReleaseTicketContainer { get; private set; }
-	public UpdateSprintBacklogContainer? UpdateSprintBacklogContainer { get; private set; }
+	public ReleaseTicketContainer ReleaseTicketContainer { get; private set; }
+	public UpdateSprintBacklogContainer UpdateSprintBacklogContainer { get; private set; }
 	public UpdateCfdContainer UpdateCfdContainer { get; } = null!;
 
 	public long Id { get; }
@@ -48,12 +48,14 @@ public class Day
 		this.scenario = scenario;
 		awaitedEvents = initiallyAwaitedEvents.Select(t => new AwaitedEvent(t)).ToList();
 
-		this.analystsNumber = analystsNumber;
-		this.programmersNumber = programmersNumber;
-		this.testersNumber = testersNumber;
+		AnalystsNumber = analystsNumber;
+		ProgrammersNumber = programmersNumber;
+		TestersNumber = testersNumber;
 
 		UpdateTeamRolesContainer = new UpdateTeamRolesContainer();
 		UpdateCfdContainer = new UpdateCfdContainer();
+		ReleaseTicketContainer = new ReleaseTicketContainer();
+		UpdateSprintBacklogContainer = new UpdateSprintBacklogContainer();
 	}
 
 	internal int RollDiceForAnotherTeam()
@@ -74,7 +76,7 @@ public class Day
 		EnsureCanPostEvent(DayEventType.UpdateTeamRoles);
 		EnsureCanUpdateTeamRoles(from);
 
-		UpdateTeamRolesContainer.AddUpdate(this, from, to);
+		UpdateTeamRolesContainer.AddUpdate(from, to);
 	}
 
 	internal void RollDices()
@@ -83,9 +85,9 @@ public class Day
 
 		var diceRoller = new DiceRoller(new Random());
 		var swapByRole = UpdateTeamRolesContainer?.BuildTeamRolesUpdate() ?? [];
-		var (analystsDiceNumber, analystsScores) = RollDiceForRole(analystsNumber, TeamRole.Analyst);
-		var (programmersDiceNumber, programmersScores) = RollDiceForRole(programmersNumber, TeamRole.Programmer);
-		var (testersDiceNumber, testersScores) = RollDiceForRole(testersNumber, TeamRole.Tester);
+		var (analystsDiceNumber, analystsScores) = RollDiceForRole(AnalystsNumber, TeamRole.Analyst);
+		var (programmersDiceNumber, programmersScores) = RollDiceForRole(ProgrammersNumber, TeamRole.Programmer);
+		var (testersDiceNumber, testersScores) = RollDiceForRole(TestersNumber, TeamRole.Tester);
 
 		RollDiceContainer = RollDiceContainer.CreateInstance(
 			this,
@@ -116,16 +118,32 @@ public class Day
 	internal void ReleaseTickets(string[] ticketIds)
 	{
 		EnsureCanPostEvent(DayEventType.ReleaseTickets);
-
-		ReleaseTicketContainer = ReleaseTicketContainer.CreateInstance(this, ticketIds);
+		
+		ticketIds.ForEach(t => ReleaseTicketContainer.Update(t));
 		UpdateCfdContainer.Update(UpdateCfdContainerPatchType.Released, ticketIds.Length);
+	}
+	
+	internal void EndOfReleaseTickets()
+	{
+		EnsureCanPostEvent(DayEventType.EndOfReleaseTickets);
+		
+		ReleaseTicketContainer.Freeze();
+		PostDayEvent(DayEventType.EndOfReleaseTickets, null);
 	}
 
 	internal void UpdateSprintBacklog(string[] ticketIds)
 	{
 		EnsureCanPostEvent(DayEventType.UpdateSprintBacklog);
 
-		UpdateSprintBacklogContainer = UpdateSprintBacklogContainer.CreateInstance(this, ticketIds);
+		ticketIds.ForEach(t => UpdateSprintBacklogContainer.Update(t));
+	}
+	
+	internal void EndOfUpdateSprintBacklog()
+	{
+		EnsureCanPostEvent(DayEventType.EndOfUpdateSprintBacklog);
+		
+		UpdateSprintBacklogContainer.Freeze();
+		PostDayEvent(DayEventType.EndOfUpdateSprintBacklog, null);
 	}
 
 	internal void UpdateCfd(
@@ -171,9 +189,9 @@ public class Day
 
 		var limit = from switch
 		{
-			TeamRole.Analyst => analystsNumber,
-			TeamRole.Programmer => programmersNumber,
-			TeamRole.Tester => testersNumber,
+			TeamRole.Analyst => AnalystsNumber,
+			TeamRole.Programmer => ProgrammersNumber,
+			TeamRole.Tester => TestersNumber,
 			_ => throw new ArgumentOutOfRangeException()
 		};
 

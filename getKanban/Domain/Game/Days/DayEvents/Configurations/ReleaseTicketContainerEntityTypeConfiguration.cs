@@ -10,9 +10,12 @@ public class ReleaseTicketContainerEntityTypeConfiguration : IEntityTypeConfigur
 	{
 		builder.HasKey(e => e.Id);
 
+		builder.Property(e => e.Frozen);
+		builder.Ignore(e => e.TicketIds);
+		
 		builder
-			.Property(e => e.TicketIds)
+			.Property("ticketIds")
 			.IsRequired()
-			.HasConversion(new ReadOnlyListConverter<string>());
+			.HasConversion(new ListConverter<string>());
 	}
 }

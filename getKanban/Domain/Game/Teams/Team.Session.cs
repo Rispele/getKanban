@@ -15,13 +15,14 @@ public partial class Team
 	private List<Day> days { get; } = null!;
 	private int previousDayNumber => currentDayNumber - 1;
 
-	private Day currentDay => days.Single(d => d.Number == currentDayNumber);
+	public IReadOnlyList<Day> Days => days;
+	public Day CurrentDay => days.Single(d => d.Number == currentDayNumber);
 	private Day? previousDay => days.SingleOrDefault(d => d.Number == previousDayNumber);
 
 	public IReadOnlyList<TeamRoleUpdate> CurrentDayTeamRoleUpdates =>
-		currentDay.UpdateTeamRolesContainer.TeamRoleUpdates;
+		CurrentDay.UpdateTeamRolesContainer.TeamRoleUpdates;
 
-	public RollDiceContainer? CurrentDayRollDiceContainer => currentDay.RollDiceContainer;
+	public RollDiceContainer? CurrentDayRollDiceContainer => CurrentDay.RollDiceContainer;
 
 	public IReadOnlyList<UpdateCfdContainer> CfdContainers => days
 		.OrderBy(d => d.Number)
@@ -31,48 +32,58 @@ public partial class Team
 
 	public int RollDiceForAnotherTeam()
 	{
-		return currentDay.RollDiceForAnotherTeam();
+		return CurrentDay.RollDiceForAnotherTeam();
 	}
 
 	public void UpdateTeamRoles(TeamRole from, TeamRole to)
 	{
-		currentDay.UpdateTeamRoles(from, to);
+		CurrentDay.UpdateTeamRoles(from, to);
 	}
 
 	public void RollDices()
 	{
-		currentDay.RollDices();
+		CurrentDay.RollDices();
 	}
 
 	public void ReleaseTickets(string[] ticketIds)
 	{
 		EnsureCanReleaseTickets(ticketIds);
 
-		currentDay.ReleaseTickets(ticketIds);
+		CurrentDay.ReleaseTickets(ticketIds);
+	}
+
+	public void EndOfReleaseTickets()
+	{
+		CurrentDay.EndOfReleaseTickets();
 	}
 
 	public void UpdateSprintBacklog(string[] ticketIds)
 	{
 		EnsureCanTakeTickets(ticketIds);
 
-		currentDay.UpdateSprintBacklog(ticketIds);
+		CurrentDay.UpdateSprintBacklog(ticketIds);
+	}
+
+	public void EndOfUpdateSprintBacklog()
+	{
+		CurrentDay.EndOfUpdateSprintBacklog();
 	}
 
 	public void UpdateCfd(UpdateCfdContainerPatchType patchType, int value)
 	{
-		currentDay.UpdateCfd(patchType, value);
+		CurrentDay.UpdateCfd(patchType, value);
 	}
 
 	public void EndOfUpdateCfd()
 	{
 		EnsureCanEndOfUpdateCfd();
 
-		currentDay.EndOfUpdateCfd();
+		CurrentDay.EndOfUpdateCfd();
 	}
 
 	public void EndDay()
 	{
-		currentDay.EndDay();
+		CurrentDay.EndDay();
 
 		currentDayNumber++;
 		days.Add(ConfigureDay(currentDayNumber, days));
@@ -80,7 +91,7 @@ public partial class Team
 
 	private void EnsureCanEndOfUpdateCfd()
 	{
-		var currentDayCfd = currentDay.UpdateCfdContainer;
+		var currentDayCfd = CurrentDay.UpdateCfdContainer;
 		var previousDayCfd = previousDay?.UpdateCfdContainer ?? UpdateCfdContainer.None;
 
 		if (currentDayCfd
@@ -148,7 +159,7 @@ public partial class Team
 	private HashSet<string> BuildTicketsInWork(List<Day> daysToProcess)
 	{
 		return BuildTakenTickets(daysToProcess)
-			.Except(days.SelectMany(t => t.ReleaseTicketContainer?.TicketIds ?? []))
+			.Except(BuildReleasedTickets(daysToProcess))
 			.ToHashSet();
 	}
 
@@ -197,14 +208,16 @@ public partial class Team
 			.For(
 				DayEventType.RollDice,
 				shouldRelease
-					? DayEventType.ReleaseTickets
+					? [DayEventType.ReleaseTickets, DayEventType.EndOfReleaseTickets]
 					: shouldUpdateSprintBacklog
-						? DayEventType.UpdateSprintBacklog
-						: DayEventType.UpdateCfd)
+						? [DayEventType.UpdateSprintBacklog, DayEventType.EndOfUpdateSprintBacklog]
+						: [DayEventType.UpdateCfd])
 			.For(
-				DayEventType.ReleaseTickets,
-				shouldUpdateSprintBacklog ? DayEventType.UpdateSprintBacklog : DayEventType.UpdateCfd)
-			.For(DayEventType.UpdateSprintBacklog, DayEventType.UpdateCfd)
+				DayEventType.EndOfReleaseTickets,
+				shouldUpdateSprintBacklog
+					? [DayEventType.UpdateSprintBacklog, DayEventType.EndOfUpdateSprintBacklog]
+					: [DayEventType.UpdateCfd])
+			.For(DayEventType.EndOfUpdateSprintBacklog, DayEventType.UpdateCfd)
 			.For(
 				DayEventType.UpdateCfd,
 				builder => builder.ForEventType(DayEventType.UpdateCfd).WithCondition("Released", null),

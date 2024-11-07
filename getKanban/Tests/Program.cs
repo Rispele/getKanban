@@ -1,6 +1,6 @@
-﻿using Domain;
+﻿using Core.DbContexts;
+using Domain;
 using Microsoft.EntityFrameworkCore;
-using WebApp.DbContexts;
 
 var db = new TeamsContext();
 db.Database.EnsureCreated();

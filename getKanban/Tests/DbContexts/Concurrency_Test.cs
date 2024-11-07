@@ -1,11 +1,11 @@
-﻿using Domain;
+﻿using Core.DbContexts;
+using Domain;
 using Domain.Game;
 using Domain.Game.Days.DayEvents.DayContainers;
 using Domain.Users;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
-using WebApp.DbContexts;
 
 namespace Tests.DbContexts;
 
@@ -30,7 +30,7 @@ public class Concurrency_Test
 	public async Task Day_ConcurrentUpdate_ShouldThrowOnConflict()
 	{
 		var (context1, context2, session1, session2) = await SetupGameSessionInDifferentContexts();
-
+		
 		var (team1, team2) = (session1.Teams.Single(), session2.Teams.Single());
 		team1.RollDices();
 		team2.RollDices();
@@ -45,7 +45,9 @@ public class Concurrency_Test
 		var (context1, context2, session1, session2) = await SetupGameSessionInDifferentContexts(
 			s => s.Teams.Single().RollDices(),
 			s => s.Teams.Single().ReleaseTickets([]),
-			s => s.Teams.Single().UpdateSprintBacklog([]));
+			s => s.Teams.Single().EndOfReleaseTickets(),
+			s => s.Teams.Single().UpdateSprintBacklog([]),
+			s => s.Teams.Single().EndOfUpdateSprintBacklog());
 
 		var (team1, team2) = (session1.Teams.Single(), session2.Teams.Single());
 		team1.UpdateCfd(UpdateCfdContainerPatchType.ToDeploy, 10);
@@ -75,6 +77,7 @@ public class Concurrency_Test
 		var user = await context.AddAsync(new User("userName"));
 		var session = await context.AddAsync(new GameSession(user.Entity, "name", 1));
 
+		session.Entity.Start();
 		actions.ForEach(a => a(session.Entity));
 
 		await context.SaveChangesAsync();

@@ -1,7 +1,7 @@
-﻿using Domain;
+﻿using Core.DbContexts;
+using Domain;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
-using WebApp.DbContexts;
 
 namespace Tests.DbContexts;
 

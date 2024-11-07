@@ -19,9 +19,9 @@ public class DayEntityTypeConfiguration : IEntityTypeConfiguration<Day>
 
 		builder.Ignore("currentlyAwaitedEvents");
 
-		builder.Property("analystsNumber");
-		builder.Property("programmersNumber");
-		builder.Property("testersNumber");
+		builder.Property(d => d.AnalystsNumber);
+		builder.Property(d => d.ProgrammersNumber);
+		builder.Property(d => d.TestersNumber);
 
 		builder.Property(e => e.Number);
 
