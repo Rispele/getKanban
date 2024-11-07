@@ -7,21 +7,20 @@ namespace Domain.Game.Days.Commands;
 public class EndDayCommand : DayCommand
 {
 	public override DayCommandType CommandType => DayCommandType.EndDay;
-	
+
 	internal override void Execute(Team team, Day day)
 	{
 		day.EnsureCanPostEvent(CommandType);
 		EnsureCfdIsValid(team);
 		
-		team.AddNextDay();
-		
 		day.ReleaseTicketContainer.Freeze();
 		day.UpdateSprintBacklogContainer.Freeze();
 		day.UpdateCfdContainer.Freeze();
-		
+
+		team.AddNextDay();
 		day.PostDayEvent(CommandType, null);
 	}
-	
+
 	private void EnsureCfdIsValid(Team team)
 	{
 		var currentDayCfd = team.CurrentDay.UpdateCfdContainer;

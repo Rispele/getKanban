@@ -16,7 +16,9 @@ public class Day
 	public int ProgrammersNumber { get; }
 	public int TestersNumber { get; }
 
-	private IEnumerable<AwaitedCommands> currentlyAwaitedEvents => awaitedCommands.Where(@event => !@event.Removed);
+	private IEnumerable<AwaitedCommands> currentlyAwaitedEvents => awaitedCommands
+		.Where(@event => !@event.Removed);
+	
 	public WorkAnotherTeamContainer? WorkAnotherTeamContainer { get; internal set; }
 	public UpdateTeamRolesContainer UpdateTeamRolesContainer { get; } = null!;
 	public RollDiceContainer? RollDiceContainer { get; internal set; }
