@@ -25,4 +25,8 @@
       <_ContentIncludedByDefault Remove="Pages\JoinGame\JoinGame.cshtml" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="wwwroot\images\" />
+    </ItemGroup>
+
 </Project>

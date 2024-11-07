@@ -3,14 +3,21 @@
     flex-direction: row;
     column-gap: 50px;
     
-    width: 1400px;
+    width: 1300px;
     min-height: 500px;
 }
 @media (max-width: 1200px) {
     .commandEditorContainer {
-        max-width: 1200px;
+        max-width: 1000px;
         width: fit-content;
     }
+}
+
+.commandEditorHeader {
+    width: 100%;
+    height: fit-content;
+
+    align-content: center;
 }
 
 .commandEditorWindowsHeight {
@@ -19,7 +26,7 @@
 }
 
 .commandEditorSWindow {
-    width: 200px;
+    width: 300px;
 }
 
 .commandEditorLWindow {
@@ -27,16 +34,16 @@
     flex-direction: row;
     flex-wrap: wrap;
     
-    width: 804px;
+    width: 904px;
 }
 @media (max-width: 1200px) {
     .commandEditorLWindow {
-        width: 404px;
+        width: 604px;
     }
 }
 @media (max-width: 800px) {
     .commandEditorLWindow {
-        width: 200px;
+        width: 300px;
     }
 }
 
@@ -48,7 +55,7 @@
 }
 
 .commandEditorCommandContainer {
-    width: 200px;
+    width: 300px;
     height: 500px;
     
     border-width: 1px;
@@ -64,15 +71,10 @@
     height: 400px;
 }
 
-.commandEditorRandomButton {
-    width: 180px;
-    height: 40px;
-    
-    font-size: 15px;
-    line-height: 35px;
-    text-align: center;
-    
-    margin-left: 10px;
+.commandEditorButtonsTemplate {
+    width: 300px;
+    height: 50px;
+
 }
 
 .commandEditorBorderStyle {

@@ -75,6 +75,10 @@ body {
   margin: 50px auto;
 }
 
+.centered-25 {
+  margin: 25px auto;
+}
+
 .centered {
   margin: auto;
 }

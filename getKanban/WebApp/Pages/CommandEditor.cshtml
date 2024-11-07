@@ -5,28 +5,31 @@
     ViewData["Title"] = "Command Editor Page";
 }
 
-<div class="commandEditorContainer centered-50">
-    <div class="commandEditorSWindow commandEditorWindowsHeight commandEditorBorderStyle commandEditorBorderWidth commandEditorBorderRadius">
-        <div class="commandEditorHeaders text-center">
-            <p class="fs-6">Ожидают</p>
-        </div>
+@* Header *@
+<div class="commandEditorHeader text-center">
+    <h1 class="display-4 fw-bold">getKanban: "Кабаньи бега"</h1>
+</div>
 
-        <div class="commandEditorNamesContainer text-center">
-            <p class="fs-6">Артём</p>
-            <p class="fs-6">Вова</p>
-            <p class="fs-6">Софа</p>
-            <p class="fs-6">Эрик</p>
-        </div>
-        
-        <button class="commandEditorRandomButton authorizationButton">Распределить случайно</button>
-    </div>
+@* Windows *@
+<div class="commandEditorContainer centered-25">
     
+    @* Command windows *@
     <div class="commandEditorLWindow commandEditorWindowsHeight commandEditorBorderStyle commandEditorBorderWidth commandEditorBorderRadius">
+        
+        @* Command window template *@
         <div class="commandEditorCommandContainer commandEditorBorderRadius">
-            <div class="commandEditorHeaders text-center">
-                <p class="fs-6">Команда 1</p>
-            </div>
             
+            @* Command header container *@
+            <div class="commandEditorHeaders text-center">
+                
+                @* Command name and link for copy *@
+                <p class="fs-6">
+                    Команда 1
+                    <img src="images/copy_button.jpg" alt="copy" width="20" height="20">
+                </p>
+            </div>
+
+            @* Players in command *@
             <div class="commandEditorNamesContainer text-center">
                 <p class="fs-6">Дима</p>
                 <p class="fs-6">Алтынгуль</p>
@@ -37,7 +40,10 @@
 
         <div class="commandEditorCommandContainer commandEditorBorderRadius">
             <div class="commandEditorHeaders text-center">
-                <p class="fs-6">Команда 2</p>
+                <p class="fs-6">
+                    Команда 2
+                    <img src="images/copy_button.jpg" alt="copy" width="20" height="20">
+                </p>
             </div>
 
             <div class="commandEditorNamesContainer text-center">
@@ -50,7 +56,10 @@
 
         <div class="commandEditorCommandContainer commandEditorBorderRadius">
             <div class="commandEditorHeaders text-center">
-                <p class="fs-6">Команда 3</p>
+                <p class="fs-6">
+                    Команда 3
+                    <img src="images/copy_button.jpg" alt="copy" width="20" height="20">
+                </p>
             </div>
 
             <div class="commandEditorNamesContainer text-center">
@@ -63,7 +72,10 @@
 
         <div class="commandEditorCommandContainer commandEditorBorderRadius">
             <div class="commandEditorHeaders text-center">
-                <p class="fs-6">Команда 4</p>
+                <p class="fs-6">
+                    Команда 4
+                    <img src="images/copy_button.jpg" alt="copy" width="20" height="20">
+                </p>
             </div>
 
             <div class="commandEditorNamesContainer text-center">
@@ -74,12 +86,20 @@
             </div>
         </div>
     </div>
-    
+
+    @* Angels *@
     <div class="commandEditorSWindow commandEditorWindowsHeight commandEditorBorderStyle commandEditorBorderWidth commandEditorBorderRadius">
-        <div class="commandEditorHeaders text-center">
-            <p class="fs-6">Поддержка</p>
-        </div>
         
+        @* Angels header container *@
+        <div class="commandEditorHeaders text-center">
+            @* Name and link for copy *@
+            <p class="fs-6">
+                Ангелы
+                <img src="images/copy_button.jpg" alt="copy" width="20" height="20">
+            </p>
+        </div>
+
+        @* Angels Name *@
         <div class="commandEditorNamesContainer text-center">
             <p class="fs-6">Артём</p>
             <p class="fs-6">Вова</p>
@@ -88,3 +108,9 @@
         </div>
     </div>
 </div>
+
+@* Start game button *@
+<form class="text-center">
+    @* asp-area="" asp-page="/Shared/JoinTeamSession" *@
+    <button class="commandEditorButtonsTemplate authorizationButton">Начать игру</button>
+</form>
