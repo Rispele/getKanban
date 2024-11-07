@@ -9,14 +9,9 @@ public class
 {
 	public void Configure(EntityTypeBuilder<UpdateSprintBacklogContainer> builder)
 	{
-		builder.HasKey(e => e.Id);
-
-		builder.Property(e => e.Frozen);
-		builder.Property("ticketIds")
-			.HasConversion(new ListConverter<string>());
+		builder.ConfigureAsFreezableDayContainer();
+		builder.Property("ticketIds").HasConversion(new ListConverter<string>());
 
 		builder.Ignore(e => e.TicketIds);
-		// builder.Property(e => e.TicketIds)
-		// .HasConversion(new ReadOnlyListConverter<string>());
 	}
 }

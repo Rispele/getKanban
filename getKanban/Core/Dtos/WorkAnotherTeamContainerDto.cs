@@ -1,6 +1,6 @@
 ﻿namespace Core.Dtos;
 
-public class WorkAnotherTeamContainerDto
+public class WorkAnotherTeamContainerDto : DayContainerDto
 {
 	public int DiceNumber { get; init; }
 

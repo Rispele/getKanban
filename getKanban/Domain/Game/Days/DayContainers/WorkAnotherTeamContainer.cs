@@ -5,10 +5,8 @@ using Microsoft.EntityFrameworkCore;
 namespace Domain.Game.Days.DayContainers;
 
 [EntityTypeConfiguration(typeof(WorkAnotherTeamContainerEntityTypeConfiguration))]
-public class WorkAnotherTeamContainer
+public class WorkAnotherTeamContainer : DayContainer
 {
-	public long Id { get; }
-
 	public int DiceNumber { get; }
 
 	public int ScoresNumber { get; }

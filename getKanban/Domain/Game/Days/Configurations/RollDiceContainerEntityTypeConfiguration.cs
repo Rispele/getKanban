@@ -9,9 +9,7 @@ public class RollDiceContainerEntityTypeConfiguration : IEntityTypeConfiguration
 {
 	public void Configure(EntityTypeBuilder<RollDiceContainer> builder)
 	{
-		builder.HasKey(e => e.Id);
-
-		builder.Property(e => e.Id).ValueGeneratedOnAdd();
+		builder.ConfigureAsDayContainer();
 
 		ConfigurePropertyConversion(builder, e => e.AnalystsDiceNumber);
 		ConfigurePropertyConversion(builder, e => e.ProgrammersDiceNumber);

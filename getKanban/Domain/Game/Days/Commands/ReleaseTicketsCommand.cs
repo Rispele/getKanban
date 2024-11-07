@@ -1,5 +1,4 @@
 ﻿using Domain.DomainExceptions;
-using Domain.Game.Days.DayContainers;
 using Domain.Game.Teams;
 
 namespace Domain.Game.Days.Commands;
@@ -15,21 +14,17 @@ public class ReleaseTicketsCommand : DayCommand
 	internal override void Execute(Team team, Day day)
 	{
 		day.EnsureCanPostEvent(CommandType);
-		
-		foreach (var ticketId in TicketIds)
+
+		if (Remove)
 		{
-			if (Remove)
-			{
-				day.ReleaseTicketContainer.Remove(ticketId);
-			}
-			else
-			{
-				EnsureCanReleaseTickets(team);
-				day.ReleaseTicketContainer.Update(ticketId);
-			}
+			TicketIds.ForEach(t => day.ReleaseTicketContainer.Remove(t));
+		}
+		else
+		{
+			EnsureCanReleaseTickets(team);
+			TicketIds.ForEach(t => day.ReleaseTicketContainer.Update(t));
 		}
 		
-		day.UpdateCfdContainer.Update(UpdateCfdContainerPatchType.Released, TicketIds.Count);
 		day.PostDayEvent(CommandType, null);
 	}
 	

@@ -4,17 +4,16 @@ using Microsoft.EntityFrameworkCore;
 namespace Domain.Game.Days.DayContainers;
 
 [EntityTypeConfiguration(typeof(UpdateTeamRolesContainerEntityTypeConfiguration))]
-public class UpdateTeamRolesContainer
+public class UpdateTeamRolesContainer : DayContainer
 {
 	private readonly List<TeamRoleUpdate> teamRoleUpdates = [];
-
-	public long Id { get; }
 
 	public IReadOnlyList<TeamRoleUpdate> TeamRoleUpdates => teamRoleUpdates;
 
 	internal void AddUpdate(TeamRole from, TeamRole to)
 	{
 		teamRoleUpdates.Add(new TeamRoleUpdate { From = from, To = to });
+		Version++;
 	}
 
 	internal void Remove(long updateId)
@@ -23,6 +22,7 @@ public class UpdateTeamRolesContainer
 		{
 			teamRoleUpdates.Remove(teamRoleUpdates.Single(t => t.Id == updateId));
 		}
+		Version++;
 	}
 
 	public Dictionary<TeamRole, TeamRole[]> BuildTeamRolesUpdate()

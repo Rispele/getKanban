@@ -8,11 +8,10 @@ public class ReleaseTicketContainerEntityTypeConfiguration : IEntityTypeConfigur
 {
 	public void Configure(EntityTypeBuilder<ReleaseTicketContainer> builder)
 	{
-		builder.HasKey(e => e.Id);
-
-		builder.Property(e => e.Frozen);
 		builder.Ignore(e => e.TicketIds);
 		
+		builder.ConfigureAsFreezableDayContainer();
+
 		builder
 			.Property("ticketIds")
 			.IsRequired()

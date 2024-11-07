@@ -1,6 +1,6 @@
 ﻿namespace Core.Dtos;
 
-public class RollDiceContainerDto
+public class RollDiceContainerDto : DayContainerDto
 {
 	public IReadOnlyList<int> AnalystsDiceNumber { get; init; } = null!;
 	public IReadOnlyList<int> ProgrammersDiceNumber { get; init; } = null!;

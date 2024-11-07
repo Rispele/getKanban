@@ -1,22 +1,17 @@
 ﻿using Domain.DomainExceptions;
 using Domain.Game.Days.Configurations;
-using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Game.Days.DayContainers;
 
 [EntityTypeConfiguration(typeof(UpdateCfdContainerEntityTypeConfiguration))]
-public class UpdateCfdContainer
+public class UpdateCfdContainer : FreezableDayContainer
 {
-	public long Id { get; }
 	public int? Released { get; private set; }
 	public int? ToDeploy { get; private set; }
 	public int? WithTesters { get; private set; }
 	public int? WithProgrammers { get; private set; }
 	public int? WithAnalysts { get; private set; }
-	public bool Frozen { get; private set; }
-
-	public long Timestamp { get; [UsedImplicitly] private set; }
 
 	public UpdateCfdContainer()
 	{
@@ -68,11 +63,8 @@ public class UpdateCfdContainer
 			default:
 				throw new ArgumentOutOfRangeException(nameof(patchType), patchType, null);
 		}
-	}
 
-	internal void Freeze()
-	{
-		Frozen = true;
+		Version++;
 	}
 
 	internal static UpdateCfdContainer None =>

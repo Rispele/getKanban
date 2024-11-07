@@ -5,9 +5,8 @@ using Microsoft.EntityFrameworkCore;
 namespace Domain.Game.Days.DayContainers;
 
 [EntityTypeConfiguration(typeof(RollDiceContainerEntityTypeConfiguration))]
-public class RollDiceContainer
+public class RollDiceContainer : DayContainer
 {
-	public long Id { get; }
 	public IReadOnlyList<int> AnalystsDiceNumber { get; } = null!;
 	public IReadOnlyList<int> ProgrammersDiceNumber { get; } = null!;
 	public IReadOnlyList<int> TestersDiceNumber { get; } = null!;

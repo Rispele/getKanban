@@ -5,13 +5,9 @@ using Microsoft.EntityFrameworkCore;
 namespace Domain.Game.Days.DayContainers;
 
 [EntityTypeConfiguration(typeof(UpdateSprintBacklogContainerEntityTypeConfiguration))]
-public class UpdateSprintBacklogContainer
+public class UpdateSprintBacklogContainer : FreezableDayContainer
 {
 	private readonly List<string> ticketIds;
-
-	public long Id { get; private set; }
-	
-	public bool Frozen { get; private set; }
 
 	public IReadOnlyList<string> TicketIds => ticketIds;
 		
@@ -33,6 +29,7 @@ public class UpdateSprintBacklogContainer
 		}
 		
 		ticketIds.Add(ticketId);
+		Version++;
 	}
 	
 	internal void Remove(string ticketId)
@@ -48,10 +45,6 @@ public class UpdateSprintBacklogContainer
 		}
 		
 		ticketIds.Remove(ticketId);
-	}
-	
-	internal void Freeze()
-	{
-		Frozen = true;
+		Version++;
 	}
 }
