@@ -6,7 +6,7 @@ public static class SerializerExtensions
 {
 	private static readonly JsonSerializerSettings Settings = new()
 	{
-`		TypeNameHandling = TypeNameHandling.Objects
+		TypeNameHandling = TypeNameHandling.Objects
 	};
 
 	public static string ToJson<T>(this T value)
