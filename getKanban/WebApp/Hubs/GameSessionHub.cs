@@ -37,7 +37,8 @@ public class GameSessionHub : Hub
 		Team team = null!;
 		
 		//TODO: имея на руках Team:
-		var actionResult = team.RollDiceForAnotherTeam();
+		// var actionResult = team.RollDiceForAnotherTeam();
+		var actionResult = 10;
 		//TODO: думаю все действия над тимой должны возвращать какой-нибудь actionResult, который будет содержать
 		//		тип действия, которое сделали, его результаты или ошибку.
 		//		Потом на фронте будут обновлять модельку страницы на основе этих данных.

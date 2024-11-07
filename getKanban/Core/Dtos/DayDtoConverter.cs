@@ -1,5 +1,5 @@
 ﻿using Domain.Game.Days;
-using Domain.Game.Days.DayEvents.DayContainers;
+using Domain.Game.Days.DayContainers;
 
 namespace Core.Dtos;
 
@@ -26,8 +26,9 @@ public class DayDtoConverter
 			return null;
 		}
 
-		return new WorkAnotherTeamContainerDto()
+		return new WorkAnotherTeamContainerDto
 		{
+			Version = container.Version,
 			DiceNumber = container.DiceNumber,
 			ScoresNumber = container.ScoresNumber
 		};
@@ -37,6 +38,7 @@ public class DayDtoConverter
 	{
 		return new UpdateTeamRolesContainerDto
 		{
+			Version = container.Version,
 			TeamRoleUpdates = container.TeamRoleUpdates.Select(t => (t.Id, t.From, t.To)).ToList()
 		};
 	}
@@ -50,6 +52,7 @@ public class DayDtoConverter
 		
 		return new RollDiceContainerDto
 		{
+			Version = container.Version,
 			AnalystsDiceNumber = container.AnalystsDiceNumber,
 			ProgrammersDiceNumber = container.ProgrammersDiceNumber,
 			TestersDiceNumber = container.TestersDiceNumber,
@@ -63,6 +66,7 @@ public class DayDtoConverter
 	{
 		return new ReleaseTicketContainerDto
 		{
+			Version = container.Version,
 			TicketIds = container.TicketIds
 		};
 	}
@@ -71,6 +75,7 @@ public class DayDtoConverter
 	{
 		return new UpdateSprintBacklogContainerDto
 		{
+			Version = container.Version,
 			TicketIds = container.TicketIds
 		};
 	}
@@ -79,6 +84,7 @@ public class DayDtoConverter
 	{
 		return new UpdateCfdContainerDto
 		{
+			Version = container.Version,
 			Released = container.Released,
 			ToDeploy = container.ToDeploy,
 			WithAnalysts = container.WithAnalysts,

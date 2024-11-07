@@ -1,13 +1,12 @@
-﻿using Domain.Game.Days.DayEvents.Configurations;
+﻿using Domain.Game.Days.Configurations;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 
-namespace Domain.Game.Days.DayEvents.DayContainers;
+namespace Domain.Game.Days.DayContainers;
 
 [EntityTypeConfiguration(typeof(RollDiceContainerEntityTypeConfiguration))]
-public class RollDiceContainer
+public class RollDiceContainer : DayContainer
 {
-	public long Id { get; }
 	public IReadOnlyList<int> AnalystsDiceNumber { get; } = null!;
 	public IReadOnlyList<int> ProgrammersDiceNumber { get; } = null!;
 	public IReadOnlyList<int> TestersDiceNumber { get; } = null!;
@@ -37,7 +36,6 @@ public class RollDiceContainer
 	}
 
 	internal static RollDiceContainer CreateInstance(
-		Day day,
 		int[] analystsDiceNumber,
 		int[] programmersDiceNumber,
 		int[] testersDiceNumber,
@@ -45,8 +43,6 @@ public class RollDiceContainer
 		int[] programmersScores,
 		int[] testersScores)
 	{
-		day.PostDayEvent(DayEventType.RollDice, null);
-
 		return new RollDiceContainer(
 			analystsDiceNumber,
 			programmersDiceNumber,

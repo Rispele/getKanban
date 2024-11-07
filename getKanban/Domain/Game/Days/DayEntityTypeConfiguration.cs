@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
-using Domain.Game.Days.DayEvents;
-using Domain.Game.Days.DayEvents.DayContainers;
+using Domain.Game.Days.DayContainers;
 using Domain.Game.Days.Scenarios;
+using Domain.Serializers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
@@ -35,11 +35,11 @@ public class DayEntityTypeConfiguration : IEntityTypeConfiguration<Day>
 		ConfigureContainerRelation<UpdateCfdContainer>(builder, d => d.UpdateCfdContainer!);
 
 		builder
-			.HasMany<AwaitedEvent>("awaitedEvents")
+			.HasMany<AwaitedCommands>("awaitedCommands")
 			.WithOne()
 			.OnDelete(DeleteBehavior.Cascade);
 
-		builder.Navigation("awaitedEvents").AutoInclude();
+		builder.Navigation("awaitedCommands").AutoInclude();
 	}
 
 	private static void ConfigureContainerRelation<TContainer>(
@@ -57,6 +57,6 @@ public class DayEntityTypeConfiguration : IEntityTypeConfiguration<Day>
 	}
 
 	private class ScenarioConverter() : ValueConverter<Scenario, string>(
-		context => JsonConvert.SerializeObject(context),
+		context => context.ToJson(),
 		str => JsonConvert.DeserializeObject<Scenario>(str)!);
 }

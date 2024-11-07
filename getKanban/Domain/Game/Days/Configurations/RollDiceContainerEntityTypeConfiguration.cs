@@ -1,17 +1,15 @@
 ﻿using System.Linq.Expressions;
-using Domain.Game.Days.DayEvents.DayContainers;
+using Domain.Game.Days.DayContainers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Domain.Game.Days.DayEvents.Configurations;
+namespace Domain.Game.Days.Configurations;
 
 public class RollDiceContainerEntityTypeConfiguration : IEntityTypeConfiguration<RollDiceContainer>
 {
 	public void Configure(EntityTypeBuilder<RollDiceContainer> builder)
 	{
-		builder.HasKey(e => e.Id);
-
-		builder.Property(e => e.Id).ValueGeneratedOnAdd();
+		builder.ConfigureAsDayContainer();
 
 		ConfigurePropertyConversion(builder, e => e.AnalystsDiceNumber);
 		ConfigurePropertyConversion(builder, e => e.ProgrammersDiceNumber);

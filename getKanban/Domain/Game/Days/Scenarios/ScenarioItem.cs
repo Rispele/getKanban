@@ -1,5 +1,3 @@
-﻿using Domain.Game.Days.DayEvents;
+﻿namespace Domain.Game.Days.Scenarios;
 
-namespace Domain.Game.Days.Scenarios;
-
-public record ScenarioItem(DayEventType[] EventTypes, ScenarioItemCondition[] conditions);
+public record ScenarioItem(DayCommandType[] ToAdd, ScenarioItemCondition[] conditions, DayCommandType[] ToRemove);

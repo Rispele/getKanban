@@ -1,16 +1,14 @@
 ﻿using Domain.DomainExceptions;
-using Domain.Game.Days.DayEvents.Configurations;
+using Domain.Game.Days.Configurations;
 using Microsoft.EntityFrameworkCore;
 
-namespace Domain.Game.Days.DayEvents.DayContainers;
+namespace Domain.Game.Days.DayContainers;
 
 [EntityTypeConfiguration(typeof(ReleaseTicketContainerEntityTypeConfiguration))]
-public class ReleaseTicketContainer
+public class ReleaseTicketContainer : FreezableDayContainer
 {
 	private readonly List<string> ticketIds;
 
-	public long Id { get; }
-	public bool Frozen { get; private set; }
 	public IReadOnlyList<string> TicketIds => ticketIds;
 
 	internal ReleaseTicketContainer()
@@ -31,6 +29,7 @@ public class ReleaseTicketContainer
 		}
 		
 		ticketIds.Add(ticketId);
+		Version++;
 	}
 	
 	internal void Remove(string ticketId)
@@ -46,10 +45,6 @@ public class ReleaseTicketContainer
 		}
 		
 		ticketIds.Remove(ticketId);
-	}
-	
-	internal void Freeze()
-	{
-		Frozen = true;
+		Version++;
 	}
 }

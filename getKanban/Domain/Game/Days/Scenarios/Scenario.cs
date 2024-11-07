@@ -1,24 +1,27 @@
-﻿using Domain.Game.Days.DayEvents;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace Domain.Game.Days.Scenarios;
 
 public class Scenario
 {
-	[JsonProperty] private readonly Dictionary<DayEventType, ScenarioItem[]> scenario;
+	[JsonProperty] private readonly Dictionary<DayCommandType, ScenarioItem[]> scenario;
 
-	public Scenario(Dictionary<DayEventType, ScenarioItem[]> scenario)
+	public Scenario(Dictionary<DayCommandType, ScenarioItem[]> scenario)
 	{
 		this.scenario = scenario;
 	}
 
-	public IEnumerable<DayEventType> GetNextAwaited(DayEventType dayEventType, object? parameters)
+	public (DayCommandType[] toAdd, DayCommandType[] toRemove) GetNextAwaited(
+		DayCommandType dayCommandType,
+		object? parameters)
 	{
-		var items = scenario[dayEventType];
-		return items
+		var items = scenario[dayCommandType];
+		var itemsMatched = items
 			.Where(item => MatchConditions(parameters, item.conditions))
-			.SelectMany(item => item.EventTypes)
-			.Distinct(); //TODO (d.smirnov): сделать залупку, ака OR для ScenarioItemCondition чтобы не делать этот убогий дистинкт, когда для нескольких вариантов под операцией ИЛИ нужно писать несколько ScenarioItems. Опять же, не уверен что буду этим заниматься
+			.ToArray();
+		return (
+			itemsMatched.SelectMany(item => item.ToAdd).Distinct().ToArray(),
+			itemsMatched.SelectMany(item => item.ToRemove).Distinct().ToArray());
 	}
 
 	private bool MatchConditions(object? parameters, ScenarioItemCondition[] conditions)

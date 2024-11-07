@@ -1,7 +1,7 @@
-﻿using Domain.Game.Days.DayEvents.Configurations;
+﻿using Domain.Game.Days.Configurations;
 using Microsoft.EntityFrameworkCore;
 
-namespace Domain.Game.Days.DayEvents.DayContainers;
+namespace Domain.Game.Days.DayContainers;
 
 [EntityTypeConfiguration(typeof(TeamRoleUpdateEntityTypeConfiguration))]
 public class TeamRoleUpdate

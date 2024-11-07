@@ -10,7 +10,7 @@ public class TeamSessionSettings
 {
 	public long Id { get; }
 
-	public IReadOnlyList<string> InitiallyTakenTickets { get; set; } = null!;
+	public IReadOnlyList<string> InitiallyTakenTickets { get; init; } = null!;
 
 	public int ReleaseCycleLength { get; init; }
 

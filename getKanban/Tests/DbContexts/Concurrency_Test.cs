@@ -1,7 +1,8 @@
 ﻿using Core.DbContexts;
 using Domain;
 using Domain.Game;
-using Domain.Game.Days.DayEvents.DayContainers;
+using Domain.Game.Days.Commands;
+using Domain.Game.Days.DayContainers;
 using Domain.Users;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +26,25 @@ public class Concurrency_Test
 		await ShouldNotThrowOnSave(context1);
 		await ShouldThrowOnSave<DbUpdateConcurrencyException>(context2);
 	}
+	
+	[Test]
+	public async Task UpdateTeamRoles_ConcurrentUpdate_ShouldThrowOnConflict()
+	{
+		var (context1, context2, session1, session2) = await SetupGameSessionInDifferentContexts();
+		
+		var (team1, team2) = (session1.Teams.Single(), session2.Teams.Single());
+		var command = new UpdateTeamRolesCommand
+		{
+			From = TeamRole.Analyst,
+			To = TeamRole.Programmer
+		};
+		
+		team1.ExecuteCommand(command);
+		team2.ExecuteCommand(command);
+
+		await ShouldNotThrowOnSave(context1);
+		await ShouldThrowOnSave<DbUpdateConcurrencyException>(context2);
+	}
 
 	[Test]
 	public async Task Day_ConcurrentUpdate_ShouldThrowOnConflict()
@@ -32,26 +52,49 @@ public class Concurrency_Test
 		var (context1, context2, session1, session2) = await SetupGameSessionInDifferentContexts();
 		
 		var (team1, team2) = (session1.Teams.Single(), session2.Teams.Single());
-		team1.RollDices();
-		team2.RollDices();
+		var rollDiceCommand = new RollDiceCommand();
+		
+		team1.ExecuteCommand(rollDiceCommand);
+		team2.ExecuteCommand(rollDiceCommand);
 
 		await ShouldNotThrowOnSave(context1);
 		await ShouldThrowOnSave<DbUpdateException>(context2);
 	}
-
+	
 	[Test]
 	public async Task UpdateCfdContainer_ConcurrentUpdate_ShouldThrowOnConflict()
 	{
 		var (context1, context2, session1, session2) = await SetupGameSessionInDifferentContexts(
-			s => s.Teams.Single().RollDices(),
-			s => s.Teams.Single().ReleaseTickets([]),
-			s => s.Teams.Single().EndOfReleaseTickets(),
-			s => s.Teams.Single().UpdateSprintBacklog([]),
-			s => s.Teams.Single().EndOfUpdateSprintBacklog());
-
+			s => s.Teams.Single().ExecuteCommand(new RollDiceCommand()));
 		var (team1, team2) = (session1.Teams.Single(), session2.Teams.Single());
-		team1.UpdateCfd(UpdateCfdContainerPatchType.ToDeploy, 10);
-		team2.UpdateCfd(UpdateCfdContainerPatchType.ToDeploy, 5);
+
+		var command = new UpdateCfdCommand
+		{
+			PatchType = UpdateCfdContainerPatchType.ToDeploy,
+			Value = 1
+		};
+		
+		team1.ExecuteCommand(command);
+		team2.ExecuteCommand(command);
+
+		await ShouldNotThrowOnSave(context1);
+		await ShouldThrowOnSave<DbUpdateConcurrencyException>(context2);
+	}
+	
+	[Test]
+	public async Task ReleaseTicketsContainer_ConcurrentUpdate_ShouldThrowOnConflict()
+	{
+		var (context1, context2, session1, session2) = await SetupGameSessionInDifferentContexts(
+			s => s.Teams.Single().ExecuteCommand(new RollDiceCommand()));
+		var (team1, team2) = (session1.Teams.Single(), session2.Teams.Single());
+
+		var command = new ReleaseTicketsCommand
+		{
+			TicketIds = ["S01", "S05"]
+		};
+		
+		team1.ExecuteCommand(command);
+		team2.ExecuteCommand(command);
 
 		await ShouldNotThrowOnSave(context1);
 		await ShouldThrowOnSave<DbUpdateConcurrencyException>(context2);

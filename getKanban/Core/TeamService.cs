@@ -1,7 +1,7 @@
 ﻿using Core.DbContexts;
 using Core.DbContexts.Extensions;
 using Core.Dtos;
-using Domain.Game.Days.DayEvents.DayContainers;
+using Domain.Game.Days.DayContainers;
 
 namespace Core;
 
@@ -20,7 +20,6 @@ public class TeamService
 	{
 		var team = await context.GetTeam(gameSessionId, teamId);
 
-		team.RollDiceForAnotherTeam();
 		await context.SaveChangesAsync();
 		
 		return dayDtoConverter.Convert(team.CurrentDay).WorkAnotherTeamContainer!;
@@ -34,7 +33,6 @@ public class TeamService
 	{
 		var team = await context.GetTeam(gameSessionId, teamId);
 
-		team.UpdateTeamRoles(from, to);
 		await context.SaveChangesAsync();
 		
 		return dayDtoConverter.Convert(team.CurrentDay).UpdateTeamRolesContainer;

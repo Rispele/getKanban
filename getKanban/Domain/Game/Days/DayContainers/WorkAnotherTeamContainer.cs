@@ -1,14 +1,12 @@
-﻿using Domain.Game.Days.DayEvents.Configurations;
+﻿using Domain.Game.Days.Configurations;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 
-namespace Domain.Game.Days.DayEvents.DayContainers;
+namespace Domain.Game.Days.DayContainers;
 
 [EntityTypeConfiguration(typeof(WorkAnotherTeamContainerEntityTypeConfiguration))]
-public class WorkAnotherTeamContainer
+public class WorkAnotherTeamContainer : DayContainer
 {
-	public long Id { get; }
-
 	public int DiceNumber { get; }
 
 	public int ScoresNumber { get; }
@@ -27,11 +25,9 @@ public class WorkAnotherTeamContainer
 	}
 
 	internal static WorkAnotherTeamContainer CreateInstance(
-		Day day,
 		int diceNumber,
 		int scoresNumber)
 	{
-		day.PostDayEvent(DayEventType.WorkAnotherTeam, null);
 
 		return new WorkAnotherTeamContainer(
 			diceNumber,

@@ -20,8 +20,8 @@ public class DayDto
 		WorkAnotherTeamContainerDto? workAnotherTeamContainer,
 		UpdateTeamRolesContainerDto updateTeamRolesContainer,
 		RollDiceContainerDto? rollDiceContainer,
-		ReleaseTicketContainerDto? releaseTicketContainer,
-		UpdateSprintBacklogContainerDto? updateSprintBacklogContainer,
+		ReleaseTicketContainerDto releaseTicketContainer,
+		UpdateSprintBacklogContainerDto updateSprintBacklogContainer,
 		UpdateCfdContainerDto updateCfdContainer)
 	{
 		AnalystsNumber = analystsNumber;

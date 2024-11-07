@@ -1,6 +1,6 @@
 ﻿namespace Core.Dtos;
 
-public class UpdateCfdContainerDto
+public class UpdateCfdContainerDto : DayContainerDto
 {
 	public int? Released { get; init; }
 	public int? ToDeploy { get; init; }

@@ -1,4 +1,4 @@
-﻿namespace Domain.Game.Days.DayEvents.DayContainers;
+﻿namespace Domain.Game.Days.DayContainers;
 
 public enum TeamRole
 {

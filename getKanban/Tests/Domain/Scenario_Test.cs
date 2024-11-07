@@ -1,4 +1,4 @@
-﻿using Domain.Game.Days.DayEvents;
+﻿using Domain.Game.Days;
 using Domain.Game.Days.Scenarios;
 using FluentAssertions;
 using NUnit.Framework;
@@ -12,12 +12,25 @@ public class Scenario_Test
 	public void SingleEvent_NoCondition_ShouldReturn()
 	{
 		var scenario = ScenarioBuilder.Create()
-			.For(DayEventType.UpdateTeamRoles, DayEventType.UpdateCfd)
+			.For(DayCommandType.UpdateTeamRoles, b=> b.AwaitCommands(DayCommandType.UpdateCfd))
 			.Build();
 
-		var nextAwaited = scenario.GetNextAwaited(DayEventType.UpdateTeamRoles, null);
+		var nextAwaited = scenario.GetNextAwaited(DayCommandType.UpdateTeamRoles, null);
 
-		nextAwaited.Should().Equal(DayEventType.UpdateCfd);
+		nextAwaited.toAdd.Should().Equal(DayCommandType.UpdateCfd);
+	}
+	
+	[Test]
+	public void SingleCommand_Reawait_ShouldReturn()
+	{
+		var scenario = ScenarioBuilder.Create()
+			.For(DayCommandType.UpdateTeamRoles, b=> b.ReAwaitCommand(DayCommandType.UpdateCfd))
+			.Build();
+
+		var nextAwaited = scenario.GetNextAwaited(DayCommandType.UpdateTeamRoles, null);
+
+		nextAwaited.toAdd.Should().Equal(DayCommandType.UpdateCfd);
+		nextAwaited.toRemove.Should().Equal(DayCommandType.UpdateCfd);
 	}
 
 	[Test]
@@ -25,13 +38,13 @@ public class Scenario_Test
 	{
 		var scenario = ScenarioBuilder.Create()
 			.For(
-				DayEventType.UpdateTeamRoles,
-				b => b.ForEventType(DayEventType.UpdateCfd).WithCondition("param", true))
+				DayCommandType.UpdateTeamRoles,
+				b => b.AwaitCommands(DayCommandType.UpdateCfd).WithCondition("param", true))
 			.Build();
 
-		var nextAwaited = scenario.GetNextAwaited(DayEventType.UpdateTeamRoles, new { param = true });
+		var nextAwaited = scenario.GetNextAwaited(DayCommandType.UpdateTeamRoles, new { param = true });
 
-		nextAwaited.Should().Equal(DayEventType.UpdateCfd);
+		nextAwaited.toAdd.Should().Equal(DayCommandType.UpdateCfd);
 	}
 
 	[Test]
@@ -39,13 +52,13 @@ public class Scenario_Test
 	{
 		var scenario = ScenarioBuilder.Create()
 			.For(
-				DayEventType.UpdateTeamRoles,
-				b => b.ForEventType(DayEventType.UpdateCfd).WithCondition("param", true))
+				DayCommandType.UpdateTeamRoles,
+				b => b.AwaitCommands(DayCommandType.UpdateCfd).WithCondition("param", true))
 			.Build();
 
-		var nextAwaited = scenario.GetNextAwaited(DayEventType.UpdateTeamRoles, new { param = false });
+		var nextAwaited = scenario.GetNextAwaited(DayCommandType.UpdateTeamRoles, new { param = false });
 
-		nextAwaited.Should().BeEmpty();
+		nextAwaited.toAdd.Should().BeEmpty();
 	}
 
 	[Test]
@@ -53,17 +66,17 @@ public class Scenario_Test
 	{
 		var scenario = ScenarioBuilder.Create()
 			.For(
-				DayEventType.UpdateTeamRoles,
+				DayCommandType.UpdateTeamRoles,
 				b => b
-					.ForEventType(DayEventType.UpdateCfd)
+					.AwaitCommands(DayCommandType.UpdateCfd)
 					.WithCondition("param1", true)
 					.WithCondition("param2", true))
 			.Build();
 
 		var nextAwaited = scenario
-			.GetNextAwaited(DayEventType.UpdateTeamRoles, new { param1 = true, param2 = true });
+			.GetNextAwaited(DayCommandType.UpdateTeamRoles, new { param1 = true, param2 = true });
 
-		nextAwaited.Should().Equal(DayEventType.UpdateCfd);
+		nextAwaited.toAdd.Should().Equal(DayCommandType.UpdateCfd);
 	}
 
 	[Test]
@@ -71,16 +84,16 @@ public class Scenario_Test
 	{
 		var scenario = ScenarioBuilder.Create()
 			.For(
-				DayEventType.UpdateTeamRoles,
+				DayCommandType.UpdateTeamRoles,
 				b => b
-					.ForEventType(DayEventType.UpdateCfd)
+					.AwaitCommands(DayCommandType.UpdateCfd)
 					.WithCondition("param1", true)
 					.WithCondition("param2", true))
 			.Build();
 
 		var nextAwaited = scenario
-			.GetNextAwaited(DayEventType.UpdateTeamRoles, new { param1 = true, param2 = false });
+			.GetNextAwaited(DayCommandType.UpdateTeamRoles, new { param1 = true, param2 = false });
 
-		nextAwaited.Should().BeEmpty();
+		nextAwaited.toAdd.Should().BeEmpty();
 	}
 }
