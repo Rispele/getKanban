@@ -59,4 +59,9 @@ public class GameSession
 		var team = teams.Single(t => t.Id == teamId);
 		team.AddPlayer(user);
 	}
+
+	public void Start()
+	{
+		teams.ForEach(t => t.StartSession());
+	}
 }
