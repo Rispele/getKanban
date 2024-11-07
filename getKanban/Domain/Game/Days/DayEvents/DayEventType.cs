@@ -7,8 +7,10 @@ public enum DayEventType
 	UpdateTeamRoles = 1,
 	RollDice = 2,
 	ReleaseTickets = 3,
-	UpdateSprintBacklog = 4,
-	UpdateCfd = 5,
-	EndOfUpdateCfd = 6,
-	EndDay = 7
+	EndOfReleaseTickets = 4,
+	UpdateSprintBacklog = 5,
+	EndOfUpdateSprintBacklog = 6,
+	UpdateCfd = 7,
+	EndOfUpdateCfd = 8,
+	EndDay = 9
 }

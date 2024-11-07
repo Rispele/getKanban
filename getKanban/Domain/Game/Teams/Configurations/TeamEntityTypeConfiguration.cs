@@ -14,8 +14,10 @@ public class TeamEntityTypeConfiguration : IEntityTypeConfiguration<Team>
 
 		builder.Property("currentDayNumber");
 
-		builder.Ignore("currentDay");
 		builder.Ignore("previousDay");
+		
+		builder.Ignore(d => d.CurrentDay);
+		builder.Ignore(d => d.Days);
 
 		builder.Ignore(e => e.CurrentDayTeamRoleUpdates);
 		builder.Ignore(e => e.CfdContainers);

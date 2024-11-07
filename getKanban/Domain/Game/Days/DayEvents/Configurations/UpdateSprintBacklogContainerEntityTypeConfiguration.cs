@@ -11,7 +11,12 @@ public class
 	{
 		builder.HasKey(e => e.Id);
 
-		builder.Property(e => e.TicketIds)
-			.HasConversion(new ReadOnlyListConverter<string>());
+		builder.Property(e => e.Frozen);
+		builder.Property("ticketIds")
+			.HasConversion(new ListConverter<string>());
+
+		builder.Ignore(e => e.TicketIds);
+		// builder.Property(e => e.TicketIds)
+		// .HasConversion(new ReadOnlyListConverter<string>());
 	}
 }
