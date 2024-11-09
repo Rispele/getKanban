@@ -11,11 +11,10 @@ namespace Domain.Game.Teams;
 public partial class Team
 {
 	private string name = null!;
-	public List<Participant> participants { get; } = null!;
-
 	public Guid GameSessionId { get; }
-
 	public Guid Id { get; }
+
+	public ParticipantsContainer Players { get; }
 
 	public long RowVersions { get; [UsedImplicitly] private set; }
 
@@ -51,18 +50,18 @@ public partial class Team
 		Id = Guid.NewGuid();
 		GameSessionId = gameSessionId;
 		this.name = name;
-		participants = [];
+		Players = new ParticipantsContainer(Id);
 		days = [];
 	}
 
-	public void AddPlayer(User user)
+	public (bool matched, bool updated) AddByInviteCode(User user, string inviteCode)
 	{
-		participants.Add(new Participant(user, ParticipantRole.Player));
+		return Players.AddParticipantIfMatchInviteCode(inviteCode, user, ParticipantRole.Player);
 	}
 
 	public bool HasAccess(Guid userId)
 	{
-		var participant = participants.SingleOrDefault(p => p.User.Id == userId);
+		var participant = Players.Participants.SingleOrDefault(p => p.User.Id == userId);
 		if (participant is null)
 		{
 			return false;

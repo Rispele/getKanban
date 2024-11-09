@@ -1,5 +1,7 @@
 ﻿using Domain.Game.Days;
+using Domain.Game.Days.Commands;
 using Domain.Game.Days.Scenarios;
+using Domain.Serializers;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -8,6 +10,17 @@ namespace Tests.Domain;
 [TestFixture]
 public class Scenario_Test
 {
+	[Test]
+	public void pp()
+	{
+		DayCommand t = new ReleaseTicketsCommand()
+		{
+			TicketIds = ["123"]
+		};
+	
+		Console.WriteLine(t.ToJson());
+		Console.WriteLine(t.ToJson().FromJson<DayCommand>().GetType());
+	}
 	[Test]
 	public void SingleEvent_NoCondition_ShouldReturn()
 	{

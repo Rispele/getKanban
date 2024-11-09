@@ -1,18 +1,21 @@
-﻿using Core.DbContexts;
-using Domain;
-using Microsoft.EntityFrameworkCore;
+﻿using Domain.Game.Days.Commands;
+using Domain.Serializers;
 
-var db = new TeamsContext();
-db.Database.EnsureCreated();
+var t = new RollDiceCommand();
 
-Console.ReadLine();
-db.Model
-	.GetEntityTypes()
-	.Select(t => t.GetTableName()!)
-	.Select(DropTableSql)
-	.ForEach(sql => db.Database.ExecuteSqlRaw(sql));
+Console.WriteLine(t.ToJson());
 
-string DropTableSql(string tableName)
-{
-	return $"""DROP TABLE public."{tableName}" CASCADE;""";
-}
+// var db = new TeamsContext();
+// db.Database.EnsureCreated();
+//
+// Console.ReadLine();
+// db.Model
+// 	.GetEntityTypes()
+// 	.Select(t => t.GetTableName()!)
+// 	.Select(DropTableSql)
+// 	.ForEach(sql => db.Database.ExecuteSqlRaw(sql));
+//
+// string DropTableSql(string tableName)
+// {
+// 	return $"""DROP TABLE public."{tableName}" CASCADE;""";
+// }

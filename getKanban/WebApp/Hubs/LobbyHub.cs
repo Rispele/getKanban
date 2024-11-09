@@ -1,37 +1,64 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using Core;
+using Domain.Serializers;
+using Microsoft.AspNetCore.SignalR;
 
 namespace WebApp.Hubs;
 
 public class LobbyHub : Hub
 {
-	public async Task SendMessage(string userId, string userName)
+	private readonly GameSessionsService gameSessionsService;
+
+	public LobbyHub(GameSessionsService gameSessionsService)
 	{
-		await Clients.All.SendAsync("NotifyJoined", userId, userName);
+		this.gameSessionsService = gameSessionsService;
+	}
+
+	private async Task Create(string name, long teamsCount)
+	{
+		var requestContext = RequestContextFactory.Build(Context);
+
+		var session = await gameSessionsService.CreateGameSession(requestContext, name, teamsCount);
+
+		await AddCurrentConnectionToLobbyGroupAsync(GetGroupId(session.Id));
+		await Clients.Caller.SendAsync("Created", session.ToJson());
 	}
 	
-	public async Task Join(Guid gameSessionId, Guid? teamId)
+	public async Task Join(Guid gameSessionId, string inviteCode)
 	{
-		var userId = GetUserIdOrThrow();
+		var requestContext = RequestContextFactory.Build(Context);
 
-		//TODO: валидируем что пользователь действительно есть в комманде или в ангелах
-
+		var addParticipantResult = await gameSessionsService.AddParticipantAsync(requestContext, gameSessionId, inviteCode);
+		
 		var groupId = GetGroupId(gameSessionId);
-		await Groups.AddToGroupAsync(Context.ConnectionId, groupId);
-		await Clients.OthersInGroup(groupId).SendCoreAsync("NotifyJoined", [teamId, userId]);
+		await AddCurrentConnectionToLobbyGroupAsync(groupId);
+		
+		await Clients.Caller.SendAsync("Joined", addParticipantResult.GameSession.ToJson());
+
+		if (!addParticipantResult.Updated)
+		{
+			return;
+		}
+
+		var (teamId, userAdded) = (addParticipantResult.UpdatedTeamId, addParticipantResult.User);
+		await Clients.OthersInGroup(groupId).SendAsync("NotifyJoined", teamId, userAdded);
 	}
 
 	public async Task StartGame(Guid gameSessionId)
 	{
-		var userId = GetUserIdOrThrow();
-		
-		//TODO: проверяем, что пользователь - создатель игры
-	
-		var groupId = GetGroupId(gameSessionId);
-		await Clients.Group(groupId).SendAsync("NotifyStarted");
+		var requestContext = RequestContextFactory.Build(Context);
+
+		await gameSessionsService.StartGameAsync(requestContext, gameSessionId);
+
+		await Clients.Group(GetGroupId(gameSessionId)).SendAsync("NotifyStarted");
 	}
 
-	private string GetUserIdOrThrow() =>
-		Context.GetHttpContext()?.Request.Cookies["userId"] ?? throw new NullReferenceException();
+	private async Task AddCurrentConnectionToLobbyGroupAsync(string groupId)
+	{
+		await Groups.AddToGroupAsync(Context.ConnectionId, groupId);
+	}
 
-	private static string GetGroupId(Guid gameSessionId) => $"lobby-{gameSessionId}";
+	private static string GetGroupId(Guid gameSessionId)
+	{
+		return $"lobby-{gameSessionId}";
+	}
 }

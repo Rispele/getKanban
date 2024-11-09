@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace WebApp.Hubs;
 
-public class GameSessionHub : Hub
+public class TeamHub : Hub
 {
 	/// <summary>
 	/// Метод используется при подключении к начавшейся игре, чтобы зарегаться в системе

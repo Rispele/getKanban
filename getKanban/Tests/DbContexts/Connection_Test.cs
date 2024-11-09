@@ -11,16 +11,14 @@ public class Connection_Test
 	[Test]
 	public void Connect_EnsureCreate_ShouldSuccessfullyCreate()
 	{
-		var users = new UsersContext();
-		users.Database.EnsureCreated();
-		var db = new GameSessionsContext();
+		var db = new DomainContext();
 		db.Database.EnsureCreated();
 	}
 
 	[Test]
 	public void Remove_Created()
 	{
-		var db = new GameSessionsContext();
+		var db = new DomainContext();
 		db.Model
 			.GetEntityTypes()
 			.Select(t => t.GetTableName()!)

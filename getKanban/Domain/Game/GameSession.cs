@@ -9,13 +9,11 @@ namespace Domain.Game;
 [EntityTypeConfiguration(typeof(GameSessionEntityTypeConfiguration))]
 public class GameSession
 {
-	private List<Participant> angels { get; } = null!;
-
-	private List<Team> teams { get; } = null!;
-
 	public Guid Id { get; }
-
 	public string Name { get; } = null!;
+
+	public ParticipantsContainer Angels { get; } = null!;
+	private List<Team> teams { get; } = null!;
 
 	public IReadOnlyList<Team> Teams => teams;
 
@@ -31,7 +29,7 @@ public class GameSession
 	{
 		Id = Guid.NewGuid();
 		Name = name;
-		angels = [];
+		Angels = new ParticipantsContainer(Id);
 		teams = [];
 
 		for (var i = 0; i < teamsCount; i++)
@@ -39,25 +37,35 @@ public class GameSession
 			teams.Add(new Team(Id, $"Untitled #{i + 1}"));
 		}
 
-		angels.Add(new Participant(creator, ParticipantRole.Creator | ParticipantRole.Angel));
+		Angels.AddParticipant(creator, ParticipantRole.Creator | ParticipantRole.Angel);
 	}
 
-	public bool HasAccess(Guid userId, Guid teamId)
+	public bool HasAccess(Guid userId, Guid? teamId = null)
 	{
-		return angels.SingleOrDefault(a => a.User.Id == userId)?.Role.Equals(ParticipantRole.Angel)
+		return Angels.Participants.SingleOrDefault(a => a.User.Id == userId)?.Role.Equals(ParticipantRole.Angel)
 		       ?? teams.SingleOrDefault(t => t.Id == teamId)?.HasAccess(userId)
-		       ?? throw new InvalidOperationException("Unknown team");
+		       ?? false;
 	}
 
-	public void AddAngel(User user)
+	public (Guid teamId, bool updated) AddByInviteCode(User user, string inviteCode)
 	{
-		angels.Add(new Participant(user, ParticipantRole.Angel));
-	}
+		var angelsUpdateResult = Angels
+			.AddParticipantIfMatchInviteCode(inviteCode, user, ParticipantRole.Angel);
+		if (angelsUpdateResult.matched)
+		{
+			return (Guid.Empty, angelsUpdateResult.updated);
+		}
 
-	public void AddPlayer(User user, Guid teamId)
-	{
-		var team = teams.Single(t => t.Id == teamId);
-		team.AddPlayer(user);
+		foreach (var team in teams)
+		{
+			var teamUpdateResult = team.AddByInviteCode(user, inviteCode);
+			if (teamUpdateResult.matched)
+			{
+				return (team.Id, teamUpdateResult.updated);
+			}
+		}
+		
+		throw new InvalidOperationException("Unknown invite code");
 	}
 
 	public void Start()

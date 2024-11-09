@@ -227,16 +227,6 @@
       &lt;Entry.Match&gt;
           &lt;And&gt;
               &lt;Kind Is="Property" /&gt;
-              &lt;Access Is="Private"/&gt;
-          &lt;/And&gt;
-      &lt;/Entry.Match&gt;
-    &lt;/Entry&gt;
-      
-    &lt;Entry DisplayName="Public Properties"&gt;
-      &lt;Entry.Match&gt;
-          &lt;And&gt;
-              &lt;Kind Is="Property" /&gt;
-              &lt;Access Is="Public"/&gt;
           &lt;/And&gt;
       &lt;/Entry.Match&gt;
     &lt;/Entry&gt;
