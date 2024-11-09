@@ -50,7 +50,7 @@ public partial class Team
 		Id = Guid.NewGuid();
 		GameSessionId = gameSessionId;
 		this.name = name;
-		Players = new ParticipantsContainer(Id);
+		Players = new ParticipantsContainer(gameSessionId, Id);
 		days = [];
 	}
 

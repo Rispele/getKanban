@@ -47,7 +47,8 @@ public class GameSessionDtoConverter
 
 	private string? ConvertInviteCode(string inviteCode)
 	{
-		return (requesterRole & ParticipantRole.Angel) != 0 ? null : inviteCode;
+		var isPermittedRole = (requesterRole & ParticipantRole.Angel) == ParticipantRole.Angel | (requesterRole & ParticipantRole.Creator) == ParticipantRole.Creator;
+		return isPermittedRole ? inviteCode : null;
 	}
 
 	private UserDto Convert(User user)

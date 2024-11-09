@@ -17,15 +17,6 @@ public class SessionController : Controller
 	}
 
 	[HttpGet]
-	[Route("create")]
-	public async Task<Guid?> CreateSession(int teamsCount, string sessionName)
-	{
-		var requestContext = RequestContextFactory.Build(Request);
-		var session = await gameSessionService.CreateGameSession(requestContext, sessionName, teamsCount);
-		return session.Id;
-	}
-
-	[HttpGet]
 	[Route("user/create")]
 	public async Task<Guid> CreateUser(string name)
 	{

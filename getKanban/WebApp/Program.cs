@@ -2,6 +2,7 @@ using Core.DbContexts;
 using Core.Dtos;
 using Core.Dtos.Builders;
 using Core.Services;
+using Domain.Game;
 using WebApp.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,7 +14,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddRazorPages();
 builder.Services.AddSignalR();
 
-builder.Services.AddScoped<GameSessionDtoConverter>();
+
 builder.Services.AddScoped<DomainContext>();
 builder.Services.AddScoped<IGameSessionService, GameSessionService>();
 builder.Services.AddScoped<IUserService, UserService>();

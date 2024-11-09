@@ -1,8 +1,19 @@
 ﻿
 @model Core.Dtos.GameSessionDto
-<head>
-    <script type="text/javascript" src="js/lobbyUpdater.js" defer></script>
-</head>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
+<script>
+    const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
+    connection.on("NotifyJoined", function (userId, userName) {
+        const playerElement = document.createElement("p");
+        playerElement.setAttribute("class", "fs-6");
+        playerElement.setAttribute("id", userId);
+        const team = document.getElementsByClassName("commandEditorNamesContainer")[0];
+        team.appendChild(playerElement);
+        playerElement.textContent = userName;
+    });
+</script>
+
 
 
 @* Header *@
@@ -33,6 +44,9 @@
 
                 @* Players in command *@
                 <div class="commandEditorNamesContainer text-center" id=@team.Id>
+                    <p class="fs-6">
+                        @team.Participants.InviteCode
+                    </p>
                     @foreach (var player in team.Participants.Users)
                     {
                         <p class="fs-6">@player.Name</p>
@@ -56,10 +70,13 @@
 
         @* Angels Name *@
         <div class="commandEditorNamesContainer text-center">
-            <p class="fs-6">Артём</p>
-            <p class="fs-6">Вова</p>
-            <p class="fs-6">Софа</p>
-            <p class="fs-6">Эрик</p>
+            <p class="fs-6">
+                @Model.Angels.InviteCode
+            </p>
+            @foreach (var player in Model.Angels.Users)
+            {
+                <p class="fs-6">@player.Name</p>
+            }
         </div>
     </div>
 </div>

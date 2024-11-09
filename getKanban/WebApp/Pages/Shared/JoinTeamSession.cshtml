@@ -3,6 +3,33 @@
     <script type="module" src="/js/lobbyPlayerAdding.js"></script>
 </head>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
+<script>
+    async function joinSession() {
+        console.log("123")
+        const userName = document.getElementById("userName").value;
+        const inviteCode = document.getElementById("sessionId").value.toString();
+        const sessionId = inviteCode.substring(0, inviteCode.indexOf("#"));
+        const teamId = inviteCode.substring(inviteCode.indexOf("#") + 1);
+        console.log(sessionId);
+        console.log(teamId);
+        if (sessionId.length > 0 && userName.length > 0) {
+            const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
+            const isGameOpened = await fetch(`http://localhost:5046/game/check?sessionId=${sessionId}&teamId=${teamId}`);
+            if ((await isGameOpened.text()) === 'true') {
+                connection.start()
+                    .then(async function (){
+                        connection.invoke("Join", sessionId, inviteCode, userName)
+                        .then(function () {
+                            window.location.href = `http://localhost:5046/lobby?sessionId=${sessionId}&teamId=${teamId}`
+                        });
+                    });
+            } else {
+            }
+        }
+    }
+</script>
+
 <div class="text-center authorizationContainer centered-100">
     <div class="authorizationHeader">
         <h1 class="fs-2 fw-normal">ID сессии</h1>
@@ -11,6 +38,6 @@
     <div class="authorizationButtons">
         <input type="text" id="userName" class="text-center authorizationButtonsTemplate authorizationCommandName">
         <input type="text" id="sessionId" class="text-center authorizationButtonsTemplate authorizationCommandName">
-        <button class="authorizationButtonsTemplate authorizationButton" id="join">Присоединиться</button>
+        <button class="authorizationButtonsTemplate authorizationButton" onclick="joinSession()">Присоединиться</button>
     </div>
 </div>

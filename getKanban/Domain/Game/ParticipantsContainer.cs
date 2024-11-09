@@ -25,6 +25,12 @@ public class ParticipantsContainer
 		participants = [];
 		InviteCode = $"{parentId}#{Guid.NewGuid()}";
 	}
+	
+	public ParticipantsContainer(Guid parentId, Guid childId)
+	{
+		participants = [];
+		InviteCode = $"{parentId}#{childId}";
+	}
 
 	internal (bool matched, bool updated) AddParticipantIfMatchInviteCode(
 		string inviteCode,

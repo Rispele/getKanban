@@ -13,21 +13,22 @@ public class LobbyHub : Hub
 		this.gameSessionService = gameSessionService;
 	}
 
-	public async Task Create(string name, long teamsCount)
+	public async Task Create(string sessionName, long teamsCount, string creatorName)
 	{
 		var requestContext = RequestContextFactory.Build(Context);
 
-		var session = await gameSessionService.CreateGameSession(requestContext, name, teamsCount);
+		var session = await gameSessionService.CreateGameSession(requestContext, sessionName, teamsCount, creatorName);
 
 		await AddCurrentConnectionToLobbyGroupAsync(GetGroupId(session.Id));
 		await Clients.Caller.SendAsync("Created", session.ToJson());
 	}
 	
-	public async Task Join(Guid gameSessionId, string inviteCode)
+	public async Task Join(string gameSessionIdStringified, string inviteCode, string userName)
 	{
+		var gameSessionId = Guid.Parse(gameSessionIdStringified);
 		var requestContext = RequestContextFactory.Build(Context);
 
-		var addParticipantResult = await gameSessionService.AddParticipantAsync(requestContext, gameSessionId, inviteCode);
+		var addParticipantResult = await gameSessionService.AddParticipantAsync(requestContext, gameSessionId, inviteCode, userName);
 		
 		var groupId = GetGroupId(gameSessionId);
 		await AddCurrentConnectionToLobbyGroupAsync(groupId);
@@ -40,7 +41,7 @@ public class LobbyHub : Hub
 		}
 
 		var (teamId, userAdded) = (addParticipantResult.UpdatedTeamId, addParticipantResult.User);
-		await Clients.OthersInGroup(groupId).SendAsync("NotifyJoined", teamId, userAdded);
+		await Clients.All.SendAsync("NotifyJoined", teamId.ToString(), userAdded.Name);
 	}
 
 	public async Task StartGame(Guid gameSessionId)

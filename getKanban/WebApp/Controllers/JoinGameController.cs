@@ -24,8 +24,8 @@ public class JoinGameController : Controller
 
 	[HttpGet]
 	[Route("check")]
-	public async Task<bool> CheckForOpenedGame(Guid sessionId)
+	public async Task<bool> CheckForOpenedGame(Guid sessionId, Guid teamId)
 	{
-		return await gameSessionService.FindGameSession(RequestContextFactory.Build(Request), sessionId) != null;
+		return await gameSessionService.FindGameSession(RequestContextFactory.Build(Request), sessionId, teamId) != null;
 	}
 }

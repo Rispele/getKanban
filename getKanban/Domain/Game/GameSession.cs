@@ -40,9 +40,15 @@ public class GameSession
 		Angels.AddParticipant(creator, ParticipantRole.Creator | ParticipantRole.Angel);
 	}
 
-	public ParticipantRole EnsureHasAccess(Guid userId, Guid? teamId = null)
+	public ParticipantRole EnsureHasAccess(User user, Guid? sessionId = null, Guid? teamId = null)
 	{
-		var angel = Angels.Participants.SingleOrDefault(a => a.User.Id == userId);
+		var team = Teams.SingleOrDefault(x => x.Id == teamId);
+		if (teamId != null && team != null)
+		{
+			AddByInviteCode(user, $"{sessionId}#{teamId}");
+		}
+		
+		var angel = Angels.Participants.SingleOrDefault(a => a.User.Id == user.Id);
 		if (angel is not null && (angel.Role & ParticipantRole.Angel) != 0)
 		{
 			return angel.Role;
@@ -50,20 +56,20 @@ public class GameSession
 		
 		if (teamId.HasValue)
 		{
-			if (teams.SingleOrDefault(t => t.Id == teamId.Value)?.HasAccess(userId) ?? false)
+			if (teams.SingleOrDefault(t => t.Id == teamId.Value)?.HasAccess(user.Id) ?? false)
 			{
 				return ParticipantRole.Player;
 			}
 		}
 		else
 		{
-			if (teams.Any(t => t.HasAccess(userId)))
+			if (teams.Any(t => t.HasAccess(user.Id)))
 			{
 				return ParticipantRole.Player;
 			}
 		}
 
-		throw new InvalidOperationException($"User {userId} has not access to this team.");
+		throw new InvalidOperationException($"User {user.Id} has not access to this team.");
 	}
 
 	public (Guid teamId, bool updated) AddByInviteCode(User user, string inviteCode)

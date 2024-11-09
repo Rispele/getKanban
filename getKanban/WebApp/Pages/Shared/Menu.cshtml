@@ -1,38 +1,45 @@
 ﻿@page
-<script>
-    async function createGameSession() {
-        const sessionName = document.getElementById("sessionName").value;
-        const teamsCount = document.getElementById("teamsCount").value;
-        if (parseInt(teamsCount) > 0) {
-            let promise = fetch(`http://localhost:5046/session/create?teamsCount=${teamsCount}&sessionName=${sessionName}`, {userId: 'include'});
-            await promise
-                .then(async result => {
-                    const responseText = await result.text();
-                    const sessionId = responseText.substring(1, responseText.length - 1);
-                    
-                    if (sessionId != null) {
-                        window.location.href = `http://localhost:5046/lobby?sessionId=${sessionId}`;
-                    } else {
-                        @* error *@
-                    }
-                });
-        }
-    }
-</script>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
 <script>
     const hubConnection = new signalR.HubConnectionBuilder()
         .withUrl("/lobbyHub")
         .build();
+    
+    async function createGameSession() {
+        const sessionName = document.getElementById("sessionName").value;
+        const teamsCount = document.getElementById("teamsCount").value;
+        const adminName = document.getElementById("adminName").value;
+        if (parseInt(teamsCount) > 0) {
+            hubConnection.start()
+                .then(function (){
+                    console.log(123);
+                    hubConnection.invoke("Create", sessionName, parseInt(teamsCount), adminName);
+                    hubConnection.on("Created", async function (dto) {
+                        console.log(dto);
+                        
+                        const sessionId = (await JSON.parse(dto))["Id"];
+                        const inviteCode = (await JSON.parse(dto))["Angels"]["InviteCode"];
+                        const anglesTeamId = inviteCode.substring(inviteCode.indexOf("#") + 1);
+                        console.log(sessionId)
+
+                        if (sessionId != null) {
+                            window.location.href = `http://localhost:5046/lobby?sessionId=${sessionId}&teamId=${anglesTeamId}`;
+                        } else {
+                            @* error *@
+                        }
+                    })
+                });
         
-    hubConnection.start()
-        .then( function (){
-            hubConnection.invoke("Create", "game", 1);
-            hubConnection.on("Created", function (dto) {
-                console.log(dto);
-            })
-        });    
+            //let promise = fetch(`http://localhost:5046/session/create?teamsCount=${teamsCount}&sessionName=${sessionName}`, {userId: 'include'});
+            
+        }
+    }
+
+</script>
+
+
+<script>
+    
 
 </script>
 
@@ -42,8 +49,9 @@
     </div>
     
     <div class="authorizationButtons">
-        <input type="number" class="text-center authorizationButtonsTemplate authorizationCommandName" id="teamsCount">
-        <input type="text" class="text-center authorizationButtonsTemplate authorizationCommandName" id="sessionName">
+        <input type="number" class="text-center authorizationButtonsTemplate authorizationCommandName" id="teamsCount" value="Число команд">
+        <input type="text" class="text-center authorizationButtonsTemplate authorizationCommandName" id="sessionName" value="Название игры">
+        <input type="text" class="text-center authorizationButtonsTemplate authorizationCommandName" id="adminName" value="Ваше имя">
         <button class="authorizationButtonsTemplate authorizationButton" onclick="createGameSession()">Создать игру</button>
     </div>
 </div>
