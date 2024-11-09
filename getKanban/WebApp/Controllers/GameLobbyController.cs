@@ -18,7 +18,7 @@ public class CommandEditorController : Controller
 	[Route("")]
 	public async Task<IActionResult> CommandEditor(Guid sessionId)
 	{
-		var session = await gameSessionService.FindGameSession(sessionId);
+		var session = await gameSessionService.FindGameSession(RequestContextFactory.Build(Request), sessionId);
 		return View(session);
 	}
 }

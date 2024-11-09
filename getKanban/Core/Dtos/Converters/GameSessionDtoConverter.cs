@@ -2,10 +2,19 @@
 using Domain.Game.Teams;
 using Domain.Users;
 
-namespace Core.Dtos;
+namespace Core.Dtos.Builders;
 
-public class GameSessionConverter
+public class GameSessionDtoConverter
 {
+	private readonly ParticipantRole requesterRole;
+	
+	private GameSessionDtoConverter(ParticipantRole requesterRole)
+	{
+		this.requesterRole = requesterRole;
+	}
+	
+	public static GameSessionDtoConverter For(ParticipantRole role) => new(role);
+
 	public GameSessionDto Convert(GameSession gameSession)
 	{
 		return new GameSessionDto
@@ -31,9 +40,14 @@ public class GameSessionConverter
 	{
 		return new ParticipantsDto
 		{
-			InviteCode = participantsContainer.InviteCode,
+			InviteCode = ConvertInviteCode(participantsContainer.InviteCode),
 			Users = participantsContainer.Participants.Select(p => Convert(p.User)).ToList()
 		};
+	}
+
+	private string? ConvertInviteCode(string inviteCode)
+	{
+		return (requesterRole & ParticipantRole.Angel) != 0 ? null : inviteCode;
 	}
 
 	private UserDto Convert(User user)

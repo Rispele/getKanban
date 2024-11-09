@@ -1,6 +1,7 @@
 ﻿using Core.DbContexts;
 using Core.DbContexts.Extensions;
 using Core.Dtos;
+using Core.Dtos.Builders;
 using Core.RequestContexts;
 using Domain.Game;
 
@@ -9,12 +10,10 @@ namespace Core.Services;
 public class GameSessionService : IGameSessionService
 {
 	private readonly DomainContext context;
-	private readonly GameSessionConverter converter;
 
-	public GameSessionService(DomainContext context, GameSessionConverter converter)
+	public GameSessionService(DomainContext context)
 	{
 		this.context = context;
-		this.converter = converter;
 	}
 
 	public async Task<GameSessionDto> CreateGameSession(
@@ -28,15 +27,22 @@ public class GameSessionService : IGameSessionService
 		context.GameSessions.Add(gameSession);
 		await context.SaveChangesAsync();
 
-		return converter.Convert(gameSession);
+		return GameSessionDtoConverter.For(ParticipantRole.Creator).Convert(gameSession);
 	}
 	
-	public async Task<GameSessionDto?> FindGameSession(Guid sessionId)
+	public async Task<GameSessionDto?> FindGameSession(RequestContext requestContext, Guid sessionId)
 	{
 		var session = await context.FindGameSessionsAsync(sessionId);
+		var participantRole = session?.EnsureHasAccess(requestContext.GetUserId());
+
+		if (session is not null && participantRole is null)
+		{
+			throw new InvalidOperationException("User has not access to this session.");
+		}
+		
 		return session is null
 			? null 
-			: converter.Convert(session);
+			: GameSessionDtoConverter.For(participantRole!.Value).Convert(session);
 	}
 
 	public async Task<AddParticipantResult> AddParticipantAsync(
@@ -50,8 +56,10 @@ public class GameSessionService : IGameSessionService
 		var (teamId, updated) = session.AddByInviteCode(user, inviteCode);
 
 		await context.SaveChangesAsync();
+		
+		var participantRole = session.EnsureHasAccess(requestContext.GetUserId());
 
-		var sessionDto = converter.Convert(session);
+		var sessionDto = GameSessionDtoConverter.For(participantRole).Convert(session);
 		var userAdded = sessionDto.Teams
 			.Single(t => t.Id == teamId)
 			.Participants.Users
@@ -63,11 +71,7 @@ public class GameSessionService : IGameSessionService
 	{
 		var session = await context.GetGameSessionsAsync(gameSessionId);
 
-		if (!session.HasAccess(requestContext.GetUserId()))
-		{
-			throw new UnauthorizedAccessException();
-		}
-
+		session.EnsureHasAccess(requestContext.GetUserId());
 		session.Start();
 
 		await context.SaveChangesAsync();

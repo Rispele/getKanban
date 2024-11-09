@@ -67,8 +67,7 @@ public partial class Team
 			return false;
 		}
 
-		return (participant.Role & ParticipantRole.Player) != 0
-		       || (participant.Role & ParticipantRole.Angel) != 0;
+		return (participant.Role & ParticipantRole.Player) != 0;
 	}
 
 	public void StartSession()

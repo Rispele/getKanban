@@ -8,7 +8,7 @@ public interface IGameSessionService
 {
 	public Task<GameSessionDto> CreateGameSession(RequestContext requestContext, string name, long teamsCount);
 
-	public Task<GameSessionDto?> FindGameSession(Guid sessionId);
+	public Task<GameSessionDto?> FindGameSession(RequestContext requestContext, Guid sessionId);
 
 	public Task<AddParticipantResult> AddParticipantAsync(
 		RequestContext requestContext,
