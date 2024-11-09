@@ -84,7 +84,21 @@
     height: fit-content;
 }
 
+.height-medium-small {
+    min-height: 200px;
+    height: fit-content;
+}
+
 .height-small {
     min-height: 100px;
+    height: fit-content;
+}
+
+.s-height-small {
+    height: 100px;
+}
+
+.height-extra-small {
+    min-height: 50px;
     height: fit-content;
 }
