@@ -20,6 +20,22 @@
     }
 </script>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
+<script>
+    const hubConnection = new signalR.HubConnectionBuilder()
+        .withUrl("/lobbyHub")
+        .build();
+        
+    hubConnection.start()
+        .then( function (){
+            hubConnection.invoke("Create", "game", 1);
+            hubConnection.on("Created", function (dto) {
+                console.log(dto);
+            })
+        });    
+
+</script>
+
 <div class="text-center authorizationContainer centered-100">
     <div class="authorizationHeader">
         <h1 class="fs-2 fw-normal">Введите количество команд и название игры</h1>

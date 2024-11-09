@@ -6,14 +6,14 @@ namespace WebApp.Hubs;
 
 public class LobbyHub : Hub
 {
-	private readonly GameSessionService gameSessionService;
+	private readonly IGameSessionService gameSessionService;
 
-	public LobbyHub(GameSessionService gameSessionService)
+	public LobbyHub(IGameSessionService gameSessionService)
 	{
 		this.gameSessionService = gameSessionService;
 	}
 
-	private async Task Create(string name, long teamsCount)
+	public async Task Create(string name, long teamsCount)
 	{
 		var requestContext = RequestContextFactory.Build(Context);
 
