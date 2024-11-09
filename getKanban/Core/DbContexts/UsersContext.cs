@@ -5,7 +5,7 @@ namespace Core.DbContexts;
 
 public class UsersContext : DbContext
 {
-	public DbSet<User> Users { get; set; }
+	public DbSet<User> User { get; set; }
 
 	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 	{

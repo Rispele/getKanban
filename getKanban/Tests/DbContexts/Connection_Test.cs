@@ -11,6 +11,8 @@ public class Connection_Test
 	[Test]
 	public void Connect_EnsureCreate_ShouldSuccessfullyCreate()
 	{
+		var users = new UsersContext();
+		users.Database.EnsureCreated();
 		var db = new GameSessionsContext();
 		db.Database.EnsureCreated();
 	}

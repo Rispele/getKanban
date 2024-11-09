@@ -11,7 +11,7 @@ namespace Domain.Game.Teams;
 public partial class Team
 {
 	private string name = null!;
-	private List<Participant> participants { get; } = null!;
+	public List<Participant> participants { get; } = null!;
 
 	public Guid GameSessionId { get; }
 

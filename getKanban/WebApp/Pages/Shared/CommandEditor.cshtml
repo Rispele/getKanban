@@ -1,0 +1,71 @@
+﻿
+@model WebApp.ViewModels.LobbyViewModel
+<head>
+    <script type="text/javascript" src="js/lobbyUpdater.js" defer></script>
+</head>
+
+
+@* Header *@
+<div class="commandEditorHeader text-center">
+    <h1 class="display-4 fw-bold">getKanban: "@Model.GameTitle"</h1>
+</div>
+
+@* Windows *@
+<div class="commandEditorContainer centered-25">
+    
+    @* Command windows *@
+    <div class="commandEditorLWindow commandEditorWindowsHeight commandEditorBorderStyle commandEditorBorderWidth commandEditorBorderRadius">
+        
+        @foreach (var team in Model.Teams)
+        {
+            @* Command window template *@
+            <div class="commandEditorCommandContainer commandEditorBorderRadius">
+            
+                @* Command header container *@
+                <div class="commandEditorHeaders text-center">
+                
+                    @* Command name and link for copy *@
+                    <p class="fs-6">
+                        @team.Name
+                        <img src="images/copy_button.jpg" alt="copy" width="20" height="20">
+                    </p>
+                </div>
+
+                @* Players in command *@
+                <div class="commandEditorNamesContainer text-center" id=@team.Id>
+                    @foreach (var player in team.participants)
+                    {
+                        <p class="fs-6">@player.User.Name</p>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+
+    @* Angels *@
+    <div class="commandEditorSWindow commandEditorWindowsHeight commandEditorBorderStyle commandEditorBorderWidth commandEditorBorderRadius">
+        
+        @* Angels header container *@
+        <div class="commandEditorHeaders text-center">
+            @* Name and link for copy *@
+            <p class="fs-6">
+                Ангелы
+                <img src="images/copy_button.jpg" alt="copy" width="20" height="20">
+            </p>
+        </div>
+
+        @* Angels Name *@
+        <div class="commandEditorNamesContainer text-center">
+            <p class="fs-6">Артём</p>
+            <p class="fs-6">Вова</p>
+            <p class="fs-6">Софа</p>
+            <p class="fs-6">Эрик</p>
+        </div>
+    </div>
+</div>
+
+@* Start game button *@
+<form class="text-center">
+    @* asp-area="" asp-page="/Shared/JoinTeamSession" *@
+    <button class="commandEditorButtonsTemplate authorizationButton">Начать игру</button>
+</form>

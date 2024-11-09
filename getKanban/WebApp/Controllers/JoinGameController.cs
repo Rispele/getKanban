@@ -1,21 +1,31 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Core;
+using Microsoft.AspNetCore.Mvc;
 
 namespace WebApp.Controllers;
 
-[Route("join")]
+[Route("game")]
 public class JoinGameController : Controller
 {
+	private readonly ISessionService sessionService;
+	private readonly IUserService userService;
+	
+	public JoinGameController(ISessionService sessionService, IUserService userService)
+	{
+		this.sessionService = sessionService;
+		this.userService = userService;
+	}
+	
 	[HttpGet]
-	[Route("game")]
-	public IActionResult JoinGame()
+	[Route("join")]
+	public IActionResult JoinTeamSession()
 	{
 		return View();
 	}
 
-	[HttpPost]
-	[Route("game")]
-	public bool CheckForOpenedGame(Guid id)
+	[HttpGet]
+	[Route("check")]
+	public async Task<bool> CheckForOpenedGame(Guid sessionId)
 	{
-		return true;
+		return await sessionService.SessionExist(sessionId);
 	}
 }

@@ -2,13 +2,10 @@
 
 namespace WebApp.Controllers;
 
+[Route("game")]
 public class TeamsCreationController : Controller
 {
-	public TeamsCreationController()
-	{
-		
-	}
-	
+	[Route("create")]
 	public IActionResult Menu()
 	{
 		return View();

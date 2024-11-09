@@ -4,30 +4,31 @@
     ViewData["Title"] = "Home page";
 }
 
+<script>
+    function redirectCreate() {window.location.href = `http://localhost:5046/game/create`}
+    function redirectJoin() {window.location.href = `http://localhost:5046/game/join`}
+</script>
+
 @* Authorization container *@
 <div class="text-center authorizationContainer centered-100">
-    
+
     @* Authorization header container *@
     <div class="authorizationHeader">
-        
+
         @* Authorization header *@
         <h1 class="display-3">getKanban</h1>
     </div>
 
     @* Authorization buttons container*@
     <div class="authorizationButtons">
-        
+
         @* Input your name *@
         <input type="text" class="text-center authorizationButtonsTemplate authorizationCommandName"/>
 
         @* Game create button *@
-        <form>
-            <button class="authorizationButtonsTemplate authorizationButton" asp-area="" asp-page="/Shared/Menu">Создать игру</button>
-        </form>
+        <button class="authorizationButtonsTemplate authorizationButton" onclick="redirectCreate()">Создать игру</button>
 
         @* Game join button *@
-        <form>
-            <button class="authorizationButtonsTemplate authorizationButton" asp-area="" asp-page="/Shared/JoinTeamSession">Присоединиться к игре</button>
-        </form>
+        <button class="authorizationButtonsTemplate authorizationButton" onclick="redirectJoin()">Присоединиться к игре</button>
     </div>
 </div>

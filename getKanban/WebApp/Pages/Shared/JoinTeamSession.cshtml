@@ -1,17 +1,7 @@
 ﻿@page
-<script>
-    async function join() {
-        const id = document.getElementById("gameId").value;
-        if (id.length > 0) {
-            const isGameOpened = await fetch('http://localhost:5000/join/game?id=' + id, { });
-            if (isGameOpened) {
-                window.location.replace('http://localhost:5000/lobby?id=' + id);
-            } else {
-                @* отрисовка блока с ошибкой *@
-            }
-        }
-    }
-</script>
+<head>
+    <script type="module" src="/js/lobbyPlayerAdding.js"></script>
+</head>
 
 <div class="text-center authorizationContainer centered-100">
     <div class="authorizationHeader">
@@ -19,14 +9,8 @@
     </div>
     
     <div class="authorizationButtons">
-        <input type="text" id="gameId" class="text-center authorizationButtonsTemplate authorizationCommandName">
-        @* <div> *@
-        @*     <p>Teams:</p> *@
-        @*     <p id="teamsValue"></p> *@
-        @*     <button onclick="addTeam()">Добавить команду</button> *@
-        @* </div> *@
-        <form>
-            <button onclick="join()" class="authorizationButtonsTemplate authorizationButton" asp-area="" asp-page="/GameLoadingPage">Присоединиться</button>
-        </form>
+        <input type="text" id="userName" class="text-center authorizationButtonsTemplate authorizationCommandName">
+        <input type="text" id="sessionId" class="text-center authorizationButtonsTemplate authorizationCommandName">
+        <button class="authorizationButtonsTemplate authorizationButton" id="join">Присоединиться</button>
     </div>
 </div>

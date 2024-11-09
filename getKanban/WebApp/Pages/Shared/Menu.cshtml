@@ -1,29 +1,33 @@
 ﻿@page
-@* <script> *@
-@*     function addTeam() { *@
-@*         const teamName = document.getElementById("teamName").value; *@
-@*         if (teamName.length > 0) { *@
-@*             const currText = document.getElementById("teamsValue").innerText; *@
-@*             document.getElementById("teamsValue").innerText = currText + (currText.length === 0 ? '' : '\n') + teamName; *@
-@*             document.getElementById("teamName").value = null; *@
-@*         } *@
-@*     } *@
-@* </script> *@
+<script>
+    async function createGameSession() {
+        const sessionName = document.getElementById("sessionName").value;
+        const teamsCount = document.getElementById("teamsCount").value;
+        if (parseInt(teamsCount) > 0) {
+            let promise = fetch(`http://localhost:5046/session/create?teamsCount=${teamsCount}&sessionName=${sessionName}`);
+            await promise
+                .then(async result => {
+                    const responseText = await result.text();
+                    const sessionId = responseText.substring(1, responseText.length - 1);
+                    
+                    if (sessionId != null) {
+                        window.location.href = `http://localhost:5046/lobby?sessionId=${sessionId}`;
+                    } else {
+                        @* error *@
+                    }
+                });
+        }
+    }
+</script>
 
 <div class="text-center authorizationContainer centered-100">
     <div class="authorizationHeader">
-        <h1 class="fs-2 fw-normal">Введите количество команд</h1>
+        <h1 class="fs-2 fw-normal">Введите количество команд и название игры</h1>
     </div>
     
     <div class="authorizationButtons">
-        <input type="number" class="text-center authorizationButtonsTemplate authorizationCommandName" id="teamName">
-        @* <div> *@
-        @*     <p>Teams:</p> *@
-        @*     <p id="teamsValue"></p> *@
-        @*     <button onclick="addTeam()">Добавить команду</button> *@
-        @* </div> *@
-        <form>
-            <button class="authorizationButtonsTemplate authorizationButton" asp-area="" asp-page="/CommandEditor">Далее</button>
-        </form>
+        <input type="number" class="text-center authorizationButtonsTemplate authorizationCommandName" id="teamsCount">
+        <input type="text" class="text-center authorizationButtonsTemplate authorizationCommandName" id="sessionName">
+        <button class="authorizationButtonsTemplate authorizationButton" onclick="createGameSession()">Создать игру</button>
     </div>
 </div>

@@ -1,3 +1,8 @@
+using Core;
+using Core.DbContexts;
+using Microsoft.EntityFrameworkCore;
+using WebApp.Hubs;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
@@ -5,6 +10,12 @@ builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddRazorPages();
+builder.Services.AddSignalR();
+
+builder.Services.AddDbContext<GameSessionsContext>();
+builder.Services.AddDbContext<UsersContext>();
+builder.Services.AddScoped<ISessionService, SessionService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 // builder.Services.AddTransient<HtmlPageHandler>();
 
@@ -32,5 +43,6 @@ app.UseAuthorization();
 // 	name: "default",
 // 	pattern: "{controller=Home}/{action=Index}");
 app.MapRazorPages();
+app.MapHub<LobbyHub>("/lobbyHub");
 
 app.Run();

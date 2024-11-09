@@ -4,6 +4,11 @@ namespace WebApp.Hubs;
 
 public class LobbyHub : Hub
 {
+	public async Task SendMessage(string userId, string userName)
+	{
+		await Clients.All.SendAsync("NotifyJoined", userId, userName);
+	}
+	
 	public async Task Join(Guid gameSessionId, Guid? teamId)
 	{
 		var userId = GetUserIdOrThrow();
