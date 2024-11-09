@@ -1,7 +1,6 @@
-﻿using Core.DbContexts;
-using Domain.Users;
+﻿using Domain.Users;
 
-namespace Core;
+namespace Core.Services;
 
 public class UserService : IUserService
 {

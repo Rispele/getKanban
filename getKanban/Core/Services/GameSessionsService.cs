@@ -4,7 +4,7 @@ using Core.Dtos;
 using Core.RequestContexts;
 using Domain.Game;
 
-namespace Core;
+namespace Core.Services;
 
 public class GameSessionsService
 {

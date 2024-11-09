@@ -1,6 +1,6 @@
 ﻿using Core.Dtos;
 
-namespace Core;
+namespace Core.Services;
 
 public record AddParticipantResult(
 	bool Updated,

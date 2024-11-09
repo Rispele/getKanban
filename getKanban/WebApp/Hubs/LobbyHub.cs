@@ -1,4 +1,4 @@
-﻿using Core;
+﻿using Core.Services;
 using Domain.Serializers;
 using Microsoft.AspNetCore.SignalR;
 

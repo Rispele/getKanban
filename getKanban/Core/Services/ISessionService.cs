@@ -1,6 +1,6 @@
 ﻿using Domain.Game.Teams;
 
-namespace Core;
+namespace Core.Services;
 
 public interface ISessionService
 {

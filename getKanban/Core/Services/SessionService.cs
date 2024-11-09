@@ -1,10 +1,8 @@
-﻿using Core.DbContexts;
-using Domain.Game;
+﻿using Domain.Game;
 using Domain.Game.Teams;
 using Domain.Users;
-using Microsoft.EntityFrameworkCore;
 
-namespace Core;
+namespace Core.Services;
 
 public class SessionService : ISessionService
 {
