@@ -1,9 +1,10 @@
-﻿using Domain.Game.Teams;
+﻿using Core.Dtos;
+using Domain.Game.Teams;
 
 namespace WebApp.ViewModels;
 
 public class LobbyViewModel
 {
-	public string GameTitle { get; set; }
-	public IEnumerable<Team> Teams { get; set; }
+	public string GameTitle { get; init; } = null!;
+	public IReadOnlyList<TeamDto> Teams { get; init; } = null!;
 }

@@ -34,11 +34,11 @@ public class TeamEntityTypeConfiguration : IEntityTypeConfiguration<Team>
 			.HasForeignKey<TeamSessionSettings>();
 
 		builder
-			.HasMany<Participant>("participants")
+			.HasOne<ParticipantsContainer>(t => t.Players)
 			.WithMany();
 
 		builder.Navigation("days").AutoInclude();
 		builder.Navigation("settings").AutoInclude();
-		builder.Navigation("participants").AutoInclude();
+		builder.Navigation(t => t.Players).AutoInclude();
 	}
 }

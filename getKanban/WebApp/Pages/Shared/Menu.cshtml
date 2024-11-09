@@ -4,7 +4,7 @@
         const sessionName = document.getElementById("sessionName").value;
         const teamsCount = document.getElementById("teamsCount").value;
         if (parseInt(teamsCount) > 0) {
-            let promise = fetch(`http://localhost:5046/session/create?teamsCount=${teamsCount}&sessionName=${sessionName}`);
+            let promise = fetch(`http://localhost:5046/session/create?teamsCount=${teamsCount}&sessionName=${sessionName}`, {userId: 'include'});
             await promise
                 .then(async result => {
                     const responseText = await result.text();

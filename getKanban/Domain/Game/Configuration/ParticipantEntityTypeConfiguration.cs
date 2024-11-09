@@ -13,7 +13,9 @@ public class ParticipantEntityTypeConfiguration : IEntityTypeConfiguration<Parti
 		builder.Property(t => t.Role);
 
 		builder
-			.HasOne<User>()
+			.HasOne<User>(t => t.User)
 			.WithMany();
+
+		builder.Navigation(t => t.User).AutoInclude();
 	}
 }

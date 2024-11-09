@@ -1,4 +1,5 @@
-﻿using Core.Services;
+﻿using Core.RequestContexts;
+using Core.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApp.Controllers.Api;
@@ -6,12 +7,12 @@ namespace WebApp.Controllers.Api;
 [Route("session")]
 public class SessionController : Controller
 {
-	private ISessionService sessionService;
+	private IGameSessionService gameSessionService;
 	private IUserService userService;
 
-	public SessionController(ISessionService sessionService, IUserService userService)
+	public SessionController(IGameSessionService gameSessionService, IUserService userService)
 	{
-		this.sessionService = sessionService;
+		this.gameSessionService = gameSessionService;
 		this.userService = userService;
 	}
 
@@ -19,8 +20,9 @@ public class SessionController : Controller
 	[Route("create")]
 	public async Task<Guid?> CreateSession(int teamsCount, string sessionName)
 	{
-		var sessionId = await sessionService.TryCreateSession(sessionName, teamsCount);
-		return sessionId;
+		var requestContext = RequestContextFactory.Build(Request);
+		var session = await gameSessionService.CreateGameSession(requestContext, sessionName, teamsCount);
+		return session.Id;
 	}
 
 	[HttpGet]

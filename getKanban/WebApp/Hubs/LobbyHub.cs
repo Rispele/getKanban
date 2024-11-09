@@ -6,18 +6,18 @@ namespace WebApp.Hubs;
 
 public class LobbyHub : Hub
 {
-	private readonly GameSessionsService gameSessionsService;
+	private readonly GameSessionService gameSessionService;
 
-	public LobbyHub(GameSessionsService gameSessionsService)
+	public LobbyHub(GameSessionService gameSessionService)
 	{
-		this.gameSessionsService = gameSessionsService;
+		this.gameSessionService = gameSessionService;
 	}
 
 	private async Task Create(string name, long teamsCount)
 	{
 		var requestContext = RequestContextFactory.Build(Context);
 
-		var session = await gameSessionsService.CreateGameSession(requestContext, name, teamsCount);
+		var session = await gameSessionService.CreateGameSession(requestContext, name, teamsCount);
 
 		await AddCurrentConnectionToLobbyGroupAsync(GetGroupId(session.Id));
 		await Clients.Caller.SendAsync("Created", session.ToJson());
@@ -27,7 +27,7 @@ public class LobbyHub : Hub
 	{
 		var requestContext = RequestContextFactory.Build(Context);
 
-		var addParticipantResult = await gameSessionsService.AddParticipantAsync(requestContext, gameSessionId, inviteCode);
+		var addParticipantResult = await gameSessionService.AddParticipantAsync(requestContext, gameSessionId, inviteCode);
 		
 		var groupId = GetGroupId(gameSessionId);
 		await AddCurrentConnectionToLobbyGroupAsync(groupId);
@@ -47,7 +47,7 @@ public class LobbyHub : Hub
 	{
 		var requestContext = RequestContextFactory.Build(Context);
 
-		await gameSessionsService.StartGameAsync(requestContext, gameSessionId);
+		await gameSessionService.StartGameAsync(requestContext, gameSessionId);
 
 		await Clients.Group(GetGroupId(gameSessionId)).SendAsync("NotifyStarted");
 	}

@@ -1,5 +1,5 @@
 ﻿
-@model WebApp.ViewModels.LobbyViewModel
+@model Core.Dtos.GameSessionDto
 <head>
     <script type="text/javascript" src="js/lobbyUpdater.js" defer></script>
 </head>
@@ -7,7 +7,7 @@
 
 @* Header *@
 <div class="commandEditorHeader text-center">
-    <h1 class="display-4 fw-bold">getKanban: "@Model.GameTitle"</h1>
+    <h1 class="display-4 fw-bold">getKanban: "@Model.Name"</h1>
 </div>
 
 @* Windows *@
@@ -33,9 +33,9 @@
 
                 @* Players in command *@
                 <div class="commandEditorNamesContainer text-center" id=@team.Id>
-                    @foreach (var player in team.participants)
+                    @foreach (var player in team.Participants.Users)
                     {
-                        <p class="fs-6">@player.User.Name</p>
+                        <p class="fs-6">@player.Name</p>
                     }
                 </div>
             </div>

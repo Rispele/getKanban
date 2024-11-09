@@ -7,22 +7,18 @@ namespace WebApp.Controllers;
 [Route("lobby")]
 public class CommandEditorController : Controller
 {
-	private readonly ISessionService sessionService;
+	private readonly IGameSessionService gameSessionService;
 
-	public CommandEditorController(ISessionService sessionService)
+	public CommandEditorController(IGameSessionService gameSessionService)
 	{
-		this.sessionService = sessionService;
+		this.gameSessionService = gameSessionService;
 	}
-	
+
 	[HttpGet]
 	[Route("")]
 	public async Task<IActionResult> CommandEditor(Guid sessionId)
 	{
-		var (teams, sessionName) = await sessionService.TryGetSession(sessionId);
-		return View(new LobbyViewModel
-		{
-			GameTitle = sessionName,
-			Teams = teams.OrderBy(x => x.Name).ToList()
-		});
+		var session = await gameSessionService.FindGameSession(sessionId);
+		return View(session);
 	}
 }

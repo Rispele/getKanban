@@ -3,6 +3,8 @@
 public class GameSessionDto
 {
 	public Guid Id { get; init; }
+	
+	public string Name { get; init; }
 
 	public ParticipantsDto Angels { get; init; } = null!;
 

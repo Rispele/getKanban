@@ -18,7 +18,7 @@ public class RequestContext
 	
 	public Guid? FindUserId()
 	{
-		if (headers.TryGetValue("UserId", out var header))
+		if (headers.TryGetValue(RequestContextKeys.UserId, out var header))
 		{
 			return Guid.Parse(header);
 		}

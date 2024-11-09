@@ -22,9 +22,10 @@ public class GameSessionEntityTypeConfiguration : IEntityTypeConfiguration<GameS
 			.HasForeignKey(t => t.GameSessionId);
 
 		builder
-			.HasMany<Participant>()
+			.HasOne<ParticipantsContainer>(t => t.Angels)
 			.WithMany();
 
+		builder.Navigation(t => t.Angels).AutoInclude();
 		builder.Navigation("teams").AutoInclude();
 	}
 }

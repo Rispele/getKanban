@@ -9,6 +9,21 @@ public class RequestContextFactory
 	{
 		return Build(context.GetHttpContext()!.Request);
 	}
+
+	public static bool TryBuild(HttpRequest request, out RequestContext? requestContext)
+	{
+		var userId = FindUserId(request);
+
+		if (userId is null)
+		{
+			requestContext = null;
+			return false;
+		}
+		
+		requestContext = new RequestContext();
+		requestContext.AddHeader(RequestContextKeys.UserId, userId.ToString());
+		return true;
+	}
 	
 	public static RequestContext Build(HttpRequest request)
 	{
@@ -21,7 +36,14 @@ public class RequestContextFactory
 	
 	private static Guid GetUserIdOrThrow(HttpRequest request)
 	{
-		var userId = request.Cookies["userId"] ?? throw new KeyNotFoundException();
-		return Guid.Parse(userId);
+		return FindUserId(request) ?? throw new KeyNotFoundException();
+	}
+	
+	private static Guid? FindUserId(HttpRequest request)
+	{
+		var value = request.Cookies[RequestContextKeys.UserId];
+		return value is null
+			? null
+			: Guid.Parse(value);
 	}
 }

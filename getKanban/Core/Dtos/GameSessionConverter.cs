@@ -11,6 +11,7 @@ public class GameSessionConverter
 		return new GameSessionDto
 		{
 			Id = gameSession.Id,
+			Name = gameSession.Name,
 			Angels = Convert(gameSession.Angels),
 			Teams = gameSession.Teams.Select(Convert).ToArray()
 		};

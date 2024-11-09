@@ -1,3 +1,5 @@
+using Core.DbContexts;
+using Core.Dtos;
 using Core.Services;
 using WebApp.Hubs;
 
@@ -10,9 +12,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddRazorPages();
 builder.Services.AddSignalR();
 
-builder.Services.AddDbContext<GameSessionsContext>();
-builder.Services.AddDbContext<UsersContext>();
-builder.Services.AddScoped<ISessionService, SessionService>();
+builder.Services.AddScoped<GameSessionConverter>();
+builder.Services.AddScoped<DomainContext>();
+builder.Services.AddScoped<IGameSessionService, GameSessionService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
 // builder.Services.AddTransient<HtmlPageHandler>();
@@ -37,9 +39,9 @@ app.UseRouting();
 
 app.UseAuthorization();
 
-// app.MapControllerRoute(
-// 	name: "default",
-// 	pattern: "{controller=Home}/{action=Index}");
+app.MapControllerRoute(
+	name: "default",
+	pattern: "{controller=Home}/{action=Index}");
 app.MapRazorPages();
 app.MapHub<LobbyHub>("/lobbyHub");
 

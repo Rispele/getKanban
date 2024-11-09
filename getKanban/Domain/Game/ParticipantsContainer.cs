@@ -1,13 +1,15 @@
-﻿using Domain.Users;
+﻿using Domain.Game.Configuration;
+using Domain.Users;
 using JetBrains.Annotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Game;
 
+[EntityTypeConfiguration(typeof(ParticipantsContainerEntityTypeConfiguration))]
 public class ParticipantsContainer
 {
 	private readonly List<Participant> participants = null!;
 
-	public Guid ParentId { get; }
 	public long Id { get; }
 
 	public string InviteCode { get; } = null!;
@@ -20,7 +22,6 @@ public class ParticipantsContainer
 
 	public ParticipantsContainer(Guid parentId)
 	{
-		ParentId = parentId;
 		participants = [];
 		InviteCode = $"{parentId}#{Guid.NewGuid()}";
 	}

@@ -1,3 +1,5 @@
+using Core.RequestContexts;
+using Core.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -5,14 +7,19 @@ namespace WebApp.Pages;
 
 public class IndexModel : PageModel
 {
-	private readonly ILogger<IndexModel> _logger;
+	private IUserService userService;
 
-	public IndexModel(ILogger<IndexModel> logger)
+	public IndexModel(IUserService userService)
 	{
-		_logger = logger;
+		this.userService = userService;
 	}
 
-	public void OnGet()
+	public async Task OnGet()
 	{
+		if (!RequestContextFactory.TryBuild(HttpContext.Request, out _))
+		{
+			var user = await userService.CreateNewUser(Guid.NewGuid().ToString());
+			Response.Cookies.Append(RequestContextKeys.UserId, user.ToString());
+		}
 	}
 }

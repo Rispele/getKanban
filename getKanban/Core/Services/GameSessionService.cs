@@ -6,18 +6,21 @@ using Domain.Game;
 
 namespace Core.Services;
 
-public class GameSessionsService
+public class GameSessionService : IGameSessionService
 {
 	private readonly DomainContext context;
 	private readonly GameSessionConverter converter;
 
-	public GameSessionsService(DomainContext context, GameSessionConverter converter)
+	public GameSessionService(DomainContext context, GameSessionConverter converter)
 	{
 		this.context = context;
 		this.converter = converter;
 	}
 
-	public async Task<GameSessionDto> CreateGameSession(RequestContext requestContext, string name, long teamsCount)
+	public async Task<GameSessionDto> CreateGameSession(
+		RequestContext requestContext,
+		string name,
+		long teamsCount)
 	{
 		var user = await context.GetUserAsync(requestContext.GetUserId());
 		var gameSession = new GameSession(user, name, teamsCount);
@@ -26,6 +29,14 @@ public class GameSessionsService
 		await context.SaveChangesAsync();
 
 		return converter.Convert(gameSession);
+	}
+	
+	public async Task<GameSessionDto?> FindGameSession(Guid sessionId)
+	{
+		var session = await context.FindGameSessionsAsync(sessionId);
+		return session is null
+			? null 
+			: converter.Convert(session);
 	}
 
 	public async Task<AddParticipantResult> AddParticipantAsync(
