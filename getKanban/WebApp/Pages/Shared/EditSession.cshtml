@@ -1,20 +1,5 @@
 ﻿@model Core.Dtos.GameSessionDto
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
-<script>
-    const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
-    connection.start();
-    connection.on("NotifyJoined", function (teamId, userId, userName) {
-        console.log(123)
-        const playerElement = document.createElement("p");
-        playerElement.setAttribute("class", "fs-6");
-        playerElement.setAttribute("id", userId.toString());
-        const team = document.getElementById(teamId);
-        team.appendChild(playerElement);
-        playerElement.textContent = userName.toString();
-    });
-</script>
-
 @* Header *@
 <div class="commandEditorHeader text-center">
     <h1 class="display-4 fw-bold">getKanban: "@Model.Name"</h1>
@@ -94,6 +79,20 @@
 @*     $1$ asp-area="" asp-page="/Shared/JoinTeamSession" #1# *@
 @*     <button class="commandEditorButtonsTemplate authorizationButton">Начать игру</button> *@
 @* </form> *@
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
+<script>
+    const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
+    connection.start();
+    connection.on("NotifyJoined", function (teamId, userId, userName) {
+        const playerElement = document.createElement("p");
+        playerElement.setAttribute("class", "fs-6");
+        playerElement.setAttribute("id", userId.toString());
+        const team = document.getElementById(teamId);
+        team.appendChild(playerElement);
+        playerElement.textContent = userName.toString();
+    });
+</script>
 
 <script>
     const currentTeamId = fetch("http://localhost:5046/session/get-current-team?sessionId=@Model.Id")
@@ -179,36 +178,36 @@
     }
     
     function placeTeamNameEditButtons(teamIds) {
-        for (let teamId of teamIds) {
-            const image = document.createElement("img");
-            image.setAttribute("src", "images/edit_button.png");
-            image.setAttribute("alt", "edit");
-            image.setAttribute("width", "20");
-            image.setAttribute("height", "20");
-            image.setAttribute("id", `edit-button-${teamId}`);
-            image.addEventListener("click", function () {
-                const input = document.createElement("input");
-                input.setAttribute("id", `edit-input-${teamId}`);
-                const button = document.createElement("button");
-                button.setAttribute("id", `edit-submit-${teamId}`);
-                button.innerText = "save";
-                button.addEventListener("click", function () {
-                    const teamName = input.value.toString();
-                    fetch("")
-                        .then(r => {
-                            input.remove();
-                            button.remove();
-                        });
-                });
-                const container = document.getElementById(`headers-${teamId}`);
-                const editBlock = document.getElementById(`edit-${teamId}`);
-                editBlock.remove();
-                container.appendChild(button);
-                container.appendChild(input);
-            });
-            
-            const editBlock = document.getElementById(`edit-${teamId}`);
-            editBlock.insertBefore(image, editBlock.firstChild);
-        }
+    @*     for (let teamId of teamIds) { *@
+    @*         const image = document.createElement("img"); *@
+    @*         image.setAttribute("src", "images/edit_button.png"); *@
+    @*         image.setAttribute("alt", "edit"); *@
+    @*         image.setAttribute("width", "20"); *@
+    @*         image.setAttribute("height", "20"); *@
+    @*         image.setAttribute("id", `edit-button-${teamId}`); *@
+    @*         image.addEventListener("click", function () { *@
+    @*             const input = document.createElement("input"); *@
+    @*             input.setAttribute("id", `edit-input-${teamId}`); *@
+    @*             const button = document.createElement("button"); *@
+    @*             button.setAttribute("id", `edit-submit-${teamId}`); *@
+    @*             button.innerText = "save"; *@
+    @*             button.addEventListener("click", function () { *@
+    @*                 const teamName = input.value.toString(); *@
+    @*                 fetch("") *@
+    @*                     .then(r => { *@
+    @*                         input.remove(); *@
+    @*                         button.remove(); *@
+    @*                     }); *@
+    @*             }); *@
+    @*             const container = document.getElementById(`headers-${teamId}`); *@
+    @*             const editBlock = document.getElementById(`edit-${teamId}`); *@
+    @*             editBlock.remove(); *@
+    @*             container.appendChild(button); *@
+    @*             container.appendChild(input); *@
+    @*         }); *@
+    @*          *@
+    @*         const editBlock = document.getElementById(`edit-${teamId}`); *@
+    @*         editBlock.insertBefore(image, editBlock.firstChild); *@
+    @*     } *@
     }
 </script>

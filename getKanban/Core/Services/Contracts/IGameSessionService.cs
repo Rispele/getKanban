@@ -8,13 +8,10 @@ public interface IGameSessionService
 {
 	public Task<GameSessionDto> CreateGameSession(RequestContext requestContext, string name, long teamsCount);
 
-	public Task<GameSessionDto?> FindGameSession(RequestContext requestContext, Guid sessionId, bool ignorePermissions);
+	public Task<GameSessionDto?> FindGameSession(RequestContext requestContext, string inviteCode, bool ignorePermissions);
 
 	public Task<AddParticipantResult> AddParticipantAsync(
 		RequestContext requestContext,
-		string inviteCode,
-		string userName);
-		Guid gameSessionId,
 		string inviteCode);
 
 	public Task StartGameAsync(RequestContext requestContext, Guid gameSessionId);

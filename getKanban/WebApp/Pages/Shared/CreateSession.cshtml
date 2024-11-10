@@ -11,11 +11,8 @@
                     hubConnection.on("Created", async function (dto) {
                         const sessionId = (await JSON.parse(dto))["Id"];
                         const inviteCode = (await JSON.parse(dto))["Angels"]["InviteCode"].toString();
-
                         if (sessionId != null) {
                             window.location.href = `http://localhost:5046/session?invite=${inviteCode}`;
-                        } else {
-                            @* error *@
                         }
                     })
                 });
@@ -27,7 +24,7 @@
     <div class="authorizationHeader">
         <h1 class="fs-2 fw-normal">Создание игры</h1>
     </div>
-    
+
     <div class="authorizationButtons">
         <input type="number" class="text-center authorizationButtonsTemplate authorizationCommandName" id="teamsCount" placeholder="Число команд">
         <input type="text" class="text-center authorizationButtonsTemplate authorizationCommandName" id="sessionName" placeholder="Название игры">

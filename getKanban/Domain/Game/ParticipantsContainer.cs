@@ -34,8 +34,8 @@ public class ParticipantsContainer
 		ParticipantRole participantRole)
 	{
 		return MatchInviteCode(inviteCode)
-			? (false, false)
-			: (true, AddParticipant(user, participantRole));
+			? (true, AddParticipant(user, participantRole))
+			: (false, false);
 	}
 
 	public Participant GetParticipant(User user)

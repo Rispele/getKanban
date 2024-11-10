@@ -1,5 +1,4 @@
 using Core.Helpers;
-using Core.Services;
 using Core.Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,11 +18,9 @@ public class SessionController : Controller
 	[Route("")]
 	public async Task<IActionResult> EditSession(string invite)
 	{
-		var (sessionId, teamId) = InviteCodeHelper.SplitInviteCode(invite);
-		var session = await gameSessionService.FindGameSession(RequestContextFactory.Build(Request), sessionId, teamId);
 		var session = await gameSessionService.FindGameSession(
 			RequestContextFactory.Build(Request),
-			sessionId,
+			invite,
 			ignorePermissions: false);
 		
 		return View(session);
@@ -47,12 +44,10 @@ public class SessionController : Controller
 	[Route("check")]
 	public async Task<bool> CheckForOpenedGame(string invite)
 	{
-		var (sessionId, teamId) = InviteCodeHelper.SplitInviteCode(invite);
-		return await gameSessionService.FindGameSession(RequestContextFactory.Build(Request), sessionId, teamId) != null;
 		return await gameSessionService.FindGameSession(
 			RequestContextFactory.Build(Request),
-			sessionId,
-			ignorePermissions: true) != null;
+			invite,
+			ignorePermissions: false) != null;
 	}
 
 	[HttpGet]

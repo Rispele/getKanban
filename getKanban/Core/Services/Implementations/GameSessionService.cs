@@ -36,9 +36,10 @@ public class GameSessionService : IGameSessionService
 
 	public async Task<GameSessionDto?> FindGameSession(
 		RequestContext requestContext,
-		Guid sessionId,
+		string inviteCode,
 		bool ignorePermissions)
 	{
+		var sessionId = InviteCodeHelper.ResolveGameSessionId(inviteCode);
 		var session = await context.FindGameSessionsAsync(sessionId);
 
 		if (session is null)
@@ -50,19 +51,16 @@ public class GameSessionService : IGameSessionService
 		
 		var participantRole = ignorePermissions 
 			? ParticipantRole.Creator
-			: session.EnsureHasAccess(user);
+			: session.EnsureHasAccess(user, inviteCode);
 
 		return GameSessionDtoConverter.For(participantRole).Convert(session);
 	}
 
 	public async Task<AddParticipantResult> AddParticipantAsync(
 		RequestContext requestContext,
-		Guid gameSessionId,
 		string inviteCode)
-		string inviteCode,
-		string userName)
 	{
-		var gameSessionId = inviteCodeHelper.ResolveGameSessionId(inviteCode);
+		var gameSessionId = InviteCodeHelper.ResolveGameSessionId(inviteCode);
 
 		var session = await context.GetGameSessionsAsync(gameSessionId);
 		var user = await context.GetUserAsync(requestContext.GetUserId());
@@ -70,10 +68,8 @@ public class GameSessionService : IGameSessionService
 		var (teamId, updated) = session.AddByInviteCode(user, inviteCode);
 
 		await context.SaveChangesAsync();
-
-		var inviteTeamId = InviteCodeHelper.SplitInviteCode(inviteCode).teamId;
-		var participantRole = session.EnsureHasAccess(user, gameSessionId, inviteTeamId);
-		var participantRole = session.EnsureHasAccess(user);
+		
+		var participantRole = session.EnsureHasAccess(user, inviteCode);
 		var sessionDto = GameSessionDtoConverter.For(participantRole).Convert(session);
 
 		var participantAdded = teamId.Equals(Guid.Empty) && participantRole == ParticipantRole.Angel
