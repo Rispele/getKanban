@@ -14,24 +14,44 @@ public class LobbyHub : Hub
 		this.gameSessionService = gameSessionService;
 	}
 
+	public override async Task OnConnectedAsync()
+	{
+		Console.WriteLine("Connected " + Context.ConnectionId);
+		await base.OnConnectedAsync();
+	}
+	
+	public override async Task OnDisconnectedAsync(Exception? exception)
+	{
+		Console.WriteLine("Disconnected " + Context.ConnectionId);
+		await base.OnDisconnectedAsync(exception);
+	}
+	
 	public async Task Create(string sessionName, long teamsCount, string creatorName)
 	{
 		var requestContext = RequestContextFactory.Build(Context);
 
-		var session = await gameSessionService.CreateGameSession(requestContext, sessionName, teamsCount, creatorName);
+		var session = await gameSessionService.CreateGameSession(
+			requestContext,
+			sessionName,
+			teamsCount,
+			creatorName);
 
+		Console.WriteLine($"{GetGroupId(session.Id)} created");
+		
 		await AddCurrentConnectionToLobbyGroupAsync(GetGroupId(session.Id));
 		await Clients.Caller.SendAsync("Created", session.ToJson());
 	}
-	
-	public async Task Join(string gameSessionIdStringified, string inviteCode, string userName)
+
+	public async Task Join(string inviteCode, string userName)
 	{
-		var gameSessionId = Guid.Parse(gameSessionIdStringified);
 		var requestContext = RequestContextFactory.Build(Context);
 
-		var addParticipantResult = await gameSessionService.AddParticipantAsync(requestContext, gameSessionId, inviteCode, userName);
-		
-		var groupId = GetGroupId(gameSessionId);
+		var addParticipantResult = await gameSessionService.AddParticipantAsync(
+			requestContext,
+			inviteCode,
+			userName);
+
+		var groupId = GetGroupId(addParticipantResult.GameSession.Id);
 		await AddCurrentConnectionToLobbyGroupAsync(groupId);
 
 		if (!addParticipantResult.Updated)
@@ -40,7 +60,11 @@ public class LobbyHub : Hub
 		}
 
 		var (teamId, userAdded) = (addParticipantResult.UpdatedTeamId, addParticipantResult.User);
-		await Clients.All.SendAsync("NotifyJoined", teamId.ToString(), addParticipantResult.User.Id, userAdded.Name);
+		await Clients.Group(GetGroupId(addParticipantResult.GameSession.Id)).SendAsync(
+			"NotifyJoined",
+			teamId.ToString(),
+			addParticipantResult.User.Id,
+			userAdded.Name);
 	}
 
 	public async Task StartGame(Guid gameSessionId)

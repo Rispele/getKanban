@@ -1,5 +1,6 @@
 using Core.DbContexts;
 using Core.Dtos;
+using Core.Helpers;
 using Core.Services;
 using Core.Services.Contracts;
 using Core.Services.Implementations;
@@ -16,6 +17,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddSignalR();
 
 
+builder.Services.AddScoped<InviteCodeHelper>();
 builder.Services.AddScoped<DomainContext>();
 builder.Services.AddScoped<IGameSessionService, GameSessionService>();
 builder.Services.AddScoped<IUserService, UserService>();

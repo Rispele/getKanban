@@ -35,9 +35,4 @@ public static class DomainContextExtensions
 		var user = await usersContext.Users.SingleOrDefaultAsync(t => t.Id == userId);
 		return user ?? throw new InvalidOperationException("User not found");
 	}
-
-	public static async Task SetUserName(this DomainContext usersContext, User user, string userName)
-	{
-		user.Name = userName;
-	}
 }

@@ -12,10 +12,12 @@ namespace Core.Services.Implementations;
 public class GameSessionService : IGameSessionService
 {
 	private readonly DomainContext context;
+	private readonly InviteCodeHelper inviteCodeHelper;
 
-	public GameSessionService(DomainContext context)
+	public GameSessionService(DomainContext context, InviteCodeHelper inviteCodeHelper)
 	{
 		this.context = context;
+		this.inviteCodeHelper = inviteCodeHelper;
 	}
 
 	public async Task<GameSessionDto> CreateGameSession(
@@ -25,7 +27,8 @@ public class GameSessionService : IGameSessionService
 		string creatorName)
 	{
 		var user = await context.GetUserAsync(requestContext.GetUserId());
-		await context.SetUserName(user, creatorName);
+
+		user.Name = creatorName;
 		var gameSession = new GameSession(user, name, teamsCount);
 
 		context.GameSessions.Add(gameSession);
@@ -33,61 +36,65 @@ public class GameSessionService : IGameSessionService
 
 		return GameSessionDtoConverter.For(ParticipantRole.Creator).Convert(gameSession);
 	}
-	
-	public async Task<GameSessionDto?> FindGameSession(RequestContext requestContext, Guid sessionId, Guid teamId)
+
+	public async Task<GameSessionDto?> FindGameSession(
+		RequestContext requestContext,
+		Guid sessionId,
+		bool ignorePermissions)
 	{
 		var session = await context.FindGameSessionsAsync(sessionId);
-		var user = await context.GetUserAsync(requestContext.GetUserId());
-		var participantRole = session?.EnsureHasAccess(user!, sessionId, teamId);
-
-		if (session is not null && participantRole is null)
-		{
-			throw new InvalidOperationException("User has not access to this session.");
-		}
 
 		if (session is null)
 		{
 			return null;
 		}
-		return GameSessionDtoConverter.For(participantRole!.Value).Convert(session);
+
+		var user = await context.GetUserAsync(requestContext.GetUserId());
+		
+		var participantRole = ignorePermissions 
+			? ParticipantRole.Creator
+			: session.EnsureHasAccess(user);
+
+		return GameSessionDtoConverter.For(participantRole).Convert(session);
 	}
 
 	public async Task<AddParticipantResult> AddParticipantAsync(
 		RequestContext requestContext,
-		Guid gameSessionId,
 		string inviteCode,
 		string userName)
 	{
+		var gameSessionId = inviteCodeHelper.ResolveGameSessionId(inviteCode);
+
 		var session = await context.GetGameSessionsAsync(gameSessionId);
 		var user = await context.GetUserAsync(requestContext.GetUserId());
-		await context.SetUserName(user, userName);
 
+		user.Name = userName;
 		var (teamId, updated) = session.AddByInviteCode(user, inviteCode);
+
 		await context.SaveChangesAsync();
 
-		var inviteTeamId = Guid.Parse(InviteCodeHelper.SplitInviteCode(inviteCode).teamId);
-		var participantRole = session.EnsureHasAccess(user, gameSessionId, inviteTeamId);
+		var participantRole = session.EnsureHasAccess(user);
 		var sessionDto = GameSessionDtoConverter.For(participantRole).Convert(session);
+
+		var participantAdded = teamId.Equals(Guid.Empty) && participantRole == ParticipantRole.Angel
+			? sessionDto.Angels.Users.Single(x => x.Id == user.Id)
+			: sessionDto.Teams
+				.Single(t => t.Id == teamId)
+				.Participants.Users
+				.Single(u => u.Id == user.Id);
 		
-		if (teamId.Equals(Guid.Empty) && participantRole == ParticipantRole.Angel)
-		{
-			var angelAdded = sessionDto.Angels.Users
-				.Single(x => x.Id == user.Id);
-			return new AddParticipantResult(updated, sessionDto, inviteTeamId, angelAdded);
-		}
-		
-		var userAdded = sessionDto.Teams
-			.Single(t => t.Id == teamId)
-			.Participants.Users
-			.Single(u => u.Id == user.Id);
-		return new AddParticipantResult(updated, sessionDto, teamId, userAdded);
+		return new AddParticipantResult(
+			updated,
+			sessionDto,
+			teamId,
+			participantAdded);
 	}
 
 	public async Task StartGameAsync(RequestContext requestContext, Guid gameSessionId)
 	{
 		var session = await context.GetGameSessionsAsync(gameSessionId);
 		var user = await context.GetUserAsync(requestContext.GetUserId());
-		
+
 		session.EnsureHasAccess(user);
 		session.Start();
 

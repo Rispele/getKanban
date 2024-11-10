@@ -7,12 +7,12 @@ namespace Core.Dtos.Converters;
 public class GameSessionDtoConverter
 {
 	private readonly ParticipantRole requesterRole;
-	
+
 	private GameSessionDtoConverter(ParticipantRole requesterRole)
 	{
 		this.requesterRole = requesterRole;
 	}
-	
+
 	public static GameSessionDtoConverter For(ParticipantRole role) => new(role);
 
 	public GameSessionDto Convert(GameSession gameSession)
@@ -35,7 +35,7 @@ public class GameSessionDtoConverter
 			Participants = Convert(team.Players)
 		};
 	}
-	
+
 	private ParticipantsDto Convert(ParticipantsContainer participantsContainer)
 	{
 		return new ParticipantsDto
@@ -47,7 +47,8 @@ public class GameSessionDtoConverter
 
 	private string? ConvertInviteCode(string inviteCode)
 	{
-		var isPermittedRole = (requesterRole & ParticipantRole.Angel) == ParticipantRole.Angel | (requesterRole & ParticipantRole.Creator) == ParticipantRole.Creator;
+		var isPermittedRole = (requesterRole & ParticipantRole.Angel) == ParticipantRole.Angel
+		                   || (requesterRole & ParticipantRole.Creator) == ParticipantRole.Creator;
 		return isPermittedRole ? inviteCode : null;
 	}
 

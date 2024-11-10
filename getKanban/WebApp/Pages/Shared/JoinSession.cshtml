@@ -3,22 +3,18 @@
     async function joinSession() {
         const userName = document.getElementById("userName").value;
         const inviteCode = document.getElementById("sessionId").value.toString();
-        const sessionId = inviteCode.substring(0, inviteCode.indexOf("#"));
-        const teamId = inviteCode.substring(inviteCode.indexOf("#") + 1);
-        if (sessionId.length > 0 && userName.length > 0) {
-            const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
-            const isGameOpened = await fetch(`http://localhost:5046/session/check?sessionId=${sessionId}&teamId=${teamId}`);
-            if ((await isGameOpened.text()) === 'true') {
-                connection.start()
-                    .then(async function (){
-                        connection.invoke("Join", sessionId, inviteCode, userName)
+        
+        const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
+        const isGameOpened = await fetch(`http://localhost:5046/session/check?sessionId=${sessionId}`);
+        if ((await isGameOpened.text()) === 'true') {
+            connection.start()
+                .then(async function (){
+                    connection.invoke("Join", inviteCode, userName)
                         .then(function () {
                             window.location.href = `http://localhost:5046/session?sessionId=${sessionId}&teamId=${teamId}`
                         });
-                    });
-            } else {
-            }
-        }
+                });
+        } 
     }
 </script>
 
@@ -26,7 +22,7 @@
     <div class="authorizationHeader">
         <h1 class="fs-2 fw-normal">Присоединиться к игре</h1>
     </div>
-    
+
     <div class="authorizationButtons">
         <input type="text" id="userName" class="text-center authorizationButtonsTemplate authorizationCommandName" placeholder="Ваше имя">
         <input type="text" id="sessionId" class="text-center authorizationButtonsTemplate authorizationCommandName" placeholder="Код приглашения">
