@@ -1,9 +1,10 @@
 ﻿using Core.DbContexts;
 using Core.Dtos;
+using Core.Services.Contracts;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 
-namespace Core.Services;
+namespace Core.Services.Implementations;
 
 public class UserService : IUserService
 {

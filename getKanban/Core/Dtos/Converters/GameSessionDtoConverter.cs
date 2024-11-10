@@ -2,7 +2,7 @@
 using Domain.Game.Teams;
 using Domain.Users;
 
-namespace Core.Dtos.Builders;
+namespace Core.Dtos.Converters;
 
 public class GameSessionDtoConverter
 {

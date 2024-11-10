@@ -1,7 +1,8 @@
 ﻿using Core.Dtos;
 using Core.RequestContexts;
+using Core.Services.Implementations;
 
-namespace Core.Services;
+namespace Core.Services.Contracts;
 
 public interface IGameSessionService
 {

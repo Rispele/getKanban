@@ -1,12 +1,13 @@
 ﻿using Core.DbContexts;
 using Core.DbContexts.Extensions;
 using Core.Dtos;
-using Core.Dtos.Builders;
+using Core.Dtos.Converters;
 using Core.Helpers;
 using Core.RequestContexts;
+using Core.Services.Contracts;
 using Domain.Game;
 
-namespace Core.Services;
+namespace Core.Services.Implementations;
 
 public class GameSessionService : IGameSessionService
 {
