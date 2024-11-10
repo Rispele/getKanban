@@ -23,4 +23,13 @@ public class HomeController : Controller
 		
 		return View();
 	}
+
+	[HttpGet]
+	[Route("add-username")]
+	public async Task AddUserName(string name)
+	{
+		var userId = Guid.Parse(Request.Cookies[RequestContextKeys.UserId] ?? throw new InvalidOperationException());
+		var user = await userService.GetUserById(userId) ?? throw new InvalidOperationException();
+		await userService.SetUserName(user.Id, name);
+	}
 }

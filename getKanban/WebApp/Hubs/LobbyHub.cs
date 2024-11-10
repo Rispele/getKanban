@@ -1,4 +1,5 @@
-﻿using Core.Services;
+﻿using Core.Helpers;
+using Core.Services;
 using Domain.Serializers;
 using Microsoft.AspNetCore.SignalR;
 
@@ -13,22 +14,22 @@ public class LobbyHub : Hub
 		this.gameSessionService = gameSessionService;
 	}
 
-	public async Task Create(string sessionName, long teamsCount, string creatorName)
+	public async Task Create(string sessionName, long teamsCount)
 	{
 		var requestContext = RequestContextFactory.Build(Context);
 
-		var session = await gameSessionService.CreateGameSession(requestContext, sessionName, teamsCount, creatorName);
+		var session = await gameSessionService.CreateGameSession(requestContext, sessionName, teamsCount);
 
 		await AddCurrentConnectionToLobbyGroupAsync(GetGroupId(session.Id));
 		await Clients.Caller.SendAsync("Created", session.ToJson());
 	}
 	
-	public async Task Join(string gameSessionIdStringified, string inviteCode, string userName)
+	public async Task Join(string inviteCode)
 	{
-		var gameSessionId = Guid.Parse(gameSessionIdStringified);
+		var gameSessionId = InviteCodeHelper.SplitInviteCode(inviteCode).sessionId;
 		var requestContext = RequestContextFactory.Build(Context);
 
-		var addParticipantResult = await gameSessionService.AddParticipantAsync(requestContext, gameSessionId, inviteCode, userName);
+		var addParticipantResult = await gameSessionService.AddParticipantAsync(requestContext, gameSessionId, inviteCode);
 		
 		var groupId = GetGroupId(gameSessionId);
 		await AddCurrentConnectionToLobbyGroupAsync(groupId);
@@ -39,6 +40,7 @@ public class LobbyHub : Hub
 		}
 
 		var (teamId, userAdded) = (addParticipantResult.UpdatedTeamId, addParticipantResult.User);
+		var a = Clients.OthersInGroup(groupId).ToJson();
 		await Clients.All.SendAsync("NotifyJoined", teamId.ToString(), addParticipantResult.User.Id, userAdded.Name);
 	}
 

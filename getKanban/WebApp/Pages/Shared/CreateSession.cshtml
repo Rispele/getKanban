@@ -3,19 +3,17 @@
     async function createGameSession() {
         const sessionName = document.getElementById("sessionName").value;
         const teamsCount = parseInt(document.getElementById("teamsCount").value);
-        const adminName = document.getElementById("adminName").value;
         if (teamsCount > 0) {
             const hubConnection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
             hubConnection.start()
                 .then(function (){
-                    hubConnection.invoke("Create", sessionName, teamsCount, adminName);
+                    hubConnection.invoke("Create", sessionName, teamsCount);
                     hubConnection.on("Created", async function (dto) {
                         const sessionId = (await JSON.parse(dto))["Id"];
-                        const inviteCode = (await JSON.parse(dto))["Angels"]["InviteCode"];
-                        const angelsTeamId = inviteCode.substring(inviteCode.indexOf("#") + 1);
+                        const inviteCode = (await JSON.parse(dto))["Angels"]["InviteCode"].toString();
 
                         if (sessionId != null) {
-                            window.location.href = `http://localhost:5046/session?sessionId=${sessionId}&teamId=${angelsTeamId}`;
+                            window.location.href = `http://localhost:5046/session?invite=${inviteCode}`;
                         } else {
                             @* error *@
                         }
@@ -33,7 +31,6 @@
     <div class="authorizationButtons">
         <input type="number" class="text-center authorizationButtonsTemplate authorizationCommandName" id="teamsCount" placeholder="Число команд">
         <input type="text" class="text-center authorizationButtonsTemplate authorizationCommandName" id="sessionName" placeholder="Название игры">
-        <input type="text" class="text-center authorizationButtonsTemplate authorizationCommandName" id="adminName" placeholder="Ваше имя">
         <button class="authorizationButtonsTemplate authorizationButton" onclick="createGameSession()">Создать игру</button>
     </div>
 </div>

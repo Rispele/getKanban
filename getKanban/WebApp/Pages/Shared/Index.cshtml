@@ -3,8 +3,20 @@
 }
 
 <script>
-    function redirectCreate() {window.location.href = `http://localhost:5046/session/create`}
-    function redirectJoin() {window.location.href = `http://localhost:5046/session/join`}
+    function redirectCreate() {
+        const userName = document.getElementsByClassName("authorizationCommandName")[0].value.toString();
+        fetch(`http://localhost:5046/add-username?name=${userName}`)
+            .then(r => {
+                window.location.href = `http://localhost:5046/session/create`
+            });
+    }
+    function redirectJoin() {
+        const userName = document.getElementsByClassName("authorizationCommandName")[0].value.toString();
+        fetch(`http://localhost:5046/add-username?name=${userName}`)
+            .then(r => {
+                window.location.href = `http://localhost:5046/session/join`
+            });
+    }
 </script>
 
 @* Authorization container *@
@@ -20,8 +32,8 @@
     @* Authorization buttons container*@
     <div class="authorizationButtons">
 
-        @* Input your name 
-        <input type="text" class="text-center authorizationButtonsTemplate authorizationCommandName"/> *@
+        @* Input your name *@
+        <input type="text" class="text-center authorizationButtonsTemplate authorizationCommandName" placeholder="Ваше имя"/>
 
         @* Game create button *@
         <button class="authorizationButtonsTemplate authorizationButton" onclick="redirectCreate()">Создать игру</button>

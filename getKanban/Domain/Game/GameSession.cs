@@ -1,4 +1,5 @@
-﻿using Domain.Game.Configuration;
+﻿using Core.Helpers;
+using Domain.Game.Configuration;
 using Domain.Game.Teams;
 using Domain.Users;
 using JetBrains.Annotations;
@@ -42,37 +43,40 @@ public class GameSession
 
 	public ParticipantRole EnsureHasAccess(User user, Guid? sessionId = null, Guid? teamId = null)
 	{
-		var inviteCode = $"{sessionId}#{teamId}";
-		if (Angels.MatchInviteCode(inviteCode))
+		if (sessionId is not null && teamId is not null)
 		{
-			var angel = Angels.Participants.SingleOrDefault(a => a.User.Id == user.Id);
-			if (angel is not null && (angel.Role & ParticipantRole.Angel) != 0)
+			var inviteCode = InviteCodeHelper.ConcatInviteCode(sessionId.Value, teamId.Value);
+			if (Angels.MatchInviteCode(inviteCode))
 			{
-				return angel.Role;
+				var angel = Angels.Participants.SingleOrDefault(a => a.User.Id == user.Id);
+				if (angel is not null && (angel.Role & ParticipantRole.Angel) != 0)
+				{
+					return angel.Role;
+				}
+
+				return ParticipantRole.Angel;
 			}
 
-			return ParticipantRole.Angel;
-		}
+			var inviteTeamToJoin = teams.SingleOrDefault(x => x.Players.MatchInviteCode(inviteCode));
+			if (inviteTeamToJoin is not null)
+			{
+				return ParticipantRole.Player;
 
-		var inviteTeamToJoin = teams.SingleOrDefault(x => x.Players.MatchInviteCode(inviteCode));
-		if (inviteTeamToJoin is not null)
-		{
-			return ParticipantRole.Player;
-
-			// if (teamId.HasValue)
-			// {
-			// 	if (teams.SingleOrDefault(t => t.Id == teamId.Value)?.HasAccess(user.Id) ?? false)
-			// 	{
-			// 		return ParticipantRole.Player;
-			// 	}
-			// }
-			// else
-			// {
-			// 	if (teams.Any(t => t.HasAccess(user.Id)))
-			// 	{
-			// 		return ParticipantRole.Player;
-			// 	}
-			// }
+				// if (teamId.HasValue)
+				// {
+				// 	if (teams.SingleOrDefault(t => t.Id == teamId.Value)?.HasAccess(user.Id) ?? false)
+				// 	{
+				// 		return ParticipantRole.Player;
+				// 	}
+				// }
+				// else
+				// {
+				// 	if (teams.Any(t => t.HasAccess(user.Id)))
+				// 	{
+				// 		return ParticipantRole.Player;
+				// 	}
+				// }
+			}
 		}
 		
 		throw new InvalidOperationException($"User {user.Id} has not access to this team.");

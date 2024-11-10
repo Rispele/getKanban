@@ -20,11 +20,9 @@ public class GameSessionService : IGameSessionService
 	public async Task<GameSessionDto> CreateGameSession(
 		RequestContext requestContext,
 		string name,
-		long teamsCount,
-		string creatorName)
+		long teamsCount)
 	{
 		var user = await context.GetUserAsync(requestContext.GetUserId());
-		await context.SetUserName(user, creatorName);
 		var gameSession = new GameSession(user, name, teamsCount);
 
 		context.GameSessions.Add(gameSession);
@@ -37,7 +35,7 @@ public class GameSessionService : IGameSessionService
 	{
 		var session = await context.FindGameSessionsAsync(sessionId);
 		var user = await context.GetUserAsync(requestContext.GetUserId());
-		var participantRole = session?.EnsureHasAccess(user!, sessionId, teamId);
+		var participantRole = session?.EnsureHasAccess(user, sessionId, teamId);
 
 		if (session is not null && participantRole is null)
 		{
@@ -54,17 +52,15 @@ public class GameSessionService : IGameSessionService
 	public async Task<AddParticipantResult> AddParticipantAsync(
 		RequestContext requestContext,
 		Guid gameSessionId,
-		string inviteCode,
-		string userName)
+		string inviteCode)
 	{
 		var session = await context.GetGameSessionsAsync(gameSessionId);
 		var user = await context.GetUserAsync(requestContext.GetUserId());
-		await context.SetUserName(user, userName);
 
 		var (teamId, updated) = session.AddByInviteCode(user, inviteCode);
 		await context.SaveChangesAsync();
 
-		var inviteTeamId = Guid.Parse(InviteCodeHelper.SplitInviteCode(inviteCode).teamId);
+		var inviteTeamId = InviteCodeHelper.SplitInviteCode(inviteCode).teamId;
 		var participantRole = session.EnsureHasAccess(user, gameSessionId, inviteTeamId);
 		var sessionDto = GameSessionDtoConverter.For(participantRole).Convert(session);
 		
@@ -91,5 +87,23 @@ public class GameSessionService : IGameSessionService
 		session.Start();
 
 		await context.SaveChangesAsync();
+	}
+
+	public async Task<Guid?> GetCurrentTeam(RequestContext requestContext, Guid gameSessionId)
+	{
+		var session = await context.GetGameSessionsAsync(gameSessionId);
+		var user = await context.GetUserAsync(requestContext.GetUserId());
+		
+		var teamId = session.Teams
+			.SingleOrDefault(
+				x => x.Players.Participants
+					.SingleOrDefault(p => p.User.Id == user.Id) is not null)?.Id;
+		
+		return teamId;
+	}
+
+	public Guid GetTeamInviteId(string inviteCode)
+	{
+		return InviteCodeHelper.SplitInviteCode(inviteCode).teamId;
 	}
 }

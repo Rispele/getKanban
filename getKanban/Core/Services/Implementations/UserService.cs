@@ -52,5 +52,7 @@ public class UserService : IUserService
 		{
 			user.Name = userName;
 		}
+
+		await context.SaveChangesAsync();
 	}
 }

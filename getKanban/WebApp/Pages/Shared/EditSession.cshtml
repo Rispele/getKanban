@@ -1,5 +1,19 @@
-﻿
-@model Core.Dtos.GameSessionDto
+﻿@model Core.Dtos.GameSessionDto
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
+<script>
+    const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
+    connection.start();
+    connection.on("NotifyJoined", function (teamId, userId, userName) {
+        console.log(123)
+        const playerElement = document.createElement("p");
+        playerElement.setAttribute("class", "fs-6");
+        playerElement.setAttribute("id", userId.toString());
+        const team = document.getElementById(teamId);
+        team.appendChild(playerElement);
+        playerElement.textContent = userName.toString();
+    });
+</script>
 
 @* Header *@
 <div class="commandEditorHeader text-center">
@@ -8,32 +22,32 @@
 
 @* Windows *@
 <div class="commandEditorContainer centered-25">
-    
+
     @* Command windows *@
     <div class="commandEditorLWindow commandEditorWindowsHeight commandEditorBorderStyle commandEditorBorderWidth commandEditorBorderRadius">
-        
+
         @foreach (var team in Model.Teams)
         {
             @* Command window template *@
             <div class="commandEditorCommandContainer commandEditorBorderRadius">
-            
+
                 @* Command header container *@
-                <div class="commandEditorHeaders text-center">
-                
+                <div class="commandEditorHeaders text-center" id="headers-@team.Id">
+
                     @* Command name and link for copy *@
-                    <p class="fs-6">
-                        <img src="images/edit_button.png"
-                             alt="edit"
-                             width="20"
-                             height="20"
-                             id="edit-@team.Id">
+                    <p class="fs-6" id="edit-@team.Id">
+                        @* <img src="images/edit_button.png" *@
+                        @*      alt="edit" *@
+                        @*      width="20" *@
+                        @*      height="20" *@
+                        @*      id="edit-button-@team.Id"> *@
                         @team.Name
-                        <img
-                            src="images/copy_button.jpg"
-                            alt="copy"
-                            width="20"
-                            height="20"
-                            id="link-@team.Participants.InviteCode">
+                        @* <img *@
+                        @*     src="images/copy_button.jpg" *@
+                        @*     alt="copy" *@
+                        @*     width="20" *@
+                        @*     height="20" *@
+                        @*     id="link-@team.Participants.InviteCode"> *@
                     </p>
                 </div>
 
@@ -50,23 +64,23 @@
 
     @* Angels *@
     <div class="commandEditorSWindow commandEditorWindowsHeight commandEditorBorderStyle commandEditorBorderWidth commandEditorBorderRadius">
-        
+
         @* Angels header container *@
         <div class="commandEditorHeaders text-center">
             @* Name and link for copy *@
-            <p class="fs-6">
+            <p class="fs-6" id="edit-angels">
                 Ангелы
-                <img
-                    src="images/copy_button.jpg"
-                    alt="copy"
-                    width="20"
-                    height="20"
-                    id="link-@Model.Angels.InviteCode">
+                @* <img *@
+                @*     src="images/copy_button.jpg" *@
+                @*     alt="copy" *@
+                @*     width="20" *@
+                @*     height="20" *@
+                @*     id="link-@Model.Angels.InviteCode"> *@
             </p>
         </div>
 
         @* Angels Name *@
-        <div class="commandEditorNamesContainer text-center" id="@Model.Angels.InviteCode!.Substring(Model.Angels.InviteCode.IndexOf("#", StringComparison.Ordinal) + 1)">
+        <div class="commandEditorNamesContainer angelsEditor text-center">
             @foreach (var player in Model.Angels.Users)
             {
                 <p class="fs-6" id="@player.Id">@player.Name</p>
@@ -75,16 +89,74 @@
     </div>
 </div>
 
-@* Start game button *@
-<form class="text-center">
-    @* asp-area="" asp-page="/Shared/JoinTeamSession" *@
-    <button class="commandEditorButtonsTemplate authorizationButton">Начать игру</button>
-</form>
+@* $1$ Start game button #1# *@
+@* <form class="text-center"> *@
+@*     $1$ asp-area="" asp-page="/Shared/JoinTeamSession" #1# *@
+@*     <button class="commandEditorButtonsTemplate authorizationButton">Начать игру</button> *@
+@* </form> *@
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
 <script>
-    if (@((Model.Angels.InviteCode != null).ToString().ToLower()) && @(Model.Teams.All(x => x.Participants.InviteCode != null).ToString().ToLower()))
-    {
+    const currentTeamId = fetch("http://localhost:5046/session/get-current-team?sessionId=@Model.Id")
+        .then(r => {
+            return r;
+        });
+    
+    if (isCurrentUserAdmin()) {
+        const teamId = fetch(`http://localhost:5046/session/get-team-invite?invite=@Model.Angels.InviteCode`)
+            .then(r => {
+                return r.toString();
+            });
+        document.getElementsByClassName("angelsEditor")[0].setAttribute("id", teamId);
+    
+        const teamLinks = [];
+        const teamIds = [];
+        @foreach (var team in Model.Teams)
+        {
+            @:teamLinks.push("@team.Participants.InviteCode");
+            @:teamIds.push("@team.Id");
+        }
+    
+        placeTeamNameEditButtons(teamIds);
+        placeAdminTeamLinks("@Model.Angels.InviteCode", teamLinks, teamIds);
+        placeBeginButton();
+    } else if (currentTeamId != null) {
+        placeTeamNameEditButtons([currentTeamId]);
+    }
+    
+    function isCurrentUserAdmin() {
+        return @((Model.Angels.InviteCode != null).ToString().ToLower()) &&
+            @(Model.Teams.All(x => x.Participants.InviteCode != null).ToString().ToLower())
+    }
+    
+    function placeBeginButton() {
+        const form = document.createElement("form");
+        form.setAttribute("class", "text-center");
+        const button = document.createElement("button");
+        button.setAttribute("class", "commandEditorButtonsTemplate authorizationButton");
+        button.innerText = "Начать игру";
+        const container = document.getElementsByClassName("commandEditorContainer")[0];
+        form.appendChild(button);
+        container.after(form);
+    }
+    
+    function placeAdminTeamLinks(angelsInviteLink, teamInviteLinks, teamIds) {
+        const angelsIcon = buildIcon(angelsInviteLink);
+        document.getElementById("edit-angels").appendChild(angelsIcon);
+        for (let i = 0; i < teamInviteLinks.length; i++) {
+            const teamIcon = buildIcon(teamInviteLinks[i]);
+            document.getElementById(`edit-${teamIds[i]}`).appendChild(teamIcon);
+        }
+        
+        function buildIcon(id) {
+            const image = document.createElement("img");
+            image.setAttribute("src", "images/copy_button.jpg");
+            image.setAttribute("alt", "edit");
+            image.setAttribute("width", "20");
+            image.setAttribute("height", "20");
+            image.setAttribute("id", `link-${id}`);
+            return image;
+        }
+        
         document.getElementById("link-@Model.Angels.InviteCode").addEventListener('click', e => {
             const copyText = "@Model.Angels.InviteCode";
             navigator.clipboard.writeText(copyText)
@@ -93,7 +165,7 @@
         let inviteCodes = [];
         @foreach (var dto in Model.Teams)
         {
-        @:inviteCodes.push("@dto.Participants.InviteCode");
+            @:inviteCodes.push("@dto.Participants.InviteCode");
         }
         if (inviteCodes.length > 0) {
             for(let inviteCode of inviteCodes) {
@@ -105,16 +177,38 @@
             }
         }
     }
-
-    const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
-    connection.start();
-    connection.on("NotifyJoined", function (teamId, userId, userName) {
-        const playerElement = document.createElement("p");
-        playerElement.setAttribute("class", "fs-6");
-        playerElement.setAttribute("id", userId.toString());
-        const team = document.getElementById(teamId);
-        team.appendChild(playerElement);
-        playerElement.textContent = userName.toString();
-    });
+    
+    function placeTeamNameEditButtons(teamIds) {
+        for (let teamId of teamIds) {
+            const image = document.createElement("img");
+            image.setAttribute("src", "images/edit_button.png");
+            image.setAttribute("alt", "edit");
+            image.setAttribute("width", "20");
+            image.setAttribute("height", "20");
+            image.setAttribute("id", `edit-button-${teamId}`);
+            image.addEventListener("click", function () {
+                const input = document.createElement("input");
+                input.setAttribute("id", `edit-input-${teamId}`);
+                const button = document.createElement("button");
+                button.setAttribute("id", `edit-submit-${teamId}`);
+                button.innerText = "save";
+                button.addEventListener("click", function () {
+                    const teamName = input.value.toString();
+                    fetch("")
+                        .then(r => {
+                            input.remove();
+                            button.remove();
+                        });
+                });
+                const container = document.getElementById(`headers-${teamId}`);
+                const editBlock = document.getElementById(`edit-${teamId}`);
+                editBlock.remove();
+                container.appendChild(button);
+                container.appendChild(input);
+            });
+            
+            const editBlock = document.getElementById(`edit-${teamId}`);
+            editBlock.insertBefore(image, editBlock.firstChild);
+        }
+    }
 </script>
-

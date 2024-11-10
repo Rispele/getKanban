@@ -1,4 +1,5 @@
-﻿using Domain.Game.Configuration;
+﻿using Core.Helpers;
+using Domain.Game.Configuration;
 using Domain.Users;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
@@ -20,16 +21,11 @@ public class ParticipantsContainer
 	{
 	}
 
-	public ParticipantsContainer(Guid parentId)
+	public ParticipantsContainer(Guid parentId, Guid? childId = null)
 	{
 		participants = [];
-		InviteCode = $"{parentId}#{Guid.NewGuid()}";
-	}
-	
-	public ParticipantsContainer(Guid parentId, Guid childId)
-	{
-		participants = [];
-		InviteCode = $"{parentId}#{childId}";
+		var providedChildId = childId ?? Guid.NewGuid(); 
+		InviteCode = InviteCodeHelper.ConcatInviteCode(parentId, providedChildId);
 	}
 
 	internal (bool matched, bool updated) AddParticipantIfMatchInviteCode(

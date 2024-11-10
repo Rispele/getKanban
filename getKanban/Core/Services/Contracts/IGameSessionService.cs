@@ -5,15 +5,18 @@ namespace Core.Services;
 
 public interface IGameSessionService
 {
-	public Task<GameSessionDto> CreateGameSession(RequestContext requestContext, string name, long teamsCount, string creatorName);
+	public Task<GameSessionDto> CreateGameSession(RequestContext requestContext, string name, long teamsCount);
 
 	public Task<GameSessionDto?> FindGameSession(RequestContext requestContext, Guid sessionId, Guid teamId);
 
 	public Task<AddParticipantResult> AddParticipantAsync(
 		RequestContext requestContext,
 		Guid gameSessionId,
-		string inviteCode,
-		string userName);
+		string inviteCode);
 
 	public Task StartGameAsync(RequestContext requestContext, Guid gameSessionId);
+	
+	public Task<Guid?> GetCurrentTeam(RequestContext requestContext, Guid gameSessionId);
+	
+	public Guid GetTeamInviteId(string inviteCode);
 }

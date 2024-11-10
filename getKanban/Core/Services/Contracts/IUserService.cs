@@ -1,6 +1,16 @@
-﻿namespace Core.Services;
+﻿using Core.Dtos;
+using Domain.Users;
+
+namespace Core.Services;
 
 public interface IUserService
 {
 	public Task<Guid> CreateNewUser(string name);
+	public Task<User?> GetUserById(Guid id);
+
+	public Task<User?> GetUser(UserDto userDto);
+
+	public Task DeleteUserById(Guid id);
+
+	public Task SetUserName(Guid userId, string userName);
 }
