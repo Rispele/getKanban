@@ -1,5 +1,6 @@
-﻿using Core.Helpers;
+using Core.Helpers;
 using Core.Services;
+using Core.Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApp.Controllers;
@@ -13,36 +14,45 @@ public class SessionController : Controller
 	{
 		this.gameSessionService = gameSessionService;
 	}
-	
+
 	[HttpGet]
 	[Route("")]
 	public async Task<IActionResult> EditSession(string invite)
 	{
 		var (sessionId, teamId) = InviteCodeHelper.SplitInviteCode(invite);
 		var session = await gameSessionService.FindGameSession(RequestContextFactory.Build(Request), sessionId, teamId);
+		var session = await gameSessionService.FindGameSession(
+			RequestContextFactory.Build(Request),
+			sessionId,
+			ignorePermissions: false);
+		
 		return View(session);
 	}
-	
+
 	[HttpGet]
 	[Route("join")]
 	public IActionResult JoinSession()
 	{
 		return View();
 	}
-	
+
 	[HttpGet]
 	[Route("create")]
 	public IActionResult CreateSession()
 	{
 		return View();
 	}
-	
+
 	[HttpGet]
 	[Route("check")]
 	public async Task<bool> CheckForOpenedGame(string invite)
 	{
 		var (sessionId, teamId) = InviteCodeHelper.SplitInviteCode(invite);
 		return await gameSessionService.FindGameSession(RequestContextFactory.Build(Request), sessionId, teamId) != null;
+		return await gameSessionService.FindGameSession(
+			RequestContextFactory.Build(Request),
+			sessionId,
+			ignorePermissions: true) != null;
 	}
 
 	[HttpGet]

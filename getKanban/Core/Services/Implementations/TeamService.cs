@@ -3,7 +3,7 @@ using Core.DbContexts.Extensions;
 using Core.Dtos;
 using Domain.Game.Days.Commands;
 
-namespace Core.Services;
+namespace Core.Services.Implementations;
 
 public class TeamService
 {

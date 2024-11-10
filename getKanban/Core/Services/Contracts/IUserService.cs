@@ -1,7 +1,7 @@
-﻿using Core.Dtos;
+using Core.Dtos;
 using Domain.Users;
 
-namespace Core.Services;
+namespace Core.Services.Contracts;
 
 public interface IUserService
 {

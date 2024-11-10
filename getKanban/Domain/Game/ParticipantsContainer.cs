@@ -33,14 +33,19 @@ public class ParticipantsContainer
 		User user,
 		ParticipantRole participantRole)
 	{
-		return InviteCode != inviteCode
+		return MatchInviteCode(inviteCode)
 			? (false, false)
 			: (true, AddParticipant(user, participantRole));
 	}
 
-	public bool MatchInviteCode(string inviteCode)
+	public Participant GetParticipant(User user)
 	{
-		return InviteCode == inviteCode;
+		return participants.Single(p => p.User.Id == user.Id);
+	}
+
+	public bool Contains(User user)
+	{
+		return participants.Any(p => p.User.Id == user.Id);
 	}
 
 	public bool AddParticipant(User user, ParticipantRole participantRole)
@@ -52,5 +57,10 @@ public class ParticipantsContainer
 
 		participants.Add(new Participant(user, participantRole));
 		return true;
+	}
+	
+	public bool MatchInviteCode(string inviteCode)
+	{
+		return InviteCode == inviteCode;
 	}
 }
