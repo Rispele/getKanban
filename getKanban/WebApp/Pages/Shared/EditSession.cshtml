@@ -1,0 +1,120 @@
+﻿
+@model Core.Dtos.GameSessionDto
+
+@* Header *@
+<div class="commandEditorHeader text-center">
+    <h1 class="display-4 fw-bold">getKanban: "@Model.Name"</h1>
+</div>
+
+@* Windows *@
+<div class="commandEditorContainer centered-25">
+    
+    @* Command windows *@
+    <div class="commandEditorLWindow commandEditorWindowsHeight commandEditorBorderStyle commandEditorBorderWidth commandEditorBorderRadius">
+        
+        @foreach (var team in Model.Teams)
+        {
+            @* Command window template *@
+            <div class="commandEditorCommandContainer commandEditorBorderRadius">
+            
+                @* Command header container *@
+                <div class="commandEditorHeaders text-center">
+                
+                    @* Command name and link for copy *@
+                    <p class="fs-6">
+                        <img src="images/edit_button.png"
+                             alt="edit"
+                             width="20"
+                             height="20"
+                             id="edit-@team.Id">
+                        @team.Name
+                        <img
+                            src="images/copy_button.jpg"
+                            alt="copy"
+                            width="20"
+                            height="20"
+                            id="link-@team.Participants.InviteCode">
+                    </p>
+                </div>
+
+                @* Players in command *@
+                <div class="commandEditorNamesContainer text-center" id=@team.Id>
+                    @foreach (var player in team.Participants.Users)
+                    {
+                        <p class="fs-6" id="@player.Id">@player.Name</p>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+
+    @* Angels *@
+    <div class="commandEditorSWindow commandEditorWindowsHeight commandEditorBorderStyle commandEditorBorderWidth commandEditorBorderRadius">
+        
+        @* Angels header container *@
+        <div class="commandEditorHeaders text-center">
+            @* Name and link for copy *@
+            <p class="fs-6">
+                Ангелы
+                <img
+                    src="images/copy_button.jpg"
+                    alt="copy"
+                    width="20"
+                    height="20"
+                    id="link-@Model.Angels.InviteCode">
+            </p>
+        </div>
+
+        @* Angels Name *@
+        <div class="commandEditorNamesContainer text-center" id="@Model.Angels.InviteCode!.Substring(Model.Angels.InviteCode.IndexOf("#", StringComparison.Ordinal) + 1)">
+            @foreach (var player in Model.Angels.Users)
+            {
+                <p class="fs-6" id="@player.Id">@player.Name</p>
+            }
+        </div>
+    </div>
+</div>
+
+@* Start game button *@
+<form class="text-center">
+    @* asp-area="" asp-page="/Shared/JoinTeamSession" *@
+    <button class="commandEditorButtonsTemplate authorizationButton">Начать игру</button>
+</form>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
+<script>
+    if (@((Model.Angels.InviteCode != null).ToString().ToLower()) && @(Model.Teams.All(x => x.Participants.InviteCode != null).ToString().ToLower()))
+    {
+        document.getElementById("link-@Model.Angels.InviteCode").addEventListener('click', e => {
+            const copyText = "@Model.Angels.InviteCode";
+            navigator.clipboard.writeText(copyText)
+                .then(() => console.log(`Text copied: ${copyText}`))
+        });
+        let inviteCodes = [];
+        @foreach (var dto in Model.Teams)
+        {
+        @:inviteCodes.push("@dto.Participants.InviteCode");
+        }
+        if (inviteCodes.length > 0) {
+            for(let inviteCode of inviteCodes) {
+                document.getElementById(`link-${inviteCode}`).addEventListener('click', e => {
+                    const copyText = inviteCode;
+                    navigator.clipboard.writeText(copyText)
+                        .then(() => console.log(`Text copied: ${copyText}`))
+                });
+            }
+        }
+    }
+
+    const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
+    connection.start();
+    connection.on("NotifyJoined", function (teamId, userId, userName) {
+        const playerElement = document.createElement("p");
+        playerElement.setAttribute("class", "fs-6");
+        playerElement.setAttribute("id", userId.toString());
+        const team = document.getElementById(teamId);
+        team.appendChild(playerElement);
+        playerElement.textContent = userName.toString();
+    });
+</script>
+

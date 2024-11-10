@@ -28,7 +28,6 @@
 
     <ItemGroup>
       <Folder Include="Pages\CommandEditor\" />
-      <Folder Include="wwwroot\images\" />
     </ItemGroup>
 
 </Project>

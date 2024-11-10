@@ -1,11 +1,10 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "Home page";
 }
 
 <script>
-    function redirectCreate() {window.location.href = `http://localhost:5046/game/create`}
-    function redirectJoin() {window.location.href = `http://localhost:5046/game/join`}
+    function redirectCreate() {window.location.href = `http://localhost:5046/session/create`}
+    function redirectJoin() {window.location.href = `http://localhost:5046/session/join`}
 </script>
 
 @* Authorization container *@
@@ -21,8 +20,8 @@
     @* Authorization buttons container*@
     <div class="authorizationButtons">
 
-        @* Input your name *@
-        <input type="text" class="text-center authorizationButtonsTemplate authorizationCommandName"/>
+        @* Input your name 
+        <input type="text" class="text-center authorizationButtonsTemplate authorizationCommandName"/> *@
 
         @* Game create button *@
         <button class="authorizationButtonsTemplate authorizationButton" onclick="redirectCreate()">Создать игру</button>

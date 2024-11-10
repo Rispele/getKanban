@@ -42,6 +42,11 @@ public class ParticipantsContainer
 			: (true, AddParticipant(user, participantRole));
 	}
 
+	public bool MatchInviteCode(string inviteCode)
+	{
+		return InviteCode == inviteCode;
+	}
+
 	public bool AddParticipant(User user, ParticipantRole participantRole)
 	{
 		if (participants.Any(t => t.User.Id == user.Id))

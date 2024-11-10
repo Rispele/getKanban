@@ -32,8 +32,6 @@ public class LobbyHub : Hub
 		
 		var groupId = GetGroupId(gameSessionId);
 		await AddCurrentConnectionToLobbyGroupAsync(groupId);
-		
-		await Clients.Caller.SendAsync("Joined", addParticipantResult.GameSession.ToJson());
 
 		if (!addParticipantResult.Updated)
 		{
@@ -41,7 +39,7 @@ public class LobbyHub : Hub
 		}
 
 		var (teamId, userAdded) = (addParticipantResult.UpdatedTeamId, addParticipantResult.User);
-		await Clients.All.SendAsync("NotifyJoined", teamId.ToString(), userAdded.Name);
+		await Clients.All.SendAsync("NotifyJoined", teamId.ToString(), addParticipantResult.User.Id, userAdded.Name);
 	}
 
 	public async Task StartGame(Guid gameSessionId)

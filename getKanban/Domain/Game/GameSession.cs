@@ -42,33 +42,39 @@ public class GameSession
 
 	public ParticipantRole EnsureHasAccess(User user, Guid? sessionId = null, Guid? teamId = null)
 	{
-		var team = Teams.SingleOrDefault(x => x.Id == teamId);
-		if (teamId != null && team != null)
+		var inviteCode = $"{sessionId}#{teamId}";
+		if (Angels.MatchInviteCode(inviteCode))
 		{
-			AddByInviteCode(user, $"{sessionId}#{teamId}");
-		}
-		
-		var angel = Angels.Participants.SingleOrDefault(a => a.User.Id == user.Id);
-		if (angel is not null && (angel.Role & ParticipantRole.Angel) != 0)
-		{
-			return angel.Role;
-		}
-		
-		if (teamId.HasValue)
-		{
-			if (teams.SingleOrDefault(t => t.Id == teamId.Value)?.HasAccess(user.Id) ?? false)
+			var angel = Angels.Participants.SingleOrDefault(a => a.User.Id == user.Id);
+			if (angel is not null && (angel.Role & ParticipantRole.Angel) != 0)
 			{
-				return ParticipantRole.Player;
+				return angel.Role;
 			}
-		}
-		else
-		{
-			if (teams.Any(t => t.HasAccess(user.Id)))
-			{
-				return ParticipantRole.Player;
-			}
+
+			return ParticipantRole.Angel;
 		}
 
+		var inviteTeamToJoin = teams.SingleOrDefault(x => x.Players.MatchInviteCode(inviteCode));
+		if (inviteTeamToJoin is not null)
+		{
+			return ParticipantRole.Player;
+
+			// if (teamId.HasValue)
+			// {
+			// 	if (teams.SingleOrDefault(t => t.Id == teamId.Value)?.HasAccess(user.Id) ?? false)
+			// 	{
+			// 		return ParticipantRole.Player;
+			// 	}
+			// }
+			// else
+			// {
+			// 	if (teams.Any(t => t.HasAccess(user.Id)))
+			// 	{
+			// 		return ParticipantRole.Player;
+			// 	}
+			// }
+		}
+		
 		throw new InvalidOperationException($"User {user.Id} has not access to this team.");
 	}
 

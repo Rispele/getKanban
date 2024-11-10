@@ -2,6 +2,7 @@
 using Core.DbContexts.Extensions;
 using Core.Dtos;
 using Core.Dtos.Builders;
+using Core.Helpers;
 using Core.RequestContexts;
 using Domain.Game;
 
@@ -61,12 +62,19 @@ public class GameSessionService : IGameSessionService
 		await context.SetUserName(user, userName);
 
 		var (teamId, updated) = session.AddByInviteCode(user, inviteCode);
-
 		await context.SaveChangesAsync();
-		
-		var participantRole = session.EnsureHasAccess(user);
 
+		var inviteTeamId = Guid.Parse(InviteCodeHelper.SplitInviteCode(inviteCode).teamId);
+		var participantRole = session.EnsureHasAccess(user, gameSessionId, inviteTeamId);
 		var sessionDto = GameSessionDtoConverter.For(participantRole).Convert(session);
+		
+		if (teamId.Equals(Guid.Empty) && participantRole == ParticipantRole.Angel)
+		{
+			var angelAdded = sessionDto.Angels.Users
+				.Single(x => x.Id == user.Id);
+			return new AddParticipantResult(updated, sessionDto, inviteTeamId, angelAdded);
+		}
+		
 		var userAdded = sessionDto.Teams
 			.Single(t => t.Id == teamId)
 			.Participants.Users
