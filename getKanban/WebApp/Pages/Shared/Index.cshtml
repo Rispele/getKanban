@@ -4,17 +4,20 @@
 
 <script>
     function redirectCreate() {
-        const userName = document.getElementsByClassName("authorizationCommandName")[0].value.toString();
-        fetch(`http://localhost:5046/add-username?name=${userName}`)
-            .then(r => {
-                window.location.href = `http://localhost:5046/session/create`
-            });
+        redirect("create");
     }
     function redirectJoin() {
+        redirect("join");
+    }
+    
+    function redirect(endpoint) {
         const userName = document.getElementsByClassName("authorizationCommandName")[0].value.toString();
+        if (userName.length === 0) {
+            return
+        }
         fetch(`http://localhost:5046/add-username?name=${userName}`)
             .then(r => {
-                window.location.href = `http://localhost:5046/session/join`
+                window.location.href = `http://localhost:5046/session/${endpoint}`
             });
     }
 </script>

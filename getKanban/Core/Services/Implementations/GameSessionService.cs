@@ -48,10 +48,16 @@ public class GameSessionService : IGameSessionService
 		}
 
 		var user = await context.GetUserAsync(requestContext.GetUserId());
-		
-		var participantRole = ignorePermissions 
-			? ParticipantRole.Creator
-			: session.EnsureHasAccess(user, inviteCode);
+
+		ParticipantRole participantRole;
+		if (ignorePermissions)
+		{
+			participantRole = ParticipantRole.Creator;
+		}
+		else
+		{
+			participantRole = session.EnsureHasAnyAccess(user, inviteCode);
+		}
 
 		return GameSessionDtoConverter.For(participantRole).Convert(session);
 	}
@@ -69,7 +75,7 @@ public class GameSessionService : IGameSessionService
 
 		await context.SaveChangesAsync();
 		
-		var participantRole = session.EnsureHasAccess(user, inviteCode);
+		var participantRole = session.EnsureHasAnyAccess(user, inviteCode);
 		var sessionDto = GameSessionDtoConverter.For(participantRole).Convert(session);
 
 		var participantAdded = teamId.Equals(Guid.Empty) && participantRole == ParticipantRole.Angel
