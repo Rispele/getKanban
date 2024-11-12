@@ -15,13 +15,13 @@ public partial class Team
 	private int previousDayNumber => currentDayNumber - 1;
 
 	public IReadOnlyList<Day> Days => days;
-	public Day CurrentDay => days.Single(d => d.Number == currentDayNumber);
+	public Day? CurrentDay => days.SingleOrDefault(d => d.Number == currentDayNumber);
 	internal Day? previousDay => days.SingleOrDefault(d => d.Number == previousDayNumber);
 
-	public IReadOnlyList<TeamRoleUpdate> CurrentDayTeamRoleUpdates =>
-		CurrentDay.UpdateTeamRolesContainer.TeamRoleUpdates;
+	public IReadOnlyList<TeamRoleUpdate?> CurrentDayTeamRoleUpdates =>
+		CurrentDay?.UpdateTeamRolesContainer.TeamRoleUpdates ?? Array.Empty<TeamRoleUpdate?>()!;
 
-	public RollDiceContainer? CurrentDayRollDiceContainer => CurrentDay.RollDiceContainer;
+	public RollDiceContainer? CurrentDayRollDiceContainer => CurrentDay?.RollDiceContainer;
 
 	public IReadOnlyList<UpdateCfdContainer> CfdContainers => days
 		.OrderBy(d => d.Number)

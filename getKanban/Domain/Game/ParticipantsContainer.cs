@@ -1,4 +1,5 @@
-﻿using Core.Helpers;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using Core.Helpers;
 using Domain.Game.Configuration;
 using Domain.Users;
 using JetBrains.Annotations;
@@ -13,6 +14,9 @@ public class ParticipantsContainer
 
 	public long Id { get; }
 
+	[NotMapped]
+	public Guid PublicId { get; private set; }
+
 	public string InviteCode { get; } = null!;
 	public IReadOnlyList<Participant> Participants => participants;
 
@@ -24,7 +28,8 @@ public class ParticipantsContainer
 	public ParticipantsContainer(Guid parentId, Guid? childId = null)
 	{
 		participants = [];
-		var providedChildId = childId ?? Guid.NewGuid(); 
+		var providedChildId = childId ?? Guid.NewGuid();
+		PublicId = providedChildId;
 		InviteCode = InviteCodeHelper.ConcatInviteCode(parentId, providedChildId);
 	}
 
