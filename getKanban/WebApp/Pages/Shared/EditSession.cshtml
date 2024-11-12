@@ -331,7 +331,7 @@
                                     button.remove();
                                     placeTeamNameEditButtons([teamId], [teamName], inviteCode === null ? [] : [inviteCode])
                                     placeTeamNames([teamId], [teamName])
-                                    if (inviteCode !== null) {
+                                    if (inviteCode !== null && inviteCode !== undefined) {
                                         placePlayersTeamCopyButton(teamId, inviteCode)
                                     }
                                 });
