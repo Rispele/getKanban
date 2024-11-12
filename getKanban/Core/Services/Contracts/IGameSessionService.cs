@@ -25,4 +25,6 @@ public interface IGameSessionService
 	public Guid GetTeamInviteId(string inviteCode);
 	
 	public Task UpdateTeamName(Guid sessionId, Guid teamId, string name);
+	
+	public Task<string> GetTeamName(Guid sessionId, Guid teamId);
 }

@@ -141,4 +141,10 @@ public class GameSessionService : IGameSessionService
 		team.Name = name;
 		await context.SaveChangesAsync();
 	}
+	
+	public async Task<string> GetTeamName(Guid sessionId, Guid teamId)
+	{
+		var team = await context.GetTeamAsync(sessionId, teamId);
+		return team.Name;
+	}
 }

@@ -63,6 +63,18 @@ public class LobbyHub : Hub
 			userAdded.Name);
 	}
 
+	public async Task UpdateName(Guid sessionId, Guid teamId)
+	{
+		var teamName = await gameSessionService.GetTeamName(sessionId, teamId);
+		var groupId = GetGroupId(sessionId);
+		
+		Console.WriteLine($"{groupId} notified");
+		await Clients.All.SendAsync(
+			"NotifyRenamed",
+			teamId.ToString(),
+			teamName);
+	}
+
 	public async Task StartGame(Guid gameSessionId)
 	{
 		var requestContext = RequestContextFactory.Build(Context);

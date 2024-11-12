@@ -95,6 +95,10 @@
 </script>
 
 <script type="module" async="async">
+    connection.on("NotifyRenamed", function (teamId, teamName) {
+        placeTeamNames([teamId], [teamName])
+    });
+    
     let currentTeamId = null
     let currentTeamName = null
     let currentTeamLink = null
@@ -154,8 +158,8 @@
         const teamNames = [];
         @foreach (var team in Model.Teams)
         {
-        @:teamIds.push("@team.Id");
-        @:teamNames.push("@team.Name");
+            @:teamIds.push("@team.Id");
+            @:teamNames.push("@team.Name");
         }
         
         placeTeamNameEditButtons([currentTeamId], [currentTeamName]);
@@ -171,8 +175,14 @@
                 editBlock.setAttribute("id", `edit-${teamIds[i]}`);
                 const headersBlock = document.getElementById(`headers-${teamIds[i]}`);
                 headersBlock.appendChild(editBlock);
+            } else {
+                const name = document.getElementById(`edit-name-${teamIds[i]}`);
+                if (name !== null) {
+                    name.remove();
+                }
             }
             const text = document.createElement("p");
+            text.setAttribute("id", `edit-name-${teamIds[i]}`)
             text.innerText = teamNames[i];
             editBlock.appendChild(text);
         }
@@ -315,13 +325,16 @@
                 if (teamName.length > 0) {
                     fetch(`http://localhost:5046/session/update-team-name?sessionId=@Model.Id&teamId=${teamId}&name=${teamName}`)
                         .then(r => {
-                            input.remove();
-                            button.remove();
-                            placeTeamNameEditButtons([teamId], [teamName], inviteCode === null ? [] : [inviteCode])
-                            placeTeamNames([teamId], [teamName])
-                            if (inviteCode !== null) {
-                                placePlayersTeamCopyButton(teamId, inviteCode)
-                            }
+                            connection.invoke("UpdateName", "@Model.Id", teamId)
+                                .then(function () {
+                                    input.remove();
+                                    button.remove();
+                                    placeTeamNameEditButtons([teamId], [teamName], inviteCode === null ? [] : [inviteCode])
+                                    placeTeamNames([teamId], [teamName])
+                                    if (inviteCode !== null) {
+                                        placePlayersTeamCopyButton(teamId, inviteCode)
+                                    }
+                                });
                         });
                 }
             });
@@ -334,5 +347,6 @@
             headersBlock.appendChild(editBlock)
         }
     }
+
 
 </script>
