@@ -104,7 +104,7 @@ public class GameSessionService : IGameSessionService
 		await context.SaveChangesAsync();
 	}
 
-	public async Task<Team?> GetCurrentTeam(RequestContext requestContext, Guid gameSessionId)
+	public async Task<TeamDto?> GetCurrentTeam(RequestContext requestContext, Guid gameSessionId)
 	{
 		var session = await context.GetGameSessionsAsync(gameSessionId);
 		var user = await context.GetUserAsync(requestContext.GetUserId());
@@ -114,10 +114,10 @@ public class GameSessionService : IGameSessionService
 				x => x.Players.Participants
 					.SingleOrDefault(p => p.User.Id == user.Id) is not null);
 		
-		return team;
+		return TeamDtoConverter.For(ParticipantRole.Player).Convert(team);
 	}
 	
-	public async Task<ParticipantsContainer?> GetCurrentAngels(RequestContext requestContext, Guid gameSessionId)
+	public async Task<AngelsDto?> GetCurrentAngels(RequestContext requestContext, Guid gameSessionId)
 	{
 		var session = await context.GetGameSessionsAsync(gameSessionId);
 		var user = await context.GetUserAsync(requestContext.GetUserId());
@@ -127,7 +127,7 @@ public class GameSessionService : IGameSessionService
 				? null
 				: session.Angels;
 		
-		return angels;
+		return AngelsDtoConverter.For(ParticipantRole.Creator).Convert(angels);
 	}
 
 	public Guid GetTeamInviteId(string inviteCode)

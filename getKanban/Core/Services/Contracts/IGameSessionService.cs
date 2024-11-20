@@ -18,9 +18,9 @@ public interface IGameSessionService
 
 	public Task StartGameAsync(RequestContext requestContext, Guid gameSessionId);
 	
-	public Task<Team?> GetCurrentTeam(RequestContext requestContext, Guid gameSessionId);
+	public Task<TeamDto?> GetCurrentTeam(RequestContext requestContext, Guid gameSessionId);
 
-	public Task<ParticipantsContainer?> GetCurrentAngels(RequestContext requestContext, Guid gameSessionId);
+	public Task<AngelsDto?> GetCurrentAngels(RequestContext requestContext, Guid gameSessionId);
 	
 	public Guid GetTeamInviteId(string inviteCode);
 	

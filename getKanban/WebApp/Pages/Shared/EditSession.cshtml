@@ -125,9 +125,9 @@
             .then(data => {
                 if (data.length > 0) {
                     const jsonData = JSON.parse(data);
-                    currentTeamId = jsonData["PublicId"];
+                    currentTeamId = jsonData["id"];
                     currentTeamName = "Ангелы";
-                    currentTeamLink = jsonData["InviteCode"];
+                    currentTeamLink = jsonData["participants"]["inviteCode"];
                 }
             });
     }

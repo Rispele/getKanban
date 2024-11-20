@@ -1,3 +1,4 @@
+using Core.Dtos;
 using Core.Helpers;
 using Core.Services.Contracts;
 using Domain.Game.Teams;
@@ -54,18 +55,16 @@ public class SessionController : Controller
 
 	[HttpGet]
 	[Route("get-current-team")]
-	public async Task<string?> GetCurrentTeam(Guid sessionId)
+	public async Task<TeamDto?> GetCurrentTeam(Guid sessionId)
 	{
-		var team = await gameSessionService.GetCurrentTeam(RequestContextFactory.Build(Request), sessionId);
-		return team is null ? string.Empty : JsonConvert.SerializeObject(team);
+		return await gameSessionService.GetCurrentTeam(RequestContextFactory.Build(Request), sessionId);
 	}
 	
 	[HttpGet]
 	[Route("get-current-angels")]
-	public async Task<string?> GetCurrentAngels(Guid sessionId)
+	public async Task<AngelsDto?> GetCurrentAngels(Guid sessionId)
 	{
-		var team = await gameSessionService.GetCurrentAngels(RequestContextFactory.Build(Request), sessionId);
-		return team is null ? string.Empty : JsonConvert.SerializeObject(team);
+		return await gameSessionService.GetCurrentAngels(RequestContextFactory.Build(Request), sessionId);
 	}
 	
 	[HttpGet]
