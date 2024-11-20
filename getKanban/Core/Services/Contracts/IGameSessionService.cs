@@ -1,6 +1,8 @@
 ﻿using Core.Dtos;
 using Core.RequestContexts;
 using Core.Services.Implementations;
+using Domain.Game;
+using Domain.Game.Teams;
 
 namespace Core.Services.Contracts;
 
@@ -16,7 +18,13 @@ public interface IGameSessionService
 
 	public Task StartGameAsync(RequestContext requestContext, Guid gameSessionId);
 	
-	public Task<Guid?> GetCurrentTeam(RequestContext requestContext, Guid gameSessionId);
+	public Task<TeamDto?> GetCurrentTeam(RequestContext requestContext, Guid gameSessionId);
+
+	public Task<AngelsDto?> GetCurrentAngels(RequestContext requestContext, Guid gameSessionId);
 	
 	public Guid GetTeamInviteId(string inviteCode);
+	
+	public Task UpdateTeamName(Guid sessionId, Guid teamId, string name);
+	
+	public Task<string> GetTeamName(Guid sessionId, Guid teamId);
 }

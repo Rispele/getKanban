@@ -6,6 +6,7 @@ using Core.Helpers;
 using Core.RequestContexts;
 using Core.Services.Contracts;
 using Domain.Game;
+using Domain.Game.Teams;
 
 namespace Core.Services.Implementations;
 
@@ -103,21 +104,47 @@ public class GameSessionService : IGameSessionService
 		await context.SaveChangesAsync();
 	}
 
-	public async Task<Guid?> GetCurrentTeam(RequestContext requestContext, Guid gameSessionId)
+	public async Task<TeamDto?> GetCurrentTeam(RequestContext requestContext, Guid gameSessionId)
 	{
 		var session = await context.GetGameSessionsAsync(gameSessionId);
 		var user = await context.GetUserAsync(requestContext.GetUserId());
 		
-		var teamId = session.Teams
+		var team = session.Teams
 			.SingleOrDefault(
 				x => x.Players.Participants
-					.SingleOrDefault(p => p.User.Id == user.Id) is not null)?.Id;
+					.SingleOrDefault(p => p.User.Id == user.Id) is not null);
 		
-		return teamId;
+		return TeamDtoConverter.For(ParticipantRole.Player).Convert(team);
+	}
+	
+	public async Task<AngelsDto?> GetCurrentAngels(RequestContext requestContext, Guid gameSessionId)
+	{
+		var session = await context.GetGameSessionsAsync(gameSessionId);
+		var user = await context.GetUserAsync(requestContext.GetUserId());
+
+		var angels =
+			session.Angels.Participants.SingleOrDefault(x => x.User.Id == user.Id) is null
+				? null
+				: session.Angels;
+		
+		return AngelsDtoConverter.For(ParticipantRole.Creator).Convert(angels);
 	}
 
 	public Guid GetTeamInviteId(string inviteCode)
 	{
 		return InviteCodeHelper.SplitInviteCode(inviteCode).teamId;
+	}
+
+	public async Task UpdateTeamName(Guid sessionId, Guid teamId, string name)
+	{
+		var team = await context.GetTeamAsync(sessionId, teamId);
+		team.Name = name;
+		await context.SaveChangesAsync();
+	}
+	
+	public async Task<string> GetTeamName(Guid sessionId, Guid teamId)
+	{
+		var team = await context.GetTeamAsync(sessionId, teamId);
+		return team.Name;
 	}
 }

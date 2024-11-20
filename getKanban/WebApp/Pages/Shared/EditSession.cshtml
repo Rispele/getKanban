@@ -20,20 +20,20 @@
                 <div class="commandEditorHeaders text-center" id="headers-@team.Id">
 
                     @* Command name and link for copy *@
-                    <p class="fs-6" id="edit-@team.Id">
-                        @* <img src="images/edit_button.png" *@
-                        @*      alt="edit" *@
-                        @*      width="20" *@
-                        @*      height="20" *@
-                        @*      id="edit-button-@team.Id"> *@
-                        @team.Name
-                        @* <img *@
-                        @*     src="images/copy_button.jpg" *@
-                        @*     alt="copy" *@
-                        @*     width="20" *@
-                        @*     height="20" *@
-                        @*     id="link-@team.Participants.InviteCode"> *@
-                    </p>
+                    @* <p class="fs-6" id="edit-@team.Id"> *@
+                    @*     $1$ <img src="images/edit_button.png" #1# *@
+                    @*     $1$      alt="edit" #1# *@
+                    @*     $1$      width="20" #1# *@
+                    @*     $1$      height="20" #1# *@
+                    @*     $1$      id="edit-button-@team.Id"> #1# *@
+                    @*     @team.Name *@
+                    @*     $1$ <img #1# *@
+                    @*     $1$     src="images/copy_button.jpg" #1# *@
+                    @*     $1$     alt="copy" #1# *@
+                    @*     $1$     width="20" #1# *@
+                    @*     $1$     height="20" #1# *@
+                    @*     $1$     id="link-@team.Participants.InviteCode"> #1# *@
+                    @* </p> *@
                 </div>
 
                 @* Players in command *@
@@ -94,11 +94,43 @@
     });
 </script>
 
-<script>
-    const currentTeamId = fetch("http://localhost:5046/session/get-current-team?sessionId=@Model.Id")
-        .then(r => {
-            return r;
-        });
+<script type="module" async="async">
+    connection.on("NotifyRenamed", function (teamId, teamName) {
+        placeTeamNames([teamId], [teamName])
+    });
+    
+    let currentTeamId = null
+    let currentTeamName = null
+    let currentTeamLink = null
+    
+    await fetchTeam();
+    await fetchAngels();
+    
+    async function fetchTeam() {
+        await fetch("http://localhost:5046/session/get-current-team?sessionId=@Model.Id")
+            .then(r => r.text())
+            .then(data => {
+                if (data.length > 0) {
+                    const jsonData = JSON.parse(data);
+                    currentTeamId = jsonData["Id"];
+                    currentTeamName = jsonData["Name"];
+                    currentTeamLink = jsonData["Players"]["InviteCode"];
+                }
+            });
+    }
+    
+    async function fetchAngels() {
+        await fetch("http://localhost:5046/session/get-current-angels?sessionId=@Model.Id")
+            .then(r => r.text())
+            .then(data => {
+                if (data.length > 0) {
+                    const jsonData = JSON.parse(data);
+                    currentTeamId = jsonData["id"];
+                    currentTeamName = "Ангелы";
+                    currentTeamLink = jsonData["participants"]["inviteCode"];
+                }
+            });
+    }
     
     if (isCurrentUserAdmin()) {
         const teamId = fetch(`http://localhost:5046/session/get-team-invite?invite=@Model.Angels.InviteCode`)
@@ -109,17 +141,51 @@
     
         const teamLinks = [];
         const teamIds = [];
+        const teamNames = [];
         @foreach (var team in Model.Teams)
         {
             @:teamLinks.push("@team.Participants.InviteCode");
             @:teamIds.push("@team.Id");
+            @:teamNames.push("@team.Name");
         }
-    
-        placeTeamNameEditButtons(teamIds);
+        
+        placeTeamNameEditButtons(teamIds, teamNames, teamLinks);
+        placeTeamNames(teamIds, teamNames);
         placeAdminTeamLinks("@Model.Angels.InviteCode", teamLinks, teamIds);
         placeBeginButton();
     } else if (currentTeamId != null) {
-        placeTeamNameEditButtons([currentTeamId]);
+        const teamIds = [];
+        const teamNames = [];
+        @foreach (var team in Model.Teams)
+        {
+            @:teamIds.push("@team.Id");
+            @:teamNames.push("@team.Name");
+        }
+        
+        placeTeamNameEditButtons([currentTeamId], [currentTeamName]);
+        placeTeamNames(teamIds, teamNames);
+    }
+    
+    function placeTeamNames(teamIds, teamNames) {
+        for (let i = 0; i < teamIds.length; i++) {
+            let editBlock = document.getElementById(`edit-${teamIds[i]}`);
+            if (editBlock === null) {
+                editBlock = document.createElement("p");
+                editBlock.setAttribute("class", "fs-6");
+                editBlock.setAttribute("id", `edit-${teamIds[i]}`);
+                const headersBlock = document.getElementById(`headers-${teamIds[i]}`);
+                headersBlock.appendChild(editBlock);
+            } else {
+                const name = document.getElementById(`edit-name-${teamIds[i]}`);
+                if (name !== null) {
+                    name.remove();
+                }
+            }
+            const text = document.createElement("p");
+            text.setAttribute("id", `edit-name-${teamIds[i]}`)
+            text.innerText = teamNames[i];
+            editBlock.appendChild(text);
+        }
     }
     
     function isCurrentUserAdmin() {
@@ -177,37 +243,110 @@
         }
     }
     
-    function placeTeamNameEditButtons(teamIds) {
-    @*     for (let teamId of teamIds) { *@
-    @*         const image = document.createElement("img"); *@
-    @*         image.setAttribute("src", "images/edit_button.png"); *@
-    @*         image.setAttribute("alt", "edit"); *@
-    @*         image.setAttribute("width", "20"); *@
-    @*         image.setAttribute("height", "20"); *@
-    @*         image.setAttribute("id", `edit-button-${teamId}`); *@
-    @*         image.addEventListener("click", function () { *@
-    @*             const input = document.createElement("input"); *@
-    @*             input.setAttribute("id", `edit-input-${teamId}`); *@
-    @*             const button = document.createElement("button"); *@
-    @*             button.setAttribute("id", `edit-submit-${teamId}`); *@
-    @*             button.innerText = "save"; *@
-    @*             button.addEventListener("click", function () { *@
-    @*                 const teamName = input.value.toString(); *@
-    @*                 fetch("") *@
-    @*                     .then(r => { *@
-    @*                         input.remove(); *@
-    @*                         button.remove(); *@
-    @*                     }); *@
-    @*             }); *@
-    @*             const container = document.getElementById(`headers-${teamId}`); *@
-    @*             const editBlock = document.getElementById(`edit-${teamId}`); *@
-    @*             editBlock.remove(); *@
-    @*             container.appendChild(button); *@
-    @*             container.appendChild(input); *@
-    @*         }); *@
-    @*          *@
-    @*         const editBlock = document.getElementById(`edit-${teamId}`); *@
-    @*         editBlock.insertBefore(image, editBlock.firstChild); *@
-    @*     } *@
+    function placePlayersTeamCopyButton(teamId, inviteCode) {
+        function buildIcon(id) {
+            const image = document.createElement("img");
+            image.setAttribute("src", "images/copy_button.jpg");
+            image.setAttribute("alt", "edit");
+            image.setAttribute("width", "20");
+            image.setAttribute("height", "20");
+            image.setAttribute("id", `link-${id}`);
+            return image;
+        }
+
+        const teamIcon = buildIcon(inviteCode);
+        document.getElementById(`edit-${teamId}`).appendChild(teamIcon);
+        document.getElementById(`link-${inviteCode}`).addEventListener('click', e => {
+            const copyText = inviteCode;
+            navigator.clipboard.writeText(copyText)
+                .then(() => console.log(`Text copied: ${copyText}`))
+        });
     }
+    
+    function placeTeamNameEditButtons(teamIds, teamNames, inviteCodes) {
+        @* Command header container *@
+        @* <div class="commandEditorHeaders text-center" id="headers-@team.Id"> *@
+
+            @* Command name and link for copy *@
+        @* <p class="fs-6" id="edit-@team.Id"> *@
+        @*     $1$ <img src="images/edit_button.png" #1# *@
+        @*     $1$      alt="edit" #1# *@
+        @*     $1$      width="20" #1# *@
+        @*     $1$      height="20" #1# *@
+        @*     $1$      id="edit-button-@team.Id"> #1# *@
+        @*     @team.Name *@
+        @*     $1$ <img #1# *@
+        @*     $1$     src="images/copy_button.jpg" #1# *@
+        @*     $1$     alt="copy" #1# *@
+        @*     $1$     width="20" #1# *@
+        @*     $1$     height="20" #1# *@
+        @*     $1$     id="link-@team.Participants.InviteCode"> #1# *@
+        @* </p> *@
+        @* </div> *@
+    
+        for (let i = 0; i < teamIds.length; i++) {
+            const teamId = teamIds[i];
+            const teamName = teamNames[i];
+            let inviteCode = null;
+            if (inviteCodes !== undefined) {
+                inviteCode = inviteCodes[i];
+            }
+
+            const headersBlock = document.getElementById(`headers-${teamId}`);
+            
+            const editBlock = document.createElement("p");
+            editBlock.setAttribute("class", "fs-6");
+            editBlock.setAttribute("id", `edit-${teamId}`);
+            
+            const image = document.createElement("img");
+            image.setAttribute("src", "images/edit_button.png");
+            image.setAttribute("alt", "edit");
+            image.setAttribute("width", "20");
+            image.setAttribute("height", "20");
+            image.setAttribute("id", `edit-button-${teamId}`);
+            image.addEventListener("click", function () { replaceWithInput(teamId, inviteCode) });
+            
+            editBlock.appendChild(image);
+            headersBlock.appendChild(editBlock);
+        }
+        
+        function replaceWithInput(teamId, inviteCode){
+            const headersBlock = document.getElementById(`headers-${teamId}`);
+            headersBlock.innerHTML = '';
+
+            const input = document.createElement("input");
+            input.setAttribute("id", `edit-input-${teamId}`);
+            
+            const button = document.createElement("button");
+            button.setAttribute("id", `edit-submit-${teamId}`);
+            button.innerText = "save";
+            button.addEventListener("click", function () {
+                const teamName = input.value.toString();
+                if (teamName.length > 0) {
+                    fetch(`http://localhost:5046/session/update-team-name?sessionId=@Model.Id&teamId=${teamId}&name=${teamName}`)
+                        .then(r => {
+                            connection.invoke("UpdateName", "@Model.Id", teamId)
+                                .then(function () {
+                                    input.remove();
+                                    button.remove();
+                                    placeTeamNameEditButtons([teamId], [teamName], inviteCode === null ? [] : [inviteCode])
+                                    placeTeamNames([teamId], [teamName])
+                                    if (inviteCode !== null && inviteCode !== undefined) {
+                                        placePlayersTeamCopyButton(teamId, inviteCode)
+                                    }
+                                });
+                        });
+                }
+            });
+            
+            const editBlock = document.createElement("p");
+            editBlock.setAttribute("class", "fs-6");
+            editBlock.setAttribute("id", `edit-${teamId}`);
+            editBlock.appendChild(button);
+            editBlock.appendChild(input);
+            headersBlock.appendChild(editBlock)
+        }
+    }
+
+
 </script>

@@ -1,6 +1,9 @@
+using Core.Dtos;
 using Core.Helpers;
 using Core.Services.Contracts;
+using Domain.Game.Teams;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace WebApp.Controllers;
 
@@ -52,9 +55,16 @@ public class SessionController : Controller
 
 	[HttpGet]
 	[Route("get-current-team")]
-	public async Task<Guid?> GetCurrentTeam(Guid sessionId)
+	public async Task<TeamDto?> GetCurrentTeam(Guid sessionId)
 	{
 		return await gameSessionService.GetCurrentTeam(RequestContextFactory.Build(Request), sessionId);
+	}
+	
+	[HttpGet]
+	[Route("get-current-angels")]
+	public async Task<AngelsDto?> GetCurrentAngels(Guid sessionId)
+	{
+		return await gameSessionService.GetCurrentAngels(RequestContextFactory.Build(Request), sessionId);
 	}
 	
 	[HttpGet]
@@ -62,5 +72,12 @@ public class SessionController : Controller
 	public Guid GetTeamInviteId(string invite)
 	{
 		return gameSessionService.GetTeamInviteId(invite);
+	}
+	
+	[HttpGet]
+	[Route("update-team-name")]
+	public async Task UpdateTeamName(Guid sessionId, Guid teamId, string name)
+	{
+		await gameSessionService.UpdateTeamName(sessionId, teamId, name);
 	}
 }
