@@ -1,20 +1,20 @@
 ﻿.stepHeader {
     position: fixed;
-    
+
     left: 0;
     top: 0;
-    
+
     width: 100%;
     height: 50px;
-    
+
     border-bottom: 1px solid black;
 }
 
 .infoContainer {
     width: 800px;
-    
-    background-color: darkgrey;
-    
+
+    background-color: #E6E6E6;
+
     border-color: black;
     border-style: solid;
     border-width: 2px;
@@ -25,7 +25,6 @@
         width: 500px;
     }
 }
-
 @media (max-width: 600px) {
     .infoContainer {
         width: 400px;
@@ -42,35 +41,46 @@
 }
 
 .stepControlButtons {
-    position: fixed;
+    margin-top: 40px;
 
-    bottom: 100px;
-    
-    width: 150px;
+    width: 200px;
     height: 40px;
-    
+
     border-radius: 15px;
-    
-    background-color: black;
-    
+
+    background-color: #363636;
+
     color: white;
+}
+@media (max-width: 600px) {
+    .stepControlButtons {
+        width: 150px;
+    }
 }
 
 .leftButton {
-    left: 70px;
+    /*left: 70px;*/
+    margin-left: 70px;
+    margin-right: 130px;
 }
 @media (max-width: 900px) {
     .leftButton {
-        left: 30px;
+        /*left: 30px;*/
+        margin-left: 30px;
+        margin-right: 20px;
     }
 }
 
 .rightButton {
-    right: 50px;
+    /*right: 50px;*/
+    margin-right: 70px;
+    margin-left: 130px;
 }
 @media (max-width: 900px) {
     .rightButton {
-        right: 30px;
+        /*right: 30px;*/
+        margin-right: 30px;
+        margin-left: 20px;
     }
 }
 
@@ -87,4 +97,26 @@
 .height-small {
     min-height: 100px;
     height: fit-content;
+}
+
+.height-extra-small {
+    height: 50px;
+}
+
+.container-1 {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+
+    width: 805px;
+}
+@media (max-width: 900px) {
+    .container-1 {
+        width: 505px;
+    }
+}
+@media (max-width: 600px) {
+    .container-1 {
+        width: 405px;
+    }
 }

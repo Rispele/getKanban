@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="~/css/commandEditor.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/css/game.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/css/gameStepPages.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="~/css/checkboxPages.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="~/css/rolesEditorPages.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/WebApp.styles.css" asp-append-version="true"/>
 </head>
 <body>
@@ -25,11 +27,11 @@
 @*                     <li class="nav-item"> *@
 @*                         <a class="nav-link text-dark" asp-area="" asp-page="/Index">Index</a> *@
 @*                     </li> *@
-@*              *@
+@* *@
 @*                     <li class="nav-item"> *@
-@*                         <a class="nav-link text-dark" asp-area="" asp-page="/Home">Home</a> *@
+@*                         <a class="nav-link text-dark" asp-area="" asp-page="/FirstStepPage">Home</a> *@
 @*                     </li> *@
-@*              *@
+@*                      *@
 @*                     <li class="nav-item"> *@
 @*                         <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a> *@
 @*                     </li> *@
@@ -53,6 +55,7 @@
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 <script src="~/js/site.js" asp-append-version="true"></script>
+<script src="~/js/drag-and-drop.js" asp-append-version="true"></script>
 
 @await RenderSectionAsync("Scripts", required: false)
 </body>

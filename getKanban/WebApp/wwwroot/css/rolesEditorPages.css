@@ -1,0 +1,113 @@
+﻿.table-container {
+    width: 1240px;
+    height: auto;
+    overflow: hidden;
+    border: none;
+}
+
+table {
+    width: 1240px;
+    min-height: 500px;
+    height: fit-content;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+thead th {
+    background-color: white;
+    text-align: center;
+    border-bottom: 1px solid black;
+    font-weight: bold;
+}
+
+td, th {
+    border-right: 1px solid black;
+}
+
+td:last-child, th:last-child {
+    border-right: none;
+}
+
+tbody td {
+    background-color: white;
+    text-align: center;
+    vertical-align: top;
+}
+
+.dropzone {
+    width: 410px;
+    min-height: 400px;
+    height: fit-content;
+    padding: 10px;
+    background-color: white;
+}
+
+/* Убираем внешние рамки таблицы */
+table tr:first-child th:first-child {
+    border-left: none;
+}
+
+table tr:last-child td:first-child {
+    border-left: none;
+}
+
+
+.draggable {
+    width: 350px;
+    height: 80px;
+    background-color: #E6E6E6;
+    border-radius: 20px;
+    border-style: solid;
+    border-color: black;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-left: 45px;
+    position: relative;
+    cursor: grab;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 10px 30px;
+}
+
+.draggable:active {
+    cursor: grabbing;
+}
+
+.textContainer {
+    width: 200px;
+    height: fit-content;
+}
+
+.text {
+    width:fit-content;
+
+    margin-bottom: 5px;
+}
+
+.lines {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.line {
+    margin-bottom: 5px;
+    background-color: #000;
+}
+
+.full {
+    height: 2px;
+    width: 100%;
+}
+
+.half {
+    height: 2px;
+    right: 0;
+    width: 50%;
+}
+
+.dragging {
+    opacity: 1;
+}
+
+

@@ -13,7 +13,8 @@
     function redirect(endpoint) {
         const userName = document.getElementsByClassName("authorizationCommandName")[0].value.toString();
         if (userName.length === 0) {
-            return
+            alert("Введите своё имя");
+            return;
         }
         fetch(`http://localhost:5046/add-username?name=${userName}`)
             .then(r => {

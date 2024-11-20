@@ -1,0 +1,85 @@
+﻿.container1 {
+    width: 950px;
+    min-height: 450px;
+    height: fit-content;
+
+    margin: 50px auto;
+
+    background-color: #fff;
+    padding: 20px;
+
+    /*box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);*/
+    /*border-radius: 10px;*/
+}
+
+.title {
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.divider {
+    width: 100%;
+    height: 1px;
+    background-color: black;
+    border: none;
+    margin-bottom: 20px;
+}
+
+.container2 {
+    width: 900px;
+    min-height: 300px;
+    height: fit-content;
+
+    margin: 0 auto;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.checkboxCardContainer {
+    width: 215px;
+    height: 100px;
+    background-color: #E6E6E6;
+    border-radius: 20px;
+    border-style: solid;
+    border-color: black;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-left: 20px;
+    position: relative;
+    cursor: grab;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 10px 5px;
+}
+
+.checkboxCardContent {
+    width: 55px;
+    min-height: 50px;
+    height: fit-content;
+}
+
+.checkboxCardInput {
+    width: 30px;
+    height: 30px;
+
+    display: none;
+
+    position: absolute;
+
+    top: 10px;
+    right: 10px;
+}
+
+.checkboxCardInput:checked ~ .checkboxCardContainer{
+    background-color: #CDFFCA;
+}
+
+.checkboxCardNumber {
+    width:fit-content;
+
+    margin-bottom: 5px;
+}
