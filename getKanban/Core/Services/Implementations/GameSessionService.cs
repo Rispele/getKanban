@@ -80,7 +80,8 @@ public class GameSessionService : IGameSessionService
 		var sessionDto = GameSessionDtoConverter.For(participantRole).Convert(session);
 
 		var participantAdded = teamId.Equals(Guid.Empty) && participantRole == ParticipantRole.Angel
-			? sessionDto.Angels.Users.Single(x => x.Id == user.Id)
+			? sessionDto.Angels.Participants.Users
+				.Single(x => x.Id == user.Id)
 			: sessionDto.Teams
 				.Single(t => t.Id == teamId)
 				.Participants.Users
@@ -109,25 +110,18 @@ public class GameSessionService : IGameSessionService
 		var session = await context.GetGameSessionsAsync(gameSessionId);
 		var user = await context.GetUserAsync(requestContext.GetUserId());
 		
+		var angels =
+			session.Angels.Participants.SingleOrDefault(x => x.User.Id == user.Id) is null
+				? null
+				: session.Angels;
 		var team = session.Teams
 			.SingleOrDefault(
 				x => x.Players.Participants
 					.SingleOrDefault(p => p.User.Id == user.Id) is not null);
 		
-		return TeamDtoConverter.For(ParticipantRole.Player).Convert(team);
-	}
-	
-	public async Task<AngelsDto?> GetCurrentAngels(RequestContext requestContext, Guid gameSessionId)
-	{
-		var session = await context.GetGameSessionsAsync(gameSessionId);
-		var user = await context.GetUserAsync(requestContext.GetUserId());
-
-		var angels =
-			session.Angels.Participants.SingleOrDefault(x => x.User.Id == user.Id) is null
-				? null
-				: session.Angels;
-		
-		return AngelsDtoConverter.For(ParticipantRole.Creator).Convert(angels);
+		return angels is not null
+			? TeamDtoConverter.For(ParticipantRole.Creator).ConvertAngels(angels)
+			: TeamDtoConverter.For(ParticipantRole.Player).Convert(team);
 	}
 
 	public Guid GetTeamInviteId(string inviteCode)

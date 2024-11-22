@@ -1,4 +1,6 @@
-﻿namespace Core.Dtos;
+﻿using Domain.Game;
+
+namespace Core.Dtos;
 
 public class GameSessionDto
 {
@@ -6,7 +8,9 @@ public class GameSessionDto
 	
 	public string Name { get; init; }
 
-	public ParticipantsDto Angels { get; init; } = null!;
+	public TeamDto Angels { get; init; } = null!;
 
 	public IReadOnlyList<TeamDto> Teams { get; init; } = null!;
+
+	public ParticipantRole RequesterRole { get; init; }
 }

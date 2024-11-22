@@ -1,0 +1,31 @@
+﻿<div class="stepHeader">
+    <h1 class="fs-1 fw- text-center">Команда pipipupu. День 9</h1>
+</div>
+
+<div class="infoContainer height-large centered-100">
+    <h1 class="fs-4 text-center">
+        Проверка
+    </h1>
+    
+    <div class="info height-small centered-100">
+        <p class="fs-5 fw-normal">Проверьте, что ограничения WIP не превышены.</p>
+        <p class="fs-5 fw-normal">При необходимости, внесите коррективы в работу.</p>
+    </div>
+</div>
+
+<button class="stepControlButtons rightButton" id="prev">
+    Назад
+</button>
+
+<button class="stepControlButtons rightButton" id="next">
+    Далее
+</button>
+
+<script>
+    document.getElementById("prev").addEventListener('click', function () {
+        window.location.href = `http://localhost:5046/step/2`
+    });
+    document.getElementById("next").addEventListener('click', function () {
+        window.location.href = `http://localhost:5046/step/4`
+    });
+</script>

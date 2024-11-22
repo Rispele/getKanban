@@ -21,8 +21,9 @@ public class GameSessionDtoConverter
 		{
 			Id = gameSession.Id,
 			Name = gameSession.Name,
-			Angels = Convert(gameSession.Angels),
-			Teams = gameSession.Teams.Select(Convert).ToArray()
+			Angels = ConvertAngels(gameSession.Angels),
+			Teams = gameSession.Teams.Select(Convert).ToArray(),
+			RequesterRole = requesterRole
 		};
 	}
 
@@ -33,6 +34,16 @@ public class GameSessionDtoConverter
 			Id = team.Id,
 			Name = team.Name,
 			Participants = Convert(team.Players)
+		};
+	}
+
+	private TeamDto ConvertAngels(ParticipantsContainer angels)
+	{
+		return new TeamDto
+		{
+			Id = angels.PublicId,
+			Name = "Ангелы",
+			Participants = Convert(angels)
 		};
 	}
 

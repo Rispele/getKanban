@@ -10,7 +10,7 @@
                     hubConnection.invoke("Create", sessionName, teamsCount);
                     hubConnection.on("Created", async function (dto) {
                         const sessionId = (await JSON.parse(dto))["Id"];
-                        const inviteCode = (await JSON.parse(dto))["Angels"]["InviteCode"].toString();
+                        const inviteCode = (await JSON.parse(dto))["Angels"]["Participants"]["InviteCode"].toString();
                         if (sessionId != null) {
                             window.location.href = `http://localhost:5046/session?invite=${inviteCode}`;
                         }

@@ -1,0 +1,31 @@
+﻿<div class="stepHeader">
+    <h1 class="fs-1 fw- text-center">Команда pipipupu. День 9</h1>
+</div>
+
+<div class="infoContainer height-large centered-100">
+    <h1 class="fs-4 text-center">
+        Релиз
+    </h1>
+    
+    <div class="info height-small centered-100">
+        <p class="fs-5 fw-normal">Передвиньте тикеты из "Готово к поставке" в "Поставлено".</p>
+        <p class="fs-5 fw-normal">Для этих тикетов обновите поле "День поставки".</p>
+    </div>
+</div>
+
+<button class="stepControlButtons rightButton" id="prev">
+    Назад
+</button>
+
+<button class="stepControlButtons rightButton" id="next">
+    Далее
+</button>
+
+<script>
+    document.getElementById("prev").addEventListener('click', function () {
+        window.location.href = `http://localhost:5046/step/3`
+    });
+    document.getElementById("next").addEventListener('click', function () {
+        window.location.href = `http://localhost:5046/step/4/1`
+    });
+</script>

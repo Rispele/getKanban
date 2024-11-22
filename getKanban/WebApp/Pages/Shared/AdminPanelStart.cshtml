@@ -1,0 +1,22 @@
+﻿@* @model List<Domain.Game.Teams.Team> *@
+@* *@
+@* <script> *@
+@*     @foreach (var team in Model) *@
+@*     { *@
+@*         <text> *@
+@*             document.getElementById("@team.Id").addEventListener('click', function () { *@
+@*                 window.location.href = `http://localhost:5046/admin/days?teamId=${@team.Id}`; *@
+@*             }); *@
+@*         </text> *@
+@*     } *@
+@* </script> *@
+@* *@
+@* <div> *@
+@*     <p>getKanban: "@Model.SessionName"</p> *@
+@*     <p>Выберите команду, которой нужна помощь</p> *@
+@*      *@
+@*     @foreach (var team in Model) *@
+@*     { *@
+@*         <p id="@team.Id">@team.Name</p> *@
+@*     } *@
+@* </div> *@

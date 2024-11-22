@@ -1,0 +1,32 @@
+﻿@* @model List<Domain.Game.Days.Day> *@
+@* *@
+@* <script> *@
+@*      *@
+@* </script> *@
+@* *@
+@* <div> *@
+@*     <p>Команда: @Model.TeamName</p> *@
+@*     <img src="images/edit_button.png"> *@
+@*      *@
+@*     @foreach (var day in Model) *@
+@*     { *@
+@*         @if (day.Status == DayStatus.Finished) *@
+@*         { *@
+@*             <p class="finished">День @day.Number</p> *@
+@*         } *@
+@* *@
+@*         @if (day.Status == DayStatus.InProcess) *@
+@*         { *@
+@*             <img src="images/restart.jpg"> *@
+@*             <p class="inProcess">День @day.Number</p> *@
+@*             <img src="images/edit.jpg"> *@
+@*         } *@
+@* *@
+@*         @if (day.Status == DayStatus.NotStartedYet) *@
+@*         { *@
+@*             <p class="notStartedYet">День @day.Number</p> *@
+@*         } *@
+@*     } *@
+@*      *@
+@*     <button class="back-button">Назад</button> *@
+@* </div> *@

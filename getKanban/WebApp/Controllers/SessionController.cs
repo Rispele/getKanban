@@ -61,13 +61,6 @@ public class SessionController : Controller
 	}
 	
 	[HttpGet]
-	[Route("get-current-angels")]
-	public async Task<AngelsDto?> GetCurrentAngels(Guid sessionId)
-	{
-		return await gameSessionService.GetCurrentAngels(RequestContextFactory.Build(Request), sessionId);
-	}
-	
-	[HttpGet]
 	[Route("get-team-invite")]
 	public Guid GetTeamInviteId(string invite)
 	{

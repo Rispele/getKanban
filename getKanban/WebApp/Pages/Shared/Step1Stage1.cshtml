@@ -1,0 +1,35 @@
+﻿@* @page *@
+@* @model Step1_1PageTemplate *@
+@* *@
+@* @{ *@
+@*     ViewData["Title"] = "Step1.1"; *@
+@* } *@
+
+<div class="stepHeader">
+    <h1 class="fs-1 fw-bold text-center">Команда pipipupu. День 9</h1>
+</div>
+
+<div class="container-1 height-small centered-100">
+    <div class="infoContainer height-small">
+        <div class="info centered-50">
+            <p class="fs-5 fw-normal">Хотите изменить распределение членов команды по функциям?</p>
+        </div>
+    </div>
+
+    <button class="stepControlButtons position-relative leftButton" id="roll">
+        <p class="fs-6">Нет, бросить кубик</p>
+    </button>
+
+    <button class="stepControlButtons position-relative rightButton" id="change">
+        <p class="fs-6">Изменить</p>
+    </button>
+</div>
+
+<script>
+    document.getElementById("roll").addEventListener('click', function () {
+        window.location.href = "http://localhost:5046/step/2"
+    });
+    document.getElementById("change").addEventListener('click', function () {
+        window.location.href = "http://localhost:5046/step/1/2"
+    });
+</script>

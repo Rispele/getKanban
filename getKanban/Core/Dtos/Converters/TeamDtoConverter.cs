@@ -25,6 +25,16 @@ public class TeamDtoConverter
 		};
 	}
 
+	public TeamDto? ConvertAngels(ParticipantsContainer? angels)
+	{
+		return angels is null ? null : new TeamDto
+		{
+			Id = angels.PublicId,
+			Name = "Ангелы",
+			Participants = Convert(angels)
+		};
+	}
+
 	private ParticipantsDto Convert(ParticipantsContainer participantsContainer)
 	{
 		return new ParticipantsDto

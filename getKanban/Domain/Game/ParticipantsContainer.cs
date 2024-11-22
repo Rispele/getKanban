@@ -13,8 +13,7 @@ public class ParticipantsContainer
 	private readonly List<Participant> participants = null!;
 
 	public long Id { get; }
-
-	[NotMapped]
+	
 	public Guid PublicId { get; private set; }
 
 	public string InviteCode { get; } = null!;

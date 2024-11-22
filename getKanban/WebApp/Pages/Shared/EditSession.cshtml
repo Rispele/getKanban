@@ -1,4 +1,5 @@
-﻿@model Core.Dtos.GameSessionDto
+﻿@using Domain.Game
+@model Core.Dtos.GameSessionDto
 
 @* Header *@
 <div class="commandEditorHeader text-center">
@@ -17,27 +18,10 @@
             <div class="commandEditorCommandContainer commandEditorBorderRadius">
 
                 @* Command header container *@
-                <div class="commandEditorHeaders text-center" id="headers-@team.Id">
-
-                    @* Command name and link for copy *@
-                    @* <p class="fs-6" id="edit-@team.Id"> *@
-                    @*     $1$ <img src="images/edit_button.png" #1# *@
-                    @*     $1$      alt="edit" #1# *@
-                    @*     $1$      width="20" #1# *@
-                    @*     $1$      height="20" #1# *@
-                    @*     $1$      id="edit-button-@team.Id"> #1# *@
-                    @*     @team.Name *@
-                    @*     $1$ <img #1# *@
-                    @*     $1$     src="images/copy_button.jpg" #1# *@
-                    @*     $1$     alt="copy" #1# *@
-                    @*     $1$     width="20" #1# *@
-                    @*     $1$     height="20" #1# *@
-                    @*     $1$     id="link-@team.Participants.InviteCode"> #1# *@
-                    @* </p> *@
-                </div>
+                <div class="commandEditorHeaders text-center" id="headers-@team.Id"></div>
 
                 @* Players in command *@
-                <div class="commandEditorNamesContainer text-center" id=@team.Id>
+                <div class="commandEditorNamesContainer text-center" id="@team.Id">
                     @foreach (var player in team.Participants.Users)
                     {
                         <p class="fs-6" id="@player.Id">@player.Name</p>
@@ -51,22 +35,11 @@
     <div class="commandEditorSWindow commandEditorWindowsHeight commandEditorBorderStyle commandEditorBorderWidth commandEditorBorderRadius">
 
         @* Angels header container *@
-        <div class="commandEditorHeaders text-center">
-            @* Name and link for copy *@
-            <p class="fs-6" id="edit-angels">
-                Ангелы
-                @* <img *@
-                @*     src="images/copy_button.jpg" *@
-                @*     alt="copy" *@
-                @*     width="20" *@
-                @*     height="20" *@
-                @*     id="link-@Model.Angels.InviteCode"> *@
-            </p>
-        </div>
+        <div class="commandEditorHeaders text-center" id="headers-@Model.Angels.Id"></div>
 
         @* Angels Name *@
-        <div class="commandEditorNamesContainer angelsEditor text-center">
-            @foreach (var player in Model.Angels.Users)
+        <div class="commandEditorNamesContainer angelsEditor text-center" id="@Model.Angels.Id">
+            @foreach (var player in Model.Angels.Participants.Users)
             {
                 <p class="fs-6" id="@player.Id">@player.Name</p>
             }
@@ -74,11 +47,12 @@
     </div>
 </div>
 
-@* $1$ Start game button #1# *@
-@* <form class="text-center"> *@
-@*     $1$ asp-area="" asp-page="/Shared/JoinTeamSession" #1# *@
-@*     <button class="commandEditorButtonsTemplate authorizationButton">Начать игру</button> *@
-@* </form> *@
+@if ((Model.RequesterRole & ParticipantRole.Creator) == ParticipantRole.Creator)
+{
+    <form class="text-center">
+        <button class="commandEditorButtonsTemplate authorizationButton" type="button" onclick="startGame()">Начать игру</button>
+    </form>
+}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
 <script>
@@ -92,231 +66,79 @@
         team.appendChild(playerElement);
         playerElement.textContent = userName.toString();
     });
+    
+    function startGame() {window.location.href = `http://localhost:5046/step/1`}
 </script>
 
 <script type="module" async="async">
     connection.on("NotifyRenamed", function (teamId, teamName) {
-        placeTeamNames([teamId], [teamName])
+        refreshTeamsHeaders(teamId, teamName)
     });
     
-    let currentTeamId = null
-    let currentTeamName = null
-    let currentTeamLink = null
-    
-    await fetchTeam();
-    await fetchAngels();
-    
-    async function fetchTeam() {
-        await fetch("http://localhost:5046/session/get-current-team?sessionId=@Model.Id")
-            .then(r => r.text())
-            .then(data => {
-                if (data.length > 0) {
-                    const jsonData = JSON.parse(data);
-                    currentTeamId = jsonData["Id"];
-                    currentTeamName = jsonData["Name"];
-                    currentTeamLink = jsonData["Players"]["InviteCode"];
-                }
-            });
-    }
-    
-    async function fetchAngels() {
-        await fetch("http://localhost:5046/session/get-current-angels?sessionId=@Model.Id")
-            .then(r => r.text())
-            .then(data => {
-                if (data.length > 0) {
-                    const jsonData = JSON.parse(data);
-                    currentTeamId = jsonData["id"];
-                    currentTeamName = "Ангелы";
-                    currentTeamLink = jsonData["participants"]["inviteCode"];
-                }
-            });
-    }
-    
-    if (isCurrentUserAdmin()) {
-        const teamId = fetch(`http://localhost:5046/session/get-team-invite?invite=@Model.Angels.InviteCode`)
-            .then(r => {
-                return r.toString();
-            });
-        document.getElementsByClassName("angelsEditor")[0].setAttribute("id", teamId);
-    
-        const teamLinks = [];
-        const teamIds = [];
-        const teamNames = [];
-        @foreach (var team in Model.Teams)
-        {
-            @:teamLinks.push("@team.Participants.InviteCode");
-            @:teamIds.push("@team.Id");
-            @:teamNames.push("@team.Name");
-        }
-        
-        placeTeamNameEditButtons(teamIds, teamNames, teamLinks);
-        placeTeamNames(teamIds, teamNames);
-        placeAdminTeamLinks("@Model.Angels.InviteCode", teamLinks, teamIds);
-        placeBeginButton();
-    } else if (currentTeamId != null) {
-        const teamIds = [];
-        const teamNames = [];
-        @foreach (var team in Model.Teams)
-        {
-            @:teamIds.push("@team.Id");
-            @:teamNames.push("@team.Name");
-        }
-        
-        placeTeamNameEditButtons([currentTeamId], [currentTeamName]);
-        placeTeamNames(teamIds, teamNames);
-    }
-    
-    function placeTeamNames(teamIds, teamNames) {
-        for (let i = 0; i < teamIds.length; i++) {
-            let editBlock = document.getElementById(`edit-${teamIds[i]}`);
-            if (editBlock === null) {
-                editBlock = document.createElement("p");
-                editBlock.setAttribute("class", "fs-6");
-                editBlock.setAttribute("id", `edit-${teamIds[i]}`);
-                const headersBlock = document.getElementById(`headers-${teamIds[i]}`);
-                headersBlock.appendChild(editBlock);
+    const currentTeamJson = await fetch("http://localhost:5046/session/get-current-team?sessionId=@Model.Id")
+        .then(r => r.text())
+        .then(data => {
+            if (data.length > 0) {
+                return JSON.parse(data);
             } else {
-                const name = document.getElementById(`edit-name-${teamIds[i]}`);
-                if (name !== null) {
-                    name.remove();
-                }
             }
-            const text = document.createElement("p");
-            text.setAttribute("id", `edit-name-${teamIds[i]}`)
-            text.innerText = teamNames[i];
-            editBlock.appendChild(text);
-        }
-    }
-    
-    function isCurrentUserAdmin() {
-        return @((Model.Angels.InviteCode != null).ToString().ToLower()) &&
-            @(Model.Teams.All(x => x.Participants.InviteCode != null).ToString().ToLower())
-    }
-    
-    function placeBeginButton() {
-        const form = document.createElement("form");
-        form.setAttribute("class", "text-center");
-        const button = document.createElement("button");
-        button.setAttribute("class", "commandEditorButtonsTemplate authorizationButton");
-        button.innerText = "Начать игру";
-        const container = document.getElementsByClassName("commandEditorContainer")[0];
-        form.appendChild(button);
-        container.after(form);
-    }
-    
-    function placeAdminTeamLinks(angelsInviteLink, teamInviteLinks, teamIds) {
-        const angelsIcon = buildIcon(angelsInviteLink);
-        document.getElementById("edit-angels").appendChild(angelsIcon);
-        for (let i = 0; i < teamInviteLinks.length; i++) {
-            const teamIcon = buildIcon(teamInviteLinks[i]);
-            document.getElementById(`edit-${teamIds[i]}`).appendChild(teamIcon);
-        }
-        
-        function buildIcon(id) {
-            const image = document.createElement("img");
-            image.setAttribute("src", "images/copy_button.jpg");
-            image.setAttribute("alt", "edit");
-            image.setAttribute("width", "20");
-            image.setAttribute("height", "20");
-            image.setAttribute("id", `link-${id}`);
-            return image;
-        }
-        
-        document.getElementById("link-@Model.Angels.InviteCode").addEventListener('click', e => {
-            const copyText = "@Model.Angels.InviteCode";
-            navigator.clipboard.writeText(copyText)
-                .then(() => console.log(`Text copied: ${copyText}`))
         });
-        let inviteCodes = [];
-        @foreach (var dto in Model.Teams)
-        {
-            @:inviteCodes.push("@dto.Participants.InviteCode");
-        }
-        if (inviteCodes.length > 0) {
-            for(let inviteCode of inviteCodes) {
-                document.getElementById(`link-${inviteCode}`).addEventListener('click', e => {
-                    const copyText = inviteCode;
-                    navigator.clipboard.writeText(copyText)
-                        .then(() => console.log(`Text copied: ${copyText}`))
-                });
-            }
-        }
+
+    let currentTeamId = currentTeamJson["id"];
+    let currentTeamName = currentTeamJson["name"];
+    let currentTeamLink = currentTeamJson["participants"]["inviteCode"];
+
+    const teamLinks = [];
+    const teamIds = [];
+    const teamNames = [];
+    @foreach (var team in Model.Teams)
+    {
+        @:teamLinks.push("@team.Participants.InviteCode");
+        @:teamIds.push("@team.Id");
+        @:teamNames.push("@Html.Raw(team.Name)");
     }
+    teamLinks.push("@Model.Angels.Participants.InviteCode");
+    teamIds.push("@Model.Angels.Id");
+    teamNames.push("@Html.Raw(Model.Angels.Name)");
     
-    function placePlayersTeamCopyButton(teamId, inviteCode) {
-        function buildIcon(id) {
-            const image = document.createElement("img");
-            image.setAttribute("src", "images/copy_button.jpg");
-            image.setAttribute("alt", "edit");
-            image.setAttribute("width", "20");
-            image.setAttribute("height", "20");
-            image.setAttribute("id", `link-${id}`);
-            return image;
+    refreshTeamsHeaders();
+    
+    function refreshTeamsHeaders(renameTeamId = null, renameTeamName = null) {
+        if (renameTeamId !== null) {
+            teamNames[teamIds.indexOf(renameTeamId)] = renameTeamName;
         }
-
-        const teamIcon = buildIcon(inviteCode);
-        document.getElementById(`edit-${teamId}`).appendChild(teamIcon);
-        document.getElementById(`link-${inviteCode}`).addEventListener('click', e => {
-            const copyText = inviteCode;
-            navigator.clipboard.writeText(copyText)
-                .then(() => console.log(`Text copied: ${copyText}`))
-        });
-    }
-    
-    function placeTeamNameEditButtons(teamIds, teamNames, inviteCodes) {
-        @* Command header container *@
-        @* <div class="commandEditorHeaders text-center" id="headers-@team.Id"> *@
-
-            @* Command name and link for copy *@
-        @* <p class="fs-6" id="edit-@team.Id"> *@
-        @*     $1$ <img src="images/edit_button.png" #1# *@
-        @*     $1$      alt="edit" #1# *@
-        @*     $1$      width="20" #1# *@
-        @*     $1$      height="20" #1# *@
-        @*     $1$      id="edit-button-@team.Id"> #1# *@
-        @*     @team.Name *@
-        @*     $1$ <img #1# *@
-        @*     $1$     src="images/copy_button.jpg" #1# *@
-        @*     $1$     alt="copy" #1# *@
-        @*     $1$     width="20" #1# *@
-        @*     $1$     height="20" #1# *@
-        @*     $1$     id="link-@team.Participants.InviteCode"> #1# *@
-        @* </p> *@
-        @* </div> *@
-    
-        for (let i = 0; i < teamIds.length; i++) {
-            const teamId = teamIds[i];
-            const teamName = teamNames[i];
-            let inviteCode = null;
-            if (inviteCodes !== undefined) {
-                inviteCode = inviteCodes[i];
-            }
-
-            const headersBlock = document.getElementById(`headers-${teamId}`);
-            
-            const editBlock = document.createElement("p");
-            editBlock.setAttribute("class", "fs-6");
-            editBlock.setAttribute("id", `edit-${teamId}`);
-            
-            const image = document.createElement("img");
-            image.setAttribute("src", "images/edit_button.png");
-            image.setAttribute("alt", "edit");
-            image.setAttribute("width", "20");
-            image.setAttribute("height", "20");
-            image.setAttribute("id", `edit-button-${teamId}`);
-            image.addEventListener("click", function () { replaceWithInput(teamId, inviteCode) });
-            
-            editBlock.appendChild(image);
-            headersBlock.appendChild(editBlock);
-        }
+        const isCurrentUserAdmin = @(((Model.RequesterRole & ParticipantRole.Creator) == ParticipantRole.Creator).ToString().ToLower());
         
-        function replaceWithInput(teamId, inviteCode){
+        if (isCurrentUserAdmin) {
+            for (let i = 0; i < teamIds.length; i++) {
+                recreateEditBlock(teamIds[i]);
+            }
+            placeTeamNameEditButtons(teamIds);
+            placeTeamNames(teamIds, teamNames);
+            placeTeamLinks(teamIds, teamLinks);
+        } else if (currentTeamId !== null) {
+            for (let i = 0; i < teamIds.length; i++) {
+                recreateEditBlock(teamIds[i]);
+            }
+            placeTeamNameEditButtons([currentTeamId]);
+            placeTeamNames(teamIds, teamNames);
+        }
+    }
+
+    function placeTeamNameEditButtons(teamIds) {
+        for (let teamId of teamIds) {
+            const icon = buildIcon(`edit-button-${teamId}`, "images/edit_button.png");
+            icon.addEventListener("click", function () { replaceWithInput(teamId) });
+            getOrCreateEditBlock(teamId).appendChild(icon);
+        }
+
+        function replaceWithInput(teamId){
             const headersBlock = document.getElementById(`headers-${teamId}`);
             headersBlock.innerHTML = '';
 
             const input = document.createElement("input");
             input.setAttribute("id", `edit-input-${teamId}`);
-            
+
             const button = document.createElement("button");
             button.setAttribute("id", `edit-submit-${teamId}`);
             button.innerText = "save";
@@ -324,29 +146,65 @@
                 const teamName = input.value.toString();
                 if (teamName.length > 0) {
                     fetch(`http://localhost:5046/session/update-team-name?sessionId=@Model.Id&teamId=${teamId}&name=${teamName}`)
-                        .then(r => {
+                        .then(function () {
                             connection.invoke("UpdateName", "@Model.Id", teamId)
                                 .then(function () {
-                                    input.remove();
-                                    button.remove();
-                                    placeTeamNameEditButtons([teamId], [teamName], inviteCode === null ? [] : [inviteCode])
-                                    placeTeamNames([teamId], [teamName])
-                                    if (inviteCode !== null && inviteCode !== undefined) {
-                                        placePlayersTeamCopyButton(teamId, inviteCode)
-                                    }
+                                    refreshTeamsHeaders(teamId, teamName);
                                 });
                         });
                 }
             });
-            
-            const editBlock = document.createElement("p");
-            editBlock.setAttribute("class", "fs-6");
-            editBlock.setAttribute("id", `edit-${teamId}`);
+
+            const editBlock = getOrCreateEditBlock(teamId)
             editBlock.appendChild(button);
             editBlock.appendChild(input);
-            headersBlock.appendChild(editBlock)
+        }
+    }
+    
+    function placeTeamNames(teamIds, teamNames) {
+        for (let i = 0; i < teamIds.length; i++) {
+            const text = document.createElement("p");
+            text.setAttribute("id", `edit-name-${teamIds[i]}`)
+            text.innerText = teamNames[i];
+            getOrCreateEditBlock(teamIds[i]).appendChild(text);
+        }
+    }
+    
+    function placeTeamLinks(teamIds, teamInviteLinks) {
+        for (let i = 0; i < teamIds.length; i++) {
+            const teamIcon = buildIcon(`link-${teamInviteLinks[i]}`, "images/copy_button.jpg");
+            teamIcon.addEventListener('click', function () {
+                navigator.clipboard.writeText(teamInviteLinks[i])
+                    .then(() => console.log(`Text copied: ${teamInviteLinks[i]}`))
+            });
+            getOrCreateEditBlock(teamIds[i]).appendChild(teamIcon);
         }
     }
 
-
+    function buildIcon(iconId, imgPath) {
+        const image = document.createElement("img");
+        image.setAttribute("src", imgPath);
+        image.setAttribute("alt", "edit");
+        image.setAttribute("width", "20");
+        image.setAttribute("height", "20");
+        image.setAttribute("id", iconId);
+        return image;
+    }
+    
+    function recreateEditBlock(teamId) {
+        let editBlock = document.getElementById(`edit-${teamId}`);
+        if (editBlock !== null && editBlock !== undefined) {
+            editBlock.remove();
+        }
+        editBlock = document.createElement("p");
+        editBlock.setAttribute("class", "fs-6");
+        editBlock.setAttribute("id", `edit-${teamId}`);
+        document.getElementById(`headers-${teamId}`).appendChild(editBlock);
+        return editBlock;
+    }
+    
+    function getOrCreateEditBlock(teamId) {
+        let editBlock = document.getElementById(`edit-${teamId}`);
+        return editBlock !== null && editBlock !== undefined ? editBlock : recreateEditBlock(teamId);
+    }
 </script>
