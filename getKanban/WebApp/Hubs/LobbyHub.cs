@@ -1,4 +1,3 @@
-using Core.Helpers;
 using Core.Services.Contracts;
 using Domain.Serializers;
 using Microsoft.AspNetCore.SignalR;
@@ -16,20 +15,41 @@ public class LobbyHub : Hub
 	
 	public override async Task OnConnectedAsync()
 	{
+		var requestContext = RequestContextFactory.Build(Context);
+		var currentUser = await gameSessionService.GetCurrentUser(requestContext);
+		var connection = await gameSessionService.GetCurrentConnection(currentUser.Id);
+		if (connection is null)
+		{
+			return;
+		}
+		if (connection.HubConnectionId != Context.ConnectionId)
+		{
+			await gameSessionService.SaveCurrentConnection(currentUser.Id, connection.LobbyId, Context.ConnectionId);
+			await RemoveCurrentConnectionFromLobbyGroupAsync(connection.LobbyId);
+			await AddCurrentConnectionToLobbyGroupAsync(connection.LobbyId);
+		}
+		
 		Console.WriteLine("Connected " + Context.ConnectionId);
 		await base.OnConnectedAsync();
 	}
 	
 	public override async Task OnDisconnectedAsync(Exception? exception)
 	{
-		Console.WriteLine("Disconnected " + Context.ConnectionId);
-		await base.OnDisconnectedAsync(exception);
+		var requestContext = RequestContextFactory.Build(Context);
+		var currentUser = await gameSessionService.GetCurrentUser(requestContext);
+		var connection = await gameSessionService.GetCurrentConnection(currentUser.Id);
+		if (connection is not null)
+		{
+			await RemoveCurrentConnectionFromLobbyGroupAsync(connection.LobbyId);
+		
+			Console.WriteLine("Disconnected " + Context.ConnectionId);
+			await base.OnDisconnectedAsync(exception);
+		}
 	}
 	
 	public async Task Create(string sessionName, long teamsCount)
 	{
 		var requestContext = RequestContextFactory.Build(Context);
-
 		var session = await gameSessionService.CreateGameSession(requestContext, sessionName, teamsCount);
 
 		Console.WriteLine($"{GetGroupId(session.Id)} created");
@@ -86,7 +106,19 @@ public class LobbyHub : Hub
 
 	private async Task AddCurrentConnectionToLobbyGroupAsync(string groupId)
 	{
+		var requestContext = RequestContextFactory.Build(Context);
+		var currentUser = await gameSessionService.GetCurrentUser(requestContext);
+		await gameSessionService.SaveCurrentConnection(currentUser.Id, groupId, Context.ConnectionId);
+		
 		await Groups.AddToGroupAsync(Context.ConnectionId, groupId);
+	}
+
+	private async Task RemoveCurrentConnectionFromLobbyGroupAsync(string groupId)
+	{
+		var requestContext = RequestContextFactory.Build(Context);
+		var currentUser = await gameSessionService.GetCurrentUser(requestContext);
+		
+		await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupId);
 	}
 
 	private static string GetGroupId(Guid gameSessionId)

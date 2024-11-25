@@ -1,10 +1,7 @@
 using Core.DbContexts;
-using Core.Dtos;
 using Core.Helpers;
-using Core.Services;
 using Core.Services.Contracts;
 using Core.Services.Implementations;
-using Domain.Game;
 using WebApp.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +16,7 @@ builder.Services.AddSignalR();
 
 builder.Services.AddScoped<InviteCodeHelper>();
 builder.Services.AddScoped<DomainContext>();
+builder.Services.AddScoped<ConnectionsContext>();
 builder.Services.AddScoped<IGameSessionService, GameSessionService>();
 builder.Services.AddScoped<IUserService, UserService>();
 

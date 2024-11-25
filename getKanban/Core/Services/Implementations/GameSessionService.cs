@@ -2,22 +2,28 @@
 using Core.DbContexts.Extensions;
 using Core.Dtos;
 using Core.Dtos.Converters;
+using Core.Entities;
 using Core.Helpers;
 using Core.RequestContexts;
 using Core.Services.Contracts;
 using Domain.Game;
-using Domain.Game.Teams;
+using Microsoft.EntityFrameworkCore;
 
 namespace Core.Services.Implementations;
 
 public class GameSessionService : IGameSessionService
 {
 	private readonly DomainContext context;
+	private readonly ConnectionsContext connectionsContext;
 	private readonly InviteCodeHelper inviteCodeHelper;
 
-	public GameSessionService(DomainContext context, InviteCodeHelper inviteCodeHelper)
+	public GameSessionService(
+		DomainContext context,
+		ConnectionsContext connectionsContext,
+		InviteCodeHelper inviteCodeHelper)
 	{
 		this.context = context;
+		this.connectionsContext = connectionsContext;
 		this.inviteCodeHelper = inviteCodeHelper;
 	}
 
@@ -140,5 +146,51 @@ public class GameSessionService : IGameSessionService
 	{
 		var team = await context.GetTeamAsync(sessionId, teamId);
 		return team.Name;
+	}
+
+	public async Task<UserDto> GetCurrentUser(RequestContext requestContext)
+	{
+		var user = await context.GetUserAsync(requestContext.GetUserId());
+		return new UserDto
+		{
+			Id = user.Id,
+			Name = user.Name
+		};
+	}
+
+	public async Task<HubConnection?> GetCurrentConnection(Guid userId)
+	{
+		return await connectionsContext.GetCurrentConnection(userId);
+	}
+	
+	public async Task<HubConnection?> SaveCurrentConnection(Guid userId, string lobbyId, string hubConnectionId)
+	{
+		var connection = await connectionsContext.GetCurrentConnection(userId);
+		if (connection is null)
+		{
+			connection = new HubConnection
+			{
+				UserId = userId,
+				LobbyId = lobbyId,
+				HubConnectionId = hubConnectionId
+			};
+			connectionsContext.HubConnections.Add(connection);
+			await connectionsContext.SaveChangesAsync();
+			return connection;
+		}
+
+		connection.LobbyId = lobbyId;
+		connection.HubConnectionId = hubConnectionId;
+		await connectionsContext.SaveChangesAsync();
+		return connection;
+	}
+
+	public async Task RemoveConnection(Guid userId)
+	{
+		await connectionsContext.HubConnections
+			.AsNoTracking()
+			.Where(x => x.UserId == userId)
+			.ExecuteDeleteAsync();
+		await connectionsContext.SaveChangesAsync();
 	}
 }

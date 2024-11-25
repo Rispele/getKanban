@@ -1,4 +1,5 @@
 ﻿using Core.Dtos;
+using Core.Entities;
 using Core.RequestContexts;
 using Core.Services.Implementations;
 using Domain.Game;
@@ -25,4 +26,12 @@ public interface IGameSessionService
 	public Task UpdateTeamName(Guid sessionId, Guid teamId, string name);
 	
 	public Task<string> GetTeamName(Guid sessionId, Guid teamId);
+
+	public Task<UserDto> GetCurrentUser(RequestContext requestContext);
+
+	public Task<HubConnection?> GetCurrentConnection(Guid userId);
+
+	public Task<HubConnection?> SaveCurrentConnection(Guid userId, string lobbyId, string hubConnectionId);
+
+	public Task RemoveConnection(Guid userId);
 }
