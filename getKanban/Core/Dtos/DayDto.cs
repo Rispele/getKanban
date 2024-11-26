@@ -13,6 +13,14 @@ public class DayDto
 	public UpdateSprintBacklogContainerDto UpdateSprintBacklogContainer { get; }
 	public UpdateCfdContainerDto UpdateCfdContainer { get; }
 
+	public string Status { get; } = "InProcess";
+
+	public int Number { get; } = 9;
+
+	public DayDto()
+	{
+	}
+	
 	public DayDto(
 		int analystsNumber,
 		int programmersNumber,

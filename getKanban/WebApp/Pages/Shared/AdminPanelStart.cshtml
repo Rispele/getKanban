@@ -1,22 +1,29 @@
-﻿@* @model List<Domain.Game.Teams.Team> *@
-@* *@
-@* <script> *@
-@*     @foreach (var team in Model) *@
-@*     { *@
-@*         <text> *@
-@*             document.getElementById("@team.Id").addEventListener('click', function () { *@
-@*                 window.location.href = `/admin/days?teamId=${@team.Id}`; *@
-@*             }); *@
-@*         </text> *@
-@*     } *@
-@* </script> *@
-@* *@
-@* <div> *@
-@*     <p>getKanban: "@Model.SessionName"</p> *@
-@*     <p>Выберите команду, которой нужна помощь</p> *@
-@*      *@
-@*     @foreach (var team in Model) *@
-@*     { *@
-@*         <p id="@team.Id">@team.Name</p> *@
-@*     } *@
-@* </div> *@
+﻿@model Core.Dtos.AdminPanelTeamsDto
+
+<div class="commandEditorHeader text-center">
+    <h1 class="display-4 fw-bold">getKanban: "@Model.GameSessionName"</h1>
+</div>
+
+<div class="text-center authorizationContainer centered-100">
+    <div class="authorizationHeader">
+        <h1 class="fs-2 fw-normal">Выберите команду, которой нужна помощь</h1>
+    </div>
+
+    <div class="authorizationButtons">
+        @foreach (var team in Model.Teams)
+        {
+            <p id="@team.Id">@team.Name</p>
+        }
+    </div>
+</div>
+
+<script>
+    @foreach (var team in Model.Teams)
+    {
+        <text>
+            document.getElementById("@team.Id").addEventListener('click', function () {
+                window.location.href = `/admin/days?sessionId=@Model.GameSessionId&teamId=@team.Id`;
+            });
+        </text>
+    }
+</script>

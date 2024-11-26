@@ -50,12 +50,12 @@
 @if ((Model.RequesterRole & ParticipantRole.Creator) == ParticipantRole.Creator)
 {
     <form class="text-center">
-        <button class="commandEditorButtonsTemplate authorizationButton" type="button" onclick="startGame()">Начать игру</button>
+        <button class="commandEditorButtonsTemplate authorizationButton" type="button" id="start">Начать игру</button>
     </form>
 }
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
-<script>
+<script type="module" async="async">
     const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
     connection.start();
     connection.on("NotifyJoined", function (teamId, userId, userName) {
@@ -66,23 +66,29 @@
         team.appendChild(playerElement);
         playerElement.textContent = userName.toString();
     });
-    connection.on("NotifyStarted", function () {
-        window.location.href = `/step/1`
+    connection.on("NotifyStarted", async function () {
+        await fetch("/session/get-current-team?sessionId=@Model.Id")
+            .then(async r => {
+                if (JSON.parse(await r.text())["name"] === "Ангелы") {
+                    window.location.href = `/admin?sessionId=@Model.Id`;
+                } else {
+                    window.location.href = `/step/1`;
+                }
+            })
     });
     
-    function startGame() {
-        connection.invoke("StartGame", "@Model.Id")
-            .then(function () {
-                window.location.href = `/step/1`
-            });
+    const startButton = document.getElementById("start");
+    if (startButton !== null && startButton !== undefined) {
+        startButton.addEventListener('click', function () {
+            connection.invoke("StartGame", "@Model.Id")
+                .then(function () {});
+        });
     }
-</script>
 
-<script type="module" async="async">
     connection.on("NotifyRenamed", function (teamId, teamName) {
         refreshTeamsHeaders(teamId, teamName)
     });
-    
+
     const currentTeamJson = await fetch("/session/get-current-team?sessionId=@Model.Id")
         .then(r => r.text())
         .then(data => {
@@ -101,22 +107,22 @@
     const teamNames = [];
     @foreach (var team in Model.Teams)
     {
-        @:teamLinks.push("@team.Participants.InviteCode");
-        @:teamIds.push("@team.Id");
-        @:teamNames.push("@Html.Raw(team.Name)");
+    @:teamLinks.push("@team.Participants.InviteCode");
+    @:teamIds.push("@team.Id");
+    @:teamNames.push("@Html.Raw(team.Name)");
     }
     teamLinks.push("@Model.Angels.Participants.InviteCode");
     teamIds.push("@Model.Angels.Id");
     teamNames.push("@Html.Raw(Model.Angels.Name)");
-    
+
     refreshTeamsHeaders();
-    
+
     function refreshTeamsHeaders(renameTeamId = null, renameTeamName = null) {
         if (renameTeamId !== null) {
             teamNames[teamIds.indexOf(renameTeamId)] = renameTeamName;
         }
         const isCurrentUserAdmin = @(((Model.RequesterRole & ParticipantRole.Creator) == ParticipantRole.Creator).ToString().ToLower());
-        
+
         if (isCurrentUserAdmin) {
             for (let i = 0; i < teamIds.length; i++) {
                 recreateEditBlock(teamIds[i]);
@@ -168,7 +174,7 @@
             editBlock.appendChild(input);
         }
     }
-    
+
     function placeTeamNames(teamIds, teamNames) {
         for (let i = 0; i < teamIds.length; i++) {
             const text = document.createElement("p");
@@ -177,7 +183,7 @@
             getOrCreateEditBlock(teamIds[i]).appendChild(text);
         }
     }
-    
+
     function placeTeamLinks(teamIds, teamInviteLinks) {
         for (let i = 0; i < teamIds.length; i++) {
             const teamIcon = buildIcon(`link-${teamInviteLinks[i]}`, "images/copy_button.jpg");
@@ -198,7 +204,7 @@
         image.setAttribute("id", iconId);
         return image;
     }
-    
+
     function recreateEditBlock(teamId) {
         let editBlock = document.getElementById(`edit-${teamId}`);
         if (editBlock !== null && editBlock !== undefined) {
@@ -210,7 +216,7 @@
         document.getElementById(`headers-${teamId}`).appendChild(editBlock);
         return editBlock;
     }
-    
+
     function getOrCreateEditBlock(teamId) {
         let editBlock = document.getElementById(`edit-${teamId}`);
         return editBlock !== null && editBlock !== undefined ? editBlock : recreateEditBlock(teamId);
