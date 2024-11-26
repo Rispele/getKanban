@@ -2,19 +2,18 @@
 <script>
     async function joinSession() {
         const inviteCode = document.getElementById("inviteCode").value.toString();
-        if (inviteCode.length > 0) {
-            const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
-            const isGameOpened = await fetch(`http://localhost:5046/session/check?invite=${inviteCode}`);
-            if ((await isGameOpened.text()) === 'true') {
-                connection.start()
-                    .then(async function (){
-                        connection.invoke("Join", inviteCode)
-                        .then(function () {
-                            window.location.href = `http://localhost:5046/session?invite=${inviteCode}`
-                        });
-                    });
-            }
-        }
+        if (inviteCode.length === 0) return;
+        const isGameOpened = await fetch(`/session/check?invite=${inviteCode}`);
+        if ((await isGameOpened.text()) !== 'true') return;
+        
+        const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
+        connection.start()
+            .then(async function (){
+                connection.invoke("Join", inviteCode)
+                .then(function () {
+                    window.location.href = `/session?invite=${inviteCode}`
+                });
+            });
     }
 </script>
 

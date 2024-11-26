@@ -1,5 +1,5 @@
 ﻿@* @page *@
-@* @model WebApp.Pages.FirstStepPage *@
+@model Guid?
 @* *@
 @* @{ *@
 @*     ViewData["Title"] = "FirstStep"; *@
@@ -28,8 +28,18 @@
     Далее
 </button>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
 <script>
+    const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
+    connection.start();
+    connection.on("NotifyPageChange", function (page, stage) {
+        window.location.href = `/step/${page}/${stage}`;
+    });
+    
     document.getElementById("next").addEventListener('click', function () {
-        window.location.href = `http://localhost:5046/step/1/1`;
+        connection.invoke("ChangePage", "@Model", 1, 1)
+            .then(function () {
+                window.location.href = `/step/1/1`;
+            });
     });
 </script>

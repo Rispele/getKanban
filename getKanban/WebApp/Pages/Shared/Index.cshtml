@@ -16,9 +16,9 @@
             alert("Введите своё имя");
             return;
         }
-        fetch(`http://localhost:5046/add-username?name=${userName}`)
+        fetch(`/add-username?name=${userName}`)
             .then(r => {
-                window.location.href = `http://localhost:5046/session/${endpoint}`
+                window.location.href = `/session/${endpoint}`
             });
     }
 </script>

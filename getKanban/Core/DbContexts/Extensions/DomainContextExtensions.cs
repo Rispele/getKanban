@@ -35,4 +35,13 @@ public static class DomainContextExtensions
 		var user = await usersContext.Users.SingleOrDefaultAsync(t => t.Id == userId);
 		return user ?? throw new InvalidOperationException("User not found");
 	}
+	
+	public static async Task CloseRecruitmentAsync(this DomainContext gameSessionContext, Guid sessionId)
+	{
+		var session = await gameSessionContext.GameSessions.SingleOrDefaultAsync(x => x.Id == sessionId);
+		if (session is { IsRecruitmentFinished: false })
+		{
+			session.IsRecruitmentFinished = true;
+		}
+	}
 }

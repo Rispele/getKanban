@@ -3,20 +3,21 @@
     async function createGameSession() {
         const sessionName = document.getElementById("sessionName").value;
         const teamsCount = parseInt(document.getElementById("teamsCount").value);
-        if (teamsCount > 0) {
-            const hubConnection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
-            hubConnection.start()
-                .then(function (){
-                    hubConnection.invoke("Create", sessionName, teamsCount);
-                    hubConnection.on("Created", async function (dto) {
-                        const sessionId = (await JSON.parse(dto))["Id"];
-                        const inviteCode = (await JSON.parse(dto))["Angels"]["Participants"]["InviteCode"].toString();
-                        if (sessionId != null) {
-                            window.location.href = `http://localhost:5046/session?invite=${inviteCode}`;
-                        }
-                    })
-                });
+        if (teamsCount <= 0) {
+            return;
         }
+        const hubConnection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
+        hubConnection.start()
+            .then(function (){
+                hubConnection.invoke("Create", sessionName, teamsCount);
+                hubConnection.on("Created", async function (dto) {
+                    const sessionId = (await JSON.parse(dto))["Id"];
+                    const inviteCode = (await JSON.parse(dto))["Angels"]["Participants"]["InviteCode"].toString();
+                    if (sessionId != null) {
+                        window.location.href = `/session?invite=${inviteCode}`;
+                    }
+                })
+            });
     }
 </script>
 

@@ -1,16 +1,24 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Core.Services.Contracts;
+using Microsoft.AspNetCore.Mvc;
 
 namespace WebApp.Controllers;
 
 [Route("step")]
 public class DayStepsController : Controller
 {
+	private readonly IGameSessionService gameSessionService;
+	
+	public DayStepsController(IGameSessionService gameSessionService)
+	{
+		this.gameSessionService = gameSessionService;
+	}
+	
 	[HttpGet]
 	[Route("1")]
 	[Route("1/0")]
-	public IActionResult Step1Stage0()
+	public async Task<IActionResult> Step1Stage0()
 	{
-		return View();
+		return View(await gameSessionService.GetCurrentSessionId(RequestContextFactory.Build(Request)));
 	}
 	
 	[HttpGet]
@@ -25,6 +33,16 @@ public class DayStepsController : Controller
 	public IActionResult Step1Stage2()
 	{
 		return View();
+	}
+
+	[HttpPost]
+	[Route("save-roles-transformation")]
+	public void SaveRolesTransformation([FromBody] string[][] transformations)
+	{
+		foreach (var transformation in transformations)
+		{
+			Console.WriteLine($"{transformation[0]} {transformation[1]}");
+		}
 	}
 	
 	[HttpGet]

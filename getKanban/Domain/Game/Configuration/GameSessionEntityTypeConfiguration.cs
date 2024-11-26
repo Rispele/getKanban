@@ -14,6 +14,8 @@ public class GameSessionEntityTypeConfiguration : IEntityTypeConfiguration<GameS
 
 		builder.Property(x => x.Name).IsRequired();
 
+		builder.Property(x => x.IsRecruitmentFinished).IsRequired();
+
 		builder.Ignore(t => t.Teams);
 
 		builder

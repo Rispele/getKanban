@@ -1,9 +1,6 @@
 using Core.Dtos;
-using Core.Helpers;
 using Core.Services.Contracts;
-using Domain.Game.Teams;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace WebApp.Controllers;
 
@@ -25,8 +22,9 @@ public class SessionController : Controller
 			RequestContextFactory.Build(Request),
 			invite,
 			ignorePermissions: false);
-		
-		return View(session);
+		return session is { IsRecruitmentFinished: false }
+			? View(session)
+			: View("Error", "Запрашиваемая сессия не была найдена или закрыта.");
 	}
 
 	[HttpGet]
@@ -47,10 +45,11 @@ public class SessionController : Controller
 	[Route("check")]
 	public async Task<bool> CheckForOpenedGame(string invite)
 	{
-		return await gameSessionService.FindGameSession(
+		var session = await gameSessionService.FindGameSession(
 			RequestContextFactory.Build(Request),
 			invite,
-			ignorePermissions: false) != null;
+			ignorePermissions: false);
+		return session is not null;
 	}
 
 	[HttpGet]

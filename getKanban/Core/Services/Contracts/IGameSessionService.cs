@@ -2,8 +2,6 @@
 using Core.Entities;
 using Core.RequestContexts;
 using Core.Services.Implementations;
-using Domain.Game;
-using Domain.Game.Teams;
 
 namespace Core.Services.Contracts;
 
@@ -28,6 +26,8 @@ public interface IGameSessionService
 	public Task<string> GetTeamName(Guid sessionId, Guid teamId);
 
 	public Task<UserDto> GetCurrentUser(RequestContext requestContext);
+
+	public Task<Guid?> GetCurrentSessionId(RequestContext requestContext);
 
 	public Task<HubConnection?> GetCurrentConnection(Guid userId);
 

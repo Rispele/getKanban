@@ -18,6 +18,8 @@ public class GameSession
 
 	public IReadOnlyList<Team> Teams => teams;
 
+	public bool IsRecruitmentFinished = false;
+
 	[UsedImplicitly]
 	private GameSession()
 	{

@@ -104,6 +104,11 @@ public class LobbyHub : Hub
 		await Clients.Group(GetGroupId(gameSessionId)).SendAsync("NotifyStarted");
 	}
 
+	public async Task ChangePage(Guid gameSessionId, int pageNumber, int stageNumber)
+	{
+		await Clients.Group(GetGroupId(gameSessionId)).SendAsync("NotifyPageChange", pageNumber, stageNumber);
+	}
+
 	private async Task AddCurrentConnectionToLobbyGroupAsync(string groupId)
 	{
 		var requestContext = RequestContextFactory.Build(Context);

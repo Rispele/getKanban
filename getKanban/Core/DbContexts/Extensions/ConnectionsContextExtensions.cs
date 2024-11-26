@@ -1,4 +1,5 @@
 ﻿using Core.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Core.DbContexts.Extensions;
 
@@ -8,6 +9,6 @@ public static class ConnectionsContextExtensions
 		this ConnectionsContext connectionsContext,
 		Guid userId)
 	{
-		return connectionsContext.HubConnections.SingleOrDefault(x => x.UserId == userId);
+		return await connectionsContext.HubConnections.SingleOrDefaultAsync(x => x.UserId == userId);
 	}
 }

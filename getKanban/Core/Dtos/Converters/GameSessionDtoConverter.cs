@@ -23,7 +23,8 @@ public class GameSessionDtoConverter
 			Name = gameSession.Name,
 			Angels = ConvertAngels(gameSession.Angels),
 			Teams = gameSession.Teams.Select(Convert).ToArray(),
-			RequesterRole = requesterRole
+			RequesterRole = requesterRole,
+			IsRecruitmentFinished = gameSession.IsRecruitmentFinished
 		};
 	}
 

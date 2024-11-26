@@ -81,7 +81,7 @@ public class GameSessionService : IGameSessionService
 		var (teamId, updated) = session.AddByInviteCode(user, inviteCode);
 
 		await context.SaveChangesAsync();
-		
+
 		var participantRole = session.EnsureHasAnyAccess(user, inviteCode);
 		var sessionDto = GameSessionDtoConverter.For(participantRole).Convert(session);
 
@@ -92,7 +92,7 @@ public class GameSessionService : IGameSessionService
 				.Single(t => t.Id == teamId)
 				.Participants.Users
 				.Single(u => u.Id == user.Id);
-		
+
 		return new AddParticipantResult(
 			updated,
 			sessionDto,
@@ -104,8 +104,9 @@ public class GameSessionService : IGameSessionService
 	{
 		var session = await context.GetGameSessionsAsync(gameSessionId);
 		var user = await context.GetUserAsync(requestContext.GetUserId());
-
+		
 		session.EnsureHasAccess(user);
+		await context.CloseRecruitmentAsync(gameSessionId);
 		session.Start();
 
 		await context.SaveChangesAsync();
@@ -115,7 +116,7 @@ public class GameSessionService : IGameSessionService
 	{
 		var session = await context.GetGameSessionsAsync(gameSessionId);
 		var user = await context.GetUserAsync(requestContext.GetUserId());
-		
+
 		var angels =
 			session.Angels.Participants.SingleOrDefault(x => x.User.Id == user.Id) is null
 				? null
@@ -124,7 +125,7 @@ public class GameSessionService : IGameSessionService
 			.SingleOrDefault(
 				x => x.Players.Participants
 					.SingleOrDefault(p => p.User.Id == user.Id) is not null);
-		
+
 		return angels is not null
 			? TeamDtoConverter.For(ParticipantRole.Creator).ConvertAngels(angels)
 			: TeamDtoConverter.For(ParticipantRole.Player).Convert(team);
@@ -141,7 +142,7 @@ public class GameSessionService : IGameSessionService
 		team.Name = name;
 		await context.SaveChangesAsync();
 	}
-	
+
 	public async Task<string> GetTeamName(Guid sessionId, Guid teamId)
 	{
 		var team = await context.GetTeamAsync(sessionId, teamId);
@@ -158,11 +159,36 @@ public class GameSessionService : IGameSessionService
 		};
 	}
 
+	public async Task<Guid?> GetCurrentSessionId(RequestContext requestContext)
+	{
+		var user = await context.GetUserAsync(requestContext.GetUserId());
+		var sessions = context.GameSessions.ToList();
+		foreach (var session in sessions)
+		{
+			var teamsParticipants = session.Teams.ToList().SelectMany(x => x.Players.Participants);
+			var angelsParticipants = session.Angels.Participants;
+
+			var teamParticipant = teamsParticipants.SingleOrDefault(x => x.User.Id == user.Id);
+			if (teamParticipant != default)
+			{
+				return session.Id;
+			}
+
+			var angelsParticipant = angelsParticipants.SingleOrDefault(x => x.User.Id == user.Id);
+			if (angelsParticipant != default)
+			{
+				return session.Id;
+			}
+		}
+
+		return null;
+	}
+
 	public async Task<HubConnection?> GetCurrentConnection(Guid userId)
 	{
 		return await connectionsContext.GetCurrentConnection(userId);
 	}
-	
+
 	public async Task<HubConnection?> SaveCurrentConnection(Guid userId, string lobbyId, string hubConnectionId)
 	{
 		var connection = await connectionsContext.GetCurrentConnection(userId);

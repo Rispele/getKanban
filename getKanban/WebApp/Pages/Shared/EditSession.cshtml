@@ -66,8 +66,16 @@
         team.appendChild(playerElement);
         playerElement.textContent = userName.toString();
     });
+    connection.on("NotifyStarted", function () {
+        window.location.href = `/step/1`
+    });
     
-    function startGame() {window.location.href = `http://localhost:5046/step/1`}
+    function startGame() {
+        connection.invoke("StartGame", "@Model.Id")
+            .then(function () {
+                window.location.href = `/step/1`
+            });
+    }
 </script>
 
 <script type="module" async="async">
@@ -75,7 +83,7 @@
         refreshTeamsHeaders(teamId, teamName)
     });
     
-    const currentTeamJson = await fetch("http://localhost:5046/session/get-current-team?sessionId=@Model.Id")
+    const currentTeamJson = await fetch("/session/get-current-team?sessionId=@Model.Id")
         .then(r => r.text())
         .then(data => {
             if (data.length > 0) {
@@ -113,14 +121,14 @@
             for (let i = 0; i < teamIds.length; i++) {
                 recreateEditBlock(teamIds[i]);
             }
-            placeTeamNameEditButtons(teamIds);
+            placeTeamNameEditButtons(teamIds.filter(function (x) {return x !== "@Model.Angels.Id"}));
             placeTeamNames(teamIds, teamNames);
             placeTeamLinks(teamIds, teamLinks);
         } else if (currentTeamId !== null) {
             for (let i = 0; i < teamIds.length; i++) {
                 recreateEditBlock(teamIds[i]);
             }
-            if (currentTeamId !== "@Model.Angels.Id")placeTeamNameEditButtons([currentTeamId]);
+            if (currentTeamId !== "@Model.Angels.Id") placeTeamNameEditButtons([currentTeamId]);
             placeTeamNames(teamIds, teamNames);
         }
     }
@@ -145,7 +153,7 @@
             button.addEventListener("click", function () {
                 const teamName = input.value.toString();
                 if (teamName.length > 0) {
-                    fetch(`http://localhost:5046/session/update-team-name?sessionId=@Model.Id&teamId=${teamId}&name=${teamName}`)
+                    fetch(`/session/update-team-name?sessionId=@Model.Id&teamId=${teamId}&name=${teamName}`)
                         .then(function () {
                             connection.invoke("UpdateName", "@Model.Id", teamId)
                                 .then(function () {

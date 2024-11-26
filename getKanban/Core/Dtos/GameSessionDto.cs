@@ -13,4 +13,6 @@ public class GameSessionDto
 	public IReadOnlyList<TeamDto> Teams { get; init; } = null!;
 
 	public ParticipantRole RequesterRole { get; init; }
+	
+	public bool IsRecruitmentFinished = false;
 }

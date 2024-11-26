@@ -4,7 +4,7 @@
 @* @{ *@
 @*     ViewData["Title"] = "Step1.2"; *@
 @* } *@
-
+<meta charset="UTF-8">
 <div class="table-container">
     <table>
         <thead>
@@ -105,6 +105,44 @@
 
 <script>
     document.getElementById("roll").addEventListener('click', function () {
-        window.location.href = `http://localhost:5046/step/2`
+        const result = [];
+        const analysts = document.getElementsByClassName("dropzone")[0];
+        const analystsRoles = analysts.getElementsByClassName("text");
+        for (let role of analystsRoles) {
+            result.push([translateRole(role.innerText), "Analyst"]);
+        }
+        
+        const programmers = document.getElementsByClassName("dropzone")[1];
+        const programmersRoles = programmers.getElementsByClassName("text");
+        for (let role of programmersRoles) {
+            result.push([translateRole(role.innerText), "Developer"]);
+        }
+        
+        const testers = document.getElementsByClassName("dropzone")[2];
+        const testersRoles = testers.getElementsByClassName("text");
+        for (let role of testersRoles) {
+            result.push([role.innerText, "Tester"]);
+        }
+        //
+        //JSON.stringify(result).replace("\\", "");
+        fetch("/step/save-roles-transformation", {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(result)
+        }).then(function () {window.location.href = `/step/2`});
+        
+        function translateRole(role) {
+            return role === "Аналитик"
+                ? "Analyst"
+                : role === "Разработчик"
+                    ? "Developer"
+                    : role === "Тестировщик"
+                        ? "Tester"
+                        : null;
+        }
+        
+        
     });
 </script>
