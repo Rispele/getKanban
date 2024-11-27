@@ -1,6 +1,6 @@
 ﻿using Core.Services.Contracts;
 using Domain.Game.Days.Commands;
-using Domain.Game.Days.DayContainers;
+using Domain.Game.Days.DayContainers.TeamMembers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApp.Controllers;
@@ -43,24 +43,22 @@ public class DayStepsController : Controller
 	[Route("save-roles-transformation")]
 	public async Task SaveRolesTransformation([FromBody] string[] transformation)
 	{
+		throw new NotImplementedException();
 		var currentSessionId = await gameSessionService.GetCurrentSessionId(RequestContextFactory.Build(Request));
 		var currentUser = await gameSessionService.GetCurrentUser(RequestContextFactory.Build(Request));
 		var currentTeam = await gameSessionService.GetCurrentTeam(
 			RequestContextFactory.Build(Request),
 			currentSessionId!.Value);
-
+		
 		var roleFrom = Enum.Parse<TeamRole>(transformation[0]);
 		var roleTo = Enum.Parse<TeamRole>(transformation[1]);
-
+		
 		await teamService.PatchDayAsync(
 			currentSessionId!.Value,
 			currentTeam!.Id,
 			currentUser.Id,
 			new UpdateTeamRolesCommand
 			{
-				From = roleFrom,
-				To = roleTo,
-				Remove = false
 			});
 	}
 

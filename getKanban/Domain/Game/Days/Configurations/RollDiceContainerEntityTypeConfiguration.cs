@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Domain.Game.Days.DayContainers;
+using Domain.Game.Days.DayContainers.RollDice;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -11,12 +12,7 @@ public class RollDiceContainerEntityTypeConfiguration : IEntityTypeConfiguration
 	{
 		builder.ConfigureAsDayContainer();
 
-		ConfigurePropertyConversion(builder, e => e.AnalystsDiceNumber);
-		ConfigurePropertyConversion(builder, e => e.ProgrammersDiceNumber);
-		ConfigurePropertyConversion(builder, e => e.TestersDiceNumber);
-		ConfigurePropertyConversion(builder, e => e.AnalystsScores);
-		ConfigurePropertyConversion(builder, e => e.ProgrammersScores);
-		ConfigurePropertyConversion(builder, e => e.TestersScores);
+		ConfigurePropertyConversion(builder, e => e.DiceRollResults);
 	}
 
 	private static void ConfigurePropertyConversion<TProperty>(
@@ -26,6 +22,6 @@ public class RollDiceContainerEntityTypeConfiguration : IEntityTypeConfiguration
 		builder
 			.Property(propertyExpression)
 			.IsRequired()
-			.HasConversion(new ReadOnlyListConverter<int>());
+			.HasConversion(new ReadOnlyListConverter<DiceRollResult>());
 	}
 }

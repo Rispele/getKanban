@@ -1,4 +1,8 @@
 ﻿
+using Core.Dtos.Containers;
+using Core.Dtos.Containers.RollDice;
+using Core.Dtos.Containers.TeamMembers;
+
 namespace Core.Dtos;
 
 public class DayDto
@@ -7,7 +11,7 @@ public class DayDto
 	public int ProgrammersNumber { get; }
 	public int TestersNumber { get; }
 	public WorkAnotherTeamContainerDto? WorkAnotherTeamContainer { get; }
-	public UpdateTeamRolesContainerDto UpdateTeamRolesContainer { get; }
+	public TeamMembersContainerDto TeamMembersContainer { get; }
 	public RollDiceContainerDto? RollDiceContainer { get; }
 	public ReleaseTicketContainerDto ReleaseTicketContainer { get; }
 	public UpdateSprintBacklogContainerDto UpdateSprintBacklogContainer { get; }
@@ -26,7 +30,7 @@ public class DayDto
 		int programmersNumber,
 		int testersNumber,
 		WorkAnotherTeamContainerDto? workAnotherTeamContainer,
-		UpdateTeamRolesContainerDto updateTeamRolesContainer,
+		TeamMembersContainerDto teamMembersContainer,
 		RollDiceContainerDto? rollDiceContainer,
 		ReleaseTicketContainerDto releaseTicketContainer,
 		UpdateSprintBacklogContainerDto updateSprintBacklogContainer,
@@ -36,7 +40,7 @@ public class DayDto
 		ProgrammersNumber = programmersNumber;
 		TestersNumber = testersNumber;
 		WorkAnotherTeamContainer = workAnotherTeamContainer;
-		UpdateTeamRolesContainer = updateTeamRolesContainer;
+		TeamMembersContainer = teamMembersContainer;
 		RollDiceContainer = rollDiceContainer;
 		ReleaseTicketContainer = releaseTicketContainer;
 		UpdateSprintBacklogContainer = updateSprintBacklogContainer;

@@ -4,6 +4,7 @@ using Domain.DbContexts;
 using Domain.Game;
 using Domain.Game.Days.Commands;
 using Domain.Game.Days.DayContainers;
+using Domain.Game.Days.DayContainers.TeamMembers;
 using Domain.Users;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
@@ -34,9 +35,11 @@ public class Concurrency_Test
 		var (context1, context2, session1, session2) = await SetupGameSessionInDifferentContexts();
 		
 		var (team1, team2) = (session1.Teams.Single(), session2.Teams.Single());
+		var member = team1.CurrentDay!.TeamMembersContainer.TeamMembers
+			.First(t => t.InitialRole == TeamRole.Programmer);
 		var command = new UpdateTeamRolesCommand
 		{
-			From = TeamRole.Analyst,
+			TeamMemberId = member.Id,
 			To = TeamRole.Programmer
 		};
 		

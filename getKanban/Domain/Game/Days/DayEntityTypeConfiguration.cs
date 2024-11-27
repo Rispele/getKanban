@@ -1,5 +1,7 @@
 ﻿using System.Linq.Expressions;
 using Domain.Game.Days.DayContainers;
+using Domain.Game.Days.DayContainers.RollDice;
+using Domain.Game.Days.DayContainers.TeamMembers;
 using Domain.Game.Days.Scenarios;
 using Domain.Serializers;
 using Microsoft.EntityFrameworkCore;
@@ -28,8 +30,8 @@ public class DayEntityTypeConfiguration : IEntityTypeConfiguration<Day>
 		builder.Property(e => e.Timestamp).ConfigureAsRowVersion();
 
 		ConfigureContainerRelation<WorkAnotherTeamContainer>(builder, d => d.WorkAnotherTeamContainer!);
-		ConfigureContainerRelation<UpdateTeamRolesContainer>(builder, d => d.UpdateTeamRolesContainer!);
-		ConfigureContainerRelation<RollDiceContainer>(builder, d => d.RollDiceContainer!);
+		ConfigureContainerRelation<TeamMembersContainer>(builder, d => d.TeamMembersContainer!);
+		ConfigureContainerRelation<RollDiceContainer>(builder, d => d.DiceRollContainer!);
 		ConfigureContainerRelation<ReleaseTicketContainer>(builder, d => d.ReleaseTicketContainer!);
 		ConfigureContainerRelation<UpdateSprintBacklogContainer>(builder, d => d.UpdateSprintBacklogContainer!);
 		ConfigureContainerRelation<UpdateCfdContainer>(builder, d => d.UpdateCfdContainer!);

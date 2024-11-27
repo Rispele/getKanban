@@ -1,5 +1,7 @@
 ﻿using Domain.DomainExceptions;
 using Domain.Game.Days.DayContainers;
+using Domain.Game.Days.DayContainers.RollDice;
+using Domain.Game.Days.DayContainers.TeamMembers;
 using Domain.Game.Days.Scenarios;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
@@ -18,12 +20,12 @@ public class Day
 
 	private IEnumerable<AwaitedCommands> currentlyAwaitedEvents => awaitedCommands
 		.Where(@event => !@event.Removed);
-	
+
 	public WorkAnotherTeamContainer? WorkAnotherTeamContainer { get; internal set; }
-	public UpdateTeamRolesContainer UpdateTeamRolesContainer { get; } = null!;
-	public RollDiceContainer? RollDiceContainer { get; internal set; }
-	public ReleaseTicketContainer ReleaseTicketContainer { get; private set; }
-	public UpdateSprintBacklogContainer UpdateSprintBacklogContainer { get; private set; }
+	public TeamMembersContainer TeamMembersContainer { get; } = null!;
+	public RollDiceContainer? DiceRollContainer { get; internal set; }
+	public ReleaseTicketContainer ReleaseTicketContainer { get; private set; } = null!;
+	public UpdateSprintBacklogContainer UpdateSprintBacklogContainer { get; private set; } = null!;
 	public UpdateCfdContainer UpdateCfdContainer { get; } = null!;
 
 	public long Id { get; }
@@ -53,7 +55,7 @@ public class Day
 		ProgrammersNumber = programmersNumber;
 		TestersNumber = testersNumber;
 
-		UpdateTeamRolesContainer = new UpdateTeamRolesContainer();
+		TeamMembersContainer = new TeamMembersContainer(AnalystsNumber, ProgrammersNumber, TestersNumber);
 		UpdateCfdContainer = new UpdateCfdContainer();
 		ReleaseTicketContainer = new ReleaseTicketContainer();
 		UpdateSprintBacklogContainer = new UpdateSprintBacklogContainer();

@@ -1,6 +1,8 @@
 ﻿using Domain.Game.Days;
 using Domain.Game.Days.Commands;
 using Domain.Game.Days.DayContainers;
+using Domain.Game.Days.DayContainers.RollDice;
+using Domain.Game.Days.DayContainers.TeamMembers;
 using Domain.Game.Days.Scenarios;
 using Domain.Game.Tickets;
 
@@ -18,10 +20,10 @@ public partial class Team
 	public Day? CurrentDay => days.SingleOrDefault(d => d.Number == currentDayNumber);
 	internal Day? previousDay => days.SingleOrDefault(d => d.Number == previousDayNumber);
 
-	public IReadOnlyList<TeamRoleUpdate?> CurrentDayTeamRoleUpdates =>
-		CurrentDay?.UpdateTeamRolesContainer.TeamRoleUpdates ?? Array.Empty<TeamRoleUpdate?>()!;
+	public IReadOnlyList<TeamMember> CurrentDayTeamRoleUpdates => CurrentDay?.TeamMembersContainer.TeamMembers
+	                                                           ?? Array.Empty<TeamMember>();
 
-	public RollDiceContainer? CurrentDayRollDiceContainer => CurrentDay?.RollDiceContainer;
+	public RollDiceContainer? CurrentDayRollDiceContainer => CurrentDay?.DiceRollContainer;
 
 	public IReadOnlyList<UpdateCfdContainer> CfdContainers => days
 		.OrderBy(d => d.Number)
@@ -113,6 +115,7 @@ public partial class Team
 					{
 						toAwait.Add(DayCommandType.ReleaseTickets);
 					}
+
 					if (shouldUpdateSprintBacklog)
 					{
 						toAwait.Add(DayCommandType.UpdateSprintBacklog);
@@ -123,7 +126,9 @@ public partial class Team
 						.RemoveAwaited(DayCommandType.RollDice, DayCommandType.UpdateTeamRoles);
 				})
 			.For(DayCommandType.ReleaseTickets, builders => builders.ReAwaitCommand(DayCommandType.ReleaseTickets))
-			.For(DayCommandType.UpdateSprintBacklog, builders => builders.ReAwaitCommand(DayCommandType.UpdateSprintBacklog))
+			.For(
+				DayCommandType.UpdateSprintBacklog,
+				builders => builders.ReAwaitCommand(DayCommandType.UpdateSprintBacklog))
 			.For(
 				DayCommandType.UpdateCfd,
 				builder => builder.ReAwaitCommand(DayCommandType.UpdateCfd).WithCondition("Released", null),

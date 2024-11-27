@@ -1,4 +1,6 @@
 ﻿using Domain.Game.Days.DayContainers;
+using Domain.Game.Days.DayContainers.RollDice;
+using Domain.Game.Days.DayContainers.TeamMembers;
 using Domain.Game.Teams;
 
 namespace Domain.Game.Days.Commands;
@@ -12,35 +14,21 @@ public class RollDiceCommand : DayCommand
 		day.EnsureCanPostEvent(CommandType);
 
 		var diceRoller = new DiceRoller(new Random());
-		var swapByRole = day.UpdateTeamRolesContainer.BuildTeamRolesUpdate();
-		var (analystsDiceNumber, analystsScores) = RollDiceForRole(day.AnalystsNumber, TeamRole.Analyst);
-		var (programmersDiceNumber, programmersScores) = RollDiceForRole(day.ProgrammersNumber, TeamRole.Programmer);
-		var (testersDiceNumber, testersScores) = RollDiceForRole(day.TestersNumber, TeamRole.Tester);
-
-		day.RollDiceContainer = RollDiceContainer.CreateInstance(
-			analystsDiceNumber,
-			programmersDiceNumber,
-			testersDiceNumber,
-			analystsScores,
-			programmersScores,
-			testersScores);
+		var teamMembers = day.TeamMembersContainer.TeamMembers;
+		day.DiceRollContainer = RollDiceContainer.CreateInstance(teamMembers.Select(RollDiceForMember));
 
 		day.PostDayEvent(CommandType, null);
+
 		return;
 
-		(int[] diceNumber, int[] diceScores) RollDiceForRole(int roleSize, TeamRole role)
+		DiceRollResult RollDiceForMember(TeamMember member)
 		{
-			var swaps = swapByRole.GetValueOrDefault(role, []);
-			var diceNumber = new int[roleSize];
-			var diceScores = new int[roleSize];
-			for (var i = 0; i < roleSize; i++)
-			{
-				var asRole = i < swaps.Length ? swaps[i] : role;
-				diceNumber[i] = diceRoller.RollDice();
-				diceScores[i] = MapDiceNumberToScoreSettings.MapByRole(role, asRole, diceNumber[i]);
-			}
-
-			return (diceNumber, diceScores);
+			var diceNumber = diceRoller.RollDice();
+			var scores = MapDiceNumberToScoreSettings.MapByRole(
+				member.InitialRole,
+				member.CurrentRole,
+				diceNumber);
+			return new DiceRollResult(member.Id, diceNumber, scores);
 		}
 	}
 }

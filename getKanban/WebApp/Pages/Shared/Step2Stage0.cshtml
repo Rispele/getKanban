@@ -1,8 +1,25 @@
-﻿@model Core.Dtos.RollDiceContainerDto
+﻿@using Core.Dtos.Containers.RollDice
+@using Core.Dtos.Containers.TeamMembers
+@model Core.Dtos.Containers.RollDice.RollDiceContainerDto
 
 <div class="stepHeader">
     <h1 class="fs-1 fw- text-center">Команда pipipupu. День 9</h1>
 </div>
+
+@functions
+{
+    private IEnumerable<int> SelectDiceNumber(TeamRoleDto initialRole) =>
+        GetDiceRollResultsByInitialRole(initialRole)
+            .Select(t => t.DiceNumber);
+
+    private IEnumerable<int> SelectScores(TeamRoleDto initialRole) =>
+        GetDiceRollResultsByInitialRole(initialRole)
+            .Select(t => t.Scores);
+
+    private IEnumerable<DiceRollResultDto> GetDiceRollResultsByInitialRole(TeamRoleDto initialRole) =>
+        Model.DiceRollResults
+            .Where(t => t.InitialRole == initialRole);
+}
 
 <div class="infoContainer height-large centered-100">
     <h1 class="fs-4 text-center">
@@ -16,12 +33,12 @@
     </div>
     
     <div>
-        <p>Результат броска для аналитиков: @string.Join(" ", Model.AnalystsDiceNumber)</p>
-        <p>Результат броска для разработчиков: @string.Join(" ", Model.ProgrammersDiceNumber)</p>
-        <p>Результат броска для тестировщиков: @string.Join(" ", Model.TestersDiceNumber)</p>
-        <p>Итоговый счет для аналитиков: @string.Join(" ", Model.AnalystsScores)</p>
-        <p>Итоговый счет для разработчиков: @string.Join(" ", Model.ProgrammersScores)</p>
-        <p>Итоговый счет для тестировщиков: @string.Join(" ", Model.TestersScores)</p>
+        <p>Результат броска для аналитиков: @string.Join(" ", SelectDiceNumber(TeamRoleDto.Analyst))</p>
+        <p>Результат броска для разработчиков: @string.Join(" ", SelectDiceNumber(TeamRoleDto.Programmer))</p>
+        <p>Результат броска для тестировщиков: @string.Join(" ", SelectDiceNumber(TeamRoleDto.Tester))</p>
+        <p>Итоговый счет для аналитиков: @string.Join(" ", SelectScores(TeamRoleDto.Analyst))</p>
+        <p>Итоговый счет для разработчиков: @string.Join(" ", SelectScores(TeamRoleDto.Programmer))</p>
+        <p>Итоговый счет для тестировщиков: @string.Join(" ", SelectScores(TeamRoleDto.Tester))</p>
     </div>
 </div>
 

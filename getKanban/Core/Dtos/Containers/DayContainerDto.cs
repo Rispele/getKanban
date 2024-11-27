@@ -1,4 +1,4 @@
-﻿namespace Core.Dtos;
+﻿namespace Core.Dtos.Containers;
 
 public abstract class DayContainerDto
 {
