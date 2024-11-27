@@ -1,11 +1,12 @@
 ﻿using Core.DbContexts;
 using Core.DbContexts.Extensions;
 using Core.Dtos;
+using Core.Services.Contracts;
 using Domain.Game.Days.Commands;
 
 namespace Core.Services.Implementations;
 
-public class TeamService
+public class TeamService : ITeamService
 {
 	private readonly DomainContext context;
 	private readonly DayDtoConverter dayDtoConverter;

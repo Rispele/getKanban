@@ -109,19 +109,28 @@
         const analysts = document.getElementsByClassName("dropzone")[0];
         const analystsRoles = analysts.getElementsByClassName("text");
         for (let role of analystsRoles) {
-            result.push([translateRole(role.innerText), "Analyst"]);
+            const trRole = translateRole(role.innerText);
+            if (trRole !== "Analyst") {
+                result.push([trRole, "Analyst"]);
+            }
         }
         
         const programmers = document.getElementsByClassName("dropzone")[1];
         const programmersRoles = programmers.getElementsByClassName("text");
         for (let role of programmersRoles) {
-            result.push([translateRole(role.innerText), "Developer"]);
+            const trRole = translateRole(role.innerText);
+            if (trRole !== "Programmer") {
+                result.push([trRole, "Programmer"]);
+            }
         }
         
         const testers = document.getElementsByClassName("dropzone")[2];
         const testersRoles = testers.getElementsByClassName("text");
         for (let role of testersRoles) {
-            result.push([role.innerText, "Tester"]);
+            const trRole = translateRole(role.innerText);
+            if (trRole !== "Tester") {
+                result.push([trRole, "Tester"]);
+            }
         }
         //
         //JSON.stringify(result).replace("\\", "");
@@ -131,13 +140,17 @@
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(result)
-        }).then(function () {window.location.href = `/step/2`});
+        }).then(function () {
+            fetch(`/step/roll`).then(function () {
+                window.location.href = `/step/2`
+            });
+        });
         
         function translateRole(role) {
             return role === "Аналитик"
                 ? "Analyst"
                 : role === "Разработчик"
-                    ? "Developer"
+                    ? "Programmer"
                     : role === "Тестировщик"
                         ? "Tester"
                         : null;

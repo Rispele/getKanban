@@ -15,7 +15,7 @@ public class RollDiceContainerEntityTypeConfiguration : IEntityTypeConfiguration
 		ConfigurePropertyConversion(builder, e => e.ProgrammersDiceNumber);
 		ConfigurePropertyConversion(builder, e => e.TestersDiceNumber);
 		ConfigurePropertyConversion(builder, e => e.AnalystsScores);
-		ConfigurePropertyConversion(builder, e => e.AnalystsScores);
+		ConfigurePropertyConversion(builder, e => e.ProgrammersScores);
 		ConfigurePropertyConversion(builder, e => e.TestersScores);
 	}
 

@@ -1,4 +1,6 @@
 ﻿using Core.Services.Contracts;
+using Domain.Game.Days.Commands;
+using Domain.Game.Days.DayContainers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApp.Controllers;
@@ -7,10 +9,12 @@ namespace WebApp.Controllers;
 public class DayStepsController : Controller
 {
 	private readonly IGameSessionService gameSessionService;
+	private readonly ITeamService teamService;
 	
-	public DayStepsController(IGameSessionService gameSessionService)
+	public DayStepsController(IGameSessionService gameSessionService, ITeamService teamService)
 	{
 		this.gameSessionService = gameSessionService;
+		this.teamService = teamService;
 	}
 	
 	[HttpGet]
@@ -37,20 +41,63 @@ public class DayStepsController : Controller
 
 	[HttpPost]
 	[Route("save-roles-transformation")]
-	public void SaveRolesTransformation([FromBody] string[][] transformations)
+	public async Task SaveRolesTransformation([FromBody] string[][] transformations)
 	{
+		var currentSessionId = await gameSessionService.GetCurrentSessionId(RequestContextFactory.Build(Request));
+		var currentUser = await gameSessionService.GetCurrentUser(RequestContextFactory.Build(Request));
+		var currentTeam = await gameSessionService.GetCurrentTeam(
+			RequestContextFactory.Build(Request),
+			currentSessionId!.Value);
+		
 		foreach (var transformation in transformations)
 		{
-			Console.WriteLine($"{transformation[0]} {transformation[1]}");
+			var roleFrom = Enum.Parse<TeamRole>(transformation[0]);
+			var roleTo = Enum.Parse<TeamRole>(transformation[1]);
+			
+			await teamService.PatchDayAsync(
+				currentSessionId!.Value,
+				currentTeam!.Id,
+				currentUser.Id,
+				new UpdateTeamRolesCommand
+				{
+					From = roleFrom,
+					To = roleTo,
+					Remove = false
+				});
 		}
 	}
 	
 	[HttpGet]
 	[Route("2")]
 	[Route("2/0")]
-	public IActionResult Step2Stage0()
+	public async Task<IActionResult> Step2Stage0()
 	{
-		return View();
+		var currentSessionId = await gameSessionService.GetCurrentSessionId(RequestContextFactory.Build(Request));
+		var currentUser = await gameSessionService.GetCurrentUser(RequestContextFactory.Build(Request));
+		var currentTeam = await gameSessionService.GetCurrentTeam(
+			RequestContextFactory.Build(Request),
+			currentSessionId!.Value);
+		
+		var diceRollResult = await teamService.GetCurrentDayAsync(currentSessionId!.Value, currentTeam!.Id);
+		return View(diceRollResult.RollDiceContainer);
+	}
+
+	[HttpGet]
+	[Route("roll")]
+	public async Task RollDices()
+	{
+		var currentSessionId = await gameSessionService.GetCurrentSessionId(RequestContextFactory.Build(Request));
+		var currentUser = await gameSessionService.GetCurrentUser(RequestContextFactory.Build(Request));
+		var currentTeam = await gameSessionService.GetCurrentTeam(
+			RequestContextFactory.Build(Request),
+			currentSessionId!.Value);
+
+		await teamService.PatchDayAsync(
+			currentSessionId!.Value,
+			currentTeam!.Id,
+			currentUser.Id,
+			new RollDiceCommand()
+		);
 	}
 	
 	[HttpGet]
