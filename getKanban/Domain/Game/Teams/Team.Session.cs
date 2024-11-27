@@ -1,4 +1,5 @@
-﻿using Domain.Game.Days;
+﻿using Domain.DbContexts;
+using Domain.Game.Days;
 using Domain.Game.Days.Commands;
 using Domain.Game.Days.DayContainers;
 using Domain.Game.Days.Scenarios;
@@ -29,9 +30,9 @@ public partial class Team
 		.Where(c => c.Frozen)
 		.ToList();
 
-	public void ExecuteCommand(DayCommand command)
+	public void ExecuteCommand(DomainContext context, DayCommand command)
 	{
-		command.Execute(this, CurrentDay);
+		command.Execute(context, this, CurrentDay);
 	}
 
 	internal void AddNextDay()

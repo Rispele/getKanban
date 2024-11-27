@@ -1,4 +1,5 @@
-﻿using Domain.DomainExceptions;
+﻿using Domain.DbContexts;
+using Domain.DomainExceptions;
 using Domain.Game.Days.DayContainers;
 using Domain.Game.Teams;
 
@@ -8,7 +9,7 @@ public class EndDayCommand : DayCommand
 {
 	public override DayCommandType CommandType => DayCommandType.EndDay;
 
-	internal override void Execute(Team team, Day day)
+	internal override void Execute(DomainContext context, Team team, Day day)
 	{
 		day.EnsureCanPostEvent(CommandType);
 		EnsureCfdIsValid(team);

@@ -25,6 +25,8 @@ public static class ConfigurationExtensions
 		
 		builder.Property(e => e.Version).IsConcurrencyToken();
 		builder.Property(t => t.Timestamp).ConfigureAsRowVersion();
+
+		builder.Ignore(t => t.IsUpdated);
 	}
 
 	public static PropertyBuilder<TProperty> ConfigureAsRowVersion<TProperty>(

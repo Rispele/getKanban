@@ -13,7 +13,7 @@ public class UpdateTeamRolesContainer : DayContainer
 	internal void AddUpdate(TeamRole from, TeamRole to)
 	{
 		teamRoleUpdates.Add(new TeamRoleUpdate { From = from, To = to });
-		Version++;
+		SetUpdated();
 	}
 
 	internal void Remove(long updateId)
@@ -22,7 +22,7 @@ public class UpdateTeamRolesContainer : DayContainer
 		{
 			teamRoleUpdates.Remove(teamRoleUpdates.Single(t => t.Id == updateId));
 		}
-		Version++;
+		SetUpdated();
 	}
 
 	public Dictionary<TeamRole, TeamRole[]> BuildTeamRolesUpdate()

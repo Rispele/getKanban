@@ -3,7 +3,7 @@ using Domain.Game.Teams;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 
-namespace Core.DbContexts;
+namespace Domain.DbContexts;
 
 public class DomainContext : DbContext
 {

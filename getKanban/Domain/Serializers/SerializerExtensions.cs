@@ -9,6 +9,18 @@ public static class SerializerExtensions
 		TypeNameHandling = TypeNameHandling.Objects
 	};
 
+	public static List<T> WriteLine<T>(this List<T> l)
+	{
+		Console.WriteLine(string.Join(',', l));
+		return l;
+	}
+
+	public static string WriteLine(this string l)
+	{
+		Console.WriteLine(l);
+		return l;
+	}
+	
 	public static string ToJson<T>(this T value)
 	{
 		return JsonConvert.SerializeObject(value, Settings);

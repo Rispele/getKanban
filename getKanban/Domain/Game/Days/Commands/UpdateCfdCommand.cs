@@ -1,4 +1,5 @@
-﻿using Domain.Game.Days.DayContainers;
+﻿using Domain.DbContexts;
+using Domain.Game.Days.DayContainers;
 using Domain.Game.Teams;
 
 namespace Domain.Game.Days.Commands;
@@ -11,7 +12,7 @@ public class UpdateCfdCommand : DayCommand
 	
 	public int Value { get; init; }
 	
-	internal override void Execute(Team _, Day day)
+	internal override void Execute(DomainContext context, Team team, Day day)
 	{
 		day.EnsureCanPostEvent(CommandType);
 		

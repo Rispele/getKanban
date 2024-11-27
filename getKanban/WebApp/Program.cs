@@ -3,6 +3,7 @@ using Core.Dtos;
 using Core.Helpers;
 using Core.Services.Contracts;
 using Core.Services.Implementations;
+using Domain.DbContexts;
 using WebApp.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);

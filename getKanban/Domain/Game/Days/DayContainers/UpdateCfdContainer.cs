@@ -64,7 +64,7 @@ public class UpdateCfdContainer : FreezableDayContainer
 				throw new ArgumentOutOfRangeException(nameof(patchType), patchType, null);
 		}
 
-		Version++;
+		SetUpdated();
 	}
 
 	internal static UpdateCfdContainer None =>

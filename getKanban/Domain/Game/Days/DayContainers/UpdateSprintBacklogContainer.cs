@@ -29,7 +29,7 @@ public class UpdateSprintBacklogContainer : FreezableDayContainer
 		}
 		
 		ticketIds.Add(ticketId);
-		Version++;
+		SetUpdated();
 	}
 	
 	internal void Remove(string ticketId)
@@ -45,6 +45,6 @@ public class UpdateSprintBacklogContainer : FreezableDayContainer
 		}
 		
 		ticketIds.Remove(ticketId);
-		Version++;
+		SetUpdated();
 	}
 }

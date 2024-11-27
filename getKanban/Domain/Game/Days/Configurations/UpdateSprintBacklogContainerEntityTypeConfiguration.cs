@@ -10,7 +10,7 @@ public class
 	public void Configure(EntityTypeBuilder<UpdateSprintBacklogContainer> builder)
 	{
 		builder.ConfigureAsFreezableDayContainer();
-		builder.Property("ticketIds").HasConversion(new ListConverter<string>());
+		builder.Property("ticketIds").HasColumnType("json").HasConversion(new ListConverter<string>());
 
 		builder.Ignore(e => e.TicketIds);
 	}
