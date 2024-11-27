@@ -10,23 +10,25 @@
     <hr class="divider">
     <div class="container2">
 
-        <input type="checkbox" class="checkboxCardInput" id="checkbox1">
-        <label for="checkbox1" class="checkboxCardContainer">
-            <div class="checkboxCardContent">
-                <h2 class="checkboxCardNumber">S01</h2>
-                <div class="lines">
-                    <div class="line full"></div>
-                    <div class="line half"></div>
-                    <div class="line half"></div>
+        <div>
+            <input type="checkbox" class="checkboxCardInput" id="checkbox1">
+            <label for="checkbox1" class="checkboxCardContainer">
+                <div class="checkboxCardContent">
+                    <h2 class="checkboxCardNumber">S12</h2>
+                    <div class="lines">
+                        <div class="line full"></div>
+                        <div class="line half"></div>
+                        <div class="line half"></div>
+                    </div>
                 </div>
-            </div>
-        </label>
+            </label>
+        </div>
 
         <div>
             <input type="checkbox" class="checkboxCardInput" id="checkbox2">
             <label for="checkbox2" class="checkboxCardContainer">
                 <div class="checkboxCardContent">
-                    <h2 class="checkboxCardNumber">S01</h2>
+                    <h2 class="checkboxCardNumber">S13</h2>
                     <div class="lines">
                         <div class="line full"></div>
                         <div class="line half"></div>
@@ -40,7 +42,7 @@
             <input type="checkbox" class="checkboxCardInput" id="checkbox3">
             <label for="checkbox3" class="checkboxCardContainer">
                 <div class="checkboxCardContent">
-                    <h2 class="checkboxCardNumber">S01</h2>
+                    <h2 class="checkboxCardNumber">S14</h2>
                     <div class="lines">
                         <div class="line full"></div>
                         <div class="line half"></div>
@@ -54,7 +56,7 @@
             <input type="checkbox" class="checkboxCardInput" id="checkbox4">
             <label for="checkbox4" class="checkboxCardContainer">
                 <div class="checkboxCardContent">
-                    <h2 class="checkboxCardNumber">S01</h2>
+                    <h2 class="checkboxCardNumber">S15</h2>
                     <div class="lines">
                         <div class="line full"></div>
                         <div class="line half"></div>
@@ -68,7 +70,7 @@
             <input type="checkbox" class="checkboxCardInput" id="checkbox5">
             <label for="checkbox5" class="checkboxCardContainer">
                 <div class="checkboxCardContent">
-                    <h2 class="checkboxCardNumber">S01</h2>
+                    <h2 class="checkboxCardNumber">S16</h2>
                     <div class="lines">
                         <div class="line full"></div>
                         <div class="line half"></div>
@@ -89,10 +91,27 @@
 </div>
 
 <script>
+    const checkboxes = document.getElementsByClassName('checkboxCardInput');
+    for (let checkbox of checkboxes) {
+        checkbox.addEventListener('change', function () {
+            const remove = !this.checked;
+            const ticketId = this.parentElement.getElementsByClassName('checkboxCardNumber')[0].textContent;
+            console.log(ticketId);
+            fetch("/step/update-sprint-backlog", {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ ticketId: ticketId, remove: remove })
+            })
+        });
+    }
+    
     document.getElementById("prev").addEventListener('click', function () {
         window.location.href = `/step/4`
     });
     document.getElementById("next").addEventListener('click', function () {
         window.location.href = `/step/4/2`
     });
+
 </script>

@@ -1,4 +1,6 @@
-﻿@* @page *@
+﻿@model List<string>
+
+@* @page *@
 @* @model Step4PageTemplate *@
 @* *@
 @* @{ *@
@@ -11,73 +13,22 @@
     <hr class="divider">
     <div class="container2">
 
-        <input type="checkbox" class="checkboxCardInput" id="checkbox1">
-        <label for="checkbox1" class="checkboxCardContainer">
-            <div class="checkboxCardContent">
-                <h2 class="checkboxCardNumber">S01</h2>
-                <div class="lines">
-                    <div class="line full"></div>
-                    <div class="line half"></div>
-                    <div class="line half"></div>
-                </div>
+        @foreach (var ticketId in Model)
+        {
+            <div>
+                <input type="checkbox" class="checkboxCardInput" id="checkbox2">
+                <label for="checkbox2" class="checkboxCardContainer">
+                    <div class="checkboxCardContent">
+                        <h2 class="checkboxCardNumber">@ticketId</h2>
+                        <div class="lines">
+                            <div class="line full"></div>
+                            <div class="line half"></div>
+                            <div class="line half"></div>
+                        </div>
+                    </div>
+                </label>
             </div>
-        </label>
-
-        <div>
-            <input type="checkbox" class="checkboxCardInput" id="checkbox2">
-            <label for="checkbox2" class="checkboxCardContainer">
-                <div class="checkboxCardContent">
-                    <h2 class="checkboxCardNumber">S01</h2>
-                    <div class="lines">
-                        <div class="line full"></div>
-                        <div class="line half"></div>
-                        <div class="line half"></div>
-                    </div>
-                </div>
-            </label>
-        </div>
-
-        <div>
-            <input type="checkbox" class="checkboxCardInput" id="checkbox3">
-            <label for="checkbox3" class="checkboxCardContainer">
-                <div class="checkboxCardContent">
-                    <h2 class="checkboxCardNumber">S01</h2>
-                    <div class="lines">
-                        <div class="line full"></div>
-                        <div class="line half"></div>
-                        <div class="line half"></div>
-                    </div>
-                </div>
-            </label>
-        </div>
-
-        <div>
-            <input type="checkbox" class="checkboxCardInput" id="checkbox4">
-            <label for="checkbox4" class="checkboxCardContainer">
-                <div class="checkboxCardContent">
-                    <h2 class="checkboxCardNumber">S01</h2>
-                    <div class="lines">
-                        <div class="line full"></div>
-                        <div class="line half"></div>
-                        <div class="line half"></div>
-                    </div>
-                </div>
-            </label>
-        </div>
-
-        <div>
-            <input type="checkbox" class="checkboxCardInput" id="checkbox5">
-            <label for="checkbox5" class="checkboxCardContainer">
-                <div class="checkboxCardContent">
-                    <h2 class="checkboxCardNumber">S01</h2>
-                    <div class="lines">
-                        <div class="line full"></div>
-                        <div class="line half"></div>
-                        <div class="line half"></div>
-                    </div>
-                </div>
-            </label>
-        </div>
+        }
     </div>
 
     <button class="stepControlButtons rightButton" id="prev">
