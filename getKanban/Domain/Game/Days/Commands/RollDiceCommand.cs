@@ -1,5 +1,4 @@
-﻿using Domain.DbContexts;
-using Domain.Game.Days.DayContainers;
+﻿using Domain.Game.Days.DayContainers;
 using Domain.Game.Teams;
 
 namespace Domain.Game.Days.Commands;
@@ -8,7 +7,7 @@ public class RollDiceCommand : DayCommand
 {
 	public override DayCommandType CommandType => DayCommandType.RollDice;
 
-	internal override void Execute(DomainContext context, Team team, Day day)
+	internal override void Execute(Team team, Day day)
 	{
 		day.EnsureCanPostEvent(CommandType);
 

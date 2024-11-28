@@ -1,5 +1,4 @@
-﻿using Domain.DbContexts;
-using Domain.DomainExceptions;
+﻿using Domain.DomainExceptions;
 using Domain.Game.Teams;
 
 namespace Domain.Game.Days.Commands;
@@ -12,7 +11,7 @@ public class ReleaseTicketsCommand : DayCommand
 
 	public IReadOnlyList<string> TicketIds { get; init; } = [];
 	
-	internal override void Execute(DomainContext context, Team team, Day day)
+	internal override void Execute(Team team, Day day)
 	{
 		day.EnsureCanPostEvent(CommandType);
 
@@ -24,11 +23,6 @@ public class ReleaseTicketsCommand : DayCommand
 		{
 			EnsureCanReleaseTickets(team);
 			TicketIds.ForEach(t => day.ReleaseTicketContainer.Update(t));
-		}
-
-		if (day.ReleaseTicketContainer.IsUpdated)
-		{
-			context.Entry(day.ReleaseTicketContainer).Property("ticketIds").IsModified = true;
 		}
 
 		day.PostDayEvent(CommandType, null);

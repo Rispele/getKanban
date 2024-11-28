@@ -23,14 +23,14 @@ public class UpdateSpringBacklogSaveTicketsTests
 		await context.Database.EnsureCreatedAsync();
 		var session = await SetupGameSession(
 			context,
-			session => session.Teams.Single().ExecuteCommand(context, new RollDiceCommand()));
+			session => session.Teams.Single().ExecuteCommand(new RollDiceCommand()));
 		
 		var command = new UpdateSprintBacklogCommand
 		{
 			TicketIds = ["S12"],
 			Remove = false
 		};
-		session.Teams.Single().ExecuteCommand(context, command);
+		session.Teams.Single().ExecuteCommand(command);
 		await context.SaveChangesAsync();
 		
 		var context2 = ConfigureDbContext();

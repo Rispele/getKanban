@@ -40,8 +40,8 @@ public class Concurrency_Test
 			To = TeamRole.Programmer
 		};
 		
-		team1.ExecuteCommand(context1, command);
-		team2.ExecuteCommand(context2, command);
+		team1.ExecuteCommand(command);
+		team2.ExecuteCommand(command);
 
 		await ShouldNotThrowOnSave(context1);
 		await ShouldThrowOnSave<DbUpdateConcurrencyException>(context2);
@@ -55,8 +55,8 @@ public class Concurrency_Test
 		var (team1, team2) = (session1.Teams.Single(), session2.Teams.Single());
 		var rollDiceCommand = new RollDiceCommand();
 		
-		team1.ExecuteCommand(context1, rollDiceCommand);
-		team2.ExecuteCommand(context2, rollDiceCommand);
+		team1.ExecuteCommand(rollDiceCommand);
+		team2.ExecuteCommand(rollDiceCommand);
 
 		await ShouldNotThrowOnSave(context1);
 		await ShouldThrowOnSave<DbUpdateException>(context2);
@@ -66,7 +66,7 @@ public class Concurrency_Test
 	public async Task UpdateCfdContainer_ConcurrentUpdate_ShouldThrowOnConflict()
 	{
 		var (context1, context2, session1, session2) = await SetupGameSessionInDifferentContexts(
-			(c, s) => s.Teams.Single().ExecuteCommand(c, new RollDiceCommand()));
+			(c, s) => s.Teams.Single().ExecuteCommand(new RollDiceCommand()));
 		var (team1, team2) = (session1.Teams.Single(), session2.Teams.Single());
 
 		var command = new UpdateCfdCommand
@@ -75,8 +75,8 @@ public class Concurrency_Test
 			Value = 1
 		};
 		
-		team1.ExecuteCommand(context1, command);
-		team2.ExecuteCommand(context2, command);
+		team1.ExecuteCommand(command);
+		team2.ExecuteCommand(command);
 
 		await ShouldNotThrowOnSave(context1);
 		await ShouldThrowOnSave<DbUpdateConcurrencyException>(context2);
@@ -86,7 +86,7 @@ public class Concurrency_Test
 	public async Task ReleaseTicketsContainer_ConcurrentUpdate_ShouldThrowOnConflict()
 	{
 		var (context1, context2, session1, session2) = await SetupGameSessionInDifferentContexts(
-			(c, s) => s.Teams.Single().ExecuteCommand(c, new RollDiceCommand()));
+			(c, s) => s.Teams.Single().ExecuteCommand(new RollDiceCommand()));
 		var (team1, team2) = (session1.Teams.Single(), session2.Teams.Single());
 
 		var command = new ReleaseTicketsCommand
@@ -94,8 +94,8 @@ public class Concurrency_Test
 			TicketIds = ["S01", "S05"]
 		};
 		
-		team1.ExecuteCommand(context1, command);
-		team2.ExecuteCommand(context2, command);
+		team1.ExecuteCommand(command);
+		team2.ExecuteCommand(command);
 
 		await ShouldNotThrowOnSave(context1);
 		await ShouldThrowOnSave<DbUpdateConcurrencyException>(context2);

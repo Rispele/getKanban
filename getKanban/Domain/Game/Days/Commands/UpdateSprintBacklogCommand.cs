@@ -1,5 +1,4 @@
-﻿using Domain.DbContexts;
-using Domain.DomainExceptions;
+﻿using Domain.DomainExceptions;
 using Domain.Game.Teams;
 
 namespace Domain.Game.Days.Commands;
@@ -12,7 +11,7 @@ public class UpdateSprintBacklogCommand : DayCommand
 
 	public bool Remove { get; init; }
 
-	internal override void Execute(DomainContext context, Team team, Day day)
+	internal override void Execute(Team team, Day day)
 	{
 		day.EnsureCanPostEvent(CommandType);
 
@@ -27,11 +26,6 @@ public class UpdateSprintBacklogCommand : DayCommand
 				EnsureCanTakeTickets(team);
 				day.UpdateSprintBacklogContainer.Update(ticketId);
 			}
-		}
-
-		if (day.UpdateSprintBacklogContainer.IsUpdated)
-		{
-			context.Entry(day.UpdateSprintBacklogContainer).Property("ticketIds").IsModified = true;
 		}
 
 		day.PostDayEvent(CommandType, null);

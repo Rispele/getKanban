@@ -31,16 +31,16 @@ public class TeamService : ITeamService
 			throw new InvalidOperationException($"User with id: {userId} do not have access to this team.");
 		}
 		
-		team.ExecuteCommand(context, dayCommand);
+		team.ExecuteCommand(dayCommand);
 
 		await context.SaveChangesAsync();
 
-		return dayDtoConverter.Convert(team.CurrentDay);
+		return dayDtoConverter.Convert(team.CurrentDay!);
 	}
 
 	public async Task<DayDto> GetCurrentDayAsync(Guid gameSessionId, Guid teamId)
 	{
 		var team = await context.GetTeamAsync(gameSessionId, teamId);
-		return dayDtoConverter.Convert(team.CurrentDay);
+		return dayDtoConverter.Convert(team.CurrentDay!);
 	}
 }

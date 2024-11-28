@@ -20,6 +20,23 @@ public class ExtendedTrackerRegistry
 			.ToDictionary(definition => definition.Type);
 	}
 
+	public bool TryGetTrackedMemberName(object entity, out IEnumerable<string>? memberNames)
+	{
+		memberNames = null;
+
+		var entityType = entity.GetType();
+		if (!extendedTrackerTypeDefinitions.TryGetValue(entityType, out var extendedTrackerTypeDefinition))
+		{
+			return false;
+		}
+
+		memberNames = extendedTrackerTypeDefinition.Bindings
+			.Where(binding => binding.Tracker.Value(entity)?.Equals(true) ?? false)
+			.Select(binding => binding.TrackingName);
+
+		return true;
+	}
+
 	private static ExtendedTrackerTypeDefinition BuildTypeDefinition(Type type)
 	{
 		var properties = type.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
