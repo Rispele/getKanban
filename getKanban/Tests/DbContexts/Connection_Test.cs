@@ -14,7 +14,7 @@ public class Connection_Test
 	{
 		var db = new DomainContext();
 		db.Database.EnsureCreated();
-		
+
 		var db1 = new ConnectionsContext();
 		db1.Database.EnsureCreated();
 	}
@@ -27,7 +27,18 @@ public class Connection_Test
 			.GetEntityTypes()
 			.Select(t => t.GetTableName()!)
 			.Select(DropTableSql)
-			.ForEach(sql => db.Database.ExecuteSqlRaw(sql));
+			.ForEach(
+				sql =>
+				{
+					try
+					{
+						db.Database.ExecuteSqlRaw(sql);
+					}
+					catch (Exception e)
+					{
+						Console.WriteLine(e.Message);
+					}
+				});
 
 		string DropTableSql(string tableName)
 		{
