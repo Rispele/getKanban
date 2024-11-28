@@ -31,7 +31,7 @@ public class ExtendedTrackerRegistry
 		}
 
 		memberNames = extendedTrackerTypeDefinition.Bindings
-			.Where(binding => binding.Tracker.Value(entity)?.Equals(true) ?? false)
+			.Where(binding => binding.IsUpdated(entity))
 			.Select(binding => binding.TrackingName);
 
 		return true;
