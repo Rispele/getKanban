@@ -1,12 +1,5 @@
 ﻿@model Guid?
 
-@* @page *@
-@* @model Step1_1PageTemplate *@
-@* *@
-@* @{ *@
-@*     ViewData["Title"] = "Step1.1"; *@
-@* } *@
-
 <div class="stepHeader">
     <h1 class="fs-1 fw-bold text-center">Команда pipipupu. День 9</h1>
 </div>
@@ -27,7 +20,7 @@
     </button>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
+<script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
     const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
     connection.start();

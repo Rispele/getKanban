@@ -19,7 +19,7 @@
     Далее
 </button>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
+<script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
     const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
     connection.start();

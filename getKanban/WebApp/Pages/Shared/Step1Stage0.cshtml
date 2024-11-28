@@ -1,9 +1,4 @@
-﻿@* @page *@
-@model Guid?
-@* *@
-@* @{ *@
-@*     ViewData["Title"] = "FirstStep"; *@
-@* } *@
+﻿@model Guid?
 
 <div class="stepHeader">
     <h1 class="fs-1 fw- text-center">Команда pipipupu. День 9</h1>
@@ -20,15 +15,11 @@
     </div>
 </div>
 
-@* <button class="stepControlButtons leftButton"> *@
-@*     Назад *@
-@* </button> *@
-
 <button class="stepControlButtons rightButton" id="next">
     Далее
 </button>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
+<script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
     const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
     connection.start();

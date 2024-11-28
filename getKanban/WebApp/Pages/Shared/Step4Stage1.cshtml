@@ -1,12 +1,5 @@
 ﻿@model Guid?
 
-@* @page *@
-@* @model Step4PageTemplate *@
-@* *@
-@* @{ *@
-@*     ViewData["Title"] = "Step4"; *@
-@* } *@
-
 <div class="container1">
     <h1 class="title">Выберите тикеты, которые были сегодня поставлены</h1>
     <hr class="divider">
@@ -92,7 +85,7 @@
     </button>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
+<script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
     const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
     connection.start();

@@ -1,12 +1,6 @@
 ﻿@using Core.Dtos.Containers.TeamMembers
 @model (Guid? currentSessionId, List<Core.Dtos.Containers.TeamMemberDto> teamMemberDtos)
 
-@* @page *@
-@* @model Step1_2PageTemplate *@
-@* *@
-@* @{ *@
-@*     ViewData["Title"] = "Step1.2"; *@
-@* } *@
 <meta charset="UTF-8">
 <div class="table-container">
     <table>
@@ -70,7 +64,7 @@
     <p class="fs-6">Бросить кубики</p>
 </button>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
+<script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
     const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
     connection.start();
