@@ -1,4 +1,5 @@
-﻿using Domain.Game.Days;
+﻿using Domain.DomainExceptions;
+using Domain.Game.Days;
 using Domain.Game.Days.Commands;
 using Domain.Game.Days.DayContainers;
 using Domain.Game.Days.DayContainers.RollDice;
@@ -14,16 +15,25 @@ public partial class Team
 
 	private int currentDayNumber;
 	private List<Day> days { get; } = null!;
-	private int previousDayNumber => currentDayNumber - 1;
 
 	public IReadOnlyList<Day> Days => days;
-	public Day? CurrentDay => days.SingleOrDefault(d => d.Number == currentDayNumber);
-	internal Day? previousDay => days.SingleOrDefault(d => d.Number == previousDayNumber);
 
-	public IReadOnlyList<TeamMember> CurrentDayTeamRoleUpdates => CurrentDay?.TeamMembersContainer.TeamMembers
-	                                                           ?? Array.Empty<TeamMember>();
+	public Day CurrentDay
+	{
+		get
+		{
+			if (days.IsNullOrEmpty())
+			{
+				throw new DomainException("Game session is not initialized");
+			}
 
-	public RollDiceContainer? CurrentDayRollDiceContainer => CurrentDay?.DiceRollContainer;
+			return days.Single(d => d.Number == currentDayNumber);
+		}
+	}
+
+	internal Day? PreviousDay => days.SingleOrDefault(d => d.Number == currentDayNumber - 1);
+
+	public IReadOnlyList<TeamMember> CurrentDayTeamRoleUpdates => CurrentDay.TeamMembersContainer.TeamMembers;
 
 	public IReadOnlyList<UpdateCfdContainer> CfdContainers => days
 		.OrderBy(d => d.Number)
@@ -65,6 +75,11 @@ public partial class Team
 		return daysToProcess.Select(d => d.WorkAnotherTeamContainer?.ScoresNumber ?? 0).Sum();
 	}
 
+	public bool IsCurrentDayCfdValid()
+	{
+		return CurrentDay.IsCfdValid(PreviousDay?.UpdateCfdContainer ?? UpdateCfdContainer.None);
+	}
+
 	private Day ConfigureDay(int dayNumber, List<Day> daysToProcess)
 	{
 		var takenTickets = BuildTakenTickets(daysToProcess);
@@ -75,10 +90,9 @@ public partial class Team
 		var anotherTeamAppeared = dayNumber > 9 &&
 		                          BuildAnotherTeamScores(daysToProcess) < settings.UpdateSprintBacklogEveryDaySince;
 
-		var (scenario, initiallyAwaitedEvents) = ConfigureScenario(
-			anotherTeamAppeared,
-			shouldRelease,
-			shouldUpdateSpringBacklog);
+		var scenario = ScenarioBuilder.Create()
+			.DefaultScenario(anotherTeamAppeared, shouldRelease, shouldUpdateSpringBacklog)
+			.Build();
 
 		var testersNumber = dayNumber >= settings.IncreaseTestersNumberSince
 			? settings.IncreasedTestersNumber
@@ -87,68 +101,8 @@ public partial class Team
 		return new Day(
 			dayNumber,
 			scenario,
-			initiallyAwaitedEvents,
 			settings.AnalystsNumber,
 			settings.ProgrammersNumber,
 			testersNumber);
-	}
-
-	//TODO: пока что так, потом мб декларативно опишем
-	private static (Scenario, List<DayCommandType>) ConfigureScenario(
-		bool anotherTeamAppeared,
-		bool shouldRelease,
-		bool shouldUpdateSprintBacklog)
-	{
-		var scenarioBuilder = ScenarioBuilder.Create()
-			.For(
-				DayCommandType.WorkAnotherTeam,
-				b => b
-					.AwaitCommands(DayCommandType.UpdateTeamRoles, DayCommandType.RollDice)
-					.RemoveAwaited(DayCommandType.WorkAnotherTeam))
-			.For(DayCommandType.UpdateTeamRoles, builder => builder.ReAwaitCommand(DayCommandType.UpdateTeamRoles))
-			.For(
-				DayCommandType.RollDice,
-				builder =>
-				{
-					var toAwait = new List<DayCommandType> { DayCommandType.UpdateCfd };
-					if (shouldRelease)
-					{
-						toAwait.Add(DayCommandType.ReleaseTickets);
-					}
-
-					if (shouldUpdateSprintBacklog)
-					{
-						toAwait.Add(DayCommandType.UpdateSprintBacklog);
-					}
-
-					return builder
-						.AwaitCommands(toAwait.ToArray())
-						.RemoveAwaited(DayCommandType.RollDice, DayCommandType.UpdateTeamRoles);
-				})
-			.For(DayCommandType.ReleaseTickets, builders => builders.ReAwaitCommand(DayCommandType.ReleaseTickets))
-			.For(
-				DayCommandType.UpdateSprintBacklog,
-				builders => builders.ReAwaitCommand(DayCommandType.UpdateSprintBacklog))
-			.For(
-				DayCommandType.UpdateCfd,
-				builder => builder.ReAwaitCommand(DayCommandType.UpdateCfd).WithCondition("Released", null),
-				builder => builder.ReAwaitCommand(DayCommandType.UpdateCfd).WithCondition("ToDeploy", null),
-				builder => builder.ReAwaitCommand(DayCommandType.UpdateCfd).WithCondition("WithTesters", null),
-				builder => builder.ReAwaitCommand(DayCommandType.UpdateCfd).WithCondition("WithProgrammers", null),
-				builder => builder.ReAwaitCommand(DayCommandType.UpdateCfd).WithCondition("WithAnalysts", null),
-				builder => builder.AwaitCommands(DayCommandType.UpdateCfd, DayCommandType.EndDay)
-					.WithCondition("Released", ScenarioItemConditions.NotNull)
-					.WithCondition("ToDeploy", ScenarioItemConditions.NotNull)
-					.WithCondition("WithTesters", ScenarioItemConditions.NotNull)
-					.WithCondition("WithProgrammers", ScenarioItemConditions.NotNull)
-					.WithCondition("WithAnalysts", ScenarioItemConditions.NotNull)
-					.RemoveAwaited(DayCommandType.UpdateCfd))
-			.For(DayCommandType.EndDay, b => b);
-		return (
-			scenarioBuilder,
-			anotherTeamAppeared
-				? [DayCommandType.WorkAnotherTeam]
-				: [DayCommandType.UpdateTeamRoles, DayCommandType.RollDice]
-		);
 	}
 }

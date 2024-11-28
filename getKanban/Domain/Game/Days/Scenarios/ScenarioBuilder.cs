@@ -3,6 +3,7 @@
 public class ScenarioBuilder
 {
 	private readonly Dictionary<DayCommandType, ScenarioItem[]> scenario = new();
+	private DayCommandType[] initiallyAwaitedCommands;
 
 	private ScenarioBuilder()
 	{
@@ -23,9 +24,15 @@ public class ScenarioBuilder
 		return this;
 	}
 
+	public ScenarioBuilder WithInitiallyAwaitedCommands(params DayCommandType[] commands)
+	{
+		initiallyAwaitedCommands = commands;
+		return this;
+	}
+
 	public Scenario Build()
 	{
-		return new Scenario(scenario);
+		return new Scenario(scenario, initiallyAwaitedCommands);
 	}
 
 	public static implicit operator Scenario(ScenarioBuilder builder)

@@ -4,10 +4,15 @@ namespace Domain.Game.Days.Scenarios;
 
 public class Scenario
 {
-	[JsonProperty] private readonly Dictionary<DayCommandType, ScenarioItem[]> scenario;
+	[JsonProperty] 
+	private readonly Dictionary<DayCommandType, ScenarioItem[]> scenario;
+	
+	[JsonProperty]
+	public DayCommandType[] InitiallyAwaitedCommands { get; init; }
 
-	public Scenario(Dictionary<DayCommandType, ScenarioItem[]> scenario)
+	public Scenario(Dictionary<DayCommandType, ScenarioItem[]> scenario, DayCommandType[] initiallyAwaitedCommands)
 	{
+		InitiallyAwaitedCommands = initiallyAwaitedCommands;
 		this.scenario = scenario;
 	}
 

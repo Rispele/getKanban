@@ -42,14 +42,13 @@ public class Day
 	internal Day(
 		int number,
 		Scenario scenario,
-		List<DayCommandType> initiallyAwaitedEvents,
 		int analystsNumber,
 		int programmersNumber,
 		int testersNumber)
 	{
 		Number = number;
 		this.scenario = scenario;
-		awaitedCommands = initiallyAwaitedEvents.Select(t => new AwaitedCommands(t)).ToList();
+		awaitedCommands = scenario.InitiallyAwaitedCommands.Select(t => new AwaitedCommands(t)).ToList();
 
 		AnalystsNumber = analystsNumber;
 		ProgrammersNumber = programmersNumber;
@@ -84,6 +83,54 @@ public class Day
 		}
 
 		throw new DayEventNotAwaitedException($"{commandType} is not awaited");
+	}
+
+	internal bool IsCfdValid(UpdateCfdContainer previousDayCfd)
+	{
+		if (UpdateCfdContainer
+		    is { Released: null }
+		    or { ToDeploy: null }
+		    or { WithTesters: null }
+		    or { WithProgrammers: null }
+		    or { WithAnalysts: null })
+		{
+			return false;
+		}
+
+		var currentSumToValidate = UpdateCfdContainer.Released! + UpdateCfdContainer.ToDeploy!;
+		var previousSumToValidate = previousDayCfd.Released! + previousDayCfd.ToDeploy!;
+		if (!ValidateArgumentsSum())
+		{
+			return false;
+		}
+
+		currentSumToValidate += UpdateCfdContainer.WithTesters;
+		previousSumToValidate += previousDayCfd.WithTesters!;
+		if (!ValidateArgumentsSum())
+		{
+			return false;
+		}
+
+		currentSumToValidate += UpdateCfdContainer.WithProgrammers;
+		previousSumToValidate += previousDayCfd.WithProgrammers!;
+		if (!ValidateArgumentsSum())
+		{
+			return false;
+		}
+
+		currentSumToValidate += UpdateCfdContainer.WithAnalysts;
+		previousSumToValidate += previousDayCfd.WithAnalysts!;
+		if (!ValidateArgumentsSum())
+		{
+			return false;
+		}
+
+		return true;
+
+		bool ValidateArgumentsSum()
+		{
+			return !(currentSumToValidate < previousSumToValidate);
+		}
 	}
 
 	private bool CanPostEvent(DayCommandType commandType)

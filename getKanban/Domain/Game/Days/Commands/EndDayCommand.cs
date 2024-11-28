@@ -23,41 +23,11 @@ public class EndDayCommand : DayCommand
 
 	private void EnsureCfdIsValid(Team team)
 	{
-		var currentDayCfd = team.CurrentDay.UpdateCfdContainer;
-		var previousDayCfd = team.previousDay?.UpdateCfdContainer ?? UpdateCfdContainer.None;
+		var previousDayCfd = team.PreviousDay?.UpdateCfdContainer ?? UpdateCfdContainer.None;
 
-		if (currentDayCfd
-		    is { Released: null }
-		    or { ToDeploy: null }
-		    or { WithTesters: null }
-		    or { WithProgrammers: null }
-		    or { WithAnalysts: null })
+		if (!team.CurrentDay!.IsCfdValid(previousDayCfd))
 		{
 			throw new DomainException("Invalid cfd arguments");
-		}
-
-		var currentSumToValidate = currentDayCfd.Released! + currentDayCfd.ToDeploy!;
-		var previousSumToValidate = previousDayCfd.Released! + previousDayCfd.ToDeploy!;
-		ValidateArgumentsSum(currentSumToValidate.Value, previousSumToValidate.Value);
-
-		currentSumToValidate += currentDayCfd.WithTesters;
-		previousSumToValidate += previousDayCfd.WithTesters!;
-		ValidateArgumentsSum(currentSumToValidate.Value, previousSumToValidate.Value);
-
-		currentSumToValidate += currentDayCfd.WithProgrammers;
-		previousSumToValidate += previousDayCfd.WithProgrammers!;
-		ValidateArgumentsSum(currentSumToValidate.Value, previousSumToValidate.Value);
-
-		currentSumToValidate += currentDayCfd.WithAnalysts;
-		previousSumToValidate += previousDayCfd.WithAnalysts!;
-		ValidateArgumentsSum(currentSumToValidate.Value, previousSumToValidate.Value);
-
-		void ValidateArgumentsSum(int currentSum, int previousSum)
-		{
-			if (currentSum < previousSum)
-			{
-				throw new DomainException("Invalid cfd arguments");
-			}
 		}
 	}
 }
