@@ -109,6 +109,16 @@ public class LobbyHub : Hub
 		await Clients.Group(GetGroupId(gameSessionId)).SendAsync("NotifyPageChange", pageNumber, stageNumber);
 	}
 
+	public async Task UpdateRole(Guid gameSessionId, long teamMemberId, string roleTo)
+	{
+		await Clients.Group(GetGroupId(gameSessionId)).SendAsync("NotifyUpdateRole", teamMemberId, roleTo);
+	}
+	
+	public async Task UpdateTicketChoice(Guid gameSessionId, string ticketId)
+	{
+		await Clients.OthersInGroup(GetGroupId(gameSessionId)).SendAsync("NotifyUpdateTicketChoice", ticketId);
+	}
+
 	private async Task AddCurrentConnectionToLobbyGroupAsync(string groupId)
 	{
 		var requestContext = RequestContextFactory.Build(Context);

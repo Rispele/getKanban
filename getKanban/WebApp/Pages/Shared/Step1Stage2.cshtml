@@ -77,6 +77,12 @@
     connection.on("NotifyPageChange", function (page, stage) {
         window.location.href = `/step/${page}/${stage}`;
     });
+    connection.on("NotifyUpdateRole", function (teamMemberId, roleTo) {
+        const draggableTemp = document.getElementById(teamMemberId.toString());
+        const draggable = draggableTemp.cloneNode(true);
+        document.getElementById(roleTo).appendChild(draggable);
+        draggableTemp.remove();
+    });
     
     const draggables = document.getElementsByClassName('draggable');
     for (let draggable of draggables) {
@@ -89,7 +95,9 @@
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify([teamMemberId, roleTo])
-            })
+            }).then(function () {
+                connection.invoke("UpdateRole", "@Model.currentSessionId", parseInt(teamMemberId), roleTo);
+            });
         });
     }
 

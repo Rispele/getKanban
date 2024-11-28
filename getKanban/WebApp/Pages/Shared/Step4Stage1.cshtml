@@ -13,8 +13,8 @@
     <div class="container2">
 
         <div>
-            <input type="checkbox" class="checkboxCardInput" id="checkbox1">
-            <label for="checkbox1" class="checkboxCardContainer">
+            <input type="checkbox" class="checkboxCardInput" id="S12">
+            <label for="S12" class="checkboxCardContainer">
                 <div class="checkboxCardContent">
                     <h2 class="checkboxCardNumber">S12</h2>
                     <div class="lines">
@@ -27,8 +27,8 @@
         </div>
 
         <div>
-            <input type="checkbox" class="checkboxCardInput" id="checkbox2">
-            <label for="checkbox2" class="checkboxCardContainer">
+            <input type="checkbox" class="checkboxCardInput" id="S13">
+            <label for="S13" class="checkboxCardContainer">
                 <div class="checkboxCardContent">
                     <h2 class="checkboxCardNumber">S13</h2>
                     <div class="lines">
@@ -41,8 +41,8 @@
         </div>
 
         <div>
-            <input type="checkbox" class="checkboxCardInput" id="checkbox3">
-            <label for="checkbox3" class="checkboxCardContainer">
+            <input type="checkbox" class="checkboxCardInput" id="S14">
+            <label for="S14" class="checkboxCardContainer">
                 <div class="checkboxCardContent">
                     <h2 class="checkboxCardNumber">S14</h2>
                     <div class="lines">
@@ -55,8 +55,8 @@
         </div>
 
         <div>
-            <input type="checkbox" class="checkboxCardInput" id="checkbox4">
-            <label for="checkbox4" class="checkboxCardContainer">
+            <input type="checkbox" class="checkboxCardInput" id="S15">
+            <label for="S15" class="checkboxCardContainer">
                 <div class="checkboxCardContent">
                     <h2 class="checkboxCardNumber">S15</h2>
                     <div class="lines">
@@ -69,8 +69,8 @@
         </div>
 
         <div>
-            <input type="checkbox" class="checkboxCardInput" id="checkbox5">
-            <label for="checkbox5" class="checkboxCardContainer">
+            <input type="checkbox" class="checkboxCardInput" id="S16">
+            <label for="S16" class="checkboxCardContainer">
                 <div class="checkboxCardContent">
                     <h2 class="checkboxCardNumber">S16</h2>
                     <div class="lines">
@@ -94,6 +94,16 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
 <script>
+    const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
+    connection.start();
+    connection.on("NotifyPageChange", function (page, stage) {
+        window.location.href = `/step/${page}/${stage}`;
+    });
+    connection.on("NotifyUpdateTicketChoice", function (ticketId) {
+        const ticket = document.getElementById(ticketId);
+        ticket.checked = !ticket.checked;
+    });
+    
     const checkboxes = document.getElementsByClassName('checkboxCardInput');
     for (let checkbox of checkboxes) {
         checkbox.addEventListener('change', function () {
@@ -106,15 +116,11 @@
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({ ticketId: ticketId, remove: remove })
-            })
+            }).then(function () {
+                connection.invoke("UpdateTicketChoice", "@Model", ticketId);
+            });
         });
     }
-
-    const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
-    connection.start();
-    connection.on("NotifyPageChange", function (page, stage) {
-        window.location.href = `/step/${page}/${stage}`;
-    });
 
     document.getElementById("prev").addEventListener('click', function () {
         connection.invoke("ChangePage", "@Model", 4, 0)
@@ -128,4 +134,5 @@
                 window.location.href = `/step/4/2`;
             });
     });
+
 </script>
