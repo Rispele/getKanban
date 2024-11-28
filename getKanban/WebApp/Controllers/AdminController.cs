@@ -1,5 +1,4 @@
-﻿using Core.DbContexts;
-using Core.DbContexts.Extensions;
+﻿using Core.DbContexts.Extensions;
 using Core.Dtos;
 using Core.Dtos.Converters;
 using Core.Services.Contracts;
@@ -21,8 +20,7 @@ public class AdminController : Controller
 		this.context = context;
 	}
 	
-	[HttpGet]
-	[Route("")]
+	[HttpGet("")]
 	public async Task<IActionResult> AdminPanelStart(Guid sessionId)
 	{
 		var session = await context.FindGameSessionsAsync(sessionId);
@@ -38,8 +36,7 @@ public class AdminController : Controller
 		});
 	}
 
-	[HttpGet]
-	[Route("days")]
+	[HttpGet("days")]
 	public async Task<IActionResult> AdminPanelDays(Guid sessionId, Guid teamId)
 	{
 		var session = await context.FindGameSessionsAsync(sessionId);
@@ -55,8 +52,7 @@ public class AdminController : Controller
 		});
 	}
 
-	[HttpGet]
-	[Route("edit")]
+	[HttpGet("edit")]
 	public IActionResult AdminPanelEditing(Guid sessionId, Guid teamId, int dayNumber)
 	{
 		//var dayConfiguration = ;

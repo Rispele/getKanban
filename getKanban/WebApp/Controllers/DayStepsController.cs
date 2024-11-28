@@ -17,23 +17,20 @@ public class DayStepsController : Controller
 		this.teamService = teamService;
 	}
 
-	[HttpGet]
-	[Route("1")]
-	[Route("1/0")]
+	[HttpGet("1")]
+	[HttpGet("1/0")]
 	public async Task<IActionResult> Step1Stage0()
 	{
 		return View(await gameSessionService.GetCurrentSessionId(RequestContextFactory.Build(Request)));
 	}
 
-	[HttpGet]
-	[Route("1/1")]
+	[HttpGet("1/1")]
 	public async Task<IActionResult> Step1Stage1()
 	{
 		return View(await gameSessionService.GetCurrentSessionId(RequestContextFactory.Build(Request)));
 	}
 
-	[HttpGet]
-	[Route("1/2")]
+	[HttpGet("1/2")]
 	public async Task<IActionResult> Step1Stage2()
 	{
 		var currentSessionId = await gameSessionService.GetCurrentSessionId(RequestContextFactory.Build(Request));
@@ -48,8 +45,7 @@ public class DayStepsController : Controller
 		return View((currentSessionId, teamMembers));
 	}
 
-	[HttpPost]
-	[Route("save-roles-transformation")]
+	[HttpPost("save-roles-transformation")]
 	public async Task SaveRolesTransformation([FromBody] string[] transformation)
 	{
 		var currentSessionId = await gameSessionService.GetCurrentSessionId(RequestContextFactory.Build(Request));
@@ -72,9 +68,8 @@ public class DayStepsController : Controller
 			});
 	}
 
-	[HttpGet]
-	[Route("2")]
-	[Route("2/0")]
+	[HttpGet("2")]
+	[HttpGet("2/0")]
 	public async Task<IActionResult> Step2Stage0()
 	{
 		var currentSessionId = await gameSessionService.GetCurrentSessionId(RequestContextFactory.Build(Request));
@@ -87,8 +82,7 @@ public class DayStepsController : Controller
 		return View((currentSessionId, diceRollResult.RollDiceContainer));
 	}
 
-	[HttpGet]
-	[Route("roll")]
+	[HttpGet("roll")]
 	public async Task RollDices()
 	{
 		var currentSessionId = await gameSessionService.GetCurrentSessionId(RequestContextFactory.Build(Request));
@@ -105,24 +99,21 @@ public class DayStepsController : Controller
 		);
 	}
 
-	[HttpGet]
-	[Route("3")]
-	[Route("3/0")]
+	[HttpGet("3")]
+	[HttpGet("3/0")]
 	public async Task<IActionResult> Step3Stage0()
 	{
 		return View(await gameSessionService.GetCurrentSessionId(RequestContextFactory.Build(Request)));
 	}
 
-	[HttpGet]
-	[Route("4")]
-	[Route("4/0")]
+	[HttpGet("4")]
+	[HttpGet("4/0")]
 	public async Task<IActionResult> Step4Stage0()
 	{
 		return View(await gameSessionService.GetCurrentSessionId(RequestContextFactory.Build(Request)));
 	}
 
-	[HttpGet]
-	[Route("4/1")]
+	[HttpGet("4/1")]
 	public async Task<IActionResult> Step4Stage1()
 	{
 		return View(await gameSessionService.GetCurrentSessionId(RequestContextFactory.Build(Request)));
@@ -134,8 +125,7 @@ public class DayStepsController : Controller
 		public bool Remove { get; set; }
 	}
 
-	[HttpPost]
-	[Route("update-sprint-backlog")]
+	[HttpPost("update-sprint-backlog")]
 	public async Task UpdateSprintBacklog([FromBody] TicketModel ticketModel)
 	{
 		var currentSessionId = await gameSessionService.GetCurrentSessionId(RequestContextFactory.Build(Request));
@@ -156,8 +146,7 @@ public class DayStepsController : Controller
 		);
 	}
 
-	[HttpGet]
-	[Route("4/2")]
+	[HttpGet("4/2")]
 	public async Task<IActionResult> Step4Stage2()
 	{
 		var currentSessionId = await gameSessionService.GetCurrentSessionId(RequestContextFactory.Build(Request));
@@ -171,23 +160,20 @@ public class DayStepsController : Controller
 		return View((currentSessionId, ticketIds));
 	}
 
-	[HttpGet]
-	[Route("5")]
-	[Route("5/0")]
+	[HttpGet("5")]
+	[HttpGet("5/0")]
 	public async Task<IActionResult> Step5Stage0()
 	{
 		return View(await gameSessionService.GetCurrentSessionId(RequestContextFactory.Build(Request)));
 	}
 
-	[HttpGet]
-	[Route("5/1")]
+	[HttpGet("5/1")]
 	public async Task<IActionResult> Step5Stage1()
 	{
 		return View(await gameSessionService.GetCurrentSessionId(RequestContextFactory.Build(Request)));
 	}
 
-	[HttpGet]
-	[Route("5/2")]
+	[HttpGet("5/2")]
 	public async Task<IActionResult> Step5Stage2()
 	{
 		return View(await gameSessionService.GetCurrentSessionId(RequestContextFactory.Build(Request)));

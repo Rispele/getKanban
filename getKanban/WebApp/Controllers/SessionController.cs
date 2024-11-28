@@ -14,8 +14,7 @@ public class SessionController : Controller
 		this.gameSessionService = gameSessionService;
 	}
 
-	[HttpGet]
-	[Route("")]
+	[HttpGet("")]
 	public async Task<IActionResult> EditSession(string invite)
 	{
 		var session = await gameSessionService.FindGameSession(
@@ -27,22 +26,13 @@ public class SessionController : Controller
 			: View("Error", "Запрашиваемая сессия не была найдена или закрыта.");
 	}
 
-	[HttpGet]
-	[Route("join")]
-	public IActionResult JoinSession()
-	{
-		return View();
-	}
+	[HttpGet("join")]
+	public IActionResult JoinSession() => View();
 
-	[HttpGet]
-	[Route("create")]
-	public IActionResult CreateSession()
-	{
-		return View();
-	}
+	[HttpGet("create")]
+	public IActionResult CreateSession() => View();
 
-	[HttpGet]
-	[Route("check")]
+	[HttpGet("check")]
 	public async Task<bool> CheckForOpenedGame(string invite)
 	{
 		var session = await gameSessionService.FindGameSession(
@@ -52,22 +42,19 @@ public class SessionController : Controller
 		return session is not null;
 	}
 
-	[HttpGet]
-	[Route("get-current-team")]
+	[HttpGet("get-current-team")]
 	public async Task<TeamDto?> GetCurrentTeam(Guid sessionId)
 	{
 		return await gameSessionService.GetCurrentTeam(RequestContextFactory.Build(Request), sessionId);
 	}
 	
-	[HttpGet]
-	[Route("get-team-invite")]
+	[HttpGet("get-team-invite")]
 	public Guid GetTeamInviteId(string invite)
 	{
 		return gameSessionService.GetTeamInviteId(invite);
 	}
 	
-	[HttpGet]
-	[Route("update-team-name")]
+	[HttpGet("update-team-name")]
 	public async Task UpdateTeamName(Guid sessionId, Guid teamId, string name)
 	{
 		await gameSessionService.UpdateTeamName(sessionId, teamId, name);

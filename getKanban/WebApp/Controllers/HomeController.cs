@@ -24,8 +24,7 @@ public class HomeController : Controller
 		return View();
 	}
 
-	[HttpGet]
-	[Route("add-username")]
+	[HttpGet("add-username")]
 	public async Task AddUserName(string name)
 	{
 		var userId = Guid.Parse(Request.Cookies[RequestContextKeys.UserId] ?? throw new InvalidOperationException());
