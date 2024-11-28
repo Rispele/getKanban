@@ -1,4 +1,4 @@
-﻿@model List<string>
+﻿@model (Guid? currentSessionId, List<string> ticketIds)
 
 @* @page *@
 @* @model Step4PageTemplate *@
@@ -13,7 +13,7 @@
     <hr class="divider">
     <div class="container2">
 
-        @foreach (var ticketId in Model)
+        @foreach (var ticketId in Model.ticketIds)
         {
             <div>
                 <input type="checkbox" class="checkboxCardInput" id="checkbox2">
@@ -40,11 +40,23 @@
     </button>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
 <script>
+    const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
+    connection.start();
+    connection.on("NotifyPageChange", function (page, stage) {
+        window.location.href = `/step/${page}/${stage}`;
+    });
     document.getElementById("prev").addEventListener('click', function () {
-        window.location.href = `/step/4/1`
+        connection.invoke("ChangePage", "@Model.currentSessionId", 4, 1)
+            .then(function () {
+                window.location.href = `/step/4/1`;
+            });
     });
     document.getElementById("next").addEventListener('click', function () {
-        window.location.href = `/step/5`
+        connection.invoke("ChangePage", "@Model.currentSessionId", 5, 0)
+            .then(function () {
+                window.location.href = `/step/5`;
+            });
     });
 </script>

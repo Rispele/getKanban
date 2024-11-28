@@ -1,4 +1,6 @@
-﻿@* @page *@
+﻿@model Guid?
+
+@* @page *@
 @* @model Step4PageTemplate *@
 @* *@
 @* @{ *@
@@ -89,11 +91,24 @@
     </button>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
 <script>
+    const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
+    connection.start();
+    connection.on("NotifyPageChange", function (page, stage) {
+        window.location.href = `/step/${page}/${stage}`;
+    });
+
     document.getElementById("prev").addEventListener('click', function () {
-        window.location.href = `/step/5/1`
+        connection.invoke("ChangePage", "@Model", 5, 1)
+            .then(function () {
+                window.location.href = `/step/5/1`;
+            });
     });
     document.getElementById("next").addEventListener('click', function () {
-        window.location.href = `/step/6`
+        connection.invoke("ChangePage", "@Model", 6, 0)
+            .then(function () {
+                window.location.href = `/step/6`;
+            });
     });
 </script>

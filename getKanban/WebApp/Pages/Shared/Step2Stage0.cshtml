@@ -1,6 +1,6 @@
 ﻿@using Core.Dtos.Containers.RollDice
 @using Core.Dtos.Containers.TeamMembers
-@model Core.Dtos.Containers.RollDice.RollDiceContainerDto
+@model (Guid? currentSessionId, Core.Dtos.Containers.RollDice.RollDiceContainerDto diceResults)
 
 <div class="stepHeader">
     <h1 class="fs-1 fw- text-center">Команда pipipupu. День 9</h1>
@@ -17,7 +17,7 @@
             .Select(t => t.Scores);
 
     private IEnumerable<DiceRollResultDto> GetDiceRollResultsByInitialRole(TeamRoleDto initialRole) =>
-        Model.DiceRollResults
+        Model.diceResults.DiceRollResults
             .Where(t => t.InitialRole == initialRole);
 }
 
@@ -46,8 +46,18 @@
     Далее
 </button>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
 <script>
+    const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
+    connection.start();
+    connection.on("NotifyPageChange", function (page, stage) {
+        window.location.href = `/step/${page}/${stage}`;
+    });
+
     document.getElementById("next").addEventListener('click', function () {
-        window.location.href = `/step/3`
+        connection.invoke("ChangePage", "@Model.currentSessionId", 3, 0)
+            .then(function () {
+                window.location.href = `/step/3`;
+            });
     });
 </script>

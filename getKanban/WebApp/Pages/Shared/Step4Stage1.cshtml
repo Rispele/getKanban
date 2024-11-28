@@ -1,4 +1,6 @@
-﻿@* @page *@
+﻿@model Guid?
+
+@* @page *@
 @* @model Step4PageTemplate *@
 @* *@
 @* @{ *@
@@ -90,6 +92,7 @@
     </button>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
 <script>
     const checkboxes = document.getElementsByClassName('checkboxCardInput');
     for (let checkbox of checkboxes) {
@@ -106,12 +109,23 @@
             })
         });
     }
-    
-    document.getElementById("prev").addEventListener('click', function () {
-        window.location.href = `/step/4`
-    });
-    document.getElementById("next").addEventListener('click', function () {
-        window.location.href = `/step/4/2`
+
+    const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
+    connection.start();
+    connection.on("NotifyPageChange", function (page, stage) {
+        window.location.href = `/step/${page}/${stage}`;
     });
 
+    document.getElementById("prev").addEventListener('click', function () {
+        connection.invoke("ChangePage", "@Model", 4, 0)
+            .then(function () {
+                window.location.href = `/step/4`;
+            });
+    });
+    document.getElementById("next").addEventListener('click', function () {
+        connection.invoke("ChangePage", "@Model", 4, 2)
+            .then(function () {
+                window.location.href = `/step/4/2`;
+            });
+    });
 </script>

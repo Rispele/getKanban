@@ -1,5 +1,5 @@
 ﻿@using Core.Dtos.Containers.TeamMembers
-@model List<Core.Dtos.Containers.TeamMemberDto>
+@model (Guid? currentSessionId, List<Core.Dtos.Containers.TeamMemberDto> teamMemberDtos)
 
 @* @page *@
 @* @model Step1_2PageTemplate *@
@@ -20,7 +20,7 @@
         <tbody>
         <tr>
             <td class="dropzone" id="Analyst">
-                @foreach (var analyst in Model.Where(x => x.InitialRole == TeamRoleDto.Analyst))
+                @foreach (var analyst in Model.teamMemberDtos.Where(x => x.InitialRole == TeamRoleDto.Analyst))
                 {
                     <div class="draggable" draggable="true" id="@analyst.Id">
                         <div class="textContainer">
@@ -34,7 +34,7 @@
                 }
             </td>
             <td class="dropzone" id="Programmer">
-                @foreach (var programmer in Model.Where(x => x.InitialRole == TeamRoleDto.Programmer))
+                @foreach (var programmer in Model.teamMemberDtos.Where(x => x.InitialRole == TeamRoleDto.Programmer))
                 {
                     <div class="draggable" draggable="true" id="@programmer.Id">
                         <div class="textContainer">
@@ -48,7 +48,7 @@
                 }
             </td>
             <td class="dropzone" id="Tester">
-                @foreach (var tester in Model.Where(x => x.InitialRole == TeamRoleDto.Tester))
+                @foreach (var tester in Model.teamMemberDtos.Where(x => x.InitialRole == TeamRoleDto.Tester))
                 {
                     <div class="draggable" draggable="true" id="@tester.Id">
                         <div class="textContainer">
@@ -70,7 +70,14 @@
     <p class="fs-6">Бросить кубики</p>
 </button>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
 <script>
+    const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
+    connection.start();
+    connection.on("NotifyPageChange", function (page, stage) {
+        window.location.href = `/step/${page}/${stage}`;
+    });
+    
     const draggables = document.getElementsByClassName('draggable');
     for (let draggable of draggables) {
         draggable.addEventListener('dragend', function () {
@@ -85,10 +92,13 @@
             })
         });
     }
-    
+
     document.getElementById("roll").addEventListener('click', function () {
         fetch(`/step/roll`).then(function () {
-            window.location.href = `/step/2`
+            connection.invoke("ChangePage", "@Model.currentSessionId", 2, 0)
+                .then(function () {
+                    window.location.href = "/step/2";
+                });
         });
     });
 
@@ -101,4 +111,5 @@
                     ? "Tester"
                     : null;
     }
+
 </script>
