@@ -42,6 +42,14 @@ public class SessionController : Controller
 		return session is not null;
 	}
 
+	[HttpGet("create-session")]
+	public async Task<Guid?> CreateGameSession(string sessionName, long teamsCount)
+	{
+		var requestContext = RequestContextFactory.Build(Request);
+		var sessionId = await gameSessionService.CreateGameSession(requestContext, sessionName, teamsCount);
+		return sessionId;
+	}
+
 	[HttpGet("get-current-team")]
 	public async Task<TeamDto?> GetCurrentTeam(Guid sessionId)
 	{

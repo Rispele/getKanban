@@ -25,7 +25,7 @@ public class GameSessionService : IGameSessionService
 		this.connectionsContext = connectionsContext;
 	}
 
-	public async Task<GameSessionDto> CreateGameSession(
+	public async Task<Guid?> CreateGameSession(
 		RequestContext requestContext,
 		string name,
 		long teamsCount)
@@ -36,7 +36,7 @@ public class GameSessionService : IGameSessionService
 		context.GameSessions.Add(gameSession);
 		await context.SaveChangesAsync();
 
-		return GameSessionDtoConverter.For(ParticipantRole.Creator).Convert(gameSession);
+		return gameSession.Id;
 	}
 
 	public async Task<GameSessionDto?> FindGameSession(
@@ -65,6 +65,14 @@ public class GameSessionService : IGameSessionService
 		}
 
 		return GameSessionDtoConverter.For(participantRole).Convert(session);
+	}
+
+	public async Task<GameSessionDto?> FindGameSession(
+		RequestContext requestContext,
+		Guid sessionId,
+		bool ignorePermissions)
+	{
+		return await FindGameSession(requestContext, $"{sessionId}.{Guid.NewGuid()}", ignorePermissions);
 	}
 
 	public async Task<AddParticipantResult> AddParticipantAsync(

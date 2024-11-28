@@ -1,23 +1,20 @@
 ﻿<script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
+    const hubConnection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
+    hubConnection.on("Created", inviteCode =>
+        window.location.href = `/session?invite=${inviteCode}`
+    );
+    hubConnection.start();
+    
     async function createGameSession() {
         const sessionName = document.getElementById("sessionName").value;
         const teamsCount = parseInt(document.getElementById("teamsCount").value);
-        if (teamsCount <= 0) {
-            return;
+        if (teamsCount > 0) {
+            fetch(`/session/create-session?sessionName=${sessionName}&teamsCount=${teamsCount}`)
+                .then(async sessionId => 
+                    await hubConnection.invoke("Create", await sessionId.json())
+                );
         }
-        const hubConnection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
-        hubConnection.start()
-            .then(function (){
-                hubConnection.invoke("Create", sessionName, teamsCount);
-                hubConnection.on("Created", async function (dto) {
-                    const sessionId = (await JSON.parse(dto))["Id"];
-                    const inviteCode = (await JSON.parse(dto))["Angels"]["Participants"]["InviteCode"].toString();
-                    if (sessionId != null) {
-                        window.location.href = `/session?invite=${inviteCode}`;
-                    }
-                })
-            });
     }
 </script>
 

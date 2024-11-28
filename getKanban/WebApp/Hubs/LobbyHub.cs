@@ -47,15 +47,13 @@ public class LobbyHub : Hub
 		}
 	}
 	
-	public async Task Create(string sessionName, long teamsCount)
+	public async Task Create(Guid sessionId)
 	{
 		var requestContext = RequestContextFactory.Build(Context);
-		var session = await gameSessionService.CreateGameSession(requestContext, sessionName, teamsCount);
-
-		Console.WriteLine($"{GetGroupId(session.Id)} created");
-		
-		await AddCurrentConnectionToLobbyGroupAsync(GetGroupId(session.Id));
-		await Clients.Caller.SendAsync("Created", session.ToJson());
+		var session = await gameSessionService.FindGameSession(requestContext, sessionId, ignorePermissions: true);
+		Console.WriteLine($"{GetGroupId(session!.Id)} created");
+		await AddCurrentConnectionToLobbyGroupAsync(GetGroupId(session!.Id));
+		await Clients.Caller.SendAsync("Created", session!.Angels.Participants.InviteCode);
 	}
 	
 	public async Task Join(string inviteCode)
