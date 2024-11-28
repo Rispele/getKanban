@@ -16,16 +16,13 @@ public class GameSessionService : IGameSessionService
 {
 	private readonly DomainContext context;
 	private readonly ConnectionsContext connectionsContext;
-	private readonly InviteCodeHelper inviteCodeHelper;
 
 	public GameSessionService(
 		DomainContext context,
-		ConnectionsContext connectionsContext,
-		InviteCodeHelper inviteCodeHelper)
+		ConnectionsContext connectionsContext)
 	{
 		this.context = context;
 		this.connectionsContext = connectionsContext;
-		this.inviteCodeHelper = inviteCodeHelper;
 	}
 
 	public async Task<GameSessionDto> CreateGameSession(

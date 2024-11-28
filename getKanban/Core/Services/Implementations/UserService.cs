@@ -47,13 +47,9 @@ public class UserService : IUserService
 		}
 	}
 
-	public async Task SetUserName(Guid userId, string userName)
+	public async Task SetUserName(User user, string userName)
 	{
-		var user = await GetUserById(userId);
-		if (user != null)
-		{
-			user.Name = userName;
-		}
+		user.Name = userName;
 
 		await context.SaveChangesAsync();
 	}

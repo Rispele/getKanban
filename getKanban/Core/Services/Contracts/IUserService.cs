@@ -12,5 +12,5 @@ public interface IUserService
 
 	public Task DeleteUserById(Guid id);
 
-	public Task SetUserName(Guid userId, string userName);
+	public Task SetUserName(User user, string userName);
 }

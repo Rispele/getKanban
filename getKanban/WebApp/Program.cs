@@ -17,7 +17,6 @@ builder.Services.AddRazorPages();
 builder.Services.AddSignalR();
 
 
-builder.Services.AddScoped<InviteCodeHelper>();
 builder.Services.AddScoped<DomainContext>();
 builder.Services.AddScoped<ConnectionsContext>();
 builder.Services.AddScoped<DayDtoConverter>();

@@ -1,6 +1,6 @@
 ﻿namespace Core.Helpers;
 
-public class InviteCodeHelper
+public static class InviteCodeHelper
 {
 	public static (Guid sessionId, Guid teamId) SplitInviteCode(string inviteCode)
 	{

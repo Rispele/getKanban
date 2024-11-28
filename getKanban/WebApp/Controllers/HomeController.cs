@@ -13,6 +13,7 @@ public class HomeController : Controller
 		this.userService = userService;
 	}
 
+	[HttpGet]
 	public async Task<IActionResult> Index()
 	{
 		if (!RequestContextFactory.TryBuild(ControllerContext.HttpContext.Request, out _))
@@ -29,6 +30,6 @@ public class HomeController : Controller
 	{
 		var userId = Guid.Parse(Request.Cookies[RequestContextKeys.UserId] ?? throw new InvalidOperationException());
 		var user = await userService.GetUserById(userId) ?? throw new InvalidOperationException();
-		await userService.SetUserName(user.Id, name);
+		await userService.SetUserName(user, name);
 	}
 }

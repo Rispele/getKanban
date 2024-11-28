@@ -130,9 +130,6 @@ public class LobbyHub : Hub
 
 	private async Task RemoveCurrentConnectionFromLobbyGroupAsync(string groupId)
 	{
-		var requestContext = RequestContextFactory.Build(Context);
-		var currentUser = await gameSessionService.GetCurrentUser(requestContext);
-		
 		await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupId);
 	}
 
