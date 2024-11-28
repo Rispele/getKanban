@@ -47,10 +47,17 @@ public class UserService : IUserService
 		}
 	}
 
-	public async Task SetUserName(User user, string userName)
+	public async Task SetUserName(Guid userId, string userName)
 	{
-		user.Name = userName;
+		var user = await GetUserById(userId);
 
+		if (user is null)
+		{
+			throw new NullReferenceException("User does not exist");
+		}
+		
+		user.Name = userName;
+		
 		await context.SaveChangesAsync();
 	}
 }

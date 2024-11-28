@@ -1,6 +1,4 @@
-﻿@{
-    ViewData["Title"] = "Home page";
-}
+﻿@model string
 
 <script>
     function redirectCreate() {
@@ -37,7 +35,7 @@
     <div class="authorizationButtons">
 
         @* Input your name *@
-        <input type="text" class="text-center authorizationButtonsTemplate authorizationCommandName" placeholder="Ваше имя"/>
+        <input type="text" class="text-center authorizationButtonsTemplate authorizationCommandName" value="@Model" placeholder="Ваше имя"/>
 
         @* Game create button *@
         <button class="authorizationButtonsTemplate authorizationButton" onclick="redirectCreate()">Создать игру</button>
