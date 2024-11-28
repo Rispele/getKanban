@@ -28,6 +28,6 @@ public class TeamMembersContainer : DayContainer
 	internal void UpdateTeamMemberRole(long teamMemberId, TeamRole to)
 	{
 		teamMembers.Single(t => t.Id == teamMemberId).UpdateTeamRole(to);
-		Version++;
+		SetUpdated();
 	}
 }
