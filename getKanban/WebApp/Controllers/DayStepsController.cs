@@ -34,23 +34,31 @@ public class DayStepsController : Controller
 
 	[HttpGet]
 	[Route("1/2")]
-	public IActionResult Step1Stage2()
+	public async Task<IActionResult> Step1Stage2()
 	{
-		return View();
+		var currentSessionId = await gameSessionService.GetCurrentSessionId(RequestContextFactory.Build(Request));
+		var currentUser = await gameSessionService.GetCurrentUser(RequestContextFactory.Build(Request));
+		var currentTeam = await gameSessionService.GetCurrentTeam(
+			RequestContextFactory.Build(Request),
+			currentSessionId!.Value);
+
+		var teamMembers = (await teamService.GetCurrentDayAsync(currentSessionId!.Value, currentTeam!.Id))
+			.TeamMembersContainer.TeamRoleUpdates.ToList();
+		
+		return View(teamMembers);
 	}
 
 	[HttpPost]
 	[Route("save-roles-transformation")]
 	public async Task SaveRolesTransformation([FromBody] string[] transformation)
 	{
-		throw new NotImplementedException();
 		var currentSessionId = await gameSessionService.GetCurrentSessionId(RequestContextFactory.Build(Request));
 		var currentUser = await gameSessionService.GetCurrentUser(RequestContextFactory.Build(Request));
 		var currentTeam = await gameSessionService.GetCurrentTeam(
 			RequestContextFactory.Build(Request),
 			currentSessionId!.Value);
 		
-		var roleFrom = Enum.Parse<TeamRole>(transformation[0]);
+		var teamMemberId = long.Parse(transformation[0]);
 		var roleTo = Enum.Parse<TeamRole>(transformation[1]);
 		
 		await teamService.PatchDayAsync(
@@ -59,6 +67,8 @@ public class DayStepsController : Controller
 			currentUser.Id,
 			new UpdateTeamRolesCommand
 			{
+				TeamMemberId = teamMemberId,
+				To = roleTo
 			});
 	}
 

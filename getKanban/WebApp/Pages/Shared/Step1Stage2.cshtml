@@ -1,4 +1,7 @@
-﻿@* @page *@
+﻿@using Core.Dtos.Containers.TeamMembers
+@model List<Core.Dtos.Containers.TeamMemberDto>
+
+@* @page *@
 @* @model Step1_2PageTemplate *@
 @* *@
 @* @{ *@
@@ -17,82 +20,46 @@
         <tbody>
         <tr>
             <td class="dropzone" id="Analyst">
-                <div class="draggable" draggable="true">
-                    <div class="textContainer">
-                        <div class="text fs-6 fw-bolder">Аналитик</div>
-                        <div class="lines">
-                            <div class="line full"></div>
-                            <div class="line half"></div>
+                @foreach (var analyst in Model.Where(x => x.InitialRole == TeamRoleDto.Analyst))
+                {
+                    <div class="draggable" draggable="true" id="@analyst.Id">
+                        <div class="textContainer">
+                            <div class="text fs-6 fw-bolder">Аналитик</div>
+                            <div class="lines">
+                                <div class="line full"></div>
+                                <div class="line half"></div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="draggable" draggable="true">
-                    <div class="textContainer">
-                        <div class="text fs-6 fw-bolder">Аналитик</div>
-                        <div class="lines">
-                            <div class="line full"></div>
-                            <div class="line half"></div>
-                        </div>
-                    </div>
-                </div>
+                }
             </td>
             <td class="dropzone" id="Programmer">
-                <div class="draggable" draggable="true">
-                    <div class="textContainer">
-                        <div class="text fs-6 fw-bolder">Разработчик</div>
-                        <div class="lines">
-                            <div class="line full"></div>
-                            <div class="line half"></div>
+                @foreach (var programmer in Model.Where(x => x.InitialRole == TeamRoleDto.Programmer))
+                {
+                    <div class="draggable" draggable="true" id="@programmer.Id">
+                        <div class="textContainer">
+                            <div class="text fs-6 fw-bolder">Разработчик</div>
+                            <div class="lines">
+                                <div class="line full"></div>
+                                <div class="line half"></div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="draggable" draggable="true">
-                    <div class="textContainer">
-                        <div class="text fs-6 fw-bolder">Разработчик</div>
-                        <div class="lines">
-                            <div class="line full"></div>
-                            <div class="line half"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="draggable" draggable="true">
-                    <div class="textContainer">
-                        <div class="text fs-6 fw-bolder">Разработчик</div>
-                        <div class="lines">
-                            <div class="line full"></div>
-                            <div class="line half"></div>
-                        </div>
-                    </div>
-                </div>
+                }
             </td>
             <td class="dropzone" id="Tester">
-                <div class="draggable" draggable="true">
-                    <div class="textContainer">
-                        <div class="text fs-6 fw-bolder">Тестировщик</div>
-                        <div class="lines">
-                            <div class="line full"></div>
-                            <div class="line half"></div>
+                @foreach (var tester in Model.Where(x => x.InitialRole == TeamRoleDto.Tester))
+                {
+                    <div class="draggable" draggable="true" id="@tester.Id">
+                        <div class="textContainer">
+                            <div class="text fs-6 fw-bolder">Тестировщик</div>
+                            <div class="lines">
+                                <div class="line full"></div>
+                                <div class="line half"></div>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="draggable" draggable="true">
-                    <div class="textContainer">
-                        <div class="text fs-6 fw-bolder">Тестировщик</div>
-                        <div class="lines">
-                            <div class="line full"></div>
-                            <div class="line half"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="draggable" draggable="true">
-                    <div class="textContainer">
-                        <div class="text fs-6 fw-bolder">Тестировщик</div>
-                        <div class="lines">
-                            <div class="line full"></div>
-                            <div class="line half"></div>
-                        </div>
-                    </div>
-                </div>
+                }
             </td>
         </tr>
         </tbody>
@@ -107,52 +74,19 @@
     const draggables = document.getElementsByClassName('draggable');
     for (let draggable of draggables) {
         draggable.addEventListener('dragend', function () {
-            const roleFrom = translateRole(draggable.getElementsByClassName('text')[0].textContent);
+            const teamMemberId = draggable.id;
             const roleTo = draggable.parentElement.id.toString();
-            if (roleFrom === roleTo) {
-                return;
-            }
             fetch("/step/save-roles-transformation", {
                 method: 'POST',
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify([roleFrom, roleTo])
+                body: JSON.stringify([teamMemberId, roleTo])
             })
         });
     }
     
     document.getElementById("roll").addEventListener('click', function () {
-        // const result = [];
-        // const analysts = document.getElementsByClassName("dropzone")[0];
-        // const analystsRoles = analysts.getElementsByClassName("text");
-        // for (let role of analystsRoles) {
-        //     const trRole = translateRole(role.innerText);
-        //     if (trRole !== "Analyst") {
-        //         result.push([trRole, "Analyst"]);
-        //     }
-        // }
-        // 
-        // const programmers = document.getElementsByClassName("dropzone")[1];
-        // const programmersRoles = programmers.getElementsByClassName("text");
-        // for (let role of programmersRoles) {
-        //     const trRole = translateRole(role.innerText);
-        //     if (trRole !== "Programmer") {
-        //         result.push([trRole, "Programmer"]);
-        //     }
-        // }
-        // 
-        // const testers = document.getElementsByClassName("dropzone")[2];
-        // const testersRoles = testers.getElementsByClassName("text");
-        // for (let role of testersRoles) {
-        //     const trRole = translateRole(role.innerText);
-        //     if (trRole !== "Tester") {
-        //         result.push([trRole, "Tester"]);
-        //     }
-        // }
-        //
-        //JSON.stringify(result).replace("\\", "");
-        
         fetch(`/step/roll`).then(function () {
             window.location.href = `/step/2`
         });
