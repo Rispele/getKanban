@@ -42,14 +42,14 @@ public class ParticipantsContainer
 			: (false, false);
 	}
 
-	public Participant GetParticipant(User user)
+	public Participant GetParticipant(Guid userId)
 	{
-		return participants.Single(p => p.User.Id == user.Id);
+		return participants.Single(p => p.User.Id == userId);
 	}
 
-	public bool Contains(User user)
+	public bool Contains(Guid userId)
 	{
-		return participants.Any(p => p.User.Id == user.Id);
+		return participants.Any(p => p.User.Id == userId);
 	}
 
 	public bool AddParticipant(User user, ParticipantRole participantRole)

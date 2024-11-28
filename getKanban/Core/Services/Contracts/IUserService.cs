@@ -6,9 +6,8 @@ namespace Core.Services.Contracts;
 public interface IUserService
 {
 	public Task<Guid> CreateNewUser(string name);
-	public Task<User?> GetUserById(Guid id);
-
-	public Task<User?> GetUser(UserDto userDto);
+	
+	public Task<UserDto> GetUserById(Guid id);
 
 	public Task DeleteUserById(Guid id);
 

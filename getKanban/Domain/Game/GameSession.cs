@@ -43,11 +43,16 @@ public class GameSession
 		Angels.AddParticipant(creator, ParticipantRole.Creator | ParticipantRole.Angel);
 	}
 
-	public ParticipantRole EnsureHasAnyAccess(User user, string inviteCode)
+	public Team? FindUserTeam(Guid userId)
 	{
-		return EnsureHasAccess(user) ?? 
-		       EnsureHasInviteCodeAccess(inviteCode) ?? 
-		       throw new InvalidOperationException($"User {user.Id} has no access to this team.");
+		return Teams.SingleOrDefault(x => x.Players.Contains(userId));
+	}
+
+	public ParticipantRole EnsureHasAnyAccess(Guid userId, string inviteCode)
+	{
+		return EnsureHasAccess(userId) ??
+		       EnsureHasInviteCodeAccess(inviteCode) ??
+		       throw new InvalidOperationException($"User {userId} has no access to this team.");
 	}
 
 	public ParticipantRole? EnsureHasInviteCodeAccess(string inviteCode)
@@ -56,7 +61,7 @@ public class GameSession
 		{
 			return ParticipantRole.Angel;
 		}
-		
+
 		var teamId = InviteCodeHelper.ResolveTeamId(inviteCode);
 		var inviteTeamToJoin = Teams.SingleOrDefault(x => x.Id == teamId);
 		if (inviteTeamToJoin is not null)
@@ -67,15 +72,11 @@ public class GameSession
 		return null;
 	}
 
-	public ParticipantRole? EnsureHasAccess(User user)
+	public ParticipantRole? EnsureHasAccess(Guid userId)
 	{
-		if (Angels.Contains(user))
-		{
-			return Angels.GetParticipant(user).Role;
-		}
-
-		var teamToJoin = teams.SingleOrDefault(x => x.Players.Contains(user));
-		return teamToJoin?.Players.GetParticipant(user).Role;
+		return Angels.Contains(userId) 
+			? Angels.GetParticipant(userId).Role 
+			: FindUserTeam(userId)?.Players.GetParticipant(userId).Role;
 	}
 
 	public (Guid teamId, bool updated) AddByInviteCode(User user, string inviteCode)
@@ -95,7 +96,7 @@ public class GameSession
 				return (team.Id, teamUpdateResult.updated);
 			}
 		}
-		
+
 		throw new InvalidOperationException("Unknown invite code");
 	}
 

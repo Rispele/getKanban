@@ -17,7 +17,7 @@ public class LobbyHub : Hub
 	{
 		var requestContext = RequestContextFactory.Build(Context);
 		var currentUser = await gameSessionService.GetCurrentUser(requestContext);
-		var connection = await gameSessionService.GetCurrentConnection(currentUser.Id);
+		var connection = await gameSessionService.FindCurrentConnection(currentUser.Id);
 		if (connection is null)
 		{
 			return;
@@ -37,7 +37,7 @@ public class LobbyHub : Hub
 	{
 		var requestContext = RequestContextFactory.Build(Context);
 		var currentUser = await gameSessionService.GetCurrentUser(requestContext);
-		var connection = await gameSessionService.GetCurrentConnection(currentUser.Id);
+		var connection = await gameSessionService.FindCurrentConnection(currentUser.Id);
 		if (connection is not null)
 		{
 			await RemoveCurrentConnectionFromLobbyGroupAsync(connection.LobbyId);

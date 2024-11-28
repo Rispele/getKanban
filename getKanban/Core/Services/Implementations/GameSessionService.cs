@@ -25,7 +25,7 @@ public class GameSessionService : IGameSessionService
 		this.connectionsContext = connectionsContext;
 	}
 
-	public async Task<Guid?> CreateGameSession(
+	public async Task<Guid> CreateGameSession(
 		RequestContext requestContext,
 		string name,
 		long teamsCount)
@@ -52,17 +52,10 @@ public class GameSessionService : IGameSessionService
 			return null;
 		}
 
-		var user = await context.GetUserAsync(requestContext.GetUserId());
-
-		ParticipantRole participantRole;
-		if (ignorePermissions)
-		{
-			participantRole = ParticipantRole.Creator;
-		}
-		else
-		{
-			participantRole = session.EnsureHasAnyAccess(user, inviteCode);
-		}
+		var userId = requestContext.GetUserId();
+		var participantRole = ignorePermissions 
+			? ParticipantRole.Creator 
+			: session.EnsureHasAnyAccess(userId, inviteCode);
 
 		return GameSessionDtoConverter.For(participantRole).Convert(session);
 	}
@@ -88,12 +81,11 @@ public class GameSessionService : IGameSessionService
 
 		await context.SaveChangesAsync();
 
-		var participantRole = session.EnsureHasAnyAccess(user, inviteCode);
+		var participantRole = session.EnsureHasAnyAccess(user.Id, inviteCode);
 		var sessionDto = GameSessionDtoConverter.For(participantRole).Convert(session);
 
 		var participantAdded = teamId.Equals(Guid.Empty) && participantRole == ParticipantRole.Angel
-			? sessionDto.Angels.Participants.Users
-				.Single(x => x.Id == user.Id)
+			? sessionDto.Angels.Participants.Users.Single(x => x.Id == user.Id)
 			: sessionDto.Teams
 				.Single(t => t.Id == teamId)
 				.Participants.Users
@@ -108,33 +100,31 @@ public class GameSessionService : IGameSessionService
 
 	public async Task StartGameAsync(RequestContext requestContext, Guid gameSessionId)
 	{
+		var userId = requestContext.GetUserId();
 		var session = await context.GetGameSessionsAsync(gameSessionId);
-		var user = await context.GetUserAsync(requestContext.GetUserId());
 		
-		session.EnsureHasAccess(user);
+		session.EnsureHasAccess(userId);
 		await context.CloseRecruitmentAsync(gameSessionId);
 		session.Start();
 
 		await context.SaveChangesAsync();
 	}
 
-	public async Task<TeamDto?> GetCurrentTeam(RequestContext requestContext, Guid gameSessionId)
+	public async Task<TeamDto> GetCurrentTeam(RequestContext requestContext, Guid gameSessionId)
 	{
+		var userId = requestContext.GetUserId();
 		var session = await context.GetGameSessionsAsync(gameSessionId);
-		var user = await context.GetUserAsync(requestContext.GetUserId());
 
-		var angels =
-			session.Angels.Participants.SingleOrDefault(x => x.User.Id == user.Id) is null
-				? null
-				: session.Angels;
-		var team = session.Teams
-			.SingleOrDefault(
-				x => x.Players.Participants
-					.SingleOrDefault(p => p.User.Id == user.Id) is not null);
-
-		return angels is not null
-			? TeamDtoConverter.For(ParticipantRole.Creator).ConvertAngels(angels)
-			: TeamDtoConverter.For(ParticipantRole.Player).Convert(team);
+		var participantRole = session.EnsureHasAccess(userId);
+		return participantRole switch
+		{
+			ParticipantRole.Creator or ParticipantRole.Angel => 
+				TeamDtoConverter.For(ParticipantRole.Creator).ConvertAngels(session.Angels),
+			ParticipantRole.Player => 
+				TeamDtoConverter.For(ParticipantRole.Player).Convert(session.FindUserTeam(userId)!),
+			null => throw new InvalidOperationException($"No team found for user {userId}"),
+			_ => throw new ArgumentOutOfRangeException()
+		};
 	}
 
 	public Guid GetTeamInviteId(string inviteCode)
@@ -165,7 +155,7 @@ public class GameSessionService : IGameSessionService
 		};
 	}
 
-	public async Task<Guid?> GetCurrentSessionId(RequestContext requestContext)
+	public async Task<Guid?> FindCurrentSessionId(RequestContext requestContext)
 	{
 		var user = await context.GetUserAsync(requestContext.GetUserId());
 		var sessions = context.GameSessions.ToList();
@@ -190,14 +180,14 @@ public class GameSessionService : IGameSessionService
 		return null;
 	}
 
-	public async Task<HubConnection?> GetCurrentConnection(Guid userId)
+	public async Task<HubConnection?> FindCurrentConnection(Guid userId)
 	{
-		return await connectionsContext.GetCurrentConnection(userId);
+		return await connectionsContext.FindCurrentConnection(userId);
 	}
 
-	public async Task<HubConnection?> SaveCurrentConnection(Guid userId, string lobbyId, string hubConnectionId)
+	public async Task<HubConnection> SaveCurrentConnection(Guid userId, string lobbyId, string hubConnectionId)
 	{
-		var connection = await connectionsContext.GetCurrentConnection(userId);
+		var connection = await connectionsContext.FindCurrentConnection(userId);
 		if (connection is null)
 		{
 			connection = new HubConnection

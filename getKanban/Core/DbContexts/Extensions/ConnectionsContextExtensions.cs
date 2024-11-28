@@ -5,7 +5,7 @@ namespace Core.DbContexts.Extensions;
 
 public static class ConnectionsContextExtensions
 {
-	public static async Task<HubConnection?> GetCurrentConnection(
+	public static async Task<HubConnection?> FindCurrentConnection(
 		this ConnectionsContext connectionsContext,
 		Guid userId)
 	{

@@ -7,7 +7,7 @@ namespace Core.Services.Contracts;
 
 public interface IGameSessionService
 {
-	public Task<Guid?> CreateGameSession(RequestContext requestContext, string name, long teamsCount);
+	public Task<Guid> CreateGameSession(RequestContext requestContext, string name, long teamsCount);
 
 	public Task<GameSessionDto?> FindGameSession(RequestContext requestContext, string inviteCode, bool ignorePermissions);
 	
@@ -19,7 +19,7 @@ public interface IGameSessionService
 
 	public Task StartGameAsync(RequestContext requestContext, Guid gameSessionId);
 	
-	public Task<TeamDto?> GetCurrentTeam(RequestContext requestContext, Guid gameSessionId);
+	public Task<TeamDto> GetCurrentTeam(RequestContext requestContext, Guid gameSessionId);
 	
 	public Guid GetTeamInviteId(string inviteCode);
 	
@@ -29,11 +29,11 @@ public interface IGameSessionService
 
 	public Task<UserDto> GetCurrentUser(RequestContext requestContext);
 
-	public Task<Guid?> GetCurrentSessionId(RequestContext requestContext);
+	public Task<Guid?> FindCurrentSessionId(RequestContext requestContext);
 
-	public Task<HubConnection?> GetCurrentConnection(Guid userId);
+	public Task<HubConnection?> FindCurrentConnection(Guid userId);
 
-	public Task<HubConnection?> SaveCurrentConnection(Guid userId, string lobbyId, string hubConnectionId);
+	public Task<HubConnection> SaveCurrentConnection(Guid userId, string lobbyId, string hubConnectionId);
 
 	public Task RemoveConnection(Guid userId);
 }

@@ -14,28 +14,31 @@ public class AngelsDtoConverter
 
 	public static AngelsDtoConverter For(ParticipantRole role) => new(role);
 
-	public AngelsDto? Convert(ParticipantsContainer? participantsContainer)
+	public AngelsDto Convert(ParticipantsContainer participantsContainer)
 	{
-		return participantsContainer is null ? null : new AngelsDto
+		return new AngelsDto
 		{
 			Id = InviteCodeHelper.ResolveTeamId(participantsContainer.InviteCode),
 			Participants = Convert(participantsContainer.InviteCode, participantsContainer.Participants)
 		};
 	}
 
-	private ParticipantsDto Convert(string? inviteCode, IReadOnlyList<Participant>? participants)
+	private ParticipantsDto Convert(string inviteCode, IReadOnlyList<Participant> participants)
 	{
-		return new ParticipantsDto
-		{
-			InviteCode = inviteCode,
-			Users = Convert(participants)
-		};
+		return new ParticipantsDto(ConvertInviteCode(inviteCode), Convert(participants));
 	}
 
-	private IReadOnlyList<UserDto>? Convert(IReadOnlyList<Participant>? participants)
+	private string? ConvertInviteCode(string inviteCode)
 	{
-		return participants?.Select(
-				x => new UserDto()
+		var isPermittedRole = (requesterRole & ParticipantRole.Angel) == ParticipantRole.Angel
+		                   || (requesterRole & ParticipantRole.Creator) == ParticipantRole.Creator;
+		return isPermittedRole ? inviteCode : null;
+	}
+
+	private IReadOnlyList<UserDto> Convert(IReadOnlyList<Participant> participants)
+	{
+		return participants.Select(
+				x => new UserDto
 				{
 					Id = x.User.Id,
 					Name = x.User.Name

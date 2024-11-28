@@ -50,11 +50,9 @@ public class GameSessionDtoConverter
 
 	private ParticipantsDto Convert(ParticipantsContainer participantsContainer)
 	{
-		return new ParticipantsDto
-		{
-			InviteCode = ConvertInviteCode(participantsContainer.InviteCode),
-			Users = participantsContainer.Participants.Select(p => Convert(p.User)).ToList()
-		};
+		return new ParticipantsDto(
+			ConvertInviteCode(participantsContainer.InviteCode),
+			participantsContainer.Participants.Select(p => Convert(p.User)).ToList());
 	}
 
 	private string? ConvertInviteCode(string inviteCode)

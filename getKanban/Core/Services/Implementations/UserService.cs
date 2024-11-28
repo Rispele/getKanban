@@ -1,9 +1,9 @@
-﻿using Core.DbContexts;
+﻿using Core.DbContexts.Extensions;
 using Core.Dtos;
+using Core.Dtos.Converters;
 using Core.Services.Contracts;
 using Domain.DbContexts;
 using Domain.Users;
-using Microsoft.EntityFrameworkCore;
 
 namespace Core.Services.Implementations;
 
@@ -15,49 +15,43 @@ public class UserService : IUserService
 	{
 		this.context = context;
 	}
-	
+
 	public async Task<Guid> CreateNewUser(string name)
 	{
 		var user = new User(name);
-		
+
 		context.Users.Add(user);
-		
+
 		await context.SaveChangesAsync();
-		
+
 		return user.Id;
 	}
 
-	public async Task<User?> GetUserById(Guid id)
+	public async Task<UserDto> GetUserById(Guid id)
 	{
-		return await context.Users.FirstOrDefaultAsync(x => x.Id == id);
-	}
-
-	public async Task<User?> GetUser(UserDto userDto)
-	{
-		var user = await context.Users.FirstOrDefaultAsync(x => x.Id == userDto.Id && x.Name == userDto.Name);
-		return user;
+		var user = await context.GetUserAsync(id);
+		
+		return UserDtoConverter.Convert(user);
 	}
 
 	public async Task DeleteUserById(Guid id)
 	{
-		var user = await GetUserById(id);
-		if (user != null)
-		{
-			context.Users.Remove(user);
-		}
+		var user = await context.GetUserAsync(id);
+
+		context.Users.Remove(user);
 	}
 
 	public async Task SetUserName(Guid userId, string userName)
 	{
-		var user = await GetUserById(userId);
+		var user = await context.GetUserAsync(userId);
 
 		if (user is null)
 		{
 			throw new NullReferenceException("User does not exist");
 		}
-		
+
 		user.Name = userName;
-		
+
 		await context.SaveChangesAsync();
 	}
 }
