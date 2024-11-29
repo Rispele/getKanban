@@ -118,7 +118,7 @@ public class GameSessionService : IGameSessionService
 		var participantRole = session.EnsureHasAccess(userId);
 		return participantRole switch
 		{
-			ParticipantRole.Creator or ParticipantRole.Angel => 
+			ParticipantRole.Creator or ParticipantRole.Angel or ParticipantRole.Creator | ParticipantRole.Angel => 
 				TeamDtoConverter.For(ParticipantRole.Creator).ConvertAngels(session.Angels),
 			ParticipantRole.Player => 
 				TeamDtoConverter.For(ParticipantRole.Player).Convert(session.FindUserTeam(userId)!),

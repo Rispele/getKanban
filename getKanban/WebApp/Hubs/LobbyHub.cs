@@ -1,5 +1,4 @@
 using Core.Services.Contracts;
-using Domain.Serializers;
 using Microsoft.AspNetCore.SignalR;
 
 namespace WebApp.Hubs;
@@ -46,16 +45,7 @@ public class LobbyHub : Hub
 			await base.OnDisconnectedAsync(exception);
 		}
 	}
-	
-	public async Task Create(Guid sessionId)
-	{
-		var requestContext = RequestContextFactory.Build(Context);
-		var session = await gameSessionService.FindGameSession(requestContext, sessionId, ignorePermissions: true);
-		Console.WriteLine($"{GetGroupId(session!.Id)} created");
-		await AddCurrentConnectionToLobbyGroupAsync(GetGroupId(session!.Id));
-		await Clients.Caller.SendAsync("Created", session!.Angels.Participants.InviteCode);
-	}
-	
+
 	public async Task Join(string inviteCode)
 	{
 		var requestContext = RequestContextFactory.Build(Context);

@@ -11,9 +11,12 @@
         const teamsCount = parseInt(document.getElementById("teamsCount").value);
         if (teamsCount > 0) {
             fetch(`/session/create-session?sessionName=${sessionName}&teamsCount=${teamsCount}`)
-                .then(async sessionId => 
-                    await hubConnection.invoke("Create", await sessionId.json())
-                );
+                .then(sessionId => sessionId.json()
+                    .then(sessionId => {
+                        window.location.href = `/session/get/${sessionId}`
+                    }
+                )
+            );
         }
     }
 </script>

@@ -141,7 +141,7 @@
 
     function placeTeamNameEditButtons(teamIds) {
         for (let teamId of teamIds) {
-            const icon = buildIcon(`edit-button-${teamId}`, "images/edit_button.png");
+            const icon = buildIcon(`edit-button-${teamId}`, "/images/edit_button.png");
             icon.addEventListener("click", function () { replaceWithInput(teamId) });
             getOrCreateEditBlock(teamId).appendChild(icon);
         }
@@ -186,7 +186,7 @@
 
     function placeTeamLinks(teamIds, teamInviteLinks) {
         for (let i = 0; i < teamIds.length; i++) {
-            const teamIcon = buildIcon(`link-${teamInviteLinks[i]}`, "images/copy_button.jpg");
+            const teamIcon = buildIcon(`link-${teamInviteLinks[i]}`, "/images/copy_button.jpg");
             teamIcon.addEventListener('click', function () {
                 navigator.clipboard.writeText(teamInviteLinks[i])
                     .then(() => console.log(`Text copied: ${teamInviteLinks[i]}`))

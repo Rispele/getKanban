@@ -15,14 +15,24 @@ public class SessionController : Controller
 	}
 
 	[HttpGet("")]
-	public async Task<IActionResult> EditSession(string invite)
+	public async Task<IActionResult> EditSession(string inviteCode)
 	{
-		var session = await gameSessionService.FindGameSession(
-			RequestContextFactory.Build(Request),
-			invite,
-			ignorePermissions: false);
+		var requestContext = RequestContextFactory.Build(Request);
+		var session = await gameSessionService.FindGameSession(requestContext, inviteCode, ignorePermissions: false);
 		return session is { IsRecruitmentFinished: false }
 			? View(session)
+			: View("Error", "Запрашиваемая сессия не была найдена или закрыта.");
+	}
+	
+	//TODO: Будем использовать для переподключения и резолва текущего состояния игры
+	[HttpGet("get/{sessionId:guid}")]
+	public async Task<IActionResult> GetEditSessionLobby(Guid sessionId)
+	{
+		var requestContext = RequestContextFactory.Build(Request);
+		var session = await gameSessionService.FindGameSession(requestContext, sessionId, ignorePermissions: false);
+		
+		return session is { IsRecruitmentFinished: false }
+			? View("EditSession", session)
 			: View("Error", "Запрашиваемая сессия не была найдена или закрыта.");
 	}
 
@@ -43,11 +53,10 @@ public class SessionController : Controller
 	}
 
 	[HttpGet("create-session")]
-	public async Task<Guid?> CreateGameSession(string sessionName, long teamsCount)
+	public Task<Guid> CreateGameSession(string sessionName, long teamsCount)
 	{
 		var requestContext = RequestContextFactory.Build(Request);
-		var sessionId = await gameSessionService.CreateGameSession(requestContext, sessionName, teamsCount);
-		return sessionId;
+		return gameSessionService.CreateGameSession(requestContext, sessionName, teamsCount);
 	}
 
 	[HttpGet("get-current-team")]
