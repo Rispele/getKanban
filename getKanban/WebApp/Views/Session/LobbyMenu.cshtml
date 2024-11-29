@@ -57,7 +57,7 @@
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script type="module" async="async">
     const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
-    connection.start();
+    await connection.start().then(_ => connection.invoke("Join", "@Model.Id"));
     connection.on("NotifyJoined", function (teamId, userId, userName) {
         const playerElement = document.createElement("p");
         playerElement.setAttribute("class", "fs-6");

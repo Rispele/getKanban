@@ -13,7 +13,7 @@
             fetch(`/session/create-session?sessionName=${sessionName}&teamsCount=${teamsCount}`)
                 .then(sessionId => sessionId.json()
                     .then(sessionId => {
-                        window.location.href = `/session/get/${sessionId}`
+                        window.location.href = `/session/${sessionId}`
                     }
                 )
             );

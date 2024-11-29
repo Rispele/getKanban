@@ -46,29 +46,9 @@ public class LobbyHub : Hub
 		}
 	}
 
-	public async Task Join(string inviteCode)
+	public async Task Join(Guid sessionId)
 	{
-		var requestContext = RequestContextFactory.Build(Context);
-		
-		var addParticipantResult = await gameSessionService.AddParticipantAsync(
-			requestContext,
-			inviteCode);
-
-		var groupId = GetGroupId(addParticipantResult.GameSession.Id);
-		await AddCurrentConnectionToLobbyGroupAsync(groupId);
-
-		if (!addParticipantResult.Updated)
-		{
-			return;
-		}
-
-		var (teamId, userAdded) = (addParticipantResult.UpdatedTeamId, addParticipantResult.User);
-		Console.WriteLine($"{groupId} notified");
-		await Clients.Group(groupId).SendAsync(
-			"NotifyJoined",
-			teamId.ToString(),
-			addParticipantResult.User.Id.ToString(),
-			userAdded.Name);
+		await AddCurrentConnectionToLobbyGroupAsync(GetGroupId(sessionId));
 	}
 
 	public async Task UpdateName(Guid sessionId, Guid teamId)
