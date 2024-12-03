@@ -72,10 +72,8 @@
         window.location.href = `/step/${page}/${stage}`;
     });
     connection.on("NotifyUpdateRole", function (teamMemberId, roleTo) {
-        const draggableTemp = document.getElementById(teamMemberId.toString());
-        const draggable = draggableTemp.cloneNode(true);
+        const draggable = document.getElementById(teamMemberId.toString());
         document.getElementById(roleTo).appendChild(draggable);
-        draggableTemp.remove();
     });
     
     const draggables = document.getElementsByClassName('draggable');

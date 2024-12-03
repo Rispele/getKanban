@@ -90,6 +90,28 @@
     connection.on("NotifyPageChange", function (page, stage) {
         window.location.href = `/step/${page}/${stage}`;
     });
+    connection.on("NotifyUpdateTicketChoice", function (ticketId) {
+        const ticket = document.getElementById(ticketId);
+        ticket.checked = !ticket.checked;
+    });
+
+    const checkboxes = document.getElementsByClassName('checkboxCardInput');
+    for (let checkbox of checkboxes) {
+        checkbox.addEventListener('change', function () {
+            const remove = !this.checked;
+            const ticketId = this.parentElement.getElementsByClassName('checkboxCardNumber')[0].textContent;
+            console.log(ticketId);
+            fetch("/step/update-release", {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ ticketId: ticketId, remove: remove })
+            }).then(function () {
+                connection.invoke("UpdateTicketChoice", "@Model", ticketId);
+            });
+        });
+    }
 
     document.getElementById("prev").addEventListener('click', function () {
         connection.invoke("ChangePage", "@Model", 5, 0)

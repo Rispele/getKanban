@@ -172,10 +172,39 @@ public class DayStepsController : Controller
 	{
 		return View(await gameSessionService.FindCurrentSessionId(RequestContextFactory.Build(Request)));
 	}
+	
+	[HttpPost("update-release")]
+	public async Task UpdateRelease([FromBody] TicketModel ticketModel)
+	{
+		var currentSessionId = await gameSessionService.FindCurrentSessionId(RequestContextFactory.Build(Request));
+		var currentUser = await gameSessionService.GetCurrentUser(RequestContextFactory.Build(Request));
+		var currentTeam = await gameSessionService.GetCurrentTeam(
+			RequestContextFactory.Build(Request),
+			currentSessionId!.Value);
+		
+		await teamService.PatchDayAsync(
+			currentSessionId!.Value,
+			currentTeam!.Id,
+			currentUser.Id,
+			new ReleaseTicketsCommand()
+			{
+				TicketIds = new[] { ticketModel.TicketId },
+				Remove = ticketModel.Remove
+			}
+		);
+	}
 
 	[HttpGet("5/2")]
 	public async Task<IActionResult> Step5Stage2()
 	{
-		return View(await gameSessionService.FindCurrentSessionId(RequestContextFactory.Build(Request)));
+		var currentSessionId = await gameSessionService.FindCurrentSessionId(RequestContextFactory.Build(Request));
+		var currentUser = await gameSessionService.GetCurrentUser(RequestContextFactory.Build(Request));
+		var currentTeam = await gameSessionService.GetCurrentTeam(
+			RequestContextFactory.Build(Request),
+			currentSessionId!.Value);
+		var ticketIds = (await teamService.GetCurrentDayAsync(currentSessionId!.Value, currentTeam!.Id))
+			.ReleaseTicketContainer.TicketIds.ToList();
+		
+		return View((currentSessionId, ticketIds));
 	}
 }
