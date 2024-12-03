@@ -4,29 +4,25 @@
     <p>Команда: @Model.TeamName</p>
     <img src="/images/edit_button.png">
 
-    @foreach (var day in Model.Days)
+    @for (var i = Model.StartDayNumber; i < Model.CurrentDay.Number; i++)
     {
-        @if (day.Status == "Finished")
-        {
-            <p class="finished">День @day.Number</p>
-        }
-
-        @if (day.Status == "InProcess")
-        {
-            <img src="/images/restart_button.png">
-            <p class="inProcess">День @day.Number</p>
-            <img src="/images/edit_button.png">
-        }
-
-        @if (day.Status == "NotStartedYet")
-        {
-            <p class="notStartedYet">День @day.Number</p>
-        }
+        <p class="finished">День @i</p>
+    }
+    
+    <img src="/images/restart_button.png">
+    <p class="inProcess">День @Model.CurrentDay.Number</p>
+    <img src="/images/edit_button.png" id="day-edit">
+    
+    @for (var i = Model.CurrentDay.Number + 1; i < Model.FinishDayNumber + 1; i++)
+    {
+        <p class="notStartedYet">День @i</p>
     }
 
     <button class="back-button">Назад</button>
 </div>
 
 <script>
-
+    document.getElementById("day-edit").addEventListener('click', function () {
+        window.location.href = `/admin/edit?sessionId=@Model.SessionId&teamId=@Model.TeamId&dayNumber=@Model.CurrentDay.Number`;
+    });
 </script>

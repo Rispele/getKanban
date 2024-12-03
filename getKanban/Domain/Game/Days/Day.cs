@@ -34,6 +34,8 @@ public class Day
 
 	public long Timestamp { get; [UsedImplicitly] private set; }
 
+	public DayStatus Status { get; set; }
+
 	[UsedImplicitly]
 	private Day()
 	{
@@ -47,6 +49,7 @@ public class Day
 		int testersNumber)
 	{
 		Number = number;
+		Status = DayStatus.InProcess;
 		this.scenario = scenario;
 		awaitedCommands = scenario.InitiallyAwaitedCommands.Select(t => new AwaitedCommands(t)).ToList();
 

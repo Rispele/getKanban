@@ -48,6 +48,7 @@ public partial class Team
 
 	internal void AddNextDay()
 	{
+		days.Single(x => x.Number == currentDayNumber).Status = DayStatus.Finished;
 		currentDayNumber++;
 		days.Add(ConfigureDay(currentDayNumber, days));
 	}

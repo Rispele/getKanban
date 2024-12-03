@@ -2,7 +2,15 @@
 
 public class AdminPanelDaysDto
 {
+	public Guid SessionId { get; set; }
+
+	public Guid TeamId { get; set; }
+
 	public string TeamName { get; set; } = null!;
 	
-	public List<DayDto> Days { get; init; } = null!;
+	public DayDto CurrentDay { get; init; } = null!;
+
+	public int StartDayNumber { get; init; }
+	
+	public int FinishDayNumber { get; init; }
 }

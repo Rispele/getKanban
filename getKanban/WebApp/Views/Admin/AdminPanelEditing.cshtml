@@ -1,35 +1,37 @@
-﻿@* @model List<int> *@
-@* *@
-@* <div> *@
-@*     <p>Порядок назначения ролей</p> *@
-@*     <p>Таблица распределения ролей</p> *@
-@*      *@
-@*     <p>Поставленные тикеты</p> *@
-@*     @foreach (var submittedTicket in Model.SubmittedTickets) *@
-@*     { *@
-@*         <p class="ticket" id="@submittedTicket.Name"> *@
-@*             @submittedTicket.Name *@
-@*             <img src="images/ticket.jpg"> *@
-@*             <img src="images/closeTicket.jpg"> *@
-@*         </p> *@
-@*     } *@
-@*     <p class="add-ticket"> *@
-@*         <img src="images/addTicket.jpg"> *@
-@*     </p> *@
-@* *@
-@*     <p>Взятые в очередь тикеты</p> *@
-@*     @foreach (var takenTicket in Model.TakenTickets) *@
-@*     { *@
-@*         <p class="ticket" id="@takenTicket.Name"> *@
-@*             @takenTicket.Name *@
-@*             <img src="images/ticket.jpg"> *@
-@*             <img src="images/closeTicket.jpg"> *@
-@*         </p> *@
-@*     } *@
-@*     <p class="add-ticket"> *@
-@*         <img src="images/addTicket.jpg"> *@
-@*     </p> *@
-@* *@
-@*     <button class="save-button">Сохранить</button> *@
-@*     <button class="back-button">Назад</button> *@
-@* </div> *@
+﻿@model Core.Dtos.AdminPanelDayEditDto
+
+<div>
+    <p>Команда: @Model.TeamName</p>
+    <p>День @Model.DayNumber</p>
+    <p>Порядок назначения ролей</p>
+    <p>Таблица распределения ролей</p>
+
+    <p>Поставленные тикеты</p>
+    @foreach (var submittedTicket in Model.SubmittedTickets)
+    {
+        <p class="ticket" id="@submittedTicket">
+            @submittedTicket
+            <img src="images/ticket.jpg">
+            <img src="images/closeTicket.jpg">
+        </p>
+    }
+    <p class="add-ticket">
+        <img src="images/addTicket.jpg">
+    </p>
+
+    <p>Взятые в очередь тикеты</p>
+    @foreach (var takenTicket in Model.TakenTickets)
+    {
+        <p class="ticket" id="@takenTicket">
+            @takenTicket
+            <img src="images/ticket.jpg">
+            <img src="images/closeTicket.jpg">
+        </p>
+    }
+    <p class="add-ticket">
+        <img src="images/addTicket.jpg">
+    </p>
+
+    <button class="save-button">Сохранить</button>
+    <button class="back-button">Назад</button>
+</div>

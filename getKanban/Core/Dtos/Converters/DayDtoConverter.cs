@@ -21,7 +21,9 @@ public class DayDtoConverter
 			Convert(day.DiceRollContainer, day.TeamMembersContainer),
 			Convert(day.ReleaseTicketContainer),
 			Convert(day.UpdateSprintBacklogContainer),
-			Convert(day.UpdateCfdContainer));
+			Convert(day.UpdateCfdContainer),
+			day.Status,
+			day.Number);
 	}
 
 	private WorkAnotherTeamContainerDto? Convert(WorkAnotherTeamContainer? container)

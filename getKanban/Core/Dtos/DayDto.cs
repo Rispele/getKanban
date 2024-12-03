@@ -2,6 +2,7 @@
 using Core.Dtos.Containers;
 using Core.Dtos.Containers.RollDice;
 using Core.Dtos.Containers.TeamMembers;
+using Domain.Game.Days;
 
 namespace Core.Dtos;
 
@@ -17,13 +18,9 @@ public class DayDto
 	public UpdateSprintBacklogContainerDto UpdateSprintBacklogContainer { get; }
 	public UpdateCfdContainerDto UpdateCfdContainer { get; }
 
-	public string Status { get; } = "InProcess";
+	public DayStatus Status { get; }
 
-	public int Number { get; } = 9;
-
-	public DayDto()
-	{
-	}
+	public int Number { get; }
 	
 	public DayDto(
 		int analystsNumber,
@@ -34,7 +31,9 @@ public class DayDto
 		RollDiceContainerDto? rollDiceContainer,
 		ReleaseTicketContainerDto releaseTicketContainer,
 		UpdateSprintBacklogContainerDto updateSprintBacklogContainer,
-		UpdateCfdContainerDto updateCfdContainer)
+		UpdateCfdContainerDto updateCfdContainer,
+		DayStatus status,
+		int number)
 	{
 		AnalystsNumber = analystsNumber;
 		ProgrammersNumber = programmersNumber;
@@ -45,5 +44,7 @@ public class DayDto
 		ReleaseTicketContainer = releaseTicketContainer;
 		UpdateSprintBacklogContainer = updateSprintBacklogContainer;
 		UpdateCfdContainer = updateCfdContainer;
+		Status = status;
+		Number = number;
 	}
 }

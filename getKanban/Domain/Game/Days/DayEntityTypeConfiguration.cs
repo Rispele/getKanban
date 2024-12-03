@@ -27,6 +27,8 @@ public class DayEntityTypeConfiguration : IEntityTypeConfiguration<Day>
 
 		builder.Property(e => e.Number);
 
+		builder.Property(e => e.Status);
+
 		builder.Property(e => e.Timestamp).ConfigureAsRowVersion();
 
 		ConfigureContainerRelation<WorkAnotherTeamContainer>(builder, d => d.WorkAnotherTeamContainer!);

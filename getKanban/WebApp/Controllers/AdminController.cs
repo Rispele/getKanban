@@ -44,18 +44,47 @@ public class AdminController : Controller
 		{
 			return View("Error", "Запрашиваемая сессия не была найдена или закрыта.");
 		}
+
+		var team = await context.FindTeamAsync(session.Id, teamId);
+		if (team is null)
+		{
+			return View("Error", "Запрашиваемая сессия не была найдена или закрыта.");
+		}
+
+		var currentDay = team.CurrentDay;
 		
 		return View(new AdminPanelDaysDto
 		{
+			SessionId = session.Id,
+			TeamId = team.Id,
 			TeamName = session.Teams.SingleOrDefault(x => x.Id == teamId)?.Name!,
-			Days = [new(), new(), new()]
+			CurrentDay = new DayDtoConverter().Convert(currentDay),
+			StartDayNumber = 9,
+			FinishDayNumber = 18
 		});
 	}
 
 	[HttpGet("edit")]
-	public IActionResult AdminPanelEditing(Guid sessionId, Guid teamId, int dayNumber)
+	public async Task<IActionResult> AdminPanelEditing(Guid sessionId, Guid teamId)
 	{
-		//var dayConfiguration = ;
-		return View();
+		var session = await context.FindGameSessionsAsync(sessionId);
+		if (session is null)
+		{
+			return View("Error", "Запрашиваемая сессия не была найдена или закрыта.");
+		}
+
+		var team = await context.FindTeamAsync(session.Id, teamId);
+		if (team is null)
+		{
+			return View("Error", "Запрашиваемая сессия не была найдена или закрыта.");
+		}
+		
+		return View(new AdminPanelDayEditDto()
+		{
+			TeamName = session.Teams.SingleOrDefault(x => x.Id == teamId)?.Name!,
+			DayNumber = team.CurrentDay.Number,
+			SubmittedTickets = team.CurrentDay.ReleaseTicketContainer.TicketIds.ToList(),
+			TakenTickets = team.CurrentDay.UpdateSprintBacklogContainer.TicketIds.ToList()
+		});
 	}
 }
