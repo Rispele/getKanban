@@ -21,12 +21,6 @@ public class DayEntityTypeConfiguration : IEntityTypeConfiguration<Day>
 
 		builder.Ignore("currentlyAwaitedEvents");
 
-		builder.Property(d => d.AnalystsNumber);
-		builder.Property(d => d.ProgrammersNumber);
-		builder.Property(d => d.TestersNumber);
-
-		builder.Property(e => e.Number);
-
 		builder.Property(e => e.Status);
 
 		builder.Property(e => e.Timestamp).ConfigureAsRowVersion();
@@ -39,11 +33,17 @@ public class DayEntityTypeConfiguration : IEntityTypeConfiguration<Day>
 		ConfigureContainerRelation<UpdateCfdContainer>(builder, d => d.UpdateCfdContainer!);
 
 		builder
+			.HasOne<DaySettings>(t => t.DaySettings)
+			.WithOne()
+			.OnDelete(DeleteBehavior.Cascade);
+		
+		builder
 			.HasMany<AwaitedCommands>("awaitedCommands")
 			.WithOne()
 			.OnDelete(DeleteBehavior.Cascade);
 
 		builder.Navigation("awaitedCommands").AutoInclude();
+		builder.Navigation(t => t.DaySettings).AutoInclude();
 	}
 
 	private static void ConfigureContainerRelation<TContainer>(
