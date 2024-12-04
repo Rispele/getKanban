@@ -30,7 +30,7 @@ public class ReleaseTicketsCommand : DayCommand
 	
 	private void EnsureCanReleaseTickets(Team team)
 	{
-		if (!team.BuildTicketsInWork(team.Days).IsSupersetOf(TicketIds))
+		if (!team.GetTicketsInWorkIds(team.Days).IsSupersetOf(TicketIds))
 		{
 			throw new DayActionIsProhibitedException("You cannot release not in work tickets");
 		}

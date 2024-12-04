@@ -14,7 +14,7 @@ public partial class Team
 	public Guid GameSessionId { get; }
 	public Guid Id { get; }
 
-	public ParticipantsContainer Players { get; }
+	public ParticipantsContainer Players { get; } = null!;
 
 	public long RowVersions { get; [UsedImplicitly] private set; }
 
@@ -26,6 +26,11 @@ public partial class Team
 			if (string.IsNullOrWhiteSpace(value))
 			{
 				throw new DomainException("Name cannot be empty");
+			}
+
+			if (value.Length > 100)
+			{
+				throw new DomainException("Name cannot be longer than 100 characters");
 			}
 
 			var regex = NameRegexValidation();
@@ -41,7 +46,6 @@ public partial class Team
 	[UsedImplicitly]
 	private Team()
 	{
-		settings = TeamSessionSettings.Default();
 	}
 
 	public Team(Guid gameSessionId, string name)
@@ -49,7 +53,9 @@ public partial class Team
 	{
 		Id = Guid.NewGuid();
 		GameSessionId = gameSessionId;
-		this.name = name;
+		settings = TeamSessionSettings.Default();
+		
+		Name = name;
 		Players = new ParticipantsContainer(gameSessionId, Id);
 		days = [];
 	}

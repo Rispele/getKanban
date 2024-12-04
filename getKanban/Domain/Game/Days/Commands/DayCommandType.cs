@@ -1,4 +1,4 @@
-﻿namespace Domain.Game.Days;
+﻿namespace Domain.Game.Days.Commands;
 
 public enum DayCommandType
 {

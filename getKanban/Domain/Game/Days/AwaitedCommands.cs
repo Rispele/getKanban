@@ -1,4 +1,5 @@
-﻿using Domain.Game.Days.Configurations;
+﻿using Domain.Game.Days.Commands;
+using Domain.Game.Days.Configurations;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 

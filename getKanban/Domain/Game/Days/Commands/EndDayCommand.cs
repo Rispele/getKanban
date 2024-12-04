@@ -17,15 +17,15 @@ public class EndDayCommand : DayCommand
 		day.UpdateSprintBacklogContainer.Freeze();
 		day.UpdateCfdContainer.Freeze();
 
+		day.EndDay();
+
 		team.AddNextDay();
 		day.PostDayEvent(CommandType, null);
 	}
 
 	private void EnsureCfdIsValid(Team team)
 	{
-		var previousDayCfd = team.PreviousDay?.UpdateCfdContainer ?? UpdateCfdContainer.None;
-
-		if (!team.CurrentDay!.IsCfdValid(previousDayCfd))
+		if (!team.IsCurrentDayCfdValid())
 		{
 			throw new DomainException("Invalid cfd arguments");
 		}

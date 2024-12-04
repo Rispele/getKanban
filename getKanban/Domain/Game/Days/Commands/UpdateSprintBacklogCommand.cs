@@ -33,7 +33,7 @@ public class UpdateSprintBacklogCommand : DayCommand
 
 	private void EnsureCanTakeTickets(Team team)
 	{
-		if (team.BuildTakenTickets(team.Days).Overlaps(TicketIds))
+		if (team.GetTakenTicketIds(team.Days).Overlaps(TicketIds))
 		{
 			throw new DayActionIsProhibitedException("You cannot take already taken tickets");
 		}
