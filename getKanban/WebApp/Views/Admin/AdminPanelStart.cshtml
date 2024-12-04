@@ -1,20 +1,27 @@
 ﻿@model Core.Dtos.AdminPanelTeamsDto
 
-<div class="commandEditorHeader text-center">
-    <h1 class="display-4 fw-bold">getKanban: "@Model.GameSessionName"</h1>
-</div>
+<h1 class="fs-1 fw-bold text-center centered-25">getKanban: "@Model.GameSessionName"</h1>
+<h2 class="fs-3 fw-normal text-center">Выберите команду, которой нужна помощь</h2>
 
-<div class="text-center authorizationContainer centered-100">
-    <div class="authorizationHeader">
-        <h1 class="fs-2 fw-normal">Выберите команду, которой нужна помощь</h1>
-    </div>
+@* <div class="text-center authorizationContainer centered-100"> *@
+@* *@
+@*     <div class="authorizationButtons"> *@
+@*         @foreach (var team in Model.Teams) *@
+@*         { *@
+@*             <p id="@team.Id">@team.Name</p> *@
+@*         } *@
+@*     </div> *@
+@* </div> *@
 
-    <div class="authorizationButtons">
-        @foreach (var team in Model.Teams)
-        {
-            <p id="@team.Id">@team.Name</p>
-        }
-    </div>
+<div class="helpersCommandsContainer centered-50">
+
+    @foreach (var team in Model.Teams)
+    {
+        <div class="helpersCommand">
+            <p id="@team.Id" class="fs-5 fw-normal text-center text-top-margin">@team.Name</p>
+        </div>
+    }
+
 </div>
 
 <script>
