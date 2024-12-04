@@ -7,6 +7,8 @@ public class DaySettingsEntityTypeConfiguration : IEntityTypeConfiguration<DaySe
 {
 	public void Configure(EntityTypeBuilder<DaySettings> builder)
 	{
+		builder.HasKey(t => t.Id);
+		
 		builder.Property(t => t.Number).IsRequired();
 		
 		builder.Property(t => t.AnalystsCount).IsRequired();
