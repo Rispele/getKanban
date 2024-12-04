@@ -10,7 +10,7 @@ public class TeamSessionSettings
 {
 	public long Id { get; }
 
-	public IReadOnlyList<string> InitiallyTakenTickets { get; init; } = null!;
+	public IReadOnlyList<Ticket> InitiallyTakenTickets { get; init; } = null!;
 
 	public int ReleaseCycleLength { get; init; }
 
@@ -36,17 +36,17 @@ public class TeamSessionSettings
 		{
 			InitiallyTakenTickets =
 			[
-				TicketDescriptors.S01.Id,
-				TicketDescriptors.S02.Id,
-				TicketDescriptors.S03.Id,
-				TicketDescriptors.S04.Id,
-				TicketDescriptors.S05.Id,
-				TicketDescriptors.S06.Id,
-				TicketDescriptors.S07.Id,
-				TicketDescriptors.S08.Id,
-				TicketDescriptors.S09.Id,
-				TicketDescriptors.S10.Id,
-				TicketDescriptors.S11.Id
+				Ticket.Create(TicketDescriptors.S01.Id, 1),
+				Ticket.Create(TicketDescriptors.S02.Id, 1),
+				Ticket.Create(TicketDescriptors.S03.Id, 1),
+				Ticket.Create(TicketDescriptors.S04.Id, 1),
+				Ticket.Create(TicketDescriptors.S05.Id, 3),
+				Ticket.Create(TicketDescriptors.S06.Id, 3),
+				Ticket.Create(TicketDescriptors.S07.Id, 3),
+				Ticket.Create(TicketDescriptors.S08.Id, 3),
+				Ticket.Create(TicketDescriptors.S09.Id, 6),
+				Ticket.Create(TicketDescriptors.S10.Id, 6),
+				Ticket.Create(TicketDescriptors.S11.Id, 6)
 			],
 			ReleaseCycleLength = 3,
 			UpdateSprintBacklogEveryDaySince = 14,

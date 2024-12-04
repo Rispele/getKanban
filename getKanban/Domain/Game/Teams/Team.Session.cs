@@ -53,22 +53,25 @@ public partial class Team
 		days.Add(ConfigureDay(currentDayNumber, days));
 	}
 
-	public HashSet<string> BuildTakenTickets(IReadOnlyList<Day> daysToProcess)
+	public HashSet<Ticket> BuildTakenTickets()
 	{
-		var takenTickets = daysToProcess.SelectMany(t => t.UpdateSprintBacklogContainer?.TicketIds ?? []);
-		return settings.InitiallyTakenTickets.Concat(takenTickets).ToHashSet();
-	}
+		var releasedTickets = days
+			.SelectMany(d => d.ReleaseTicketContainer.TicketIds.Select(t => (ticketId: t, dayNumber: d.Number)))
+			.ToDictionary(t => t.ticketId, t => t.dayNumber);
 
-	public HashSet<string> BuildReleasedTickets(IReadOnlyList<Day> daysToProcess)
-	{
-		return daysToProcess.SelectMany(t => t.ReleaseTicketContainer?.TicketIds ?? []).ToHashSet();
-	}
+		var takenTickets = days
+			.SelectMany(
+				d => d.UpdateSprintBacklogContainer.TicketIds
+					.Select(
+						t => releasedTickets.TryGetValue(t, out var releasedDayNumber)
+							? Ticket.Create(t, d.Number, releasedDayNumber)
+							: Ticket.Create(t, d.Number)));
 
-	public HashSet<string> BuildTicketsInWork(IReadOnlyList<Day> daysToProcess)
-	{
-		return BuildTakenTickets(daysToProcess)
-			.Except(BuildReleasedTickets(daysToProcess))
-			.ToHashSet();
+		return settings.InitiallyTakenTickets
+			.Select(t => releasedTickets.TryGetValue(t.id, out var releasedDayNumber)
+				? Ticket.Create(t.id, t.takingDay, releasedDayNumber)
+				: Ticket.Create(t.id, t.takingDay))
+			.Concat(takenTickets).ToHashSet();
 	}
 
 	public int BuildAnotherTeamScores(List<Day> daysToProcess)
@@ -81,9 +84,23 @@ public partial class Team
 		return CurrentDay.IsCfdValid(PreviousDay?.UpdateCfdContainer ?? UpdateCfdContainer.None);
 	}
 
+	internal HashSet<string> GetTakenTicketIds(IReadOnlyList<Day> daysToProcess)
+	{
+		return settings.InitiallyTakenTickets.Select(t => t.id)
+			.Concat(daysToProcess.SelectMany(d => d.UpdateSprintBacklogContainer.TicketIds))
+			.ToHashSet();
+	}
+
+	internal HashSet<string> GetTicketsInWorkIds(IReadOnlyList<Day> daysToProcess)
+	{
+		var takenTickets = GetTakenTicketIds(daysToProcess);
+		takenTickets.ExceptWith(daysToProcess.SelectMany(d => d.ReleaseTicketContainer.TicketIds));
+		return takenTickets;
+	}
+
 	private Day ConfigureDay(int dayNumber, List<Day> daysToProcess)
 	{
-		var takenTickets = BuildTakenTickets(daysToProcess);
+		var takenTickets = GetTakenTicketIds(daysToProcess);
 		var endOfReleaseCycle = dayNumber % settings.ReleaseCycleLength == 0;
 
 		var shouldRelease = endOfReleaseCycle || takenTickets.Contains(TicketDescriptors.AutoRelease.Id);
