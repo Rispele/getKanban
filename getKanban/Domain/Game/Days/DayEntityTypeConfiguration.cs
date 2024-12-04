@@ -35,6 +35,7 @@ public class DayEntityTypeConfiguration : IEntityTypeConfiguration<Day>
 		builder
 			.HasOne<DaySettings>(t => t.DaySettings)
 			.WithOne()
+			.HasForeignKey<Day>()
 			.OnDelete(DeleteBehavior.Cascade);
 		
 		builder

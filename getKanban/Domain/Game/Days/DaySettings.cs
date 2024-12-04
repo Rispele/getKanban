@@ -5,6 +5,8 @@ namespace Domain.Game.Days;
 [EntityTypeConfiguration(typeof(DaySettingsEntityTypeConfiguration))]
 public class DaySettings
 {
+	public int Id { get; private init; }
+	
 	public int Number { get; init; }
 	
 	public int AnalystsCount { get; init; }
