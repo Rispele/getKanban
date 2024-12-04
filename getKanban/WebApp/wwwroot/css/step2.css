@@ -1,0 +1,84 @@
+.main-container {
+    width: 1300px;
+    height: 450px;
+    margin: 75px auto;
+}
+
+.main-container2 {
+    width: 1300px;
+    height: 300px;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+
+    position: relative;
+}
+
+/* Таблица через div */
+.role-table {
+    width: 500px;
+    height: 300px;
+    background-color: #E6E6E6;
+    border-radius: 25px 25px 0 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Заголовок таблицы */
+.role-table-header {
+    display: flex;
+    font-weight: bold;
+    height: 58px;
+    line-height: 58px;
+
+    border-radius: 25px 25px 0 0;
+
+    border: 1px solid black;
+}
+
+.role-table-header-cell {
+    flex: 1;
+    text-align: center;
+
+    border-right: 1px solid black;
+}
+
+.role-table-header .role-table-header-cell:last-child {
+    border-right: none;
+}
+
+/* Строки таблицы */
+.role-table-row {
+    display: flex;
+    height: 80px;
+    line-height: 80px;
+
+    border: 1px solid black;
+}
+
+.role-table-cell {
+    flex: 1;
+    text-align: center;
+
+    border-right: 1px solid black;
+}
+
+.role-table-cell:last-child {
+    border-right: none;
+}
+
+/* Элемент справа */
+.right-element {
+    width: 700px;
+    height: 300px;
+    background-color: #E6E6E6;
+
+    border-radius: 25px;
+    border: 1px solid black;
+
+    position: absolute;
+
+    right: 0;
+}

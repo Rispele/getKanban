@@ -1,0 +1,67 @@
+.container3 {
+    width: 950px;
+    min-height: 450px;
+    height: fit-content;
+
+    margin: 50px auto;
+
+    background-color: #fff;
+    padding: 20px;
+
+    /*box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);*/
+    /*border-radius: 10px;*/
+}
+
+.mine_table {
+    width: 350px;
+    height: 300px;
+
+    margin: auto;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    border: 1px solid black;
+}
+
+.row-60 {
+    width: 100%;
+    height: 60px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    border: 1px solid black;
+}
+
+.rowName {
+    width: 290px;
+    height: 100%;
+
+    border-right: 1px solid black;
+}
+
+.graphPageInput {
+    width: 57px;
+    height: 100%;
+
+    text-align: center;
+
+    border-style: none;
+}
+
+.text-top-margin {
+    margin-top: 15px;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+
+.rowStyle1 { background-color: #FFD700; }
+.rowStyle2 { background-color: #ADFF2F; }
+.rowStyle3 { background-color: #87CEEB; }
+.rowStyle4 { background-color: #FF7F50; }
+.rowStyle5 { background-color: #DA70D6; }

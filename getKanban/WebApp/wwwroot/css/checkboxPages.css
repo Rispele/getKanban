@@ -39,21 +39,87 @@
     flex-wrap: wrap;
 }
 
-.checkboxCardContainer {
+.padding-hrz-30 {
+    padding-left: 30px;
+    padding-right: 30px;
+}
+
+.checkboxContainerTripleVersion {
     width: 215px;
+    min-height: 100px;
+    height: fit-content;
+
+    margin-right: 125px;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.checkboxContainerTripleVersion:last-child {
+    margin-right: 0;
+}
+
+.checkboxContainerDoubleVersion {
+    width: 420px;
+    min-height: 100px;
+    height: fit-content;
+
+    margin-right: 60px;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.checkboxContainerDoubleVersion:last-child {
+    margin-right: 0;
+}
+
+.checkboxSingleVersion {
+    width: 100%;
+    min-height: 100px;
+    height: fit-content;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.checkboxCardsMargin {
+    width: 200px;
     height: 100px;
-    background-color: #E6E6E6;
+    margin: 5px 5px;
+}
+
+.checkboxCardContainer {
+    width: 200px;
+    height: 100px;
+    background-color: white;
     border-radius: 20px;
     border-style: solid;
-    border-color: black;
     display: flex;
     flex-direction: column;
     justify-content: center;
     padding-left: 20px;
     position: relative;
-    cursor: grab;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    margin: 10px 5px;
+}
+
+.checkboxCardStyle1 {
+    border-color: forestgreen;
+}
+
+.checkboxCardStyle2 {
+    border-color: dodgerblue;
+}
+
+.checkboxCardStyle3 {
+    border-color: darkred;
+}
+
+.cursorPointer {
+    cursor: pointer;
 }
 
 .checkboxCardContent {
@@ -75,11 +141,11 @@
 }
 
 .checkboxCardInput:checked ~ .checkboxCardContainer{
-    background-color: #CDFFCA;
+    background-color: lightgray;
 }
 
 .checkboxCardNumber {
-    width:fit-content;
+    width: fit-content;
 
     margin-bottom: 5px;
 }

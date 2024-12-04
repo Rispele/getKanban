@@ -1,0 +1,45 @@
+﻿@page
+@model Step6Stage1
+
+@{
+    ViewData["Title"] = "Step6";
+}
+
+<div class="container3">
+    <h1 class="title">Заполните таблицу, отметив сколько тикетов на доске на данный момент</h1>
+    <h1 class="title">Цвет колонки соответствует цвету стрелки.</h1>
+    <hr class="divider">
+    
+    <div class="mine_table">
+        <div class="row-60 rowStyle1">
+            <div class="rowName">
+                <p class="text-center fs-6 text-top-margin">Работа аналитиков</p>
+            </div>
+            <input type="number" class="graphPageInput rowStyle1" placeholder="0">
+        </div>
+        <div class="row-60 rowStyle2">
+            <div class="rowName">
+                <p class="text-center fs-6 text-top-margin">Работа разработчиков</p>
+            </div>
+            <input type="number" class="graphPageInput rowStyle2" placeholder="0">
+        </div>
+        <div class="row-60 rowStyle3">
+            <div class="rowName">
+                <p class="text-center fs-6 text-top-margin">Работа тестировщиков</p>
+            </div>
+            <input type="number" class="graphPageInput rowStyle3" placeholder="0">
+        </div>
+        <div class="row-60 rowStyle4">
+            <div class="rowName">
+                <p class="text-center fs-6 text-top-margin">Готовы к поставке</p>
+            </div>
+            <input type="number" class="graphPageInput rowStyle4" placeholder="0">
+        </div>
+        <div class="row-60 rowStyle5">
+            <div class="rowName">
+                <p class="text-center fs-6 text-top-margin">Поставлено</p>
+            </div>
+            <input type="number" class="graphPageInput rowStyle5" placeholder="0">
+        </div>
+    </div>
+</div>
