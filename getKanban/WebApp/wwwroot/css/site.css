@@ -67,6 +67,10 @@ body {
   color: white;
 }
 
+.centered-150 {
+  margin: 150px auto;
+}
+
 .centered-100 {
   margin: 100px auto;
 }

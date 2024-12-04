@@ -1,0 +1,23 @@
+.helpersCommandsContainer {
+    width: 350px;
+    min-height: 60px;
+    height: fit-content;
+
+    background-color: black;
+
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+}
+
+.helpersCommand {
+    width: 350px;
+    height: 60px;
+
+    border-bottom: #CAC4D0 1px solid;
+}
+
+.helpersCommand:last-child {
+    border-bottom: none;
+}
+
