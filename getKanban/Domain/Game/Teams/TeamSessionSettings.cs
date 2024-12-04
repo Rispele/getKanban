@@ -12,6 +12,8 @@ public class TeamSessionSettings
 
 	public IReadOnlyList<Ticket> InitiallyTakenTickets { get; init; } = null!;
 	
+	public IReadOnlyList<(int dayFrom, int profitPerClient)> ProfitPerClientPerDay { get; init; } = null!;
+	
 	public int ReleaseCycleLength { get; init; }
 
 	public int UpdateSprintBacklogEveryDaySince { get; init; }
@@ -30,6 +32,14 @@ public class TeamSessionSettings
 
 	public int IncreaseTestersNumberSince { get; init; }
 
+	public int GetProfitPerDay(int dayNumber)
+	{
+		return ProfitPerClientPerDay
+			.Where(t => t.dayFrom < dayNumber)
+			.MaxBy(t => t.dayFrom)
+			.profitPerClient;
+	}
+
 	public static TeamSessionSettings Default()
 	{
 		return new TeamSessionSettings
@@ -47,6 +57,12 @@ public class TeamSessionSettings
 				Ticket.Create(TicketDescriptors.S09.Id, 6),
 				Ticket.Create(TicketDescriptors.S10.Id, 6),
 				Ticket.Create(TicketDescriptors.S11.Id, 6)
+			],
+			ProfitPerClientPerDay = [
+				(0, 10),
+				(9, 15),
+				(12, 20),
+				(15, 30)
 			],
 			ReleaseCycleLength = 3,
 			UpdateSprintBacklogEveryDaySince = 14,

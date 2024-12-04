@@ -123,7 +123,7 @@ public partial class Team
 			ProgrammersCount = settings.ProgrammersNumber,
 			TestersCount = testersNumber,
 
-			ProfitPerClient = 15
+			ProfitPerClient = settings.GetProfitPerDay(dayNumber)
 		};
 
 		return new Day(daySettings, scenario);
