@@ -11,7 +11,7 @@ public class TeamSessionSettings
 	public long Id { get; }
 
 	public IReadOnlyList<Ticket> InitiallyTakenTickets { get; init; } = null!;
-
+	
 	public int ReleaseCycleLength { get; init; }
 
 	public int UpdateSprintBacklogEveryDaySince { get; init; }

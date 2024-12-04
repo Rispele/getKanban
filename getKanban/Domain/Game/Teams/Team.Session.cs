@@ -2,7 +2,6 @@
 using Domain.Game.Days;
 using Domain.Game.Days.Commands;
 using Domain.Game.Days.DayContainers;
-using Domain.Game.Days.DayContainers.RollDice;
 using Domain.Game.Days.DayContainers.TeamMembers;
 using Domain.Game.Days.Scenarios;
 using Domain.Game.Tickets;
@@ -116,11 +115,17 @@ public partial class Team
 			? settings.IncreasedTestersNumber
 			: settings.DefaultTestersNumber;
 
-		return new Day(
-			dayNumber,
-			scenario,
-			settings.AnalystsNumber,
-			settings.ProgrammersNumber,
-			testersNumber);
+		var daySettings = new DaySettings
+		{
+			Number = dayNumber,
+
+			AnalystsCount = settings.AnalystsNumber,
+			ProgrammersCount = settings.ProgrammersNumber,
+			TestersCount = testersNumber,
+
+			ProfitPerClient = 15
+		};
+
+		return new Day(daySettings, scenario);
 	}
 }

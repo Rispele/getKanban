@@ -15,10 +15,6 @@ public class Day
 	private readonly List<AwaitedCommands> awaitedCommands = null!;
 	private readonly Scenario scenario = null!;
 
-	public int AnalystsNumber { get; }
-	public int ProgrammersNumber { get; }
-	public int TestersNumber { get; }
-
 	private IEnumerable<AwaitedCommands> currentlyAwaitedEvents => awaitedCommands
 		.Where(@event => !@event.Removed);
 
@@ -29,9 +25,12 @@ public class Day
 	public UpdateSprintBacklogContainer UpdateSprintBacklogContainer { get; private set; } = null!;
 	public UpdateCfdContainer UpdateCfdContainer { get; } = null!;
 
+	// ReSharper disable once UnassignedGetOnlyAutoProperty
 	public long Id { get; }
 
-	public int Number { get; }
+	public DaySettings DaySettings { get; } = null!;
+	
+	public int Number => DaySettings.Number;
 
 	public long Timestamp { get; [UsedImplicitly] private set; }
 
@@ -42,23 +41,18 @@ public class Day
 	{
 	}
 
-	internal Day(
-		int number,
-		Scenario scenario,
-		int analystsNumber,
-		int programmersNumber,
-		int testersNumber)
+	internal Day(DaySettings settings, Scenario scenario)
 	{
-		Number = number;
+		DaySettings = settings;
+
 		Status = DayStatus.InProcess;
 		this.scenario = scenario;
 		awaitedCommands = scenario.InitiallyAwaitedCommands.Select(t => new AwaitedCommands(t)).ToList();
 
-		AnalystsNumber = analystsNumber;
-		ProgrammersNumber = programmersNumber;
-		TestersNumber = testersNumber;
-
-		TeamMembersContainer = new TeamMembersContainer(AnalystsNumber, ProgrammersNumber, TestersNumber);
+		TeamMembersContainer = new TeamMembersContainer(
+			settings.AnalystsCount,
+			settings.ProgrammersCount,
+			settings.TestersCount);
 		UpdateCfdContainer = new UpdateCfdContainer();
 		ReleaseTicketContainer = new ReleaseTicketContainer();
 		UpdateSprintBacklogContainer = new UpdateSprintBacklogContainer();

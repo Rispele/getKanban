@@ -46,6 +46,7 @@ public partial class Team
 	[UsedImplicitly]
 	private Team()
 	{
+		settings = TeamSessionSettings.Default();
 	}
 
 	public Team(Guid gameSessionId, string name)

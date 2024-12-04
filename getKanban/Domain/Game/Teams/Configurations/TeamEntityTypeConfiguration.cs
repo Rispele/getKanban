@@ -28,10 +28,12 @@ public class TeamEntityTypeConfiguration : IEntityTypeConfiguration<Team>
 			.HasMany<Day>("days")
 			.WithOne();
 
-		builder
-			.HasOne<TeamSessionSettings>("settings")
-			.WithOne()
-			.HasForeignKey<TeamSessionSettings>();
+		builder.Ignore("settings");
+		
+		// builder
+		// 	.HasOne<TeamSessionSettings>("settings")
+		// 	.WithOne()
+		// 	.HasForeignKey<TeamSessionSettings>();
 
 		builder
 			.HasOne<ParticipantsContainer>(t => t.Players)

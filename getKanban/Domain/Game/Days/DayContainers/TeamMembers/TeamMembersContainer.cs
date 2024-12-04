@@ -16,13 +16,13 @@ public class TeamMembersContainer : DayContainer
 	{
 	}
 	
-	internal TeamMembersContainer(int analystsNumber, int programmersNumber, int testersNumber)
+	internal TeamMembersContainer(int analystsCount, int programmersCount, int testersCount)
 	{
 		teamMembers = [];
 		
-		Enumerable.Range(0, analystsNumber).ForEach(_ => teamMembers.Add(new TeamMember(TeamRole.Analyst)));
-		Enumerable.Range(0, programmersNumber).ForEach(_ => teamMembers.Add(new TeamMember(TeamRole.Programmer)));
-		Enumerable.Range(0, testersNumber).ForEach(_ => teamMembers.Add(new TeamMember(TeamRole.Tester)));
+		Enumerable.Range(0, analystsCount).ForEach(_ => teamMembers.Add(new TeamMember(TeamRole.Analyst)));
+		Enumerable.Range(0, programmersCount).ForEach(_ => teamMembers.Add(new TeamMember(TeamRole.Programmer)));
+		Enumerable.Range(0, testersCount).ForEach(_ => teamMembers.Add(new TeamMember(TeamRole.Tester)));
 	}
 	
 	internal void UpdateTeamMemberRole(long teamMemberId, TeamRole to)
