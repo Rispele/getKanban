@@ -40,7 +40,7 @@ public class TeamEntityTypeConfiguration : IEntityTypeConfiguration<Team>
 			.WithMany();
 
 		builder.Navigation("days").AutoInclude();
-		builder.Navigation("settings").AutoInclude();
+		// builder.Navigation("settings").AutoInclude();
 		builder.Navigation(t => t.Players).AutoInclude();
 	}
 }
