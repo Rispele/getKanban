@@ -37,7 +37,6 @@ public partial class Team
 	public IReadOnlyList<UpdateCfdContainer> CfdContainers => days
 		.OrderBy(d => d.Number)
 		.Select(d => d.UpdateCfdContainer)
-		.Where(c => c.Frozen)
 		.ToList();
 
 	public void ExecuteCommand(DayCommand command)

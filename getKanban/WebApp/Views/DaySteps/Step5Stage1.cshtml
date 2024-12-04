@@ -1,77 +1,26 @@
-﻿@model Guid?
+﻿@model (Guid? sessionId, List<string> ticketIds)
 
 <div class="container1">
     <h1 class="title">Выберите тикеты, которые были сегодня взяты в очередь</h1>
     <hr class="divider">
     <div class="container2">
 
-        <input type="checkbox" class="checkboxCardInput" id="checkbox1">
-        <label for="checkbox1" class="checkboxCardContainer">
-            <div class="checkboxCardContent">
-                <h2 class="checkboxCardNumber">S01</h2>
-                <div class="lines">
-                    <div class="line full"></div>
-                    <div class="line half"></div>
-                    <div class="line half"></div>
-                </div>
+        @foreach (var ticketId in Model.ticketIds)
+        {
+            <div>
+                <input type="checkbox" class="checkboxCardInput" id="@ticketId">
+                <label for="@ticketId" class="checkboxCardContainer">
+                    <div class="checkboxCardContent">
+                        <h2 class="checkboxCardNumber">@ticketId</h2>
+                        <div class="lines">
+                            <div class="line full"></div>
+                            <div class="line half"></div>
+                            <div class="line half"></div>
+                        </div>
+                    </div>
+                </label>
             </div>
-        </label>
-
-        <div>
-            <input type="checkbox" class="checkboxCardInput" id="checkbox2">
-            <label for="checkbox2" class="checkboxCardContainer">
-                <div class="checkboxCardContent">
-                    <h2 class="checkboxCardNumber">S01</h2>
-                    <div class="lines">
-                        <div class="line full"></div>
-                        <div class="line half"></div>
-                        <div class="line half"></div>
-                    </div>
-                </div>
-            </label>
-        </div>
-
-        <div>
-            <input type="checkbox" class="checkboxCardInput" id="checkbox3">
-            <label for="checkbox3" class="checkboxCardContainer">
-                <div class="checkboxCardContent">
-                    <h2 class="checkboxCardNumber">S01</h2>
-                    <div class="lines">
-                        <div class="line full"></div>
-                        <div class="line half"></div>
-                        <div class="line half"></div>
-                    </div>
-                </div>
-            </label>
-        </div>
-
-        <div>
-            <input type="checkbox" class="checkboxCardInput" id="checkbox4">
-            <label for="checkbox4" class="checkboxCardContainer">
-                <div class="checkboxCardContent">
-                    <h2 class="checkboxCardNumber">S01</h2>
-                    <div class="lines">
-                        <div class="line full"></div>
-                        <div class="line half"></div>
-                        <div class="line half"></div>
-                    </div>
-                </div>
-            </label>
-        </div>
-
-        <div>
-            <input type="checkbox" class="checkboxCardInput" id="checkbox5">
-            <label for="checkbox5" class="checkboxCardContainer">
-                <div class="checkboxCardContent">
-                    <h2 class="checkboxCardNumber">S01</h2>
-                    <div class="lines">
-                        <div class="line full"></div>
-                        <div class="line half"></div>
-                        <div class="line half"></div>
-                    </div>
-                </div>
-            </label>
-        </div>
+        }
     </div>
     
     <button class="stepControlButtons rightButton" id="prev">
@@ -101,26 +50,26 @@
             const remove = !this.checked;
             const ticketId = this.parentElement.getElementsByClassName('checkboxCardNumber')[0].textContent;
             console.log(ticketId);
-            fetch("/step/update-release", {
+            fetch("/step/update-sprint-backlog", {
                 method: 'POST',
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({ ticketId: ticketId, remove: remove })
             }).then(function () {
-                connection.invoke("UpdateTicketChoice", "@Model", ticketId);
+                connection.invoke("UpdateTicketChoice", "@Model.sessionId", ticketId);
             });
         });
     }
 
     document.getElementById("prev").addEventListener('click', function () {
-        connection.invoke("ChangePage", "@Model", 5, 0)
+        connection.invoke("ChangePage", "@Model.sessionId", 5, 0)
             .then(function () {
                 window.location.href = `/step/5`;
             });
     });
     document.getElementById("next").addEventListener('click', function () {
-        connection.invoke("ChangePage", "@Model", 5, 2)
+        connection.invoke("ChangePage", "@Model.sessionId", 5, 2)
             .then(function () {
                 window.location.href = `/step/5/2`;
             });

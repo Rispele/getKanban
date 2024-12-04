@@ -31,6 +31,12 @@ public interface IGameSessionService
 
 	public Task<Guid?> FindCurrentSessionId(RequestContext requestContext);
 
+	public Task<CfdGraphDto> GetCfdDataForTeam(Guid sessionId, Guid teamId);
+
+	public Task<List<string>> GetReleaseTickets(Guid sessionId, Guid teamId);
+	
+	public Task<List<string>> GetBacklogTickets(Guid sessionId, Guid teamId);
+	
 	public Task<HubConnection?> FindCurrentConnection(Guid userId);
 
 	public Task<HubConnection> SaveCurrentConnection(Guid userId, string lobbyId, string hubConnectionId);

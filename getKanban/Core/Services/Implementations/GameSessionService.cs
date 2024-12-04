@@ -8,6 +8,7 @@ using Core.RequestContexts;
 using Core.Services.Contracts;
 using Domain.DbContexts;
 using Domain.Game;
+using Domain.Game.Tickets;
 using Microsoft.EntityFrameworkCore;
 
 namespace Core.Services.Implementations;
@@ -179,6 +180,59 @@ public class GameSessionService : IGameSessionService
 
 		return null;
 	}
+
+	public async Task<CfdGraphDto> GetCfdDataForTeam(Guid sessionId, Guid teamId)
+	{
+		var session = context.GameSessions.SingleOrDefault(x => x.Id == sessionId);
+		var team = session!.Teams.SingleOrDefault(x => x.Id == teamId);
+		var cfd = team!.CfdContainers.ToList();
+
+		var result = new CfdGraphDto();
+		var i = 0;
+		foreach (var day in cfd)
+		{
+			if (!result.GraphPointsPerLabel.ContainsKey("Работа аналитиков"))
+				result.GraphPointsPerLabel["Работа аналитиков"] = new List<(int, int)>();
+			if (!result.GraphPointsPerLabel.ContainsKey("Работа разработчиков"))
+				result.GraphPointsPerLabel["Работа разработчиков"] = new List<(int, int)>();
+			if (!result.GraphPointsPerLabel.ContainsKey("Работа тестировщиков"))
+				result.GraphPointsPerLabel["Работа тестировщиков"] = new List<(int, int)>();
+			if (!result.GraphPointsPerLabel.ContainsKey("Готовы к поставке"))
+				result.GraphPointsPerLabel["Готовы к поставке"] = new List<(int, int)>();
+			if (!result.GraphPointsPerLabel.ContainsKey("Поставлено"))
+				result.GraphPointsPerLabel["Поставлено"] = new List<(int, int)>();
+			
+			result.DaysToShow.Add(9 + i);
+			result.TotalTasksToShow.Add(20);
+			result.GraphPointsPerLabel["Работа аналитиков"].Add((9 + i, day.WithAnalysts!.Value));
+			result.GraphPointsPerLabel["Работа разработчиков"].Add((9 + i, day.WithProgrammers!.Value));
+			result.GraphPointsPerLabel["Работа тестировщиков"].Add((9 + i, day.WithTesters!.Value));
+			result.GraphPointsPerLabel["Готовы к поставке"].Add((9 + i, day.ToDeploy!.Value));
+			result.GraphPointsPerLabel["Поставлено"].Add((9 + i, day.Released!.Value));
+		}
+
+		return result;
+	}
+
+	public async Task<List<string>> GetReleaseTickets(Guid sessionId, Guid teamId)
+	{
+		var session = context.GameSessions.SingleOrDefault(x => x.Id == sessionId);
+		var team = session!.Teams.SingleOrDefault(x => x.Id == teamId);
+		var tickets = team!.BuildTakenTickets();
+		return tickets.Select(x => x.id).ToList();
+	}
+
+	public async Task<List<string>> GetBacklogTickets(Guid sessionId, Guid teamId)
+	{
+		var session = context.GameSessions.SingleOrDefault(x => x.Id == sessionId);
+		var team = session!.Teams.SingleOrDefault(x => x.Id == teamId);
+		var tickets = team!.BuildTakenTickets().ToList();
+		return TicketDescriptors.AllTicketDescriptors
+			.Select(x => x.Id)
+			.Except(tickets.Select(x => x.id))
+			.ToList();
+	}
+	
 
 	public async Task<HubConnection?> FindCurrentConnection(Guid userId)
 	{
