@@ -14,6 +14,10 @@ public class TeamSessionSettings
 	
 	public IReadOnlyList<(int dayFrom, int profitPerClient)> ProfitPerClientPerDay { get; init; } = null!;
 	
+	public int DayOfPenaltyForLostLawTicket { get; init; }
+	
+	public int DayBeforeBonusForDoneBusinessTicketCanBeGained { get; init; }
+	
 	public int ReleaseCycleLength { get; init; }
 
 	public int UpdateSprintBacklogEveryDaySince { get; init; }
@@ -64,6 +68,8 @@ public class TeamSessionSettings
 				(12, 20),
 				(15, 30)
 			],
+			DayOfPenaltyForLostLawTicket = 15,
+			DayBeforeBonusForDoneBusinessTicketCanBeGained = 18,
 			ReleaseCycleLength = 3,
 			UpdateSprintBacklogEveryDaySince = 14,
 			AnotherTeamShouldWorkSince = 9,
