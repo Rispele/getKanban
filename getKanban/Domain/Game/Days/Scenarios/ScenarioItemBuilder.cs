@@ -1,4 +1,6 @@
-﻿namespace Domain.Game.Days.Scenarios;
+﻿using Domain.Game.Days.Commands;
+
+namespace Domain.Game.Days.Scenarios;
 
 public class ScenarioItemBuilder
 {

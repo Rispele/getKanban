@@ -17,6 +17,8 @@ public class EndDayCommand : DayCommand
 		day.UpdateSprintBacklogContainer.Freeze();
 		day.UpdateCfdContainer.Freeze();
 
+		day.EndDay();
+
 		team.AddNextDay();
 		day.PostDayEvent(CommandType, null);
 	}

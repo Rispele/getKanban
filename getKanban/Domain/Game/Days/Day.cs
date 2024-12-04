@@ -1,4 +1,5 @@
 ﻿using Domain.DomainExceptions;
+using Domain.Game.Days.Commands;
 using Domain.Game.Days.DayContainers;
 using Domain.Game.Days.DayContainers.RollDice;
 using Domain.Game.Days.DayContainers.TeamMembers;
@@ -34,7 +35,7 @@ public class Day
 
 	public long Timestamp { get; [UsedImplicitly] private set; }
 
-	public DayStatus Status { get; set; }
+	public DayStatus Status { get; private set; }
 
 	[UsedImplicitly]
 	private Day()
@@ -86,6 +87,11 @@ public class Day
 		}
 
 		throw new DayEventNotAwaitedException($"{commandType} is not awaited");
+	}
+
+	internal void EndDay()
+	{
+		Status = DayStatus.Finished;
 	}
 
 	internal bool IsCfdValid(UpdateCfdContainer previousDayCfd)

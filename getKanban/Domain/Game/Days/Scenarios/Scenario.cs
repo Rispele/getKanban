@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Domain.Game.Days.Commands;
+using Newtonsoft.Json;
 
 namespace Domain.Game.Days.Scenarios;
 

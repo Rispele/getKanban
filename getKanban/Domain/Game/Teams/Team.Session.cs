@@ -11,7 +11,7 @@ namespace Domain.Game.Teams;
 
 public partial class Team
 {
-	private readonly TeamSessionSettings settings;
+	private readonly TeamSessionSettings settings = null!;
 
 	private int currentDayNumber;
 	private List<Day> days { get; } = null!;
@@ -48,7 +48,6 @@ public partial class Team
 
 	internal void AddNextDay()
 	{
-		days.Single(x => x.Number == currentDayNumber).Status = DayStatus.Finished;
 		currentDayNumber++;
 		days.Add(ConfigureDay(currentDayNumber, days));
 	}
@@ -68,9 +67,10 @@ public partial class Team
 							: Ticket.Create(t, d.Number)));
 
 		return settings.InitiallyTakenTickets
-			.Select(t => releasedTickets.TryGetValue(t.id, out var releasedDayNumber)
-				? Ticket.Create(t.id, t.takingDay, releasedDayNumber)
-				: Ticket.Create(t.id, t.takingDay))
+			.Select(
+				t => releasedTickets.TryGetValue(t.id, out var releasedDayNumber)
+					? Ticket.Create(t.id, t.takingDay, releasedDayNumber)
+					: Ticket.Create(t.id, t.takingDay))
 			.Concat(takenTickets).ToHashSet();
 	}
 
@@ -105,8 +105,8 @@ public partial class Team
 
 		var shouldRelease = endOfReleaseCycle || takenTickets.Contains(TicketDescriptors.AutoRelease.Id);
 		var shouldUpdateSpringBacklog = endOfReleaseCycle || dayNumber >= settings.UpdateSprintBacklogEveryDaySince;
-		var anotherTeamAppeared = dayNumber > 9 &&
-		                          BuildAnotherTeamScores(daysToProcess) < settings.UpdateSprintBacklogEveryDaySince;
+		var anotherTeamAppeared = dayNumber > settings.AnotherTeamShouldWorkSince
+		                       && BuildAnotherTeamScores(daysToProcess) < settings.ScoresAnotherTeamShouldGain;
 
 		var scenario = ScenarioBuilder.Create()
 			.DefaultScenario(anotherTeamAppeared, shouldRelease, shouldUpdateSpringBacklog)
