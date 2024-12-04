@@ -13,9 +13,9 @@ public class DayDtoConverter
 	public DayDto Convert(Day day)
 	{
 		return new DayDto(
-			day.AnalystsNumber,
-			day.ProgrammersNumber,
-			day.TestersNumber,
+			day.DaySettings.AnalystsCount,
+			day.DaySettings.ProgrammersCount,
+			day.DaySettings.TestersCount,
 			Convert(day.WorkAnotherTeamContainer),
 			Convert(day.TeamMembersContainer),
 			Convert(day.DiceRollContainer, day.TeamMembersContainer),
