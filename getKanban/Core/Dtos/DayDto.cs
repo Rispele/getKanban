@@ -18,6 +18,8 @@ public class DayDto
 	public UpdateSprintBacklogContainerDto UpdateSprintBacklogContainer { get; }
 	public UpdateCfdContainerDto UpdateCfdContainer { get; }
 
+	public IReadOnlyList<AwaitedEventsDto> AwaitedCommands { get; }
+
 	public DayStatus Status { get; }
 
 	public int Number { get; }
@@ -32,6 +34,7 @@ public class DayDto
 		ReleaseTicketContainerDto releaseTicketContainer,
 		UpdateSprintBacklogContainerDto updateSprintBacklogContainer,
 		UpdateCfdContainerDto updateCfdContainer,
+		IReadOnlyList<AwaitedEventsDto> awaitedCommands,
 		DayStatus status,
 		int number)
 	{
@@ -44,6 +47,7 @@ public class DayDto
 		ReleaseTicketContainer = releaseTicketContainer;
 		UpdateSprintBacklogContainer = updateSprintBacklogContainer;
 		UpdateCfdContainer = updateCfdContainer;
+		AwaitedCommands = awaitedCommands;
 		Status = status;
 		Number = number;
 	}

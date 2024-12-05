@@ -15,6 +15,8 @@ public class TeamEntityTypeConfiguration : IEntityTypeConfiguration<Team>
 		builder.Property("currentDayNumber");
 
 		builder.Ignore("previousDay");
+
+		builder.Ignore(d => d.CurrentlyAwaitedCommands);
 		
 		builder.Ignore(d => d.CurrentDay);
 		builder.Ignore(d => d.Days);

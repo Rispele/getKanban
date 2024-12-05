@@ -22,6 +22,7 @@ public class DayDtoConverter
 			Convert(day.ReleaseTicketContainer),
 			Convert(day.UpdateSprintBacklogContainer),
 			Convert(day.UpdateCfdContainer),
+			Convert(day.CurrentlyAwaitedCommands),
 			day.Status,
 			day.Number);
 	}
@@ -125,5 +126,15 @@ public class DayDtoConverter
 			WithProgrammers = container.WithProgrammers,
 			WithTesters = container.WithTesters
 		};
+	}
+
+	private IReadOnlyList<AwaitedEventsDto> Convert(IReadOnlyList<AwaitedCommands> awaitedCommandsList)
+	{
+		return awaitedCommandsList.Select(
+			x => new AwaitedEventsDto()
+			{
+				Removed = x.Removed,
+				CommandType = x.CommandType
+			}).ToList();
 	}
 }

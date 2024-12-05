@@ -19,10 +19,41 @@ public class DayStepsController : Controller
 		this.teamService = teamService;
 	}
 
+	[HttpPost("another-team-roll")]
+	public async Task AnotherTeamRoll()
+	{
+		var currentSessionId = await gameSessionService.FindCurrentSessionId(RequestContextFactory.Build(Request));
+		var currentUser = await gameSessionService.GetCurrentUser(RequestContextFactory.Build(Request));
+		var currentTeam = await gameSessionService.GetCurrentTeam(
+			RequestContextFactory.Build(Request),
+			currentSessionId!.Value);
+		
+		await teamService.PatchDayAsync(
+			currentSessionId!.Value,
+			currentTeam!.Id,
+			currentUser.Id,
+			new WorkAnotherTeamDayCommand());
+	}
+	
+
 	[HttpGet("1")]
 	[HttpGet("1/0")]
 	public async Task<IActionResult> Step1Stage0()
 	{
+		var currentSessionId = await gameSessionService.FindCurrentSessionId(RequestContextFactory.Build(Request));
+		var currentUser = await gameSessionService.GetCurrentUser(RequestContextFactory.Build(Request));
+		var currentTeam = await gameSessionService.GetCurrentTeam(
+			RequestContextFactory.Build(Request),
+			currentSessionId!.Value);
+		
+		var shouldRollForAnotherTeam = (await teamService.GetCurrentDayAsync(currentSessionId!.Value, currentTeam!.Id))
+			.AwaitedCommands.ToList().Any(x => x is { CommandType: DayCommandType.WorkAnotherTeam, Removed: false });
+
+		if (shouldRollForAnotherTeam)
+		{
+			return View("AnotherTeamRoll", currentTeam.Id);
+		}
+		
 		return View(await gameSessionService.FindCurrentSessionId(RequestContextFactory.Build(Request)));
 	}
 
@@ -123,6 +154,14 @@ public class DayStepsController : Controller
 			RequestContextFactory.Build(Request),
 			sessionId!.Value);
 
+		var shouldShowTickets = (await teamService.GetCurrentDayAsync(sessionId!.Value, currentTeam!.Id))
+			.AwaitedCommands.ToList().Any(x => x is { CommandType: DayCommandType.ReleaseTickets, Removed: false });
+
+		if (!shouldShowTickets)
+		{
+			return View("Step5Stage0", sessionId!.Value);
+		}
+		
 		var ticketIds = await gameSessionService.GetReleaseTickets(sessionId!.Value, currentTeam.Id);
 		var pageTypeNumber = (ticketIds.Any(x => x.Contains('S')) ? 1 : 0) +
 		               (ticketIds.Any(x => x.Contains('I')) ? 1 : 0) +
@@ -198,6 +237,14 @@ public class DayStepsController : Controller
 		var currentTeam = await gameSessionService.GetCurrentTeam(
 			RequestContextFactory.Build(Request),
 			sessionId!.Value);
+		
+		var shouldShowTickets = (await teamService.GetCurrentDayAsync(sessionId!.Value, currentTeam!.Id))
+			.AwaitedCommands.ToList().Any(x => x is { CommandType: DayCommandType.UpdateSprintBacklog, Removed: false });
+
+		if (!shouldShowTickets)
+		{
+			return View("Step6Stage0", sessionId!.Value);
+		}
 		
 		var ticketIds = await gameSessionService.GetBacklogTickets(sessionId!.Value, currentTeam.Id);
 		var pageTypeNumber = (ticketIds.Any(x => x.Contains('S')) ? 1 : 0) +
