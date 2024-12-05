@@ -155,6 +155,24 @@ public class GameSessionService : IGameSessionService
 			Name = user.Name
 		};
 	}
+	
+	public async Task<UserCredentialsDto> GetUserCredentials(RequestContext requestContext)
+	{
+		var currentSessionId = await FindCurrentSessionId(requestContext);
+		if (currentSessionId is null)
+		{
+			throw new InvalidOperationException();
+		}
+		var currentUser = await GetCurrentUser(requestContext);
+		var currentTeam = await GetCurrentTeam(requestContext, currentSessionId!.Value);
+
+		return new UserCredentialsDto()
+		{
+			SessionId = currentSessionId!.Value,
+			TeamId = currentTeam.Id,
+			UserId = currentUser.Id
+		};
+	}
 
 	public async Task<Guid?> FindCurrentSessionId(RequestContext requestContext)
 	{
@@ -216,6 +234,7 @@ public class GameSessionService : IGameSessionService
 			i++;
 		}
 
+		result.SessionId = sessionId;
 		return result;
 	}
 
