@@ -1,7 +1,7 @@
-@model (Guid? sessionId, int dayNumber)
+@model WebApp.Controllers.DayStepsController.StepModel
 
 <div class="stepHeader">
-    <h1 class="fs-1 fw- text-center">Команда pipipupu. День @Model.dayNumber</h1>
+    <h1 class="fs-1 fw- text-center">Команда @Html.Raw(Model.TeamName). День @Model.DayNumber</h1>
 </div>
 
 <div class="infoContainer height-large centered-100">
@@ -23,30 +23,22 @@
     Следующий день
 </button>
 
+<script src="~/js/page-switch.js"></script>
+<script src="~/js/setup-hub-connection.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
-    const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
-    connection.start();
-    connection.on("NotifyPageChange", function (page, stage) {
-        window.location.href = `/step/${page}/${stage}`;
-    });
-
-    document.getElementById("prev").addEventListener('click', function () {
-        connection.invoke("ChangePage", "@Model.sessionId", 7, 0)
-            .then(function () {
-                window.location.href = `/step/7`;
-            });
-    });
+    const connection = setupHubConnection(new signalR.HubConnectionBuilder());
+    setSwitchEvent("prev", connection, "@Model.TeamId", 7, 0);
+    
     document.getElementById("next-day").addEventListener('click', function () {
         fetch(`/step/end-day`, {
             method: 'POST',
             headers: { "Content-Type": "application/json" },
         }).then(function () {
-            connection.invoke("ChangePage", "@Model.sessionId", 1, 0)
+            connection.invoke("ChangePage", "@Model.TeamId", 1, 0)
                 .then(function () {
                     window.location.href = `/step/1`;
                 });
         })
     });
-
 </script>

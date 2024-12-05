@@ -1,5 +1,8 @@
-﻿@model Guid?
+﻿@model WebApp.Controllers.DayStepsController.StepModel
 
+<div class="stepHeader">
+    <h1 class="fs-1 fw- text-center">Команда @Html.Raw(Model.TeamName). День @Model.DayNumber</h1>
+</div>
 <div class="container3">
     <h1 class="title">Заполните таблицу, отметив сколько тикетов на доске на данный момент</h1>
     <h1 class="title">Цвет колонки соответствует цвету стрелки.</h1>
@@ -43,13 +46,11 @@
     </button>
 </div>
 
+<script src="~/js/page-switch.js"></script>
+<script src="~/js/setup-hub-connection.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
-    const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
-    connection.start();
-    connection.on("NotifyPageChange", function (page, stage) {
-        window.location.href = `/step/${page}/${stage}`;
-    });
+    const connection = setupHubConnection(new signalR.HubConnectionBuilder());
     
     document.getElementById('save-cfd').addEventListener('click', function () {
         const released = document.getElementById('released').value;
@@ -71,12 +72,10 @@
                 withAnalysts: withAnalysts
             })
         }).then(function () {
-            connection.invoke("ChangePage", "@Model", 6, 1)
+            connection.invoke("ChangePage", "@Model.TeamId", 6, 1)
                 .then(function () {
                     window.location.href = `/step/6/1`;
                 });
         });
     });
-    
-
 </script>

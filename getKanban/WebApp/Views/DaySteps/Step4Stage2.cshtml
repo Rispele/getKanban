@@ -1,11 +1,14 @@
-﻿@model (Guid? currentSessionId, List<string> ticketIds)
+﻿@model WebApp.Controllers.DayStepsController.TicketCheckStepModel
 
+<div class="stepHeader">
+    <h1 class="fs-1 fw- text-center">Команда @Html.Raw(Model.TeamName). День @Model.DayNumber</h1>
+</div>
 <div class="container1">
     <h1 class="title">Проверьте корректность заполнения.
         Если вы ошиблись, вернитесь назад и скорректируйте выбор.</h1>
     <hr class="divider">
     <div class="container2">
-        @foreach (var ticketId in Model.ticketIds)
+        @foreach (var ticketId in Model.TicketIds)
         {
             <div class="checkboxCardsMargin">
                 <div class="checkboxCardContainer">
@@ -31,23 +34,11 @@
     </button>
 </div>
 
+<script src="~/js/page-switch.js"></script>
+<script src="~/js/setup-hub-connection.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
-    const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
-    connection.start();
-    connection.on("NotifyPageChange", function (page, stage) {
-        window.location.href = `/step/${page}/${stage}`;
-    });
-    document.getElementById("prev").addEventListener('click', function () {
-        connection.invoke("ChangePage", "@Model.currentSessionId", 4, 1)
-            .then(function () {
-                window.location.href = `/step/4/1`;
-            });
-    });
-    document.getElementById("next").addEventListener('click', function () {
-        connection.invoke("ChangePage", "@Model.currentSessionId", 5, 0)
-            .then(function () {
-                window.location.href = `/step/5`;
-            });
-    });
+    const connection = setupHubConnection(new signalR.HubConnectionBuilder());
+    setSwitchEvent("prev", connection, "@Model.TeamId", 4, 1);
+    setSwitchEvent("next", connection, "@Model.TeamId", 5, 0);
 </script>

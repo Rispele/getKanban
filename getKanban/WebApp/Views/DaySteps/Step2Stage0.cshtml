@@ -1,9 +1,9 @@
 ﻿@using Core.Dtos.Containers.RollDice
 @using Core.Dtos.Containers.TeamMembers
-@model (Guid? currentSessionId, int dayNumber, RollDiceContainerDto diceResults)
+@model WebApp.Controllers.DayStepsController.RollDicesStepModel
 
 <div class="stepHeader">
-    <h1 class="fs-1 fw- text-center">Команда pipipupu. День @Model.dayNumber</h1>
+    <h1 class="fs-1 fw- text-center">Команда @Html.Raw(Model.TeamName). День @Model.DayNumber</h1>
 </div>
 
 @functions
@@ -26,7 +26,7 @@
     }
 
     private IEnumerable<DiceRollResultDto> GetDiceRollResultsByCurrentRole(TeamRoleDto currentRole) =>
-        Model.diceResults.DiceRollResults
+        Model.RollDiceContainerDto.DiceRollResults
             .Where(t => t.CurrentRole == currentRole);
 }
 
@@ -123,18 +123,10 @@
     Далее
 </button>
 
+<script src="~/js/page-switch.js"></script>
+<script src="~/js/setup-hub-connection.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
-    const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
-    connection.start();
-    connection.on("NotifyPageChange", function (page, stage) {
-        window.location.href = `/step/${page}/${stage}`;
-    });
-
-    document.getElementById("next").addEventListener('click', function () {
-        connection.invoke("ChangePage", "@Model.currentSessionId", 3, 0)
-            .then(function () {
-                window.location.href = `/step/3`;
-            });
-    });
+    const connection = setupHubConnection(new signalR.HubConnectionBuilder());
+    setSwitchEvent("next", connection, "@Model.TeamId", 3, 0);
 </script>

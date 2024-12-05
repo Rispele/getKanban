@@ -1,5 +1,8 @@
-﻿@model Core.Dtos.TicketsViewDto
+﻿@model WebApp.Controllers.DayStepsController.TicketChoiceStepModel
 
+<div class="stepHeader">
+    <h1 class="fs-1 fw- text-center">Команда @Html.Raw(Model.TeamName). День @Model.DayNumber</h1>
+</div>
 <div class="container1">
     <h1 class="title">Выберите тикеты, которые были сегодня взяты в очередь</h1>
     <hr class="divider">
@@ -91,13 +94,11 @@
     </button>
 </div>
 
+<script src="~/js/page-switch.js"></script>
+<script src="~/js/setup-hub-connection.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
-    const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
-    connection.start();
-    connection.on("NotifyPageChange", function (page, stage) {
-        window.location.href = `/step/${page}/${stage}`;
-    });
+    const connection = setupHubConnection(new signalR.HubConnectionBuilder());
     connection.on("NotifyUpdateTicketChoice", function (ticketId) {
         const ticket = document.getElementById(ticketId);
         ticket.checked = !ticket.checked;
@@ -116,21 +117,10 @@
                 },
                 body: JSON.stringify({ ticketId: ticketId, remove: remove })
             }).then(function () {
-                connection.invoke("UpdateTicketChoice", "@Model.SessionId", ticketId);
+                connection.invoke("UpdateTicketChoice", "@Model.TeamId", ticketId);
             });
         });
     }
-
-    document.getElementById("prev").addEventListener('click', function () {
-        connection.invoke("ChangePage", "@Model.SessionId", 5, 0)
-            .then(function () {
-                window.location.href = `/step/5`;
-            });
-    });
-    document.getElementById("next").addEventListener('click', function () {
-        connection.invoke("ChangePage", "@Model.SessionId", 5, 2)
-            .then(function () {
-                window.location.href = `/step/5/2`;
-            });
-    });
+    setSwitchEvent("prev", connection, "@Model.TeamId", 5, 0);
+    setSwitchEvent("next", connection, "@Model.TeamId", 5, 2);
 </script>

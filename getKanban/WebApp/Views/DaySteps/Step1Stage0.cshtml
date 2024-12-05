@@ -1,7 +1,7 @@
-﻿@model (Guid? sessionId, int dayNumber)
+﻿@model WebApp.Controllers.DayStepsController.StepModel
 
 <div class="stepHeader">
-    <h1 class="fs-1 fw- text-center">Команда pipipupu. День @Model.dayNumber</h1>
+    <h1 class="fs-1 fw- text-center">Команда @Html.Raw(Model.TeamName). День @Model.DayNumber</h1>
 </div>
 
 <div class="infoContainer height-large centered-100">
@@ -19,18 +19,10 @@
     Далее
 </button>
 
+<script src="~/js/page-switch.js"></script>
+<script src="~/js/setup-hub-connection.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
-    const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
-    connection.start();
-    connection.on("NotifyPageChange", function (page, stage) {
-        window.location.href = `/step/${page}/${stage}`;
-    });
-    
-    document.getElementById("next").addEventListener('click', function () {
-        connection.invoke("ChangePage", "@Model.sessionId", 1, 1)
-            .then(function () {
-                window.location.href = `/step/1/1`;
-            });
-    });
+    const connection = setupHubConnection(new signalR.HubConnectionBuilder());
+    setSwitchEvent("next", connection, "@Model.TeamId", 1, 1);
 </script>

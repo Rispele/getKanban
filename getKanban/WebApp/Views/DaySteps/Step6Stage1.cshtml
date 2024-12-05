@@ -1,29 +1,94 @@
-@model Core.Dtos.CfdGraphDto
+@model WebApp.Controllers.DayStepsController.CfdGraphStepModel
 
-<p>@string.Join(" ", Model.DaysToShow)</p>
-<p>@string.Join(" ", Model.TotalTasksToShow)</p>
-@foreach (var pair in Model.GraphPointsPerLabel)
+<div class="stepHeader">
+    <h1 class="fs-1 fw- text-center">Команда @Html.Raw(Model.TeamName). День @Model.DayNumber</h1>
+</div>
+
+<p>@string.Join(" ", Model.CfdGraphDto.DaysToShow)</p>
+<p>@string.Join(" ", Model.CfdGraphDto.TotalTasksToShow)</p>
+@foreach (var pair in Model.CfdGraphDto.GraphPointsPerLabel)
 {
     <p>@pair.Key - - - @string.Join(" ", pair.Value)</p>
 }
+@functions
+{
+    private int Set(Dictionary<string,List<(int, int)>> val)
+    {
+        var p = 10;
+        foreach (var key in val.Keys)
+        {
+            val[key] = new List<(int, int)>();
+            for (int i = 9; i < 15; i++)
+            {
+                val[key].Add((i, p));
+            }
+
+            p += 5;
+        }
+
+        return 1;
+    }
+}
+@foreach (var pair in Model.CfdGraphDto.GraphPointsPerLabel)
+{
+    @Set(Model.CfdGraphDto.GraphPointsPerLabel)
+}
+
+<script type="text/javascript" src="~/js/dygraph/dygraph.min.js"></script>
+<link rel="stylesheet" type="text/css" href="~/css/dygraph.min.css"/>
+
+<div id="graphdiv3" style="width:500px; height:300px;"></div>
+
+<script type="text/javascript">
+    const graphBlock = document.getElementById("graphdiv3");
+    let data = "X,";
+    @foreach (var key in Model.CfdGraphDto.GraphPointsPerLabel.Keys)
+    {
+        @:data = data + "@Html.Raw(key)" + ","
+    }
+    data = data.substring(0, data.length - 1) + "\n";
+    @for(var i = 0; i < Model.CfdGraphDto.GraphPointsPerLabel.First().Value.Count; i++)
+    {
+        <text>
+            if (data[data.length - 1] === '\n')
+            {
+                data = data + "@Model.CfdGraphDto.GraphPointsPerLabel.First().Value[i].Item1" + ",";
+            }
+        </text>
+        @foreach (var pair in Model.CfdGraphDto.GraphPointsPerLabel)
+        {
+            <text>
+                data = data + "@pair.Value[i].Item2" + ",";
+            </text>
+        }
+        <text>
+            data = data.substring(0, data.length - 1) + "\n";
+        </text>
+    }
+    
+    //"X,Значение\n" +
+    //    "2008-05-07,75\n" +
+    //    "2008-05-08,70\n" +
+    //    "2008-05-09,80\n";
+    const options = {
+        //zoomCallback: function() {this.resetZoom()},
+        //valueRange: [0, 50],
+        stackedGraph: true
+    };
+    
+    Dygraph.onDOMready(function onDOMready() {
+        const g3 = new Dygraph(graphBlock, data, options);
+    });
+</script>
 
 <button class="stepControlButtons position-relative rightButton" id="next">
     <p class="fs-6">Далее</p>
 </button>
 
+<script src="~/js/page-switch.js"></script>
+<script src="~/js/setup-hub-connection.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
-    const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
-    connection.start();
-    connection.on("NotifyPageChange", function (page, stage) {
-        window.location.href = `/step/${page}/${stage}`;
-    });
-    
-    document.getElementById("next").addEventListener('click', function () {
-        connection.invoke("ChangePage", "@Model.SessionId", 7, 0)
-            .then(function () {
-                window.location.href = `/step/7`;
-            });
-    });
-
+    const connection = setupHubConnection(new signalR.HubConnectionBuilder());
+    setSwitchEvent("next", connection, "@Model.CfdGraphDto.SessionId", 7, 0);
 </script>

@@ -1,7 +1,10 @@
 ﻿@using Core.Dtos.Containers.TeamMembers
-@model (Guid? currentSessionId, List<Core.Dtos.Containers.TeamMemberDto> teamMemberDtos)
+@model WebApp.Controllers.DayStepsController.RoleUpdateStepModel
 
 <meta charset="UTF-8">
+<div class="stepHeader">
+    <h1 class="fs-1 fw- text-center">Команда @Html.Raw(Model.TeamName). День @Model.DayNumber</h1>
+</div>
 <div class="table-container">
     <table>
         <thead>
@@ -13,48 +16,38 @@
         </thead>
         <tbody>
         <tr>
-            <td class="dropzone" id="Analyst">
-                @foreach (var analyst in Model.teamMemberDtos.Where(x => x.InitialRole == TeamRoleDto.Analyst))
-                {
-                    <div class="draggable" draggable="true" id="@analyst.Id">
-                        <div class="textContainer">
-                            <div class="text fs-6 fw-bolder">Аналитик</div>
-                            <div class="lines">
-                                <div class="line full"></div>
-                                <div class="line half"></div>
+            @foreach (var role in new[] { TeamRoleDto.Analyst, TeamRoleDto.Programmer, TeamRoleDto.Tester })
+            {
+                <td class="dropzone" id="@Html.Raw(role.ToString())">
+                    @foreach (var member in Model.TeamMemberDtos.Where(x => x.InitialRole == role))
+                    {
+                        <div class="draggable" draggable="true" id="@member.Id">
+                            <div class="textContainer">
+                                <div class="text fs-6 fw-bolder">
+                                    @{
+                                        switch (role)
+                                        {
+                                            case TeamRoleDto.Analyst:
+                                                <text>Аналитик</text>
+                                                break;
+                                            case TeamRoleDto.Programmer:
+                                                <text>Разработчик</text>
+                                                break;
+                                            case TeamRoleDto.Tester:
+                                                <text>Тестировщик</text>
+                                                break;
+                                        }
+                                    }
+                                </div>
+                                <div class="lines">
+                                    <div class="line full"></div>
+                                    <div class="line half"></div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                }
-            </td>
-            <td class="dropzone" id="Programmer">
-                @foreach (var programmer in Model.teamMemberDtos.Where(x => x.InitialRole == TeamRoleDto.Programmer))
-                {
-                    <div class="draggable" draggable="true" id="@programmer.Id">
-                        <div class="textContainer">
-                            <div class="text fs-6 fw-bolder">Разработчик</div>
-                            <div class="lines">
-                                <div class="line full"></div>
-                                <div class="line half"></div>
-                            </div>
-                        </div>
-                    </div>
-                }
-            </td>
-            <td class="dropzone" id="Tester">
-                @foreach (var tester in Model.teamMemberDtos.Where(x => x.InitialRole == TeamRoleDto.Tester))
-                {
-                    <div class="draggable" draggable="true" id="@tester.Id">
-                        <div class="textContainer">
-                            <div class="text fs-6 fw-bolder">Тестировщик</div>
-                            <div class="lines">
-                                <div class="line full"></div>
-                                <div class="line half"></div>
-                            </div>
-                        </div>
-                    </div>
-                }
-            </td>
+                    }
+                </td>
+            }
         </tr>
         </tbody>
     </table>
@@ -64,13 +57,11 @@
     <p class="fs-6">Бросить кубики</p>
 </button>
 
+<script src="~/js/page-switch.js"></script>
+<script src="~/js/setup-hub-connection.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
-    const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
-    connection.start();
-    connection.on("NotifyPageChange", function (page, stage) {
-        window.location.href = `/step/${page}/${stage}`;
-    });
+    const connection = setupHubConnection(new signalR.HubConnectionBuilder());
     connection.on("NotifyUpdateRole", function (teamMemberId, roleTo) {
         const draggable = document.getElementById(teamMemberId.toString());
         document.getElementById(roleTo).appendChild(draggable);
@@ -88,28 +79,17 @@
                 },
                 body: JSON.stringify([teamMemberId, roleTo])
             }).then(function () {
-                connection.invoke("UpdateRole", "@Model.currentSessionId", parseInt(teamMemberId), roleTo);
+                connection.invoke("UpdateRole", "@Model.TeamId", parseInt(teamMemberId), roleTo);
             });
         });
     }
 
     document.getElementById("roll").addEventListener('click', function () {
         fetch(`/step/roll`).then(function () {
-            connection.invoke("ChangePage", "@Model.currentSessionId", 2, 0)
+            connection.invoke("ChangePage", "@Model.TeamId", 2, 0)
                 .then(function () {
                     window.location.href = "/step/2";
                 });
         });
     });
-
-    function translateRole(role) {
-        return role === "Аналитик"
-            ? "Analyst"
-            : role === "Разработчик"
-                ? "Programmer"
-                : role === "Тестировщик"
-                    ? "Tester"
-                    : null;
-    }
-
 </script>
