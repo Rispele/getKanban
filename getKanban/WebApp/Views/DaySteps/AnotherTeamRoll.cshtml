@@ -1,0 +1,27 @@
+﻿@model (Guid sessionId, int dayNumber)
+
+<div class="stepHeader">
+    <h1 class="fs-1 fw- text-center">Команда pipipupu. День @Model.dayNumber Петя</h1>
+</div>
+
+<div class="infoContainer height-large centered-100">
+    <h1 class="fs-4 text-center">
+        Петя
+    </h1>
+
+    <button class="stepControlButtons rightButton" id="roll">
+        Кинуть за петю
+    </button>
+</div>
+
+<script>
+    document.getElementById('roll').addEventListener('click', function () {
+        fetch(`/step/another-team-roll`, {
+            method: 'POST',
+            headers: {"Content-Type": "application/json"}
+        })
+        .then(function () {
+            window.location.href = `/step/1/0`
+        });
+    });
+</script>

@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Domain.Game.Days;
+namespace Domain.Game.Days.Configurations;
 
 public class DaySettingsEntityTypeConfiguration : IEntityTypeConfiguration<DaySettings>
 {

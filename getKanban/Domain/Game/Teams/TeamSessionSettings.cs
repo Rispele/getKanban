@@ -39,7 +39,7 @@ public class TeamSessionSettings
 			.MaxBy(t => t.dayFrom)
 			.profitPerClient;
 	}
-
+	
 	public static TeamSessionSettings Default()
 	{
 		return new TeamSessionSettings
@@ -66,7 +66,7 @@ public class TeamSessionSettings
 			],
 			ReleaseCycleLength = 3,
 			UpdateSprintBacklogEveryDaySince = 14,
-			AnotherTeamShouldWorkSince = 9,
+			AnotherTeamShouldWorkSince = 10,
 			ScoresAnotherTeamShouldGain = 15,
 			AnalystsNumber = 2,
 			ProgrammersNumber = 3,

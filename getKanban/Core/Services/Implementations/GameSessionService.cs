@@ -155,6 +155,24 @@ public class GameSessionService : IGameSessionService
 			Name = user.Name
 		};
 	}
+	
+	public async Task<UserCredentialsDto> GetUserCredentials(RequestContext requestContext)
+	{
+		var currentSessionId = await FindCurrentSessionId(requestContext);
+		if (currentSessionId is null)
+		{
+			throw new InvalidOperationException();
+		}
+		var currentUser = await GetCurrentUser(requestContext);
+		var currentTeam = await GetCurrentTeam(requestContext, currentSessionId!.Value);
+
+		return new UserCredentialsDto()
+		{
+			SessionId = currentSessionId!.Value,
+			TeamId = currentTeam.Id,
+			UserId = currentUser.Id
+		};
+	}
 
 	public async Task<Guid?> FindCurrentSessionId(RequestContext requestContext)
 	{
@@ -203,14 +221,20 @@ public class GameSessionService : IGameSessionService
 				result.GraphPointsPerLabel["Поставлено"] = new List<(int, int)>();
 			
 			result.DaysToShow.Add(9 + i);
-			result.TotalTasksToShow.Add(20);
+			result.TotalTasksToShow.Add(day.WithAnalysts!.Value);
+			result.TotalTasksToShow.Add(day.WithProgrammers!.Value);
+			result.TotalTasksToShow.Add(day.WithTesters!.Value);
+			result.TotalTasksToShow.Add(day.ToDeploy!.Value);
+			result.TotalTasksToShow.Add(day.Released!.Value);
 			result.GraphPointsPerLabel["Работа аналитиков"].Add((9 + i, day.WithAnalysts!.Value));
 			result.GraphPointsPerLabel["Работа разработчиков"].Add((9 + i, day.WithProgrammers!.Value));
 			result.GraphPointsPerLabel["Работа тестировщиков"].Add((9 + i, day.WithTesters!.Value));
 			result.GraphPointsPerLabel["Готовы к поставке"].Add((9 + i, day.ToDeploy!.Value));
 			result.GraphPointsPerLabel["Поставлено"].Add((9 + i, day.Released!.Value));
+			i++;
 		}
 
+		result.SessionId = sessionId;
 		return result;
 	}
 
@@ -219,7 +243,7 @@ public class GameSessionService : IGameSessionService
 		var session = context.GameSessions.SingleOrDefault(x => x.Id == sessionId);
 		var team = session!.Teams.SingleOrDefault(x => x.Id == teamId);
 		var tickets = team!.BuildTakenTickets();
-		return tickets.Select(x => x.id).ToList();
+		return tickets.Where(x => x.InWork()).Select(x => x.id).ToList();
 	}
 
 	public async Task<List<string>> GetBacklogTickets(Guid sessionId, Guid teamId)

@@ -6,3 +6,24 @@
 {
     <p>@pair.Key - - - @string.Join(" ", pair.Value)</p>
 }
+
+<button class="stepControlButtons position-relative rightButton" id="next">
+    <p class="fs-6">Далее</p>
+</button>
+
+<script src="/js/signalr/dist/browser/signalr.js"></script>
+<script>
+    const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
+    connection.start();
+    connection.on("NotifyPageChange", function (page, stage) {
+        window.location.href = `/step/${page}/${stage}`;
+    });
+    
+    document.getElementById("next").addEventListener('click', function () {
+        connection.invoke("ChangePage", "@Model.SessionId", 7, 0)
+            .then(function () {
+                window.location.href = `/step/7`;
+            });
+    });
+
+</script>

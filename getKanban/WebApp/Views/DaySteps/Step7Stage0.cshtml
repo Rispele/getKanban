@@ -1,4 +1,4 @@
-﻿@model (Guid? sessionId, int dayNumber)
+@model (Guid? sessionId, int dayNumber)
 
 <div class="stepHeader">
     <h1 class="fs-1 fw- text-center">Команда pipipupu. День @Model.dayNumber</h1>
@@ -6,12 +6,12 @@
 
 <div class="infoContainer height-large centered-100">
     <h1 class="fs-4 text-center">
-        Релиз
+        Окончание дня
     </h1>
-    
+
     <div class="info height-small centered-100">
-        <p class="fs-5 fw-normal">Передвиньте тикеты из "Готово к поставке" в "Поставлено".</p>
-        <p class="fs-5 fw-normal">Для этих тикетов обновите поле "День поставки".</p>
+        <p class="fs-5 fw-normal">Снимите скрин доски, сохраните его (в случае факапа, будет фактура до какого состояния откатиться).</p>
+        <p class="fs-5 fw-normal">Прочитайте событие, которое вам приготовил день грядущий.</p>
     </div>
 </div>
 
@@ -30,16 +30,18 @@
     connection.on("NotifyPageChange", function (page, stage) {
         window.location.href = `/step/${page}/${stage}`;
     });
+
     document.getElementById("prev").addEventListener('click', function () {
-        connection.invoke("ChangePage", "@Model.sessionId", 3, 0)
+        connection.invoke("ChangePage", "@Model.sessionId", 6, 1)
             .then(function () {
-                window.location.href = `/step/3`;
+                window.location.href = `/step/6/1`;
             });
     });
     document.getElementById("next").addEventListener('click', function () {
-        connection.invoke("ChangePage", "@Model.sessionId", 4, 1)
+        connection.invoke("ChangePage", "@Model.sessionId", 7, 1)
             .then(function () {
-                window.location.href = `/step/4/1`;
+                window.location.href = `/step/7/1`;
             });
     });
+
 </script>

@@ -10,7 +10,7 @@ namespace Domain.Game.Teams;
 
 public partial class Team
 {
-	private readonly TeamSessionSettings settings = null!;
+	public readonly TeamSessionSettings Settings = null!;
 
 	private int currentDayNumber;
 	private List<Day> days { get; } = null!;
@@ -30,6 +30,8 @@ public partial class Team
 		}
 	}
 
+	public IReadOnlyList<AwaitedCommands> CurrentlyAwaitedCommands => CurrentDay.CurrentlyAwaitedCommands;
+	
 	internal Day? PreviousDay => days.SingleOrDefault(d => d.Number == currentDayNumber - 1);
 
 	public IReadOnlyList<TeamMember> CurrentDayTeamRoleUpdates => CurrentDay.TeamMembersContainer.TeamMembers;
@@ -64,7 +66,7 @@ public partial class Team
 							? Ticket.Create(t, d.Number, releasedDayNumber)
 							: Ticket.Create(t, d.Number)));
 
-		return settings.InitiallyTakenTickets
+		return Settings.InitiallyTakenTickets
 			.Select(
 				t => releasedTickets.TryGetValue(t.id, out var releasedDayNumber)
 					? Ticket.Create(t.id, t.takingDay, releasedDayNumber)
@@ -72,9 +74,20 @@ public partial class Team
 			.Concat(takenTickets).ToHashSet();
 	}
 
-	public int BuildAnotherTeamScores(List<Day> daysToProcess)
+	public bool IsTicketDeadlineNotExceeded(string ticketId, int deadlineInclusive)
 	{
-		return daysToProcess.Select(d => d.WorkAnotherTeamContainer?.ScoresNumber ?? 0).Sum();
+		var ticket = BuildTakenTickets().SingleOrDefault(t => t.id == ticketId);
+		if (ticket == null || ticket.InWork())
+		{
+			return currentDayNumber <= deadlineInclusive;
+		}
+		
+		return ticket.releaseDay!.Value <= deadlineInclusive;
+	}
+
+	public int BuildAnotherTeamScores()
+	{
+		return BuildAnotherTeamScores(days);
 	}
 
 	public bool IsCurrentDayCfdValid()
@@ -82,9 +95,14 @@ public partial class Team
 		return CurrentDay.IsCfdValid(PreviousDay?.UpdateCfdContainer ?? UpdateCfdContainer.None);
 	}
 
+	internal int BuildAnotherTeamScores(IReadOnlyCollection<Day> daysToProcess)
+	{
+		return daysToProcess.Select(d => d.WorkAnotherTeamContainer?.ScoresNumber ?? 0).Sum();
+	}
+
 	internal HashSet<string> GetTakenTicketIds(IReadOnlyList<Day> daysToProcess)
 	{
-		return settings.InitiallyTakenTickets.Select(t => t.id)
+		return Settings.InitiallyTakenTickets.Select(t => t.id)
 			.Concat(daysToProcess.SelectMany(d => d.UpdateSprintBacklogContainer.TicketIds))
 			.ToHashSet();
 	}
@@ -92,37 +110,42 @@ public partial class Team
 	internal HashSet<string> GetTicketsInWorkIds(IReadOnlyList<Day> daysToProcess)
 	{
 		var takenTickets = GetTakenTicketIds(daysToProcess);
-		takenTickets.ExceptWith(daysToProcess.SelectMany(d => d.ReleaseTicketContainer.TicketIds));
+		takenTickets.ExceptWith(GetReleasedTicketIds(daysToProcess));
 		return takenTickets;
+	}
+
+	internal HashSet<string> GetReleasedTicketIds(IReadOnlyList<Day> daysToProcess)
+	{
+		return daysToProcess.SelectMany(d => d.ReleaseTicketContainer.TicketIds).ToHashSet();
 	}
 
 	private Day ConfigureDay(int dayNumber, List<Day> daysToProcess)
 	{
-		var takenTickets = GetTakenTicketIds(daysToProcess);
-		var endOfReleaseCycle = dayNumber % settings.ReleaseCycleLength == 0;
+		var releasedTickets = GetReleasedTicketIds(daysToProcess);
+		var endOfReleaseCycle = dayNumber % Settings.ReleaseCycleLength == 0;
 
-		var shouldRelease = endOfReleaseCycle || takenTickets.Contains(TicketDescriptors.AutoRelease.Id);
-		var shouldUpdateSpringBacklog = endOfReleaseCycle || dayNumber >= settings.UpdateSprintBacklogEveryDaySince;
-		var anotherTeamAppeared = dayNumber > settings.AnotherTeamShouldWorkSince
-		                       && BuildAnotherTeamScores(daysToProcess) < settings.ScoresAnotherTeamShouldGain;
+		var shouldRelease = endOfReleaseCycle || releasedTickets.Contains(TicketDescriptors.AutoRelease.Id);
+		var shouldUpdateSpringBacklog = endOfReleaseCycle || dayNumber >= Settings.UpdateSprintBacklogEveryDaySince;
+		var anotherTeamAppeared = dayNumber > Settings.AnotherTeamShouldWorkSince
+		                       && BuildAnotherTeamScores(daysToProcess) < Settings.ScoresAnotherTeamShouldGain;
 
 		var scenario = ScenarioBuilder.Create()
 			.DefaultScenario(anotherTeamAppeared, shouldRelease, shouldUpdateSpringBacklog)
 			.Build();
 
-		var testersNumber = dayNumber >= settings.IncreaseTestersNumberSince
-			? settings.IncreasedTestersNumber
-			: settings.DefaultTestersNumber;
+		var testersNumber = dayNumber >= Settings.IncreaseTestersNumberSince
+			? Settings.IncreasedTestersNumber
+			: Settings.DefaultTestersNumber;
 
 		var daySettings = new DaySettings
 		{
 			Number = dayNumber,
 
-			AnalystsCount = settings.AnalystsNumber,
-			ProgrammersCount = settings.ProgrammersNumber,
+			AnalystsCount = Settings.AnalystsNumber,
+			ProgrammersCount = Settings.ProgrammersNumber,
 			TestersCount = testersNumber,
 
-			ProfitPerClient = settings.GetProfitPerDay(dayNumber)
+			ProfitPerClient = Settings.GetProfitPerDay(dayNumber)
 		};
 
 		return new Day(daySettings, scenario);

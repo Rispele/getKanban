@@ -3,13 +3,14 @@ using Domain.Game.Days.DayContainers;
 using Domain.Game.Days.DayContainers.RollDice;
 using Domain.Game.Days.DayContainers.TeamMembers;
 using Domain.Game.Days.Scenarios;
+using Domain.Game.Days.Scenarios.Services;
 using Domain.Serializers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Newtonsoft.Json;
 
-namespace Domain.Game.Days;
+namespace Domain.Game.Days.Configurations;
 
 public class DayEntityTypeConfiguration : IEntityTypeConfiguration<Day>
 {
@@ -19,18 +20,18 @@ public class DayEntityTypeConfiguration : IEntityTypeConfiguration<Day>
 
 		builder.Property("scenario").HasConversion(new ScenarioConverter());
 
-		builder.Ignore("currentlyAwaitedEvents");
+		builder.Ignore(t => t.CurrentlyAwaitedCommands);
 
 		builder.Property(e => e.Status);
 
 		builder.Property(e => e.Timestamp).ConfigureAsRowVersion();
 
 		ConfigureContainerRelation<WorkAnotherTeamContainer>(builder, d => d.WorkAnotherTeamContainer!);
-		ConfigureContainerRelation<TeamMembersContainer>(builder, d => d.TeamMembersContainer!);
+		ConfigureContainerRelation<TeamMembersContainer>(builder, d => d.TeamMembersContainer);
 		ConfigureContainerRelation<RollDiceContainer>(builder, d => d.DiceRollContainer!);
-		ConfigureContainerRelation<ReleaseTicketContainer>(builder, d => d.ReleaseTicketContainer!);
-		ConfigureContainerRelation<UpdateSprintBacklogContainer>(builder, d => d.UpdateSprintBacklogContainer!);
-		ConfigureContainerRelation<UpdateCfdContainer>(builder, d => d.UpdateCfdContainer!);
+		ConfigureContainerRelation<ReleaseTicketContainer>(builder, d => d.ReleaseTicketContainer);
+		ConfigureContainerRelation<UpdateSprintBacklogContainer>(builder, d => d.UpdateSprintBacklogContainer);
+		ConfigureContainerRelation<UpdateCfdContainer>(builder, d => d.UpdateCfdContainer);
 
 		builder
 			.HasOne<DaySettings>(t => t.DaySettings)
@@ -63,5 +64,5 @@ public class DayEntityTypeConfiguration : IEntityTypeConfiguration<Day>
 
 	private class ScenarioConverter() : ValueConverter<Scenario, string>(
 		context => context.ToJson(),
-		str => JsonConvert.DeserializeObject<Scenario>(str)!);
+		str => JsonConvert.DeserializeObject<Scenario>(str)!.CopyWithService(new DefaultScenarioService()));
 }

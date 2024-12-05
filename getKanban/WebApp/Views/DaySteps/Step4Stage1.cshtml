@@ -1,24 +1,82 @@
-﻿@model (Guid? sessionId, List<string> ticketIds)
+﻿@model Core.Dtos.TicketsViewDto
 
 <div class="container1">
     <h1 class="title">Выберите тикеты, которые были сегодня поставлены</h1>
     <hr class="divider">
     <div class="container2">
-
-        @foreach (var ticketId in Model.ticketIds)
+        @if (Model.TicketIds.Any(x => x.Contains("S")))
         {
-            <div>
-                <input type="checkbox" class="checkboxCardInput" id="@ticketId">
-                <label for="@ticketId" class="checkboxCardContainer">
-                    <div class="checkboxCardContent">
-                        <h2 class="checkboxCardNumber">@ticketId</h2>
-                        <div class="lines">
-                            <div class="line full"></div>
-                            <div class="line half"></div>
-                            <div class="line half"></div>
-                        </div>
+            <div class="@Html.Raw($"checkboxContainer{Model.PageType}Version")">
+                <h1 class="title">Обычные</h1>
+                <hr class="divider">
+
+                @foreach (var defaultTicket in Model.TicketIds.Where(x => x.Contains("S")))
+                {
+                    <div class="checkboxCardsMargin">
+                        <input type="checkbox" class="checkboxCardInput" id="@defaultTicket">
+                        <label for="@defaultTicket" class="checkboxCardContainer checkboxCardStyle1 cursorPointer">
+                            <div class="checkboxCardContent">
+                                <h2 class="checkboxCardNumber">@defaultTicket</h2>
+                                <div class="lines">
+                                    <div class="line full"></div>
+                                    <div class="line half"></div>
+                                    <div class="line half"></div>
+                                </div>
+                            </div>
+                        </label>
                     </div>
-                </label>
+                }
+            </div>
+        }
+
+        @if (Model.TicketIds.Any(x => x.Contains("I")))
+        {
+            <div class="@Html.Raw($"checkboxContainer{Model.PageType}Version")">
+                <h1 class="title">Инфраструктурные</h1>
+                <hr class="divider">
+
+                @foreach (var infrTicket in Model.TicketIds.Where(x => x.Contains("I")))
+                {
+                    <div class="checkboxCardsMargin">
+                        <input type="checkbox" class="checkboxCardInput" id="@infrTicket">
+                        <label for="@infrTicket" class="checkboxCardContainer checkboxCardStyle2 cursorPointer">
+                            <div class="checkboxCardContent">
+                                <h2 class="checkboxCardNumber">@infrTicket</h2>
+                                <div class="lines">
+                                    <div class="line full"></div>
+                                    <div class="line half"></div>
+                                    <div class="line half"></div>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                }
+
+            </div>
+        }
+
+        @if (Model.TicketIds.Any(x => x.Contains("E") || x.Contains("F")))
+        {
+            <div class="@Html.Raw($"checkboxContainer{Model.PageType}Version")">
+                <h1 class="title">Срочные</h1>
+                <hr class="divider">
+
+                @foreach (var fastTicket in Model.TicketIds.Where(x => x.Contains("E") || x.Contains("F")))
+                {
+                    <div class="checkboxCardsMargin">
+                        <input type="checkbox" class="checkboxCardInput" id="@fastTicket">
+                        <label for="@fastTicket" class="checkboxCardContainer checkboxCardStyle3 cursorPointer">
+                            <div class="checkboxCardContent">
+                                <h2 class="checkboxCardNumber">@fastTicket</h2>
+                                <div class="lines">
+                                    <div class="line full"></div>
+                                    <div class="line half"></div>
+                                    <div class="line half"></div>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                }
             </div>
         }
     </div>
@@ -31,6 +89,27 @@
         Далее
     </button>
 </div>
+
+    @* <div class="container2"> *@
+    @* *@
+    @*     @foreach (var ticketId in Model.ticketIds) *@
+    @*     { *@
+    @*         <div> *@
+    @*             <input type="checkbox" class="checkboxCardInput" id="@ticketId"> *@
+    @*             <label for="@ticketId" class="checkboxCardContainer"> *@
+    @*                 <div class="checkboxCardContent"> *@
+    @*                     <h2 class="checkboxCardNumber">@ticketId</h2> *@
+    @*                     <div class="lines"> *@
+    @*                         <div class="line full"></div> *@
+    @*                         <div class="line half"></div> *@
+    @*                         <div class="line half"></div> *@
+    @*                     </div> *@
+    @*                 </div> *@
+    @*             </label> *@
+    @*         </div> *@
+    @*     } *@
+    @* </div> *@
+
 
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
@@ -57,19 +136,19 @@
                 },
                 body: JSON.stringify({ ticketId: ticketId, remove: remove })
             }).then(function () {
-                connection.invoke("UpdateTicketChoice", "@Model.sessionId", ticketId);
+                connection.invoke("UpdateTicketChoice", "@Model.SessionId", ticketId);
             });
         });
     }
 
     document.getElementById("prev").addEventListener('click', function () {
-        connection.invoke("ChangePage", "@Model.sessionId", 4, 0)
+        connection.invoke("ChangePage", "@Model.SessionId", 4, 0)
             .then(function () {
                 window.location.href = `/step/4`;
             });
     });
     document.getElementById("next").addEventListener('click', function () {
-        connection.invoke("ChangePage", "@Model.sessionId", 4, 2)
+        connection.invoke("ChangePage", "@Model.SessionId", 4, 2)
             .then(function () {
                 window.location.href = `/step/4/2`;
             });

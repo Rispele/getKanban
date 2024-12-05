@@ -29,6 +29,8 @@ public interface IGameSessionService
 
 	public Task<UserDto> GetCurrentUser(RequestContext requestContext);
 
+	public Task<UserCredentialsDto> GetUserCredentials(RequestContext requestContext);
+	
 	public Task<Guid?> FindCurrentSessionId(RequestContext requestContext);
 
 	public Task<CfdGraphDto> GetCfdDataForTeam(Guid sessionId, Guid teamId);

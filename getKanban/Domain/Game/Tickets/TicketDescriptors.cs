@@ -45,9 +45,17 @@ public static class TicketDescriptors
 	public static readonly TicketDescriptor AutoRelease = new("I01", 0, ZeroClientOffRate);
 	public static readonly TicketDescriptor AutoTests = new("I02", 0, ZeroClientOffRate);
 
-	public static readonly TicketDescriptor LawTask = new("F01", 0, ZeroClientOffRate);
+	public static readonly TicketDescriptor LawTask = new(
+		"F01",
+		0,
+		ZeroClientOffRate,
+		Penalty: new TicketPenaltyDescriptor(2500, 15));
 
-	public static readonly TicketDescriptor BusinessTask = new("E01", 0, ZeroClientOffRate);
+	public static readonly TicketDescriptor BusinessTask = new(
+		"E01",
+		0,
+		ZeroClientOffRate,
+		Bonus: new TicketBonusDescriptor(4000, 18));
 
 	private static IReadOnlyList<TicketDescriptor> BusinessTicketDescriptors { get; } =
 	[

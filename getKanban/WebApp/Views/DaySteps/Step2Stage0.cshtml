@@ -1,24 +1,33 @@
 ﻿@using Core.Dtos.Containers.RollDice
 @using Core.Dtos.Containers.TeamMembers
-@model (Guid? currentSessionId, RollDiceContainerDto diceResults)
+@model (Guid? currentSessionId, int dayNumber, RollDiceContainerDto diceResults)
 
 <div class="stepHeader">
-    <h1 class="fs-1 fw- text-center">Команда pipipupu. День 9</h1>
+    <h1 class="fs-1 fw- text-center">Команда pipipupu. День @Model.dayNumber</h1>
 </div>
 
 @functions
 {
     private IEnumerable<int> SelectDiceNumber(TeamRoleDto initialRole) =>
-        GetDiceRollResultsByInitialRole(initialRole)
+        GetDiceRollResultsByCurrentRole(initialRole)
             .Select(t => t.DiceNumber);
 
-    private IEnumerable<int> SelectScores(TeamRoleDto initialRole) =>
-        GetDiceRollResultsByInitialRole(initialRole)
-            .Select(t => t.Scores);
+    private IEnumerable<string> SelectScores(TeamRoleDto currentRole)
+    {
+        var rolls = GetDiceRollResultsByCurrentRole(currentRole).ToList();
+        var sum = rolls.Sum(t => t.Scores);
+        // return rolls
+        //     .Select(
+        //         t => t.InitialRole != t.CurrentRole
+        //             ? $"{t.InitialRole} -> {t.CurrentRole} {t.Scores}"
+        //             : $"{t.InitialRole} {t.Scores}")
+        //     .Concat([$"Сумма: {sum}"]);
+        return [sum.ToString()];
+    }
 
-    private IEnumerable<DiceRollResultDto> GetDiceRollResultsByInitialRole(TeamRoleDto initialRole) =>
+    private IEnumerable<DiceRollResultDto> GetDiceRollResultsByCurrentRole(TeamRoleDto currentRole) =>
         Model.diceResults.DiceRollResults
-            .Where(t => t.InitialRole == initialRole);
+            .Where(t => t.CurrentRole == currentRole);
 }
 
 <div class="main-container">
@@ -38,15 +47,32 @@
             <!-- Строки таблицы -->
             <div class="role-table-row">
                 <div class="role-table-cell">Аналитики</div>
-                <div class="role-table-cell">@string.Join(" ", SelectScores(TeamRoleDto.Analyst))</div>
+                <div class="role-table-cell">
+                    @foreach (var s in SelectScores(TeamRoleDto.Analyst))
+                    {
+                        <div>@s</div>
+                    }
+                </div>
             </div>
             <div class="role-table-row">
                 <div class="role-table-cell">Разработчики</div>
-                <div class="role-table-cell">@string.Join(" ", SelectScores(TeamRoleDto.Programmer))</div>
+                <div class="role-table-cell">
+                    @foreach (var s in SelectScores(TeamRoleDto.Programmer))
+                    {
+                        <div>@s</div>
+                    }
+                </div>
+                @* <div class="role-table-cell"><span>@string.Join("\n", SelectScores(TeamRoleDto.Programmer))</span></div> *@
             </div>
             <div class="role-table-row">
                 <div class="role-table-cell">Тестировщики</div>
-                <div class="role-table-cell">@string.Join(" ", SelectScores(TeamRoleDto.Tester))</div>
+                <div class="role-table-cell">
+                    @foreach (var s in SelectScores(TeamRoleDto.Tester))
+                    {
+                        <div>@s</div>
+                    }
+                </div>
+                @* <div class="role-table-cell"><span>@string.Join("\n", SelectScores(TeamRoleDto.Tester))</span></div> *@
             </div>
         </div>
 
@@ -69,7 +95,7 @@
             </div>
         </div>
     </div>
-    
+
 </div>
 
 @* <div class="infoContainer height-large centered-100"> *@

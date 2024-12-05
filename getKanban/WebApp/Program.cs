@@ -23,6 +23,7 @@ builder.Services.AddScoped<DayDtoConverter>();
 builder.Services.AddScoped<IGameSessionService, GameSessionService>();
 builder.Services.AddScoped<ITeamService, TeamService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IStatisticsService, StatisticsService>();
 
 // builder.Services.AddTransient<HtmlPageHandler>();
 

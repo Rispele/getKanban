@@ -76,7 +76,7 @@
     margin-right: 0;
 }
 
-.checkboxSingleVersion {
+.checkboxContainerSingleVersion {
     width: 100%;
     min-height: 100px;
     height: fit-content;
