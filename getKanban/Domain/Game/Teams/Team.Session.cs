@@ -30,6 +30,8 @@ public partial class Team
 		}
 	}
 
+	public IReadOnlyList<AwaitedCommands> CurrentlyAwaitedCommands => CurrentDay.CurrentlyAwaitedCommands;
+	
 	internal Day? PreviousDay => days.SingleOrDefault(d => d.Number == currentDayNumber - 1);
 
 	public IReadOnlyList<TeamMember> CurrentDayTeamRoleUpdates => CurrentDay.TeamMembersContainer.TeamMembers;

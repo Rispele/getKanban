@@ -15,8 +15,9 @@ public class Day
 	private readonly List<AwaitedCommands> awaitedCommands = null!;
 	private readonly Scenario scenario = null!;
 
-	private IEnumerable<AwaitedCommands> currentlyAwaitedEvents => awaitedCommands
-		.Where(@event => !@event.Removed);
+	public IReadOnlyList<AwaitedCommands> CurrentlyAwaitedCommands => awaitedCommands
+		.Where(@event => !@event.Removed)
+		.ToList();
 
 	public WorkAnotherTeamContainer? WorkAnotherTeamContainer { get; internal set; }
 	public TeamMembersContainer TeamMembersContainer { get; } = null!;
@@ -61,7 +62,7 @@ public class Day
 	internal void PostDayEvent(DayCommandType dayCommandType, object? parameters)
 	{
 		var (toAwait, toRemove) = scenario.GetNextAwaited(dayCommandType, parameters);
-		currentlyAwaitedEvents.ForEach(
+		CurrentlyAwaitedCommands.ForEach(
 			e =>
 			{
 				if (toRemove.Contains(e.CommandType))
@@ -138,6 +139,6 @@ public class Day
 
 	private bool CanPostEvent(DayCommandType commandType)
 	{
-		return currentlyAwaitedEvents.Any(e => e.CommandType == commandType);
+		return CurrentlyAwaitedCommands.Any(e => e.CommandType == commandType);
 	}
 }

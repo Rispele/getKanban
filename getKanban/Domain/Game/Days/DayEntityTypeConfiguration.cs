@@ -19,7 +19,7 @@ public class DayEntityTypeConfiguration : IEntityTypeConfiguration<Day>
 
 		builder.Property("scenario").HasConversion(new ScenarioConverter());
 
-		builder.Ignore("currentlyAwaitedEvents");
+		builder.Ignore(t => t.CurrentlyAwaitedCommands);
 
 		builder.Property(e => e.Status);
 
