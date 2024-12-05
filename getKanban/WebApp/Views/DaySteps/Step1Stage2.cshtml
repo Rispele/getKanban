@@ -1,5 +1,5 @@
 ﻿@using Core.Dtos.Containers.TeamMembers
-@model (Guid currentSessionId, List<Core.Dtos.Containers.TeamMemberDto> teamMemberDtos)
+@model (WebApp.Models.DayFullIdDto dayFullIdDto, List<Core.Dtos.Containers.TeamMemberDto> teamMemberDtos)
 
 <meta charset="UTF-8">
 <div class="table-container">
@@ -69,7 +69,7 @@
     const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
     connection.start()
         .then(function () {
-            connection.invoke("Join", "@Model.currentSessionId");
+            connection.invoke("Join", "@Model.Item1.currentSessionId");
         });
     connection.on("NotifyPageChange", function (page, stage) {
         window.location.href = `/step/${page}/${stage}`;

@@ -66,6 +66,14 @@ public partial class Team
 		return Players.AddParticipantIfMatchInviteCode(inviteCode, user, ParticipantRole.Player);
 	}
 
+	public void EnsureHasAccess(Guid userId)
+	{
+		if (!HasAccess(userId))
+		{
+			throw new DomainException("User does not have access to this team");
+		}
+	}
+
 	public bool HasAccess(Guid userId)
 	{
 		var participant = Players.Participants.SingleOrDefault(p => p.User.Id == userId);

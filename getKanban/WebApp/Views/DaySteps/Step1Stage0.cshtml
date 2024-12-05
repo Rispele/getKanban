@@ -1,7 +1,7 @@
-﻿@model (Guid sessionId, int dayNumber)
+﻿@model WebApp.Models.DayFullIdDto
 
 <div class="stepHeader">
-    <h1 class="fs-1 fw- text-center">Команда pipipupu. День @Model.dayNumber</h1>
+    <h1 class="fs-1 fw- text-center">Команда pipipupu. День @Model.DayNumber</h1>
 </div>
 
 <div class="infoContainer height-large centered-100">
@@ -21,19 +21,19 @@
 
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
-    const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
+    const connection = new signalR.HubConnectionBuilder().withUrl("/teamSessionHub").build();
     connection.start()
         .then(function () {
-            connection.invoke("Join", "@Model.sessionId");
+            connection.invoke("Join", "@Model.GameSessionId");
         });
     connection.on("NotifyPageChange", function (page, stage) {
-        window.location.href = `/step/${page}/${stage}`;
+        window.location.href = `/@Model.GameSessionId/@Model.TeamId/step/${page}/${stage}`;
     });
     
     document.getElementById("next").addEventListener('click', function () {
-        connection.invoke("ChangePage", "@Model.sessionId", 1, 1)
+        connection.invoke("ChangePage", "@Model.GameSessionId", "@Model.TeamId", 1, 1)
             .then(function () {
-                window.location.href = `/step/1/1`;
+                window.location.href = `/@Model.GameSessionId/@Model.TeamId/step/1/1`;
             });
     });
 </script>

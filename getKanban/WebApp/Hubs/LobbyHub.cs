@@ -12,40 +12,6 @@ public class LobbyHub : Hub
 	{
 		this.gameSessionService = gameSessionService;
 	}
-	
-	public override async Task OnConnectedAsync()
-	{
-		var requestContext = RequestContextFactory.Build(Context);
-		var currentUser = await gameSessionService.GetCurrentUser(requestContext);
-		var connection = await gameSessionService.FindCurrentConnection(currentUser.Id);
-		if (connection is null)
-		{
-			return;
-		}
-		if (connection.HubConnectionId != Context.ConnectionId)
-		{
-			await gameSessionService.SaveCurrentConnection(currentUser.Id, connection.LobbyId, Context.ConnectionId);
-			await RemoveCurrentConnectionFromLobbyGroupAsync(connection.LobbyId);
-			await AddCurrentConnectionToLobbyGroupAsync(connection.LobbyId);
-		}
-		
-		Console.WriteLine("Connected " + Context.ConnectionId);
-		await base.OnConnectedAsync();
-	}
-	
-	public override async Task OnDisconnectedAsync(Exception? exception)
-	{
-		var requestContext = RequestContextFactory.Build(Context);
-		var currentUser = await gameSessionService.GetCurrentUser(requestContext);
-		var connection = await gameSessionService.FindCurrentConnection(currentUser.Id);
-		if (connection is not null)
-		{
-			await RemoveCurrentConnectionFromLobbyGroupAsync(connection.LobbyId);
-		
-			Console.WriteLine("Disconnected " + Context.ConnectionId);
-			await base.OnDisconnectedAsync(exception);
-		}
-	}
 
 	public async Task Join(Guid sessionId)
 	{
@@ -56,12 +22,8 @@ public class LobbyHub : Hub
 	{
 		var teamName = await gameSessionService.GetTeamName(sessionId, teamId);
 		var groupId = GetGroupId(sessionId);
-		
-		Console.WriteLine($"{groupId} notified");
-		await Clients.All.SendAsync(
-			"NotifyRenamed",
-			teamId.ToString(),
-			teamName);
+
+		await Clients.Group(groupId).SendAsync("NotifyRenamed", teamId.ToString(), teamName);
 	}
 
 	public async Task StartGame(Guid gameSessionId)
@@ -70,44 +32,13 @@ public class LobbyHub : Hub
 
 		await gameSessionService.StartGameAsync(requestContext, gameSessionId);
 
-		await Clients.Group(GetGroupId(gameSessionId)).SendAsync("NotifyStarted");
-	}
-
-	public async Task ChangePage(Guid gameSessionId, int pageNumber, int stageNumber)
-	{
-		await Clients.Group(GetGroupId(gameSessionId)).SendAsync("NotifyPageChange", pageNumber, stageNumber);
-	}
-
-	public async Task UpdateRole(Guid gameSessionId, long teamMemberId, string roleTo)
-	{
-		await Clients.Group(GetGroupId(gameSessionId)).SendAsync("NotifyUpdateRole", teamMemberId, roleTo);
+		var groupId = GetGroupId(gameSessionId);
+		await Clients.Group(groupId).SendAsync("NotifyStarted");
 	}
 	
-	public async Task UpdateTicketChoice(Guid gameSessionId, string ticketId)
-	{
-		Console.WriteLine($"Ticket choice: {ticketId}");
-		if (ticketId == TicketDescriptors.AutoRelease.Id)
-		{
-			await Clients.Group(GetGroupId(gameSessionId)).SendAsync("NotifyTicketsToReleaseUpdated");
-		}
-		else
-		{
-			await Clients.OthersInGroup(GetGroupId(gameSessionId)).SendAsync("NotifyUpdateTicketChoice", ticketId);
-		}
-	}
-
 	private async Task AddCurrentConnectionToLobbyGroupAsync(string groupId)
 	{
-		var requestContext = RequestContextFactory.Build(Context);
-		var currentUser = await gameSessionService.GetCurrentUser(requestContext);
-		await gameSessionService.SaveCurrentConnection(currentUser.Id, groupId, Context.ConnectionId);
-		
 		await Groups.AddToGroupAsync(Context.ConnectionId, groupId);
-	}
-
-	private async Task RemoveCurrentConnectionFromLobbyGroupAsync(string groupId)
-	{
-		await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupId);
 	}
 
 	private static string GetGroupId(Guid gameSessionId)

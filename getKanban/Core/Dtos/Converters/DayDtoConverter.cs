@@ -5,14 +5,17 @@ using Domain.Game.Days;
 using Domain.Game.Days.DayContainers;
 using Domain.Game.Days.DayContainers.RollDice;
 using Domain.Game.Days.DayContainers.TeamMembers;
+using Domain.Game.Teams;
+using WebApp.Models;
 
 namespace Core.Dtos.Converters;
 
 public class DayDtoConverter
 {
-	public DayDto Convert(Day day)
+	public DayDto Convert(Team team, Day day)
 	{
 		return new DayDto(
+			new DayFullIdDto(team.GameSessionId, team.Id, day.Number),
 			day.DaySettings.AnalystsCount,
 			day.DaySettings.ProgrammersCount,
 			day.DaySettings.TestersCount,

@@ -68,11 +68,12 @@
     });
     connection.on("NotifyStarted", async function () {
         await fetch("/session/get-current-team?sessionId=@Model.Id")
-            .then(async r => {
-                if (JSON.parse(await r.text())["name"] === "Ангелы") {
+            .then(async response => {
+                const teamDto = JSON.parse(await response.text());
+                if (teamDto["name"] === "Ангелы") {
                     window.location.href = `/admin?sessionId=@Model.Id`;
                 } else {
-                    window.location.href = `/step/1`;
+                    window.location.href = `/@Model.Id/${teamDto["Id"]}/step/1`;
                 }
             })
     });
@@ -107,9 +108,9 @@
     const teamNames = [];
     @foreach (var team in Model.Teams)
     {
-    @:teamLinks.push("@team.Participants.InviteCode");
-    @:teamIds.push("@team.Id");
-    @:teamNames.push("@Html.Raw(team.Name)");
+        @:teamLinks.push("@team.Participants.InviteCode");
+        @:teamIds.push("@team.Id");
+        @:teamNames.push("@Html.Raw(team.Name)");
     }
     teamLinks.push("@Model.Angels.Participants.InviteCode");
     teamIds.push("@Model.Angels.Id");

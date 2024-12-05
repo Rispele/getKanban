@@ -2,6 +2,7 @@
 using Core.DbContexts.Extensions;
 using Core.Dtos;
 using Core.Dtos.Converters;
+using Core.RequestContexts;
 using Core.Services.Contracts;
 using Domain.DbContexts;
 using Domain.Game.Days.Commands;
@@ -27,19 +28,23 @@ public class TeamService : ITeamService
 
 		if (!team.HasAccess(userCredentialsDto.UserId))
 		{
-			throw new InvalidOperationException($"User with id: {userCredentialsDto.UserId} do not have access to this team.");
+			throw new InvalidOperationException(
+				$"User with id: {userCredentialsDto.UserId} do not have access to this team.");
 		}
-		
+
 		team.ExecuteCommand(dayCommand);
 
 		await context.SaveChangesAsync();
 
-		return dayDtoConverter.Convert(team.CurrentDay!);
+		return dayDtoConverter.Convert(team, team.CurrentDay);
 	}
 
-	public async Task<DayDto> GetCurrentDayAsync(Guid gameSessionId, Guid teamId)
+	public async Task<DayDto> GetCurrentDayAsync(RequestContext requestContext, Guid gameSessionId, Guid teamId)
 	{
 		var team = await context.GetTeamAsync(gameSessionId, teamId);
-		return dayDtoConverter.Convert(team.CurrentDay!);
+
+		team.EnsureHasAccess(requestContext.GetUserId());
+
+		return dayDtoConverter.Convert(team, team.CurrentDay);
 	}
 }

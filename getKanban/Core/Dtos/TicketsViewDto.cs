@@ -1,14 +1,13 @@
 ﻿using Domain.Game;
+using WebApp.Models;
 
 namespace Core.Dtos;
 
 public class TicketsViewDto
 {
-	public string PageType { get; init; }
+	public DayFullIdDto dayFullIdDto { get; init; } 
 	
-	public int CurrentDayNumber { get; init; }
-
-	public Guid SessionId { get; init; }
+	public string PageType { get; init; }
 
 	public List<Ticket> TicketIds { get; init; }
 }

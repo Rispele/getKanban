@@ -18,6 +18,7 @@ public static class DomainContextExtensions
 	{
 		return context.GameSessions
 			.Where(g => g.Id == gameSessionId)
+			.Take(1)
 			.FirstOrDefaultAsync();
 	}
 
