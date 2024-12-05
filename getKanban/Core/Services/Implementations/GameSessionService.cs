@@ -234,7 +234,6 @@ public class GameSessionService : IGameSessionService
 			i++;
 		}
 
-		result.SessionId = sessionId;
 		return result;
 	}
 

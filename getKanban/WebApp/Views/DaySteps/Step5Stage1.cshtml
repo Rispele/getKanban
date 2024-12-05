@@ -1,40 +1,10 @@
+@using Domain.Game
 @model WebApp.Controllers.DayStepsController.TicketChoiceStepModel
 
 <div class="stepHeader">
     <h1 class="fs-1 fw- text-center">Команда @Html.Raw(Model.TeamName). День @Model.DayNumber</h1>
 </div>
-<div class="container1">
-    <h1 class="title">Выберите тикеты, которые были сегодня взяты в очередь</h1>
-    <hr class="divider">
-    <div class="container2">
 
-        @if (Model.TicketIds.Any(x => x.Contains("S")))
-        {
-        <div class="@Html.Raw($"checkboxContainer{Model.PageType}Version")">
-            <h1 class="title">Обычные</h1>
-            <hr class="divider">
-
-            @foreach (var defaultTicket in Model.TicketIds.Where(x => x.Contains("S")))
-            {
-            <div class="checkboxCardsMargin">
-                <input type="checkbox" class="checkboxCardInput" id="@defaultTicket">
-                <label for="@defaultTicket" class="checkboxCardContainer checkboxCardStyle1 cursorPointer">
-                    <div class="checkboxCardContent">
-                        <h2 class="checkboxCardNumber">@defaultTicket</h2>
-                        <div class="lines">
-                            <div class="line full"></div>
-                            <div class="line half"></div>
-                            <div class="line half"></div>
-                        </div>
-                    </div>
-                </label>
-            </div>
-            }
-        </div>
-        }
-
-        @if (Model.TicketIds.Any(x => x.Contains("I")))
-        {
 @functions
 {
     private void FillTickets(IEnumerable<Ticket> tickets, string cardStyle, string containerName)
@@ -47,7 +17,7 @@
             {
                 var ticketId = ticket.id;
                 <div class="checkboxCardsMargin">
-                    <input type="checkbox" class="checkboxCardInput" id="@ticketId" checked="@ticket.IsTaken(Model.CurrentDayNumber)">
+                    <input type="checkbox" class="checkboxCardInput" id="@ticketId" checked="@ticket.IsTaken(Model.DayNumber)">
                     <label for="@ticketId" class="checkboxCardContainer @cardStyle cursorPointer">
                         <div class="checkboxCardContent">
                             <h2 class="checkboxCardNumber">@ticketId</h2>
@@ -107,14 +77,10 @@
 <script src="~/js/setup-hub-connection.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
-    const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
-    connection.start()
-        .then(function () {
-            connection.invoke("Join", "@Model.SessionId");
-        });
-    connection.on("NotifyPageChange", function (page, stage) {
-        window.location.href = `/step/${page}/${stage}`;
-    });
+    const connection = setupHubConnection(new signalR.HubConnectionBuilder(), "@Model.GameSessionId", "@Model.TeamId");
+    setSwitchEvent("prev", connection, "@Model.GameSessionId", "@Model.TeamId", 5, 0);
+    setSwitchEvent("next", connection, "@Model.GameSessionId", "@Model.TeamId", 5, 2);
+    
     connection.on("NotifyUpdateTicketChoice", function (ticketId) {
         const ticket = document.getElementById(ticketId);
         ticket.checked = !ticket.checked;
@@ -137,6 +103,4 @@
             });
         });
     }
-    setSwitchEvent("prev", connection, "@Model.TeamId", 5, 0);
-    setSwitchEvent("next", connection, "@Model.TeamId", 5, 2);
 </script>

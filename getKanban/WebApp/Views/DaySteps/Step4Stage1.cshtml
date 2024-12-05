@@ -1,3 +1,4 @@
+@using Domain.Game
 @model WebApp.Controllers.DayStepsController.TicketChoiceStepModel
 
 @functions
@@ -12,7 +13,7 @@
             {
                 var ticketId = ticket.id;
                 <div class="checkboxCardsMargin">
-                    <input type="checkbox" class="checkboxCardInput" id="@ticketId" checked="@ticket.IsReleased(Model.CurrentDayNumber)">
+                    <input type="checkbox" class="checkboxCardInput" id="@ticketId" checked="@ticket.IsReleased(Model.DayNumber)">
                     <label for="@ticketId" class="checkboxCardContainer @cardStyle cursorPointer">
                         <div class="checkboxCardContent">
                             <h2 class="checkboxCardNumber">@ticketId</h2>
@@ -91,14 +92,10 @@
 <script src="~/js/setup-hub-connection.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
-    const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
-    connection.start()
-        .then(function () {
-            connection.invoke("Join", "@Model.SessionId");
-        });
-    connection.on("NotifyPageChange", function (page, stage) {
-        window.location.href = `/step/${page}/${stage}`;
-    });
+    const connection = setupHubConnection(new signalR.HubConnectionBuilder(), "@Model.GameSessionId", "@Model.TeamId");
+    setSwitchEvent("prev", connection, "@Model.GameSessionId", "@Model.TeamId", 4, 0);
+    setSwitchEvent("next", connection, "@Model.GameSessionId", "@Model.TeamId", 4, 2);
+    
     connection.on("NotifyUpdateTicketChoice", function (ticketId) {
         const ticket = document.getElementById(ticketId);
         ticket.checked = !ticket.checked;
@@ -125,7 +122,4 @@
             });
         });
     }
-
-    setSwitchEvent("prev", connection, "@Model.TeamId", 4, 0);
-    setSwitchEvent("next", connection, "@Model.TeamId", 4, 2);
 </script>

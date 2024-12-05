@@ -39,27 +39,7 @@
 <script src="~/js/setup-hub-connection.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
-    const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
-    connection.start()
-        .then(function () {
-            connection.invoke("Join", "@Model.currentSessionId");
-        });
-    connection.on("NotifyPageChange", function (page, stage) {
-        window.location.href = `/step/${page}/${stage}`;
-    });
-    document.getElementById("prev").addEventListener('click', function () {
-        connection.invoke("ChangePage", "@Model.currentSessionId", 5, 1)
-            .then(function () {
-                window.location.href = `/step/5/1`;
-            });
-    });
-    document.getElementById("next").addEventListener('click', function () {
-        connection.invoke("ChangePage", "@Model.currentSessionId", 6, 0)
-            .then(function () {
-                window.location.href = `/step/6`;
-            });
-    });
-    const connection = setupHubConnection(new signalR.HubConnectionBuilder());
-    setSwitchEvent("prev", connection, "@Model.TeamId", 5, 1);
-    setSwitchEvent("next", connection, "@Model.TeamId", 6, 0);
+    const connection = setupHubConnection(new signalR.HubConnectionBuilder(), "@Model.GameSessionId", "@Model.TeamId");
+    setSwitchEvent("prev", connection, "@Model.GameSessionId", "@Model.TeamId", 5, 1);
+    setSwitchEvent("next", connection, "@Model.GameSessionId", "@Model.TeamId", 6, 0);
 </script>

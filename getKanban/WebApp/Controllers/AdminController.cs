@@ -58,7 +58,7 @@ public class AdminController : Controller
 			SessionId = session.Id,
 			TeamId = team.Id,
 			TeamName = session.Teams.SingleOrDefault(x => x.Id == teamId)?.Name!,
-			CurrentDay = new DayDtoConverter().Convert(currentDay),
+			CurrentDay = new DayDtoConverter().Convert(team, currentDay),
 			StartDayNumber = 9,
 			FinishDayNumber = 18
 		});

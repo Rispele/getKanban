@@ -2,6 +2,7 @@
 using Core.Dtos.Containers;
 using Core.Dtos.Containers.RollDice;
 using Core.Services.Contracts;
+using Domain.Game;
 using Domain.Game.Days.Commands;
 using Domain.Game.Days.DayContainers;
 using Domain.Game.Days.DayContainers.TeamMembers;
@@ -38,8 +39,9 @@ public class DayStepsController : Controller
 	[HttpGet("1/0")]
 	public async Task<IActionResult> Step1Stage0(Guid gameSessionId, Guid teamId)
 	{
-		var credentials = await gameSessionService.GetUserCredentials(RequestContextFactory.Build(Request));
-		var currentDay = await teamService.GetCurrentDayAsync(credentials.SessionId, credentials.TeamId);
+		var requestContext = RequestContextFactory.Build(Request);
+		var credentials = await gameSessionService.GetUserCredentials(requestContext);
+		var currentDay = await teamService.GetCurrentDayAsync(requestContext, credentials.SessionId, credentials.TeamId);
 		
 		var shouldRollForAnotherTeam = currentDay
 			.AwaitedCommands.Any(x => x is { CommandType: DayCommandType.WorkAnotherTeam});
@@ -53,8 +55,9 @@ public class DayStepsController : Controller
 	[HttpGet("1/2")]
 	public async Task<IActionResult> Step1Stage2(Guid gameSessionId, Guid teamId)
 	{
-		var credentials = await gameSessionService.GetUserCredentials(RequestContextFactory.Build(Request));
-		var currentDay = await teamService.GetCurrentDayAsync(credentials.SessionId, credentials.TeamId);
+		var requestContext = RequestContextFactory.Build(Request);
+		var credentials = await gameSessionService.GetUserCredentials(requestContext);
+		var currentDay = await teamService.GetCurrentDayAsync(requestContext, credentials.SessionId, credentials.TeamId);
 		
 		var roleUpdateStepModel = await FillWithCredentials(Request, new RoleUpdateStepModel(), credentials);
 		var teamMembers = currentDay.TeamMembersContainer.TeamRoleUpdates.ToList();
@@ -66,7 +69,7 @@ public class DayStepsController : Controller
 	public async Task SaveRolesTransformation([FromBody] string[] transformation)
 	{
 		var requestContext = RequestContextFactory.Build(Request);
-		var credentials = await gameSessionService.GetUserCredentials(RequestContextFactory.Build(Request));
+		var credentials = await gameSessionService.GetUserCredentials(requestContext);
 
 		var teamMemberId = long.Parse(transformation[0]);
 		var roleTo = Enum.Parse<TeamRole>(transformation[1]);
@@ -81,8 +84,8 @@ public class DayStepsController : Controller
 	public async Task<IActionResult> Step2Stage0(Guid gameSessionId, Guid teamId)
 	{
 		var requestContext = RequestContextFactory.Build(Request);
-		var credentials = await gameSessionService.GetUserCredentials(RequestContextFactory.Build(Request));
-		var currentDay = await teamService.GetCurrentDayAsync(credentials.SessionId, credentials.TeamId);
+		var credentials = await gameSessionService.GetUserCredentials(requestContext);
+		var currentDay = await teamService.GetCurrentDayAsync(requestContext, credentials.SessionId, credentials.TeamId);
 
 		var rollDicesStepModel = await FillWithCredentials(Request, new RollDicesStepModel(), credentials);
 		rollDicesStepModel.RollDiceContainerDto = currentDay.RollDiceContainer!;
@@ -93,7 +96,7 @@ public class DayStepsController : Controller
 	public async Task RollDices(Guid gameSessionId, Guid teamId)
 	{
 		var requestContext = RequestContextFactory.Build(Request);
-		var credentials = await gameSessionService.GetUserCredentials(RequestContextFactory.Build(Request));
+		var credentials = await gameSessionService.GetUserCredentials(requestContext);
 		await teamService.PatchDayAsync(credentials, new RollDiceCommand());
 	}
 
@@ -101,9 +104,9 @@ public class DayStepsController : Controller
 	public async Task<IActionResult> Step4Stage1(Guid gameSessionId, Guid teamId)
 	{
 		var requestContext = RequestContextFactory.Build(Request);
-		var credentials = await gameSessionService.GetUserCredentials(RequestContextFactory.Build(Request));
-		var team = await gameSessionService.GetCurrentTeam(RequestContextFactory.Build(Request), credentials.SessionId);
-		var currentDay = await teamService.GetCurrentDayAsync(credentials.SessionId, credentials.TeamId);
+		var credentials = await gameSessionService.GetUserCredentials(requestContext);
+		var team = await gameSessionService.GetCurrentTeam(requestContext, credentials.SessionId);
+		var currentDay = await teamService.GetCurrentDayAsync(requestContext, credentials.SessionId, credentials.TeamId);
 
 		var shouldShowTickets = currentDay
 			.AwaitedCommands.Any(x => x is { CommandType: DayCommandType.ReleaseTickets });
@@ -151,7 +154,7 @@ public class DayStepsController : Controller
 	public async Task UpdateRelease([FromBody] TicketModel ticketModel, Guid gameSessionId, Guid teamId)
 	{
 		var requestContext = RequestContextFactory.Build(Request);
-		var credentials = await gameSessionService.GetUserCredentials(RequestContextFactory.Build(Request));
+		var credentials = await gameSessionService.GetUserCredentials(requestContext);
 
 		await teamService.PatchDayAsync(
 			credentials,
@@ -161,8 +164,9 @@ public class DayStepsController : Controller
 	[HttpGet("4/2")]
 	public async Task<IActionResult> Step4Stage2(Guid gameSessionId, Guid teamId)
 	{
-		var credentials = await gameSessionService.GetUserCredentials(RequestContextFactory.Build(Request));
-		var currentDay = await teamService.GetCurrentDayAsync(credentials.SessionId, credentials.TeamId);
+		var requestContext = RequestContextFactory.Build(Request);
+		var credentials = await gameSessionService.GetUserCredentials(requestContext);
+		var currentDay = await teamService.GetCurrentDayAsync(requestContext, credentials.SessionId, credentials.TeamId);
 		
 		var ticketIds = currentDay.ReleaseTicketContainer.TicketIds.ToList();
 		var ticketCheckStepModel = await FillWithCredentials(Request, new TicketCheckStepModel(), credentials);
@@ -174,11 +178,11 @@ public class DayStepsController : Controller
 	public async Task<IActionResult> Step5Stage1(Guid gameSessionId, Guid teamId)
 	{
 		var requestContext = RequestContextFactory.Build(Request);
-		var credentials = await gameSessionService.GetUserCredentials(RequestContextFactory.Build(Request));
-		var team = await gameSessionService.GetCurrentTeam(RequestContextFactory.Build(Request), credentials.SessionId);
-		var currentDay = await teamService.GetCurrentDayAsync(credentials.SessionId, credentials.TeamId);
+		var credentials = await gameSessionService.GetUserCredentials(requestContext);
+		var team = await gameSessionService.GetCurrentTeam(requestContext, credentials.SessionId);
+		var currentDay = await teamService.GetCurrentDayAsync(requestContext, credentials.SessionId, credentials.TeamId);
 		
-		var shouldShowTickets = (await teamService.GetCurrentDayAsync(credentials.SessionId, credentials.TeamId))
+		var shouldShowTickets = (await teamService.GetCurrentDayAsync(requestContext, credentials.SessionId, credentials.TeamId))
 			.AwaitedCommands.Any(x => x is { CommandType: DayCommandType.UpdateSprintBacklog });
 
 		if (!shouldShowTickets)
@@ -219,7 +223,7 @@ public class DayStepsController : Controller
 	public async Task UpdateSprintBacklog([FromBody] TicketModel ticketModel, Guid gameSessionId, Guid teamId)
 	{
 		var requestContext = RequestContextFactory.Build(Request);
-		var credentials = await gameSessionService.GetUserCredentials(RequestContextFactory.Build(Request));
+		var credentials = await gameSessionService.GetUserCredentials(requestContext);
 
 		await teamService.PatchDayAsync(
 			credentials,
@@ -233,8 +237,8 @@ public class DayStepsController : Controller
 	public async Task<IActionResult> Step5Stage2(Guid gameSessionId, Guid teamId)
 	{
 		var requestContext = RequestContextFactory.Build(Request);
-		var credentials = await gameSessionService.GetUserCredentials(RequestContextFactory.Build(Request));
-		var currentDay = await teamService.GetCurrentDayAsync(credentials.SessionId, credentials.TeamId);
+		var credentials = await gameSessionService.GetUserCredentials(requestContext);
+		var currentDay = await teamService.GetCurrentDayAsync(requestContext, credentials.SessionId, credentials.TeamId);
 		
 		var ticketIds = currentDay.UpdateSprintBacklogContainer.TicketIds.ToList();
 		var ticketCheckStepModel = await FillWithCredentials(Request, new TicketCheckStepModel());
@@ -280,7 +284,7 @@ public class DayStepsController : Controller
 	public async Task<IActionResult> Step6Stage1(Guid gameSessionId, Guid teamId)
 	{
 		var requestContext = RequestContextFactory.Build(Request);
-		var credentials = await gameSessionService.GetUserCredentials(RequestContextFactory.Build(Request));
+		var credentials = await gameSessionService.GetUserCredentials(requestContext);
 		var cfdGraphDto = await gameSessionService.GetCfdDataForTeam(credentials.SessionId, credentials.TeamId);
 		var cfdGraphStepModel = await FillWithCredentials(Request, new CfdGraphStepModel(), credentials);
 		cfdGraphStepModel.CfdGraphDto = cfdGraphDto;
@@ -296,6 +300,7 @@ public class DayStepsController : Controller
 
 	public class StepModel
 	{
+		public Guid GameSessionId { get; set; }
 		public Guid TeamId { get; set; }
 		public string TeamName { get; set; }
 		public int DayNumber { get; set; }
@@ -315,7 +320,7 @@ public class DayStepsController : Controller
 	{
 		public string PageType { get; set; }
 
-		public List<string> TicketIds { get; set; }
+		public List<Ticket> TicketIds { get; set; }
 	}
 	
 	public class TicketCheckStepModel : StepModel
@@ -334,11 +339,13 @@ public class DayStepsController : Controller
 		UserCredentialsDto? userCredentialsDto = null)
 		where T: StepModel
 	{
+		var requestContext = RequestContextFactory.Build(request);
 		var credentials = userCredentialsDto
-		                  ?? await gameSessionService.GetUserCredentials(RequestContextFactory.Build(request));
-		var team = await gameSessionService.GetCurrentTeam(RequestContextFactory.Build(request), credentials.SessionId);
-		var currentDay = await teamService.GetCurrentDayAsync(credentials.SessionId, credentials.TeamId);
-		stepModel.TeamId = credentials.SessionId;
+		                  ?? await gameSessionService.GetUserCredentials(requestContext);
+		var team = await gameSessionService.GetCurrentTeam(requestContext, credentials.SessionId);
+		var currentDay = await teamService.GetCurrentDayAsync(requestContext, credentials.SessionId, credentials.TeamId);
+		stepModel.GameSessionId = credentials.SessionId;
+		stepModel.TeamId = credentials.TeamId;
 		stepModel.TeamName = team.Name;
 		stepModel.DayNumber = currentDay.Number;
 		return stepModel;

@@ -27,25 +27,7 @@
 <script src="~/js/setup-hub-connection.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
-    const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
-    connection.start()
-        .then(function () {
-            connection.invoke("Join", "@Model.sessionId");
-        });
-    connection.on("NotifyPageChange", function (page, stage) {
-        window.location.href = `/step/${page}/${stage}`;
-    });
-
-    document.getElementById("prev").addEventListener('click', function () {
-        connection.invoke("ChangePage", "@Model.sessionId", 2, 0)
-            .then(function () {
-                window.location.href = `/step/2`;
-            });
-    });
-    document.getElementById("next").addEventListener('click', function () {
-        connection.invoke("ChangePage", "@Model.sessionId", 4, 0)
-            .then(function () {
-                window.location.href = `/step/4`;
-            });
-    });
+    const connection = setupHubConnection(new signalR.HubConnectionBuilder(), "@Model.GameSessionId", "@Model.TeamId");
+    setSwitchEvent("prev", connection, "@Model.GameSessionId", "@Model.TeamId", 2, 0);
+    setSwitchEvent("next", connection, "@Model.GameSessionId", "@Model.TeamId", 4, 0);
 </script>
