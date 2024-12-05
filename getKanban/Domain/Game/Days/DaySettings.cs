@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Domain.Game.Days.Configurations;
+using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Game.Days;
 
@@ -12,6 +13,8 @@ public class DaySettings
 	public int AnalystsCount { get; init; }
 	public int ProgrammersCount { get; init; }
 	public int TestersCount { get; init; }
+	
+	public bool CanReleaseNotImmediately { get; init; }
 	
 	public int ProfitPerClient { get; init; }
 }

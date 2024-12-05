@@ -1,5 +1,6 @@
 ﻿using Domain.DomainExceptions;
 using Domain.Game.Days.Commands;
+using Domain.Game.Days.Configurations;
 using Domain.Game.Days.DayContainers;
 using Domain.Game.Days.DayContainers.RollDice;
 using Domain.Game.Days.DayContainers.TeamMembers;
@@ -55,7 +56,7 @@ public class Day
 			settings.ProgrammersCount,
 			settings.TestersCount);
 		UpdateCfdContainer = new UpdateCfdContainer();
-		ReleaseTicketContainer = new ReleaseTicketContainer();
+		ReleaseTicketContainer = new ReleaseTicketContainer(settings.CanReleaseNotImmediately);
 		UpdateSprintBacklogContainer = new UpdateSprintBacklogContainer();
 	}
 

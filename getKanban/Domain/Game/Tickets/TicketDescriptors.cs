@@ -42,8 +42,19 @@ public static class TicketDescriptors
 	public static readonly TicketDescriptor S35 = new(nameof(S35), 25, DefaultClientOffRate);
 	public static readonly TicketDescriptor S36 = new(nameof(S36), 24, DefaultClientOffRate);
 
-	public static readonly TicketDescriptor AutoRelease = new("I01", 0, ZeroClientOffRate);
-	public static readonly TicketDescriptor AutoTests = new("I02", 0, ZeroClientOffRate);
+	public static readonly TicketDescriptor AutoRelease = new(
+		"I01",
+		0,
+		ZeroClientOffRate,
+		true,
+		OnRelease: team => team.CurrentDay.ReleaseTicketContainer.CanReleaseNotImmediately(),
+		OnRemove: team => team.CurrentDay.ReleaseTicketContainer.CanReleaseNotImmediately(false));
+
+	public static readonly TicketDescriptor AutoTests = new(
+		"I02",
+		0,
+		ZeroClientOffRate,
+		true);
 
 	public static readonly TicketDescriptor LawTask = new(
 		"F01",
@@ -72,4 +83,9 @@ public static class TicketDescriptors
 			.Concat(InfrastructureTicketDescriptors)
 			.Concat([LawTask, BusinessTask])
 			.ToArray();
+	
+	public static IReadOnlyDictionary<string, TicketDescriptor> TicketDescriptorsById { get; } =
+		AllTicketDescriptors.ToDictionary(t => t.Id, t => t);
+	
+	public static TicketDescriptor GetByTicketId(string ticketId) => TicketDescriptorsById[ticketId]; 
 }

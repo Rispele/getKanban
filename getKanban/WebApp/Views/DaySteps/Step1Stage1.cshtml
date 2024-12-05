@@ -1,4 +1,4 @@
-﻿@model WebApp.Controllers.DayStepsController.StepModel
+@model WebApp.Controllers.DayStepsController.StepModel
 
 <div class="stepHeader">
     <h1 class="fs-1 fw- text-center">Команда @Html.Raw(Model.TeamName). День @Model.DayNumber</h1>
@@ -24,7 +24,26 @@
 <script src="~/js/setup-hub-connection.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
-    const connection = setupHubConnection(new signalR.HubConnectionBuilder());
-    setSwitchEvent("roll", connection, "@Model.TeamId", 2, 0);
-    setSwitchEvent("change", connection, "@Model.TeamId", 1, 2);
+    const connection = new signalR.HubConnectionBuilder().withUrl("/teamSessionHub").build();
+    connection.start()
+        .then(function () {
+            connection.invoke("Join", "@Model.GameSessionId");
+        });
+    connection.on("NotifyPageChange", function (page, stage) {
+        window.location.href = `/@Model.GameSessionId/@Model.TeamId/step/${page}/${stage}`;
+    });
+
+    document.getElementById("roll").addEventListener('click', function () {
+        connection.invoke("ChangePage", "@Model.GameSessionId", 2, 0)
+            .then(function () {
+                window.location.href = "/step/2";
+            });
+    });
+
+    document.getElementById("change").addEventListener('click', function () {
+        connection.invoke("ChangePage", "@Model.sessionId", 1, 2)
+            .then(function () {
+                window.location.href = "/@Model.GameSessionId/@Model.TeamId/step/1/2";
+            });
+    });
 </script>

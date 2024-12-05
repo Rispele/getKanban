@@ -52,5 +52,6 @@ app.MapControllerRoute(
 	pattern: "{controller=Home}/{action=Index}");
 app.MapRazorPages();
 app.MapHub<LobbyHub>("/lobbyHub");
+app.MapHub<TeamSessionHub>("/teamSessionHub");
 
 app.Run();

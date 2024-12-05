@@ -17,6 +17,6 @@ public class UpdateCfdCommand : DayCommand
 		
 		day.UpdateCfdContainer.Update(PatchType, Value);
 		
-		day.PostDayEvent(CommandType, day.UpdateCfdContainer);
+		day.PostDayEvent(CommandType, team);
 	}
 }

@@ -33,11 +33,7 @@ public class UpdateCfdContainer : FreezableDayContainer
 
 	internal void Update(UpdateCfdContainerPatchType patchType, int value)
 	{
-		if (Frozen)
-		{
-			throw new DomainException("Cannot update frozen container");
-		}
-
+		EnsureNotFrozen();
 		if (value < 0)
 		{
 			throw new DomainException("Value cannot be negative.");

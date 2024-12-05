@@ -39,7 +39,7 @@ public class TeamSessionSettings
 			.MaxBy(t => t.dayFrom)
 			.profitPerClient;
 	}
-
+	
 	public static TeamSessionSettings Default()
 	{
 		return new TeamSessionSettings

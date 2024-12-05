@@ -3,11 +3,14 @@ using Core.Dtos.Containers;
 using Core.Dtos.Containers.RollDice;
 using Core.Dtos.Containers.TeamMembers;
 using Domain.Game.Days;
+using WebApp.Models;
 
 namespace Core.Dtos;
 
 public class DayDto
 {
+	public DayFullIdDto FullId { get; }
+	
 	public int AnalystsNumber { get; }
 	public int ProgrammersNumber { get; }
 	public int TestersNumber { get; }
@@ -25,6 +28,7 @@ public class DayDto
 	public int Number { get; }
 	
 	public DayDto(
+		DayFullIdDto fullId,
 		int analystsNumber,
 		int programmersNumber,
 		int testersNumber,
@@ -38,6 +42,7 @@ public class DayDto
 		DayStatus status,
 		int number)
 	{
+		FullId = fullId;
 		AnalystsNumber = analystsNumber;
 		ProgrammersNumber = programmersNumber;
 		TestersNumber = testersNumber;

@@ -20,10 +20,7 @@ public class UpdateSprintBacklogContainer : FreezableDayContainer
 	
 	internal void Update(string ticketId)
 	{
-		if (Frozen)
-		{
-			throw new DomainException("Cannot update frozen container");
-		}
+		EnsureNotFrozen();
 
 		if (ticketIds.Contains(ticketId))
 		{
@@ -36,10 +33,7 @@ public class UpdateSprintBacklogContainer : FreezableDayContainer
 	
 	internal void Remove(string ticketId)
 	{
-		if (Frozen)
-		{
-			throw new DomainException("Cannot update frozen container");
-		}
+		EnsureNotFrozen();
 
 		if (!ticketIds.Contains(ticketId))
 		{

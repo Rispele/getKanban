@@ -31,7 +31,7 @@ public partial class Team
 	}
 
 	public IReadOnlyList<AwaitedCommands> CurrentlyAwaitedCommands => CurrentDay.CurrentlyAwaitedCommands;
-	
+
 	internal Day? PreviousDay => days.SingleOrDefault(d => d.Number == currentDayNumber - 1);
 
 	public IReadOnlyList<TeamMember> CurrentDayTeamRoleUpdates => CurrentDay.TeamMembersContainer.TeamMembers;
@@ -77,22 +77,27 @@ public partial class Team
 	public bool IsTicketDeadlineNotExceeded(string ticketId, int deadlineInclusive)
 	{
 		var ticket = BuildTakenTickets().SingleOrDefault(t => t.id == ticketId);
-		if (ticket == null || ticket.InWork())
+		if (ticket == null || ticket.IsInWork(deadlineInclusive))
 		{
 			return currentDayNumber <= deadlineInclusive;
 		}
-		
+
 		return ticket.releaseDay!.Value <= deadlineInclusive;
 	}
 
-	public int BuildAnotherTeamScores(List<Day> daysToProcess)
+	public int BuildAnotherTeamScores()
 	{
-		return daysToProcess.Select(d => d.WorkAnotherTeamContainer?.ScoresNumber ?? 0).Sum();
+		return BuildAnotherTeamScores(days);
 	}
 
 	public bool IsCurrentDayCfdValid()
 	{
 		return CurrentDay.IsCfdValid(PreviousDay?.UpdateCfdContainer ?? UpdateCfdContainer.None);
+	}
+
+	internal int BuildAnotherTeamScores(IReadOnlyCollection<Day> daysToProcess)
+	{
+		return daysToProcess.Select(d => d.WorkAnotherTeamContainer?.ScoresNumber ?? 0).Sum();
 	}
 
 	internal HashSet<string> GetTakenTicketIds(IReadOnlyList<Day> daysToProcess)
@@ -116,16 +121,22 @@ public partial class Team
 
 	private Day ConfigureDay(int dayNumber, List<Day> daysToProcess)
 	{
+		var takenTickets = GetTakenTicketIds(daysToProcess);
 		var releasedTickets = GetReleasedTicketIds(daysToProcess);
 		var endOfReleaseCycle = dayNumber % Settings.ReleaseCycleLength == 0;
 
-		var shouldRelease = endOfReleaseCycle || releasedTickets.Contains(TicketDescriptors.AutoRelease.Id);
+		var isReleaseDay = endOfReleaseCycle || releasedTickets.Contains(TicketDescriptors.AutoRelease.Id);
+		var somethingToReleaseImmediately =
+			takenTickets.Any(t => TicketDescriptors.GetByTicketId(t).CanBeReleasedImmediately);
 		var shouldUpdateSpringBacklog = endOfReleaseCycle || dayNumber >= Settings.UpdateSprintBacklogEveryDaySince;
-		var anotherTeamAppeared = dayNumber >= Settings.AnotherTeamShouldWorkSince
+		var anotherTeamAppeared = dayNumber > Settings.AnotherTeamShouldWorkSince
 		                       && BuildAnotherTeamScores(daysToProcess) < Settings.ScoresAnotherTeamShouldGain;
 
 		var scenario = ScenarioBuilder.Create()
-			.DefaultScenario(anotherTeamAppeared, shouldRelease, shouldUpdateSpringBacklog)
+			.DefaultScenario(
+				anotherTeamAppeared,
+				shouldRelease: isReleaseDay || somethingToReleaseImmediately,
+				shouldUpdateSpringBacklog)
 			.Build();
 
 		var testersNumber = dayNumber >= Settings.IncreaseTestersNumberSince
@@ -139,6 +150,8 @@ public partial class Team
 			AnalystsCount = Settings.AnalystsNumber,
 			ProgrammersCount = Settings.ProgrammersNumber,
 			TestersCount = testersNumber,
+			
+			CanReleaseNotImmediately = isReleaseDay,
 
 			ProfitPerClient = Settings.GetProfitPerDay(dayNumber)
 		};

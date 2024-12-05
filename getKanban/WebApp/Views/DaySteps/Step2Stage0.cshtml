@@ -8,20 +8,10 @@
 
 @functions
 {
-    private IEnumerable<int> SelectDiceNumber(TeamRoleDto initialRole) =>
-        GetDiceRollResultsByCurrentRole(initialRole)
-            .Select(t => t.DiceNumber);
-
     private IEnumerable<string> SelectScores(TeamRoleDto currentRole)
     {
         var rolls = GetDiceRollResultsByCurrentRole(currentRole).ToList();
         var sum = rolls.Sum(t => t.Scores);
-        // return rolls
-        //     .Select(
-        //         t => t.InitialRole != t.CurrentRole
-        //             ? $"{t.InitialRole} -> {t.CurrentRole} {t.Scores}"
-        //             : $"{t.InitialRole} {t.Scores}")
-        //     .Concat([$"Сумма: {sum}"]);
         return [sum.ToString()];
     }
 
@@ -62,7 +52,6 @@
                         <div>@s</div>
                     }
                 </div>
-                @* <div class="role-table-cell"><span>@string.Join("\n", SelectScores(TeamRoleDto.Programmer))</span></div> *@
             </div>
             <div class="role-table-row">
                 <div class="role-table-cell">Тестировщики</div>
@@ -72,7 +61,6 @@
                         <div>@s</div>
                     }
                 </div>
-                @* <div class="role-table-cell"><span>@string.Join("\n", SelectScores(TeamRoleDto.Tester))</span></div> *@
             </div>
         </div>
 
@@ -98,27 +86,6 @@
 
 </div>
 
-@* <div class="infoContainer height-large centered-100"> *@
-@*     <h1 class="fs-4 text-center"> *@
-@*         Доска *@
-@*     </h1> *@
-@*      *@
-@*     <div class="info height-small centered-100"> *@
-@*         <p class="fs-5 fw-normal">Остатки работ можно потратить в течение дня. Имейте в виду, что между днями неиспользованные работы сгорают.</p> *@
-@*         <p class="fs-5 fw-normal">При необходимости, переместите новые тикеты (проверьте, чтоб соблюдалось ограничение WIP).</p> *@
-@*         <p class="fs-5 fw-normal">Потратьте остаток работ на другие тикеты.</p> *@
-@*     </div> *@
-@*      *@
-@*     <div> *@
-@*         <p>Результат броска для аналитиков: @string.Join(" ", SelectDiceNumber(TeamRoleDto.Analyst))</p> *@
-@*         <p>Результат броска для разработчиков: @string.Join(" ", SelectDiceNumber(TeamRoleDto.Programmer))</p> *@
-@*         <p>Результат броска для тестировщиков: @string.Join(" ", SelectDiceNumber(TeamRoleDto.Tester))</p> *@
-@*         <p>Итоговый счет для аналитиков: @string.Join(" ", SelectScores(TeamRoleDto.Analyst))</p> *@
-@*         <p>Итоговый счет для разработчиков: @string.Join(" ", SelectScores(TeamRoleDto.Programmer))</p> *@
-@*         <p>Итоговый счет для тестировщиков: @string.Join(" ", SelectScores(TeamRoleDto.Tester))</p> *@
-@*     </div> *@
-@* </div> *@
-
 <button class="stepControlButtons rightButton" id="next">
     Далее
 </button>
@@ -127,6 +94,19 @@
 <script src="~/js/setup-hub-connection.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
-    const connection = setupHubConnection(new signalR.HubConnectionBuilder());
-    setSwitchEvent("next", connection, "@Model.TeamId", 3, 0);
+    const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
+    connection.start()
+        .then(function () {
+            connection.invoke("Join", "@Model.currentSessionId");
+        });
+    connection.on("NotifyPageChange", function (page, stage) {
+        window.location.href = `/step/${page}/${stage}`;
+    });
+
+    document.getElementById("next").addEventListener('click', function () {
+        connection.invoke("ChangePage", "@Model.currentSessionId", 3, 0)
+            .then(function () {
+                window.location.href = `/step/3`;
+            });
+    });
 </script>

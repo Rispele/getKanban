@@ -1,4 +1,4 @@
-﻿@model WebApp.Controllers.DayStepsController.StepModel
+@model WebApp.Controllers.DayStepsController.StepModel
 
 <div class="stepHeader">
     <h1 class="fs-1 fw- text-center">Команда @Html.Raw(Model.TeamName). День @Model.DayNumber</h1>
@@ -23,7 +23,7 @@
             headers: {"Content-Type": "application/json"}
         })
         .then(function () {
-            window.location.href = `/step/1/0`
+            window.location.href = `/@Model.GameSessionId/@Model.TeamId/step/1/0`
         });
     });
 </script>

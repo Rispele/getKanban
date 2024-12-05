@@ -1,4 +1,4 @@
-﻿@model WebApp.Controllers.DayStepsController.StepModel
+@model WebApp.Controllers.DayStepsController.StepModel
 
 <div class="stepHeader">
     <h1 class="fs-1 fw- text-center">Команда @Html.Raw(Model.TeamName). День @Model.DayNumber</h1>
@@ -50,6 +50,14 @@
 <script src="~/js/setup-hub-connection.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
+    const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
+    connection.start()
+        .then(function () {
+            connection.invoke("Join", "@Model");
+        });
+    connection.on("NotifyPageChange", function (page, stage) {
+        window.location.href = `/step/${page}/${stage}`;
+    });
     const connection = setupHubConnection(new signalR.HubConnectionBuilder());
     
     document.getElementById('save-cfd').addEventListener('click', function () {

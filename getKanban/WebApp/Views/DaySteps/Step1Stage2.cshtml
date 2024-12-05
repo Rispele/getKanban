@@ -61,7 +61,14 @@
 <script src="~/js/setup-hub-connection.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
-    const connection = setupHubConnection(new signalR.HubConnectionBuilder());
+    const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
+    connection.start()
+        .then(function () {
+            connection.invoke("Join", "@Model.Item1.currentSessionId");
+        });
+    connection.on("NotifyPageChange", function (page, stage) {
+        window.location.href = `/step/${page}/${stage}`;
+    });
     connection.on("NotifyUpdateRole", function (teamMemberId, roleTo) {
         const draggable = document.getElementById(teamMemberId.toString());
         document.getElementById(roleTo).appendChild(draggable);
