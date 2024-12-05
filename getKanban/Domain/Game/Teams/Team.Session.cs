@@ -74,15 +74,15 @@ public partial class Team
 			.Concat(takenTickets).ToHashSet();
 	}
 
-	public bool IsTicketDoneInTimeOrTimeNotExceeded(string ticketId, int beforeDayInclusive)
+	public bool IsTicketDeadlineNotExceeded(string ticketId, int deadlineInclusive)
 	{
 		var ticket = BuildTakenTickets().SingleOrDefault(t => t.id == ticketId);
 		if (ticket == null || ticket.InWork())
 		{
-			return currentDayNumber <= beforeDayInclusive;
+			return currentDayNumber <= deadlineInclusive;
 		}
 		
-		return ticket.releaseDay!.Value <= beforeDayInclusive;
+		return ticket.releaseDay!.Value <= deadlineInclusive;
 	}
 
 	public int BuildAnotherTeamScores(List<Day> daysToProcess)

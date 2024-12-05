@@ -1,3 +1,3 @@
 ﻿namespace Domain.Game.Tickets;
 
-public record TicketPenaltyDescriptor(int amount, int deadline);
+public record TicketPenaltyDescriptor(int Size, int Deadline);

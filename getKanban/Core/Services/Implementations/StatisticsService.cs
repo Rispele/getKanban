@@ -1,12 +1,14 @@
 ﻿using Core.DbContexts.Extensions;
 using Core.Dtos.DayStatistics;
+using Core.Services.Contracts;
 using Domain.DbContexts;
 using Domain.Game;
+using Domain.Game.Teams;
 using Domain.Game.Tickets;
 
 namespace Core.Services.Implementations;
 
-public class StatisticsService
+public class StatisticsService : IStatisticsService
 {
 	private readonly DomainContext context;
 
@@ -28,29 +30,24 @@ public class StatisticsService
 		var clientsPerDay = EvaluateClientPerDay(firstDayNumber, currentDayNumber, clientsGainedPerDay);
 		var profitGainedPerDay = EvaluateProfitGainedPerDay(profitPerClientPerDay, clientsPerDay);
 
-		var dayStats = ConvertToDayStatisticDtos(
+		var dayStats = ConvertToDayStatisticDto(
 			firstDayNumber,
 			currentDayNumber,
 			clientsGainedPerDay,
 			profitGainedPerDay,
 			profitPerClientPerDay);
 		
-		var hasPenalty = !team.IsTicketDoneInTimeOrTimeNotExceeded(
-			TicketDescriptors.LawTask.Id,
-			team.Settings.DayOfPenaltyForLostLawTicket);
-		var hasBonus = team.IsTicketDoneInTimeOrTimeNotExceeded(
-			TicketDescriptors.BusinessTask.Id,
-			team.Settings.DayBeforeBonusForDoneBusinessTicketCanBeGained);
 		return new TeamStatisticDto
 		{
 			TeamId = teamId,
 			DayStatistics = dayStats,
-			Penalty = hasPenalty ? 2500 : 0,
-			BonusProfit = hasBonus ? 4000 : 0
+			Penalty = EvaluatePenalty(team),
+			BonusProfit = EvaluateBonusProfit(team)
 		};
 	}
+	
 
-	private static List<DayStatisticDto> ConvertToDayStatisticDtos(
+	private static List<DayStatisticDto> ConvertToDayStatisticDto(
 		int firstDayNumber,
 		int currentDayNumber,
 		Dictionary<int, int> clientsGainedPerDay,
@@ -67,6 +64,22 @@ public class StatisticsService
 					ProfitPerClient = profitPerClientPerDay[dayNumber]
 				})
 			.ToList();
+	}
+
+	private int EvaluatePenalty(Team team)
+	{
+		return TicketDescriptors.AllTicketDescriptors
+			.Where(t => t.Penalty != null)
+			.Where(t => !team.IsTicketDeadlineNotExceeded(t.Id, t.Penalty!.Deadline))
+			.Sum(t => t.Penalty!.Size);
+	}
+
+	private int EvaluateBonusProfit(Team team)
+	{
+		return TicketDescriptors.AllTicketDescriptors
+			.Where(t => t.Bonus != null)
+			.Where(t => team.IsTicketDeadlineNotExceeded(t.Id, t.Bonus!.Deadline))
+			.Sum(t => t.Bonus!.Size);
 	}
 
 	private Dictionary<int, int> EvaluateProfitGainedPerDay(
