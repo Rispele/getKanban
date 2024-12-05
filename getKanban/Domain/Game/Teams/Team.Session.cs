@@ -105,16 +105,21 @@ public partial class Team
 	internal HashSet<string> GetTicketsInWorkIds(IReadOnlyList<Day> daysToProcess)
 	{
 		var takenTickets = GetTakenTicketIds(daysToProcess);
-		takenTickets.ExceptWith(daysToProcess.SelectMany(d => d.ReleaseTicketContainer.TicketIds));
+		takenTickets.ExceptWith(GetReleasedTicketIds(daysToProcess));
 		return takenTickets;
+	}
+
+	internal HashSet<string> GetReleasedTicketIds(IReadOnlyList<Day> daysToProcess)
+	{
+		return daysToProcess.SelectMany(d => d.ReleaseTicketContainer.TicketIds).ToHashSet();
 	}
 
 	private Day ConfigureDay(int dayNumber, List<Day> daysToProcess)
 	{
-		var takenTickets = GetTakenTicketIds(daysToProcess);
+		var releasedTickets = GetReleasedTicketIds(daysToProcess);
 		var endOfReleaseCycle = dayNumber % Settings.ReleaseCycleLength == 0;
 
-		var shouldRelease = endOfReleaseCycle || takenTickets.Contains(TicketDescriptors.AutoRelease.Id);
+		var shouldRelease = endOfReleaseCycle || releasedTickets.Contains(TicketDescriptors.AutoRelease.Id);
 		var shouldUpdateSpringBacklog = endOfReleaseCycle || dayNumber >= Settings.UpdateSprintBacklogEveryDaySince;
 		var anotherTeamAppeared = dayNumber > Settings.AnotherTeamShouldWorkSince
 		                       && BuildAnotherTeamScores(daysToProcess) < Settings.ScoresAnotherTeamShouldGain;
