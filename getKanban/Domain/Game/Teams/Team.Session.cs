@@ -121,7 +121,7 @@ public partial class Team
 
 		var shouldRelease = endOfReleaseCycle || releasedTickets.Contains(TicketDescriptors.AutoRelease.Id);
 		var shouldUpdateSpringBacklog = endOfReleaseCycle || dayNumber >= Settings.UpdateSprintBacklogEveryDaySince;
-		var anotherTeamAppeared = dayNumber > Settings.AnotherTeamShouldWorkSince
+		var anotherTeamAppeared = dayNumber >= Settings.AnotherTeamShouldWorkSince
 		                       && BuildAnotherTeamScores(daysToProcess) < Settings.ScoresAnotherTeamShouldGain;
 
 		var scenario = ScenarioBuilder.Create()

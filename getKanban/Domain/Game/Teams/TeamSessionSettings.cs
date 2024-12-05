@@ -66,7 +66,7 @@ public class TeamSessionSettings
 			],
 			ReleaseCycleLength = 3,
 			UpdateSprintBacklogEveryDaySince = 14,
-			AnotherTeamShouldWorkSince = 9,
+			AnotherTeamShouldWorkSince = 10,
 			ScoresAnotherTeamShouldGain = 15,
 			AnalystsNumber = 2,
 			ProgrammersNumber = 3,

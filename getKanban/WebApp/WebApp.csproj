@@ -62,9 +62,6 @@
       <AdditionalFiles Include="Views\DaySteps\Step5Stage0.cshtml" />
       <AdditionalFiles Include="Views\DaySteps\Step5Stage1.cshtml" />
       <AdditionalFiles Include="Views\DaySteps\Step5Stage2.cshtml" />
-      <AdditionalFiles Include="Views\Session\CreateSession.cshtml" />
-      <AdditionalFiles Include="Views\Session\EditSession.cshtml" />
-      <AdditionalFiles Include="Views\Session\JoinSession.cshtml" />
       <AdditionalFiles Include="Views\Shared\Error.cshtml" />
       <AdditionalFiles Include="Views\Shared\Index.cshtml" />
       <AdditionalFiles Include="Views\Shared\_Layout.cshtml" />
