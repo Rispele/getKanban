@@ -1,6 +1,6 @@
 ﻿@using Core.Dtos.Containers.RollDice
 @using Core.Dtos.Containers.TeamMembers
-@model (Guid? currentSessionId, int dayNumber, RollDiceContainerDto diceResults)
+@model (Guid currentSessionId, int dayNumber, RollDiceContainerDto diceResults)
 
 <div class="stepHeader">
     <h1 class="fs-1 fw- text-center">Команда pipipupu. День @Model.dayNumber</h1>
@@ -126,7 +126,10 @@
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
     const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
-    connection.start();
+    connection.start()
+        .then(function () {
+            connection.invoke("Join", "@Model.currentSessionId");
+        });
     connection.on("NotifyPageChange", function (page, stage) {
         window.location.href = `/step/${page}/${stage}`;
     });

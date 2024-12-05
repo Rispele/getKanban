@@ -1,83 +1,61 @@
-﻿@model Core.Dtos.TicketsViewDto
+﻿@using Domain.Game
+@model Core.Dtos.TicketsViewDto
+
+@functions
+{
+    private void FillTickets(IEnumerable<Ticket> tickets, string cardStyle, string containerName)
+    {
+        <div class="@Html.Raw($"checkboxContainer{Model.PageType}Version")">
+            <h1 class="title">@containerName</h1>
+            <hr class="divider">
+
+            @foreach (var ticket in tickets)
+            {
+                var ticketId = ticket.id;
+                <div class="checkboxCardsMargin">
+                    <input type="checkbox" class="checkboxCardInput" id="@ticketId" checked="@ticket.IsReleased(Model.CurrentDayNumber)">
+                    <label for="@ticketId" class="checkboxCardContainer @cardStyle cursorPointer">
+                        <div class="checkboxCardContent">
+                            <h2 class="checkboxCardNumber">@ticketId</h2>
+                            <div class="lines">
+                                <div class="line full"></div>
+                                <div class="line half"></div>
+                                <div class="line half"></div>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            }
+        </div>
+    }
+}
 
 <div class="container1">
     <h1 class="title">Выберите тикеты, которые были сегодня поставлены</h1>
     <hr class="divider">
     <div class="container2">
-        @if (Model.TicketIds.Any(x => x.Contains("S")))
+        @if (Model.TicketIds.Any(x => x.id.Contains("S")))
         {
-            <div class="@Html.Raw($"checkboxContainer{Model.PageType}Version")">
-                <h1 class="title">Обычные</h1>
-                <hr class="divider">
-
-                @foreach (var defaultTicket in Model.TicketIds.Where(x => x.Contains("S")))
-                {
-                    <div class="checkboxCardsMargin">
-                        <input type="checkbox" class="checkboxCardInput" id="@defaultTicket">
-                        <label for="@defaultTicket" class="checkboxCardContainer checkboxCardStyle1 cursorPointer">
-                            <div class="checkboxCardContent">
-                                <h2 class="checkboxCardNumber">@defaultTicket</h2>
-                                <div class="lines">
-                                    <div class="line full"></div>
-                                    <div class="line half"></div>
-                                    <div class="line half"></div>
-                                </div>
-                            </div>
-                        </label>
-                    </div>
-                }
-            </div>
+            FillTickets(
+                Model.TicketIds.Where(x => x.id.Contains("S")),
+                "checkboxCardStyle1",
+                "Обычные");
         }
 
-        @if (Model.TicketIds.Any(x => x.Contains("I")))
+        @if (Model.TicketIds.Any(x => x.id.Contains("I")))
         {
-            <div class="@Html.Raw($"checkboxContainer{Model.PageType}Version")">
-                <h1 class="title">Инфраструктурные</h1>
-                <hr class="divider">
-
-                @foreach (var infrTicket in Model.TicketIds.Where(x => x.Contains("I")))
-                {
-                    <div class="checkboxCardsMargin">
-                        <input type="checkbox" class="checkboxCardInput" id="@infrTicket">
-                        <label for="@infrTicket" class="checkboxCardContainer checkboxCardStyle2 cursorPointer">
-                            <div class="checkboxCardContent">
-                                <h2 class="checkboxCardNumber">@infrTicket</h2>
-                                <div class="lines">
-                                    <div class="line full"></div>
-                                    <div class="line half"></div>
-                                    <div class="line half"></div>
-                                </div>
-                            </div>
-                        </label>
-                    </div>
-                }
-
-            </div>
+            FillTickets(
+                Model.TicketIds.Where(x => x.id.Contains("I")),
+                "checkboxCardStyle2",
+                "Инфраструктурные");
         }
 
-        @if (Model.TicketIds.Any(x => x.Contains("E") || x.Contains("F")))
+        @if (Model.TicketIds.Any(x => x.id.Contains("E") || x.id.Contains("F")))
         {
-            <div class="@Html.Raw($"checkboxContainer{Model.PageType}Version")">
-                <h1 class="title">Срочные</h1>
-                <hr class="divider">
-
-                @foreach (var fastTicket in Model.TicketIds.Where(x => x.Contains("E") || x.Contains("F")))
-                {
-                    <div class="checkboxCardsMargin">
-                        <input type="checkbox" class="checkboxCardInput" id="@fastTicket">
-                        <label for="@fastTicket" class="checkboxCardContainer checkboxCardStyle3 cursorPointer">
-                            <div class="checkboxCardContent">
-                                <h2 class="checkboxCardNumber">@fastTicket</h2>
-                                <div class="lines">
-                                    <div class="line full"></div>
-                                    <div class="line half"></div>
-                                    <div class="line half"></div>
-                                </div>
-                            </div>
-                        </label>
-                    </div>
-                }
-            </div>
+            FillTickets(
+                Model.TicketIds.Where(x => x.id.Contains("E") || x.id.Contains("F")),
+                "checkboxCardStyle3",
+                "Срочные");
         }
     </div>
 
@@ -90,37 +68,23 @@
     </button>
 </div>
 
-    @* <div class="container2"> *@
-    @* *@
-    @*     @foreach (var ticketId in Model.ticketIds) *@
-    @*     { *@
-    @*         <div> *@
-    @*             <input type="checkbox" class="checkboxCardInput" id="@ticketId"> *@
-    @*             <label for="@ticketId" class="checkboxCardContainer"> *@
-    @*                 <div class="checkboxCardContent"> *@
-    @*                     <h2 class="checkboxCardNumber">@ticketId</h2> *@
-    @*                     <div class="lines"> *@
-    @*                         <div class="line full"></div> *@
-    @*                         <div class="line half"></div> *@
-    @*                         <div class="line half"></div> *@
-    @*                     </div> *@
-    @*                 </div> *@
-    @*             </label> *@
-    @*         </div> *@
-    @*     } *@
-    @* </div> *@
-
-
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
     const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
-    connection.start();
+    connection.start()
+        .then(function () {
+            connection.invoke("Join", "@Model.SessionId");
+        });
     connection.on("NotifyPageChange", function (page, stage) {
         window.location.href = `/step/${page}/${stage}`;
     });
     connection.on("NotifyUpdateTicketChoice", function (ticketId) {
         const ticket = document.getElementById(ticketId);
         ticket.checked = !ticket.checked;
+    });
+    connection.on("NotifyTicketsToReleaseUpdated", function() {
+        console.log("reload")
+        window.location.reload();
     });
     
     const checkboxes = document.getElementsByClassName('checkboxCardInput');
@@ -134,7 +98,7 @@
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ ticketId: ticketId, remove: remove })
+                body: JSON.stringify({ TicketId: ticketId, Remove: remove })
             }).then(function () {
                 connection.invoke("UpdateTicketChoice", "@Model.SessionId", ticketId);
             });

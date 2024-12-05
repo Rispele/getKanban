@@ -1,4 +1,5 @@
 using Core.Services.Contracts;
+using Domain.Game.Tickets;
 using Microsoft.AspNetCore.SignalR;
 
 namespace WebApp.Hubs;
@@ -84,7 +85,15 @@ public class LobbyHub : Hub
 	
 	public async Task UpdateTicketChoice(Guid gameSessionId, string ticketId)
 	{
-		await Clients.OthersInGroup(GetGroupId(gameSessionId)).SendAsync("NotifyUpdateTicketChoice", ticketId);
+		Console.WriteLine($"Ticket choice: {ticketId}");
+		if (ticketId == TicketDescriptors.AutoRelease.Id)
+		{
+			await Clients.Group(GetGroupId(gameSessionId)).SendAsync("NotifyTicketsToReleaseUpdated");
+		}
+		else
+		{
+			await Clients.OthersInGroup(GetGroupId(gameSessionId)).SendAsync("NotifyUpdateTicketChoice", ticketId);
+		}
 	}
 
 	private async Task AddCurrentConnectionToLobbyGroupAsync(string groupId)

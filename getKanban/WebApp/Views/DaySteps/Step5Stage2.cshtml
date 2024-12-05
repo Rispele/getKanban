@@ -1,4 +1,4 @@
-﻿@model (Guid? currentSessionId, List<string> ticketIds)
+﻿@model (Guid currentSessionId, List<string> ticketIds)
 
 <div class="container1">
     <h1 class="title">Проверьте корректность заполнения.
@@ -35,7 +35,10 @@
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
     const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
-    connection.start();
+    connection.start()
+        .then(function () {
+            connection.invoke("Join", "@Model.currentSessionId");
+        });
     connection.on("NotifyPageChange", function (page, stage) {
         window.location.href = `/step/${page}/${stage}`;
     });

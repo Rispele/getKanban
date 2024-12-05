@@ -1,5 +1,5 @@
 ﻿@using Core.Dtos.Containers.TeamMembers
-@model (Guid? currentSessionId, List<Core.Dtos.Containers.TeamMemberDto> teamMemberDtos)
+@model (Guid currentSessionId, List<Core.Dtos.Containers.TeamMemberDto> teamMemberDtos)
 
 <meta charset="UTF-8">
 <div class="table-container">
@@ -67,7 +67,10 @@
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
     const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
-    connection.start();
+    connection.start()
+        .then(function () {
+            connection.invoke("Join", "@Model.currentSessionId");
+        });
     connection.on("NotifyPageChange", function (page, stage) {
         window.location.href = `/step/${page}/${stage}`;
     });
@@ -111,5 +114,6 @@
                     ? "Tester"
                     : null;
     }
+
 
 </script>

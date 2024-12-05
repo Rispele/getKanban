@@ -1,5 +1,6 @@
 ﻿using Domain.DomainExceptions;
 using Domain.Game.Teams;
+using Domain.Game.Tickets;
 
 namespace Domain.Game.Days.Commands;
 
@@ -7,30 +8,43 @@ public class ReleaseTicketsCommand : DayCommand
 {
 	public override DayCommandType CommandType => DayCommandType.ReleaseTickets;
 
-	public bool Remove { get; init; }
+	public string TicketId { get; }
 
-	public IReadOnlyList<string> TicketIds { get; init; } = [];
-	
+	public bool Remove { get; }
+
+	private ReleaseTicketsCommand(string ticketId, bool remove)
+	{
+		TicketId = ticketId;
+		Remove = remove;
+	}
+
+	public static ReleaseTicketsCommand Create(string ticketId, bool remove) => new(ticketId, remove);
+
 	internal override void Execute(Team team, Day day)
 	{
 		day.EnsureCanPostEvent(CommandType);
 
+		var ticket = TicketDescriptors.GetByTicketId(TicketId);
+
 		if (Remove)
 		{
-			TicketIds.ForEach(t => day.ReleaseTicketContainer.Remove(t));
+			day.ReleaseTicketContainer.Remove(ticket);
+			ticket.OnRemove?.Invoke(team);
 		}
 		else
 		{
 			EnsureCanReleaseTickets(team);
-			TicketIds.ForEach(t => day.ReleaseTicketContainer.Update(t));
+			
+			ticket.OnRelease?.Invoke(team);
+			day.ReleaseTicketContainer.Update(ticket);
 		}
 
 		day.PostDayEvent(CommandType, null);
 	}
-	
+
 	private void EnsureCanReleaseTickets(Team team)
 	{
-		if (!team.GetTicketsInWorkIds(team.Days).IsSupersetOf(TicketIds))
+		if (!team.GetTicketsInWorkIds(team.Days).Contains(TicketId))
 		{
 			throw new DayActionIsProhibitedException("You cannot release not in work tickets");
 		}

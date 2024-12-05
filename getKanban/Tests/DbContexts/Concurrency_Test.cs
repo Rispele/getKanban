@@ -92,10 +92,7 @@ public class Concurrency_Test
 			(c, s) => s.Teams.Single().ExecuteCommand(new RollDiceCommand()));
 		var (team1, team2) = (session1.Teams.Single(), session2.Teams.Single());
 
-		var command = new ReleaseTicketsCommand
-		{
-			TicketIds = ["S01", "S05"]
-		};
+		var command = ReleaseTicketsCommand.Create("S01", false);
 		
 		team1.ExecuteCommand(command);
 		team2.ExecuteCommand(command);

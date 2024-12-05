@@ -14,5 +14,7 @@ public class DaySettings
 	public int ProgrammersCount { get; init; }
 	public int TestersCount { get; init; }
 	
+	public bool CanReleaseNotImmediately { get; init; }
+	
 	public int ProfitPerClient { get; init; }
 }

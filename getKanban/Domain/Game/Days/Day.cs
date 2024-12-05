@@ -56,7 +56,7 @@ public class Day
 			settings.ProgrammersCount,
 			settings.TestersCount);
 		UpdateCfdContainer = new UpdateCfdContainer();
-		ReleaseTicketContainer = new ReleaseTicketContainer();
+		ReleaseTicketContainer = new ReleaseTicketContainer(settings.CanReleaseNotImmediately);
 		UpdateSprintBacklogContainer = new UpdateSprintBacklogContainer();
 	}
 

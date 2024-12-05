@@ -2,6 +2,7 @@
 using Core.Entities;
 using Core.RequestContexts;
 using Core.Services.Implementations;
+using Domain.Game;
 
 namespace Core.Services.Contracts;
 
@@ -35,9 +36,9 @@ public interface IGameSessionService
 
 	public Task<CfdGraphDto> GetCfdDataForTeam(Guid sessionId, Guid teamId);
 
-	public Task<List<string>> GetReleaseTickets(Guid sessionId, Guid teamId);
+	public Task<List<Ticket>> GetTicketsToRelease(Guid sessionId, Guid teamId);
 	
-	public Task<List<string>> GetBacklogTickets(Guid sessionId, Guid teamId);
+	public Task<List<Ticket>> GetBacklogTickets(Guid sessionId, Guid teamId);
 	
 	public Task<HubConnection?> FindCurrentConnection(Guid userId);
 

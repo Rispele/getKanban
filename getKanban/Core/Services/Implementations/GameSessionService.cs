@@ -54,8 +54,8 @@ public class GameSessionService : IGameSessionService
 		}
 
 		var userId = requestContext.GetUserId();
-		var participantRole = ignorePermissions 
-			? ParticipantRole.Creator 
+		var participantRole = ignorePermissions
+			? ParticipantRole.Creator
 			: session.EnsureHasAnyAccess(userId, inviteCode);
 
 		return GameSessionDtoConverter.For(participantRole).Convert(session);
@@ -103,7 +103,7 @@ public class GameSessionService : IGameSessionService
 	{
 		var userId = requestContext.GetUserId();
 		var session = await context.GetGameSessionsAsync(gameSessionId);
-		
+
 		session.EnsureHasAccess(userId);
 		await context.CloseRecruitmentAsync(gameSessionId);
 		session.Start();
@@ -119,9 +119,9 @@ public class GameSessionService : IGameSessionService
 		var participantRole = session.EnsureHasAccess(userId);
 		return participantRole switch
 		{
-			ParticipantRole.Creator or ParticipantRole.Angel or ParticipantRole.Creator | ParticipantRole.Angel => 
+			ParticipantRole.Creator or ParticipantRole.Angel or ParticipantRole.Creator | ParticipantRole.Angel =>
 				TeamDtoConverter.For(ParticipantRole.Creator).ConvertAngels(session.Angels),
-			ParticipantRole.Player => 
+			ParticipantRole.Player =>
 				TeamDtoConverter.For(ParticipantRole.Player).Convert(session.FindUserTeam(userId)!),
 			null => throw new InvalidOperationException($"No team found for user {userId}"),
 			_ => throw new ArgumentOutOfRangeException()
@@ -155,7 +155,7 @@ public class GameSessionService : IGameSessionService
 			Name = user.Name
 		};
 	}
-	
+
 	public async Task<UserCredentialsDto> GetUserCredentials(RequestContext requestContext)
 	{
 		var currentSessionId = await FindCurrentSessionId(requestContext);
@@ -163,6 +163,7 @@ public class GameSessionService : IGameSessionService
 		{
 			throw new InvalidOperationException();
 		}
+
 		var currentUser = await GetCurrentUser(requestContext);
 		var currentTeam = await GetCurrentTeam(requestContext, currentSessionId!.Value);
 
@@ -201,9 +202,8 @@ public class GameSessionService : IGameSessionService
 
 	public async Task<CfdGraphDto> GetCfdDataForTeam(Guid sessionId, Guid teamId)
 	{
-		var session = context.GameSessions.SingleOrDefault(x => x.Id == sessionId);
-		var team = session!.Teams.SingleOrDefault(x => x.Id == teamId);
-		var cfd = team!.CfdContainers.ToList();
+		var team = await context.GetTeamAsync(sessionId, teamId);
+		var cfd = team.CfdContainers.ToList();
 
 		var result = new CfdGraphDto();
 		var i = 0;
@@ -219,7 +219,7 @@ public class GameSessionService : IGameSessionService
 				result.GraphPointsPerLabel["Готовы к поставке"] = new List<(int, int)>();
 			if (!result.GraphPointsPerLabel.ContainsKey("Поставлено"))
 				result.GraphPointsPerLabel["Поставлено"] = new List<(int, int)>();
-			
+
 			result.DaysToShow.Add(9 + i);
 			result.TotalTasksToShow.Add(day.WithAnalysts!.Value);
 			result.TotalTasksToShow.Add(day.WithProgrammers!.Value);
@@ -238,25 +238,38 @@ public class GameSessionService : IGameSessionService
 		return result;
 	}
 
-	public async Task<List<string>> GetReleaseTickets(Guid sessionId, Guid teamId)
+	public async Task<List<Ticket>> GetTicketsToRelease(Guid sessionId, Guid teamId)
 	{
-		var session = context.GameSessions.SingleOrDefault(x => x.Id == sessionId);
-		var team = session!.Teams.SingleOrDefault(x => x.Id == teamId);
-		var tickets = team!.BuildTakenTickets();
-		return tickets.Where(x => x.InWork()).Select(x => x.id).ToList();
-	}
+		var team = await context.GetTeamAsync(sessionId, teamId);
+		var tickets = team.BuildTakenTickets();
 
-	public async Task<List<string>> GetBacklogTickets(Guid sessionId, Guid teamId)
-	{
-		var session = context.GameSessions.SingleOrDefault(x => x.Id == sessionId);
-		var team = session!.Teams.SingleOrDefault(x => x.Id == teamId);
-		var tickets = team!.BuildTakenTickets().ToList();
-		return TicketDescriptors.AllTicketDescriptors
-			.Select(x => x.Id)
-			.Except(tickets.Select(x => x.id))
+		var previousDayNumber = team.CurrentDay.Number - 1;
+		return tickets
+			.Where(x => x.IsInWork(previousDayNumber))
+			.Where(
+				x => team.CurrentDay.ReleaseTicketContainer.CanReleaseNotImmediatelyTickets
+				  || TicketDescriptors.GetByTicketId(x.id).CanBeReleasedImmediately)
 			.ToList();
 	}
-	
+
+	public async Task<List<Ticket>> GetBacklogTickets(Guid sessionId, Guid teamId)
+	{
+		var team = await context.GetTeamAsync(sessionId, teamId);
+
+		var tickets = team.BuildTakenTickets();
+
+		var currentDayNumber = team.CurrentDay.Number;
+		var previousDayNumber = currentDayNumber - 1;
+		var ticketsTakenThisDay = tickets
+			.Where(ticket => !ticket.IsTaken(previousDayNumber) && ticket.IsTaken(currentDayNumber))
+			.ToList();
+
+		var ticketsNotTaken = TicketDescriptors.AllTicketDescriptors
+			.Where(x => tickets.All(t => t.id != x.Id))
+			.Select(t => new Ticket(t.Id, int.MaxValue, null));
+
+		return ticketsTakenThisDay.Concat(ticketsNotTaken).ToList();
+	}
 
 	public async Task<HubConnection?> FindCurrentConnection(Guid userId)
 	{

@@ -1,6 +1,7 @@
 ﻿using Domain.Attributes;
 using Domain.DomainExceptions;
 using Domain.Game.Days.Configurations;
+using Domain.Game.Tickets;
 using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Game.Days.DayContainers;
@@ -13,40 +14,46 @@ public class ReleaseTicketContainer : FreezableDayContainer
 
 	public IReadOnlyList<string> TicketIds => ticketIds;
 
-	internal ReleaseTicketContainer()
+	public bool CanReleaseNotImmediatelyTickets { get; private set; }
+
+	internal ReleaseTicketContainer(bool canReleaseNotImmediatelyTickets)
 	{
 		ticketIds = [];
+		CanReleaseNotImmediatelyTickets = canReleaseNotImmediatelyTickets;
+	}
+
+	internal void CanReleaseNotImmediately(bool canReleaseNotImmediatelyTickets = true)
+	{
+		CanReleaseNotImmediatelyTickets = canReleaseNotImmediatelyTickets;
 	}
 	
-	internal void Update(string ticketId)
+	internal void Update(TicketDescriptor ticket)
 	{
-		if (Frozen)
+		EnsureNotFrozen();
+		if (!CanReleaseNotImmediatelyTickets && !ticket.CanBeReleasedImmediately)
 		{
-			throw new DomainException("Cannot update frozen container");
+			throw new DomainException("Cannot release ticket in that state of day");
 		}
 
-		if (ticketIds.Contains(ticketId))
+		if (ticketIds.Contains(ticket.Id))
 		{
 			return;
 		}
 		
-		ticketIds.Add(ticketId);
+		ticketIds.Add(ticket.Id);
 		SetUpdated();
 	}
 	
-	internal void Remove(string ticketId)
+	internal void Remove(TicketDescriptor ticket)
 	{
-		if (Frozen)
-		{
-			throw new DomainException("Cannot update frozen container");
-		}
+		EnsureNotFrozen();
 
-		if (!ticketIds.Contains(ticketId))
+		if (!ticketIds.Contains(ticket.Id))
 		{
 			return;
 		}
 		
-		ticketIds.Remove(ticketId);
+		ticketIds.Remove(ticket.Id);
 		SetUpdated();
 	}
 }

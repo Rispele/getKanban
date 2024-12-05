@@ -12,6 +12,8 @@ public class ReleaseTicketContainerEntityTypeConfiguration : IEntityTypeConfigur
 		
 		builder.ConfigureAsFreezableDayContainer();
 
+		builder.Property(t => t.CanReleaseNotImmediatelyTickets);
+
 		builder
 			.Property("ticketIds")
 			.IsRequired()

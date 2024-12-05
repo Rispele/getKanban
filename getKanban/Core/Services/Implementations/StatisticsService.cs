@@ -22,7 +22,7 @@ public class StatisticsService : IStatisticsService
 		var team = await context.GetTeamAsync(gameSessionId, teamId);
 
 		var takenTickets = team.BuildTakenTickets();
-		var clientsGainedPerDay = EvaluateClientsGainedPerDay(takenTickets);
+		var clientsGainedPerDay = EvaluateClientsGainedPerDay(takenTickets, team.CurrentDay.Number);
 		var profitPerClientPerDay = team.Days.ToDictionary(day => day.Number, day => day.DaySettings.ProfitPerClient);
 
 		var firstDayNumber = team.Days.Select(d => d.Number).Min();
@@ -111,12 +111,12 @@ public class StatisticsService : IStatisticsService
 		return clientsPerDay;
 	}
 
-	private static Dictionary<int, int> EvaluateClientsGainedPerDay(HashSet<Ticket> takenTickets)
+	private static Dictionary<int, int> EvaluateClientsGainedPerDay(HashSet<Ticket> takenTickets, int currentDayNumber)
 	{
 		var ticketDescriptors = TicketDescriptors.AllTicketDescriptors.ToDictionary(d => d.Id, t => t);
 
 		return takenTickets
-			.Where(ticket => ticket.IsReleased())
+			.Where(ticket => ticket.IsReleased(currentDayNumber))
 			.OrderBy(ticket => ticket.releaseDay!)
 			.Select(ticket => (releaseDay: ticket.releaseDay!.Value, clientsGained: GetClientsGainedByTicket(ticket)))
 			.GroupBy(ticket => ticket.releaseDay)

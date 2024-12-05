@@ -16,30 +16,34 @@ public static class DomainContextExtensions
 	
 	public static Task<GameSession?> FindGameSessionsAsync(this DomainContext context, Guid gameSessionId)
 	{
-		return context.GameSessions.SingleOrDefaultAsync(g => g.Id == gameSessionId);
+		return context.GameSessions
+			.Where(g => g.Id == gameSessionId)
+			.FirstOrDefaultAsync();
 	}
 
 	public static async Task<Team> GetTeamAsync(this DomainContext teamsContext, Guid gameSessionId, Guid teamId)
 	{
-		var team = await teamsContext.Teams.SingleOrDefaultAsync(
-			t => t.GameSessionId == gameSessionId && t.Id == teamId);
+		var team = await teamsContext.FindTeamAsync(gameSessionId, teamId);
 		return team ?? throw new InvalidOperationException($"Team with id {teamId} not found");
 	}
 
 	public static Task<Team?> FindTeamAsync(this DomainContext teamsContext, Guid gameSessionId, Guid teamId)
 	{
-		return teamsContext.Teams.SingleOrDefaultAsync(t => t.GameSessionId == gameSessionId && t.Id == teamId);
+		return teamsContext.Teams
+			.Where(t => t.GameSessionId == gameSessionId && t.Id == teamId)
+			.Take(1)
+			.FirstOrDefaultAsync();
 	}
 
 	public static async Task<User> GetUserAsync(this DomainContext usersContext, Guid userId)
 	{
-		var user = await usersContext.Users.SingleOrDefaultAsync(t => t.Id == userId);
+		var user = await usersContext.Users.Where(t => t.Id == userId).FirstOrDefaultAsync();
 		return user ?? throw new InvalidOperationException("User not found");
 	}
 	
 	public static async Task CloseRecruitmentAsync(this DomainContext gameSessionContext, Guid sessionId)
 	{
-		var session = await gameSessionContext.GameSessions.SingleOrDefaultAsync(x => x.Id == sessionId);
+		var session = await gameSessionContext.GetGameSessionsAsync(sessionId);
 		if (session is { IsRecruitmentFinished: false })
 		{
 			session.IsRecruitmentFinished = true;

@@ -1,10 +1,14 @@
-﻿namespace Core.Dtos;
+﻿using Domain.Game;
+
+namespace Core.Dtos;
 
 public class TicketsViewDto
 {
-	public string PageType { get; set; }
+	public string PageType { get; init; }
+	
+	public int CurrentDayNumber { get; init; }
 
-	public Guid SessionId { get; set; }
+	public Guid SessionId { get; init; }
 
-	public List<string> TicketIds { get; set; }
+	public List<Ticket> TicketIds { get; init; }
 }

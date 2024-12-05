@@ -1,4 +1,4 @@
-@model (Guid? sessionId, int dayNumber)
+@model (Guid sessionId, int dayNumber)
 
 <div class="stepHeader">
     <h1 class="fs-1 fw- text-center">Команда pipipupu. День @Model.dayNumber</h1>
@@ -26,7 +26,10 @@
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
     const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
-    connection.start();
+    connection.start()
+        .then(function () {
+            connection.invoke("Join", "@Model.sessionId");
+        });
     connection.on("NotifyPageChange", function (page, stage) {
         window.location.href = `/step/${page}/${stage}`;
     });
