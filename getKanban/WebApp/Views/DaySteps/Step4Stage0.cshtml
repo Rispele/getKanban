@@ -1,7 +1,7 @@
-﻿@model Guid?
+﻿@model (Guid? sessionId, int dayNumber)
 
 <div class="stepHeader">
-    <h1 class="fs-1 fw- text-center">Команда pipipupu. День 9</h1>
+    <h1 class="fs-1 fw- text-center">Команда pipipupu. День @Model.dayNumber</h1>
 </div>
 
 <div class="infoContainer height-large centered-100">
@@ -31,13 +31,13 @@
         window.location.href = `/step/${page}/${stage}`;
     });
     document.getElementById("prev").addEventListener('click', function () {
-        connection.invoke("ChangePage", "@Model", 3, 0)
+        connection.invoke("ChangePage", "@Model.sessionId", 3, 0)
             .then(function () {
                 window.location.href = `/step/3`;
             });
     });
     document.getElementById("next").addEventListener('click', function () {
-        connection.invoke("ChangePage", "@Model", 4, 1)
+        connection.invoke("ChangePage", "@Model.sessionId", 4, 1)
             .then(function () {
                 window.location.href = `/step/4/1`;
             });

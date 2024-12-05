@@ -1,7 +1,7 @@
-@model Guid?
+@model (Guid? sessionId, int dayNumber)
 
 <div class="stepHeader">
-    <h1 class="fs-1 fw- text-center">Команда pipipupu. День 9</h1>
+    <h1 class="fs-1 fw- text-center">Команда pipipupu. День @Model.dayNumber</h1>
 </div>
 
 <div class="infoContainer height-large centered-100">
@@ -32,7 +32,7 @@
     });
 
     document.getElementById("prev").addEventListener('click', function () {
-        connection.invoke("ChangePage", "@Model", 7, 0)
+        connection.invoke("ChangePage", "@Model.sessionId", 7, 0)
             .then(function () {
                 window.location.href = `/step/7`;
             });
@@ -42,7 +42,7 @@
             method: 'POST',
             headers: { "Content-Type": "application/json" },
         }).then(function () {
-            connection.invoke("ChangePage", "@Model", 1, 0)
+            connection.invoke("ChangePage", "@Model.sessionId", 1, 0)
                 .then(function () {
                     window.location.href = `/step/1`;
                 });

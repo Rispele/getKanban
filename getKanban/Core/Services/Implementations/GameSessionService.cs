@@ -224,7 +224,7 @@ public class GameSessionService : IGameSessionService
 		var session = context.GameSessions.SingleOrDefault(x => x.Id == sessionId);
 		var team = session!.Teams.SingleOrDefault(x => x.Id == teamId);
 		var tickets = team!.BuildTakenTickets();
-		return tickets.Select(x => x.id).ToList();
+		return tickets.Where(x => x.InWork()).Select(x => x.id).ToList();
 	}
 
 	public async Task<List<string>> GetBacklogTickets(Guid sessionId, Guid teamId)

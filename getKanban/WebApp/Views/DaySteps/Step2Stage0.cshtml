@@ -1,9 +1,9 @@
 ﻿@using Core.Dtos.Containers.RollDice
 @using Core.Dtos.Containers.TeamMembers
-@model (Guid? currentSessionId, RollDiceContainerDto diceResults)
+@model (Guid? currentSessionId, int dayNumber, RollDiceContainerDto diceResults)
 
 <div class="stepHeader">
-    <h1 class="fs-1 fw- text-center">Команда pipipupu. День 9</h1>
+    <h1 class="fs-1 fw- text-center">Команда pipipupu. День @Model.dayNumber</h1>
 </div>
 
 @functions

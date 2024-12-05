@@ -133,7 +133,6 @@ public class DayDtoConverter
 		return awaitedCommandsList.Select(
 			x => new AwaitedEventsDto()
 			{
-				Removed = x.Removed,
 				CommandType = x.CommandType
 			}).ToList();
 	}
