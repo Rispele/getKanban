@@ -1,24 +1,65 @@
 ﻿@model Core.Dtos.AdminPanelDaysDto
 
-<div>
-    <p>Команда: @Model.TeamName</p>
-    <img src="/images/edit_button.png">
+@* <div> *@
+@*     <p>Команда: @Model.TeamName</p> *@
+@*     <img src="/images/edit_button.png"> *@
+@* *@
+@*     @for (var i = Model.StartDayNumber; i < Model.CurrentDay.Number; i++) *@
+@*     { *@
+@*         <p class="finished">День @i</p> *@
+@*     } *@
+@*      *@
+@*     <img src="/images/restart_button.png"> *@
+@*     <p class="inProcess">День @Model.CurrentDay.Number</p> *@
+@*     <img src="/images/edit_button.png" id="day-edit"> *@
+@*      *@
+@*     @for (var i = Model.CurrentDay.Number + 1; i < Model.FinishDayNumber + 1; i++) *@
+@*     { *@
+@*         <p class="notStartedYet">День @i</p> *@
+@*     } *@
+@* *@
+@*     <button class="back-button">Назад</button> *@
+@* </div> *@
 
-    @for (var i = Model.StartDayNumber; i < Model.CurrentDay.Number; i++)
-    {
-        <p class="finished">День @i</p>
-    }
-    
-    <img src="/images/restart_button.png">
-    <p class="inProcess">День @Model.CurrentDay.Number</p>
-    <img src="/images/edit_button.png" id="day-edit">
-    
-    @for (var i = Model.CurrentDay.Number + 1; i < Model.FinishDayNumber + 1; i++)
-    {
-        <p class="notStartedYet">День @i</p>
-    }
+<div class="container4">
+    <h1 class="fs-1 text-center">Команда: @Model.TeamName</h1>
+    <h1 class="fs-4 text-center">Выберите день для изменения</h1>
+    <hr class="divider">
+    <div class="container2">
 
-    <button class="back-button">Назад</button>
+        @for (var i = Model.StartDayNumber; i < Model.CurrentDay.Number; i++)
+        {
+            <div class="checkboxCardsMargin">
+                <div class="checkboxCardContainer previousDayStyle">
+                    <div class="checkboxCardContent">
+                        <h2 class="checkboxCardNumber">День @i</h2>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div class="checkboxCardsMargin">
+            <div class="checkboxCardContainer currentDayStyle">
+                <div class="checkboxCardContent">
+                    <h2 class="checkboxCardNumber">День 12</h2>
+                    <img class="retry" src="images/restart_button.png" alt="retry">
+                    <img class="copy" src="images/copy_button.jpg" alt="copy">
+                </div>
+            </div>
+        </div>
+
+        @for (var i = Model.CurrentDay.Number + 1; i < Model.FinishDayNumber + 1; i++)
+        {
+            <div class="checkboxCardsMargin">
+                <div class="checkboxCardContainer">
+                    <div class="checkboxCardContent">
+                        <h2 class="checkboxCardNumber">День @i</h2>
+                    </div>
+                </div>
+            </div>
+        }
+
+    </div>
 </div>
 
 <script>

@@ -28,7 +28,7 @@ public class TeamEntityTypeConfiguration : IEntityTypeConfiguration<Team>
 			.HasMany<Day>("days")
 			.WithOne();
 
-		builder.Ignore("settings");
+		builder.Ignore(t => t.Settings);
 		
 		// builder
 		// 	.HasOne<TeamSessionSettings>("settings")

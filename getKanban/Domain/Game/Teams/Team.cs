@@ -46,7 +46,7 @@ public partial class Team
 	[UsedImplicitly]
 	private Team()
 	{
-		settings = TeamSessionSettings.Default();
+		Settings = TeamSessionSettings.Default();
 	}
 
 	public Team(Guid gameSessionId, string name)
@@ -54,7 +54,7 @@ public partial class Team
 	{
 		Id = Guid.NewGuid();
 		GameSessionId = gameSessionId;
-		settings = TeamSessionSettings.Default();
+		Settings = TeamSessionSettings.Default();
 		
 		Name = name;
 		Players = new ParticipantsContainer(gameSessionId, Id);

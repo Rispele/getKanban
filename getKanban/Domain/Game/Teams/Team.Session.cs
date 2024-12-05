@@ -10,7 +10,7 @@ namespace Domain.Game.Teams;
 
 public partial class Team
 {
-	private readonly TeamSessionSettings settings = null!;
+	public readonly TeamSessionSettings Settings = null!;
 
 	private int currentDayNumber;
 	private List<Day> days { get; } = null!;
@@ -64,12 +64,23 @@ public partial class Team
 							? Ticket.Create(t, d.Number, releasedDayNumber)
 							: Ticket.Create(t, d.Number)));
 
-		return settings.InitiallyTakenTickets
+		return Settings.InitiallyTakenTickets
 			.Select(
 				t => releasedTickets.TryGetValue(t.id, out var releasedDayNumber)
 					? Ticket.Create(t.id, t.takingDay, releasedDayNumber)
 					: Ticket.Create(t.id, t.takingDay))
 			.Concat(takenTickets).ToHashSet();
+	}
+
+	public bool IsTicketDoneInTimeOrTimeNotExceeded(string ticketId, int beforeDayInclusive)
+	{
+		var ticket = BuildTakenTickets().SingleOrDefault(t => t.id == ticketId);
+		if (ticket == null || ticket.InWork())
+		{
+			return currentDayNumber <= beforeDayInclusive;
+		}
+		
+		return ticket.releaseDay!.Value <= beforeDayInclusive;
 	}
 
 	public int BuildAnotherTeamScores(List<Day> daysToProcess)
@@ -84,7 +95,7 @@ public partial class Team
 
 	internal HashSet<string> GetTakenTicketIds(IReadOnlyList<Day> daysToProcess)
 	{
-		return settings.InitiallyTakenTickets.Select(t => t.id)
+		return Settings.InitiallyTakenTickets.Select(t => t.id)
 			.Concat(daysToProcess.SelectMany(d => d.UpdateSprintBacklogContainer.TicketIds))
 			.ToHashSet();
 	}
@@ -99,30 +110,30 @@ public partial class Team
 	private Day ConfigureDay(int dayNumber, List<Day> daysToProcess)
 	{
 		var takenTickets = GetTakenTicketIds(daysToProcess);
-		var endOfReleaseCycle = dayNumber % settings.ReleaseCycleLength == 0;
+		var endOfReleaseCycle = dayNumber % Settings.ReleaseCycleLength == 0;
 
 		var shouldRelease = endOfReleaseCycle || takenTickets.Contains(TicketDescriptors.AutoRelease.Id);
-		var shouldUpdateSpringBacklog = endOfReleaseCycle || dayNumber >= settings.UpdateSprintBacklogEveryDaySince;
-		var anotherTeamAppeared = dayNumber > settings.AnotherTeamShouldWorkSince
-		                       && BuildAnotherTeamScores(daysToProcess) < settings.ScoresAnotherTeamShouldGain;
+		var shouldUpdateSpringBacklog = endOfReleaseCycle || dayNumber >= Settings.UpdateSprintBacklogEveryDaySince;
+		var anotherTeamAppeared = dayNumber > Settings.AnotherTeamShouldWorkSince
+		                       && BuildAnotherTeamScores(daysToProcess) < Settings.ScoresAnotherTeamShouldGain;
 
 		var scenario = ScenarioBuilder.Create()
 			.DefaultScenario(anotherTeamAppeared, shouldRelease, shouldUpdateSpringBacklog)
 			.Build();
 
-		var testersNumber = dayNumber >= settings.IncreaseTestersNumberSince
-			? settings.IncreasedTestersNumber
-			: settings.DefaultTestersNumber;
+		var testersNumber = dayNumber >= Settings.IncreaseTestersNumberSince
+			? Settings.IncreasedTestersNumber
+			: Settings.DefaultTestersNumber;
 
 		var daySettings = new DaySettings
 		{
 			Number = dayNumber,
 
-			AnalystsCount = settings.AnalystsNumber,
-			ProgrammersCount = settings.ProgrammersNumber,
+			AnalystsCount = Settings.AnalystsNumber,
+			ProgrammersCount = Settings.ProgrammersNumber,
 			TestersCount = testersNumber,
 
-			ProfitPerClient = settings.GetProfitPerDay(dayNumber)
+			ProfitPerClient = Settings.GetProfitPerDay(dayNumber)
 		};
 
 		return new Day(daySettings, scenario);
