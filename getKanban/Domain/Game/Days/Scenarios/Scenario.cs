@@ -58,7 +58,12 @@ public class Scenario
 
 		bool ValueMatch(object? value)
 		{
-			if (condition.parameterValue is ScenarioItemConditions.NotNull)
+			if (condition.conditions is ScenarioItemConditions.Null)
+			{
+				return value is null;
+			}
+			
+			if (condition.conditions is ScenarioItemConditions.NotNull)
 			{
 				return value is not null;
 			}

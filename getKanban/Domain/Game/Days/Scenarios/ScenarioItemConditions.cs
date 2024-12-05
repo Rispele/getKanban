@@ -2,5 +2,6 @@
 
 public enum ScenarioItemConditions
 {
-	NotNull
+	NotNull,
+	Null
 }

@@ -14,9 +14,9 @@ public class ScenarioItemBuilder
 		return this;
 	}
 
-	public ScenarioItemBuilder WithCondition(string parameterName, object? parameterValue)
+	public ScenarioItemBuilder WithCondition(string parameterName, object? parameterValue, ScenarioItemConditions? condition)
 	{
-		itemConditions.Add(new ScenarioItemCondition(parameterName, parameterValue));
+		itemConditions.Add(new ScenarioItemCondition(parameterName, parameterValue, condition));
 		return this;
 	}
 

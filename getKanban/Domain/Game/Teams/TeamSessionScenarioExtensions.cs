@@ -33,11 +33,11 @@ public static class TeamSessionScenarioExtensions
 				builder => builder.ReAwaitUpdateCfdIfNull("WithProgrammers"),
 				builder => builder.ReAwaitUpdateCfdIfNull("WithAnalysts"),
 				builder => builder.AwaitCommands(DayCommandType.UpdateCfd, DayCommandType.EndDay)
-					.WithCondition("Released", ScenarioItemConditions.NotNull)
-					.WithCondition("ToDeploy", ScenarioItemConditions.NotNull)
-					.WithCondition("WithTesters", ScenarioItemConditions.NotNull)
-					.WithCondition("WithProgrammers", ScenarioItemConditions.NotNull)
-					.WithCondition("WithAnalysts", ScenarioItemConditions.NotNull)
+					.WithCondition("Released", null, ScenarioItemConditions.NotNull)
+					.WithCondition("ToDeploy", null, ScenarioItemConditions.NotNull)
+					.WithCondition("WithTesters", null, ScenarioItemConditions.NotNull)
+					.WithCondition("WithProgrammers", null, ScenarioItemConditions.NotNull)
+					.WithCondition("WithAnalysts", null, ScenarioItemConditions.NotNull)
 					.RemoveAwaited(DayCommandType.UpdateCfd))
 			.For(DayCommandType.EndDay, b => b);
 		return scenarioBuilder;
@@ -55,7 +55,7 @@ public static class TeamSessionScenarioExtensions
 		DayCommandType type,
 		string parameterName)
 	{
-		return builder.ReAwaitCommand(type).WithCondition(parameterName, null);
+		return builder.ReAwaitCommand(type).WithCondition(parameterName, null, ScenarioItemConditions.Null);
 	}
 
 	private static DayCommandType[] ConfigureInitiallyAwaitedCommands(bool anotherTeamAppeared)
