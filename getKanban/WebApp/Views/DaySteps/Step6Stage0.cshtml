@@ -1,4 +1,4 @@
-﻿
+﻿@model Guid?
 
 <div class="container3">
     <h1 class="title">Заполните таблицу, отметив сколько тикетов на доске на данный момент</h1>
@@ -43,7 +43,14 @@
     </button>
 </div>
 
+<script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
+    const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
+    connection.start();
+    connection.on("NotifyPageChange", function (page, stage) {
+        window.location.href = `/step/${page}/${stage}`;
+    });
+    
     document.getElementById('save-cfd').addEventListener('click', function () {
         const released = document.getElementById('released').value;
         const toDeploy = document.getElementById('to-deploy').value;
@@ -64,8 +71,12 @@
                 withAnalysts: withAnalysts
             })
         }).then(function () {
-            window.location.href = `/step/6/1`
+            connection.invoke("ChangePage", "@Model", 6, 1)
+                .then(function () {
+                    window.location.href = `/step/6/1`;
+                });
         });
     });
     
+
 </script>

@@ -1,0 +1,52 @@
+@model Guid?
+
+<div class="stepHeader">
+    <h1 class="fs-1 fw- text-center">Команда pipipupu. День 9</h1>
+</div>
+
+<div class="infoContainer height-large centered-100">
+    <h1 class="fs-4 text-center">
+        Событие
+    </h1>
+
+    <div class="info height-small centered-100">
+        <p class="fs-5 fw-normal">Обсудите в команде каковы потери, если F1 будет поставлен слишком поздно?</p>
+        <p class="fs-5 fw-normal">А если слишком рано?</p>
+    </div>
+</div>
+
+<button class="stepControlButtons rightButton" id="prev">
+    Назад
+</button>
+
+<button class="stepControlButtons rightButton" id="next-day">
+    Следующий день
+</button>
+
+<script src="/js/signalr/dist/browser/signalr.js"></script>
+<script>
+    const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
+    connection.start();
+    connection.on("NotifyPageChange", function (page, stage) {
+        window.location.href = `/step/${page}/${stage}`;
+    });
+
+    document.getElementById("prev").addEventListener('click', function () {
+        connection.invoke("ChangePage", "@Model", 7, 0)
+            .then(function () {
+                window.location.href = `/step/7`;
+            });
+    });
+    document.getElementById("next-day").addEventListener('click', function () {
+        fetch(`/step/end-day`, {
+            method: 'POST',
+            headers: { "Content-Type": "application/json" },
+        }).then(function () {
+            connection.invoke("ChangePage", "@Model", 1, 0)
+                .then(function () {
+                    window.location.href = `/step/1`;
+                });
+        })
+    });
+
+</script>

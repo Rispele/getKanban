@@ -203,12 +203,17 @@ public class GameSessionService : IGameSessionService
 				result.GraphPointsPerLabel["Поставлено"] = new List<(int, int)>();
 			
 			result.DaysToShow.Add(9 + i);
-			result.TotalTasksToShow.Add(20);
+			result.TotalTasksToShow.Add(day.WithAnalysts!.Value);
+			result.TotalTasksToShow.Add(day.WithProgrammers!.Value);
+			result.TotalTasksToShow.Add(day.WithTesters!.Value);
+			result.TotalTasksToShow.Add(day.ToDeploy!.Value);
+			result.TotalTasksToShow.Add(day.Released!.Value);
 			result.GraphPointsPerLabel["Работа аналитиков"].Add((9 + i, day.WithAnalysts!.Value));
 			result.GraphPointsPerLabel["Работа разработчиков"].Add((9 + i, day.WithProgrammers!.Value));
 			result.GraphPointsPerLabel["Работа тестировщиков"].Add((9 + i, day.WithTesters!.Value));
 			result.GraphPointsPerLabel["Готовы к поставке"].Add((9 + i, day.ToDeploy!.Value));
 			result.GraphPointsPerLabel["Поставлено"].Add((9 + i, day.Released!.Value));
+			i++;
 		}
 
 		return result;

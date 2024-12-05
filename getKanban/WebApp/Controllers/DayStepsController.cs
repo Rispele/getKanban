@@ -1,4 +1,5 @@
-﻿using Core.Services.Contracts;
+﻿using Core.Dtos;
+using Core.Services.Contracts;
 using Domain.Game.Days.Commands;
 using Domain.Game.Days.DayContainers;
 using Domain.Game.Days.DayContainers.TeamMembers;
@@ -121,7 +122,25 @@ public class DayStepsController : Controller
 		var currentTeam = await gameSessionService.GetCurrentTeam(
 			RequestContextFactory.Build(Request),
 			sessionId!.Value);
-		return View((sessionId, await gameSessionService.GetReleaseTickets(sessionId!.Value, currentTeam.Id)));
+
+		var ticketIds = await gameSessionService.GetReleaseTickets(sessionId!.Value, currentTeam.Id);
+		var pageTypeNumber = (ticketIds.Any(x => x.Contains('S')) ? 1 : 0) +
+		               (ticketIds.Any(x => x.Contains('I')) ? 1 : 0) +
+		               (ticketIds.Any(x => x.Contains('E') || x.Contains('F')) ? 1 : 0);
+		var pageType = pageTypeNumber switch
+		{
+			1 => "Single",
+			2 => "Double",
+			3 => "Triple",
+			_ => null
+		};
+
+		return View(new TicketsViewDto
+			{
+				SessionId = sessionId!.Value,
+				PageType = pageType!,
+				TicketIds = ticketIds
+			});
 	}
 
 	public class TicketModel
@@ -179,7 +198,25 @@ public class DayStepsController : Controller
 		var currentTeam = await gameSessionService.GetCurrentTeam(
 			RequestContextFactory.Build(Request),
 			sessionId!.Value);
-		return View((sessionId, await gameSessionService.GetBacklogTickets(sessionId!.Value, currentTeam.Id)));
+		
+		var ticketIds = await gameSessionService.GetBacklogTickets(sessionId!.Value, currentTeam.Id);
+		var pageTypeNumber = (ticketIds.Any(x => x.Contains('S')) ? 1 : 0) +
+		                     (ticketIds.Any(x => x.Contains('I')) ? 1 : 0) +
+		                     (ticketIds.Any(x => x.Contains('E') || x.Contains('F')) ? 1 : 0);
+		var pageType = pageTypeNumber switch
+		{
+			1 => "Single",
+			2 => "Double",
+			3 => "Triple",
+			_ => null
+		};
+
+		return View(new TicketsViewDto
+		{
+			SessionId = sessionId!.Value,
+			PageType = pageType!,
+			TicketIds = ticketIds
+		});
 	}
 	
 	[HttpPost("update-sprint-backlog")]
@@ -219,9 +256,9 @@ public class DayStepsController : Controller
 	
 	[HttpGet("6")]
 	[HttpGet("6/0")]
-	public IActionResult Step6Stage0()
+	public async Task<IActionResult> Step6Stage0()
 	{
-		return View();
+		return View(await gameSessionService.FindCurrentSessionId(RequestContextFactory.Build(Request)));
 	}
 
 	[HttpPost("update-cfd")]
@@ -276,7 +313,38 @@ public class DayStepsController : Controller
 			currentSessionId!.Value);
 
 		var cfd = await gameSessionService.GetCfdDataForTeam(currentSessionId!.Value, currentTeam.Id);
+		cfd.SessionId = currentSessionId!.Value;
 		
 		return View(cfd);
+	}
+
+	[HttpGet("7")]
+	[HttpGet("7/0")]
+	public async Task<IActionResult> Step7Stage0()
+	{
+		return View(await gameSessionService.FindCurrentSessionId(RequestContextFactory.Build(Request)));
+	}
+
+	[HttpGet("7/1")]
+	public async Task<IActionResult> Step7Stage1()
+	{
+		return View(await gameSessionService.FindCurrentSessionId(RequestContextFactory.Build(Request)));
+	}
+
+	[HttpPost("end-day")]
+	public async Task EndDay()
+	{
+		var currentSessionId = await gameSessionService.FindCurrentSessionId(RequestContextFactory.Build(Request));
+		var currentUser = await gameSessionService.GetCurrentUser(RequestContextFactory.Build(Request));
+		var currentTeam = await gameSessionService.GetCurrentTeam(
+			RequestContextFactory.Build(Request),
+			currentSessionId!.Value);
+		
+		await teamService.PatchDayAsync(
+			currentSessionId!.Value,
+			currentTeam!.Id,
+			currentUser.Id,
+			new EndDayCommand()
+		);
 	}
 }
