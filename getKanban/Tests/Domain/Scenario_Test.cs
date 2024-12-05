@@ -52,7 +52,7 @@ public class Scenario_Test
 		var scenario = ScenarioBuilder.Create()
 			.For(
 				DayCommandType.UpdateTeamRoles,
-				b => b.AwaitCommands(DayCommandType.UpdateCfd).WithCondition("param", true))
+				b => b.AwaitCommands(DayCommandType.UpdateCfd).WithCondition("param", true, null))
 			.Build();
 
 		var nextAwaited = scenario.GetNextAwaited(DayCommandType.UpdateTeamRoles, new { param = true });
@@ -66,7 +66,7 @@ public class Scenario_Test
 		var scenario = ScenarioBuilder.Create()
 			.For(
 				DayCommandType.UpdateTeamRoles,
-				b => b.AwaitCommands(DayCommandType.UpdateCfd).WithCondition("param", true))
+				b => b.AwaitCommands(DayCommandType.UpdateCfd).WithCondition("param", true, null))
 			.Build();
 
 		var nextAwaited = scenario.GetNextAwaited(DayCommandType.UpdateTeamRoles, new { param = false });
@@ -82,8 +82,8 @@ public class Scenario_Test
 				DayCommandType.UpdateTeamRoles,
 				b => b
 					.AwaitCommands(DayCommandType.UpdateCfd)
-					.WithCondition("param1", true)
-					.WithCondition("param2", true))
+					.WithCondition("param1", true, null)
+					.WithCondition("param2", true, null))
 			.Build();
 
 		var nextAwaited = scenario
@@ -100,8 +100,8 @@ public class Scenario_Test
 				DayCommandType.UpdateTeamRoles,
 				b => b
 					.AwaitCommands(DayCommandType.UpdateCfd)
-					.WithCondition("param1", true)
-					.WithCondition("param2", true))
+					.WithCondition("param1", true, null)
+					.WithCondition("param2", true, null))
 			.Build();
 
 		var nextAwaited = scenario
