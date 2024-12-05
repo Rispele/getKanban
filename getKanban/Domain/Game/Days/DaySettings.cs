@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Domain.Game.Days.Configurations;
+using Microsoft.EntityFrameworkCore;
 
 namespace Domain.Game.Days;
 

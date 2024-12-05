@@ -1,79 +1,77 @@
-﻿using Domain.Game.Days.Commands;
+﻿using System.Reflection;
+using Domain.Game.Days.Commands;
+using Domain.Game.Days.Scenarios.Services;
 using Newtonsoft.Json;
 
 namespace Domain.Game.Days.Scenarios;
 
 public class Scenario
 {
-	[JsonProperty] 
-	private readonly Dictionary<DayCommandType, ScenarioItem[]> scenario;
-	
-	[JsonProperty]
-	public DayCommandType[] InitiallyAwaitedCommands { get; init; }
+	[JsonProperty] private readonly Dictionary<DayCommandType, ScenarioItem[]> scenario;
 
-	public Scenario(Dictionary<DayCommandType, ScenarioItem[]> scenario, DayCommandType[] initiallyAwaitedCommands)
+	[JsonProperty] public DayCommandType[] InitiallyAwaitedCommands { get; init; }
+
+	[JsonIgnore] private readonly IScenarioService scenarioService;
+
+	public Scenario(
+		Dictionary<DayCommandType, ScenarioItem[]> scenario,
+		DayCommandType[] initiallyAwaitedCommands,
+		IScenarioService scenarioService)
 	{
 		InitiallyAwaitedCommands = initiallyAwaitedCommands;
 		this.scenario = scenario;
+		this.scenarioService = scenarioService;
+	}
+
+	public Scenario CopyWithService(IScenarioService service)
+	{
+		return new Scenario(scenario, InitiallyAwaitedCommands, service);
 	}
 
 	public (DayCommandType[] toAdd, DayCommandType[] toRemove) GetNextAwaited(
 		DayCommandType dayCommandType,
-		object? parameters)
+		params object?[] parameters)
 	{
 		var items = scenario[dayCommandType];
 		var itemsMatched = items
-			.Where(item => MatchConditions(parameters, item.conditions))
+			.Where(item => MatchValidationMethod(item.validationMethodName, parameters))
 			.ToArray();
 		return (
 			itemsMatched.SelectMany(item => item.ToAdd).Distinct().ToArray(),
 			itemsMatched.SelectMany(item => item.ToRemove).Distinct().ToArray());
 	}
 
-	private bool MatchConditions(object? parameters, ScenarioItemCondition[] conditions)
+	private bool MatchValidationMethod(string? validationMethodName, params object?[] parameters)
 	{
-		if (parameters is null)
+		if (validationMethodName == null)
 		{
-			return conditions.Length == 0;
+			return true;
 		}
 
-		return conditions.All(c => MatchCondition(parameters, c));
-	}
-
-	private bool MatchCondition(object parameters, ScenarioItemCondition condition)
-	{
-		var property = parameters.GetType().GetProperty(condition.parameterName);
-		if (property is not null)
+		var method = scenarioService.GetType().GetMethod(validationMethodName);
+		if (method == null)
 		{
-			return ValueMatch(property.GetValue(parameters));
+			throw new ArgumentException($"Method {validationMethodName} not found");
 		}
 
-		var field = parameters.GetType().GetField(condition.parameterName);
-		if (field is not null)
+		try
 		{
-			return ValueMatch(field.GetValue(parameters));
+			var result = method.Invoke(scenarioService, parameters);
+
+			if (result == null)
+			{
+				return false;
+			}
+
+			return (bool)result;
 		}
-
-		return false;
-
-		bool ValueMatch(object? value)
+		catch (TargetInvocationException)
 		{
-			if (condition.conditions is ScenarioItemConditions.Null)
-			{
-				return value is null;
-			}
-			
-			if (condition.conditions is ScenarioItemConditions.NotNull)
-			{
-				return value is not null;
-			}
-
-			if (value is null)
-			{
-				return condition.parameterValue is null;
-			}
-
-			return value.Equals(condition.parameterValue);
+			throw;
+		}
+		catch
+		{
+			return false;
 		}
 	}
 }

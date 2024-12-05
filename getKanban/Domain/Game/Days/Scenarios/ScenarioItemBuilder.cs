@@ -5,18 +5,12 @@ namespace Domain.Game.Days.Scenarios;
 public class ScenarioItemBuilder
 {
 	private readonly List<DayCommandType> commandTypesAwaited = [];
-	private readonly List<ScenarioItemCondition> itemConditions = [];
 	private readonly List<DayCommandType> commandTypesAwaitedToRemove = [];
+	private string? validationMethodName;
 
 	public ScenarioItemBuilder AwaitCommands(params DayCommandType[] eventTypes)
 	{
 		commandTypesAwaited.AddRange(eventTypes);
-		return this;
-	}
-
-	public ScenarioItemBuilder WithCondition(string parameterName, object? parameterValue, ScenarioItemConditions? condition)
-	{
-		itemConditions.Add(new ScenarioItemCondition(parameterName, parameterValue, condition));
 		return this;
 	}
 
@@ -33,12 +27,18 @@ public class ScenarioItemBuilder
 		return this;
 	}
 
+	public ScenarioItemBuilder WithValidationMethod(string validationMethod)
+	{
+		validationMethodName = validationMethod;
+		return this;
+	}
+
 	public ScenarioItem Build()
 	{
 		return new ScenarioItem(
 			commandTypesAwaited.ToArray(),
-			itemConditions.ToArray(),
-			commandTypesAwaitedToRemove.ToArray());
+			commandTypesAwaitedToRemove.ToArray(),
+			validationMethodName);
 	}
 
 	public static implicit operator ScenarioItem(ScenarioItemBuilder builder)

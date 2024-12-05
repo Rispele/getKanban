@@ -85,14 +85,19 @@ public partial class Team
 		return ticket.releaseDay!.Value <= deadlineInclusive;
 	}
 
-	public int BuildAnotherTeamScores(List<Day> daysToProcess)
+	public int BuildAnotherTeamScores()
 	{
-		return daysToProcess.Select(d => d.WorkAnotherTeamContainer?.ScoresNumber ?? 0).Sum();
+		return BuildAnotherTeamScores(days);
 	}
 
 	public bool IsCurrentDayCfdValid()
 	{
 		return CurrentDay.IsCfdValid(PreviousDay?.UpdateCfdContainer ?? UpdateCfdContainer.None);
+	}
+
+	internal int BuildAnotherTeamScores(IReadOnlyCollection<Day> daysToProcess)
+	{
+		return daysToProcess.Select(d => d.WorkAnotherTeamContainer?.ScoresNumber ?? 0).Sum();
 	}
 
 	internal HashSet<string> GetTakenTicketIds(IReadOnlyList<Day> daysToProcess)
@@ -121,7 +126,7 @@ public partial class Team
 
 		var shouldRelease = endOfReleaseCycle || releasedTickets.Contains(TicketDescriptors.AutoRelease.Id);
 		var shouldUpdateSpringBacklog = endOfReleaseCycle || dayNumber >= Settings.UpdateSprintBacklogEveryDaySince;
-		var anotherTeamAppeared = dayNumber >= Settings.AnotherTeamShouldWorkSince
+		var anotherTeamAppeared = dayNumber > Settings.AnotherTeamShouldWorkSince
 		                       && BuildAnotherTeamScores(daysToProcess) < Settings.ScoresAnotherTeamShouldGain;
 
 		var scenario = ScenarioBuilder.Create()

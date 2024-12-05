@@ -1,6 +1,7 @@
 ﻿using Domain.Game.Days;
 using Domain.Game.Days.Commands;
 using Domain.Game.Days.Scenarios;
+using Domain.Game.Days.Scenarios.Services;
 
 namespace Domain.Game.Teams;
 
@@ -14,6 +15,7 @@ public static class TeamSessionScenarioExtensions
 	{
 		var scenarioBuilder = scenario
 			.WithInitiallyAwaitedCommands(ConfigureInitiallyAwaitedCommands(anotherTeamAppeared))
+			.WithScenarioService(new DefaultScenarioService())
 			.For(
 				DayCommandType.WorkAnotherTeam,
 				b => b
@@ -27,35 +29,15 @@ public static class TeamSessionScenarioExtensions
 				builders => builders.ReAwaitCommand(DayCommandType.UpdateSprintBacklog))
 			.For(
 				DayCommandType.UpdateCfd,
-				builder => builder.ReAwaitUpdateCfdIfNull("Released"),
-				builder => builder.ReAwaitUpdateCfdIfNull("ToDeploy"),
-				builder => builder.ReAwaitUpdateCfdIfNull("WithTesters"),
-				builder => builder.ReAwaitUpdateCfdIfNull("WithProgrammers"),
-				builder => builder.ReAwaitUpdateCfdIfNull("WithAnalysts"),
-				builder => builder.AwaitCommands(DayCommandType.UpdateCfd, DayCommandType.EndDay)
-					.WithCondition("Released", null, ScenarioItemConditions.NotNull)
-					.WithCondition("ToDeploy", null, ScenarioItemConditions.NotNull)
-					.WithCondition("WithTesters", null, ScenarioItemConditions.NotNull)
-					.WithCondition("WithProgrammers", null, ScenarioItemConditions.NotNull)
-					.WithCondition("WithAnalysts", null, ScenarioItemConditions.NotNull)
-					.RemoveAwaited(DayCommandType.UpdateCfd))
+				builders => builders
+					.ReAwaitCommand(DayCommandType.UpdateCfd)
+					.WithValidationMethod("IsCfdNotValid"),
+				builder => builder
+					.AwaitCommands(DayCommandType.UpdateCfd, DayCommandType.EndDay)
+					.RemoveAwaited(DayCommandType.UpdateCfd)
+					.WithValidationMethod("IsCfdValid"))
 			.For(DayCommandType.EndDay, b => b);
 		return scenarioBuilder;
-	}
-
-	private static ScenarioItemBuilder ReAwaitUpdateCfdIfNull(
-		this ScenarioItemBuilder builder,
-		string parameterName)
-	{
-		return builder.ReAwaitIfNull(DayCommandType.UpdateCfd, parameterName);
-	}
-	
-	private static ScenarioItemBuilder ReAwaitIfNull(
-		this ScenarioItemBuilder builder,
-		DayCommandType type,
-		string parameterName)
-	{
-		return builder.ReAwaitCommand(type).WithCondition(parameterName, null, ScenarioItemConditions.Null);
 	}
 
 	private static DayCommandType[] ConfigureInitiallyAwaitedCommands(bool anotherTeamAppeared)
