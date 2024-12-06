@@ -21,17 +21,6 @@ public class DayStepsController : Controller
 		this.teamService = teamService;
 	}
 
-	[HttpPost("another-team-roll")]
-	public async Task AnotherTeamRoll(Guid gameSessionId, Guid teamId)
-	{
-		var requestContext = RequestContextFactory.Build(Request);
-		await teamService.PatchDayAsync(
-			requestContext,
-			gameSessionId,
-			teamId,
-			new WorkAnotherTeamDayCommand());
-	}
-
 	[HttpGet("{pageNumber:int}")]
 	[HttpGet("{pageNumber:int}/{stageNumber:int}")]
 	public async Task<IActionResult> InformationCard(
@@ -74,20 +63,6 @@ public class DayStepsController : Controller
 		return View(stepModel);
 	}
 
-	[HttpPost("save-roles-transformation")]
-	public async Task SaveRolesTransformation(Guid gameSessionId, Guid teamId, [FromBody] string[] transformation)
-	{
-		var requestContext = RequestContextFactory.Build(Request);
-		var teamMemberId = long.Parse(transformation[0]);
-		var roleTo = Enum.Parse<TeamRole>(transformation[1]);
-
-		await teamService.PatchDayAsync(
-			requestContext,
-			gameSessionId,
-			teamId,
-			new UpdateTeamRolesCommand { TeamMemberId = teamMemberId, To = roleTo });
-	}
-
 	[HttpGet("2")]
 	[HttpGet("2/0")]
 	public async Task<IActionResult> Step2Stage0(Guid gameSessionId, Guid teamId)
@@ -99,17 +74,6 @@ public class DayStepsController : Controller
 		stepModel.RollDiceContainerDto = currentDay.RollDiceContainer!;
 
 		return View(stepModel);
-	}
-
-	[HttpGet("roll")]
-	public async Task RollDices(Guid gameSessionId, Guid teamId)
-	{
-		var requestContext = RequestContextFactory.Build(Request);
-		await teamService.PatchDayAsync(
-			requestContext,
-			gameSessionId,
-			teamId,
-			new RollDiceCommand());
 	}
 
 	[HttpGet("4/1")]
@@ -152,23 +116,6 @@ public class DayStepsController : Controller
 		stepModel.TicketIds = ticketIds;
 		stepModel.PageType = pageType;
 		return View(stepModel);
-	}
-
-	public class TicketModel
-	{
-		public string TicketId { get; [UsedImplicitly] set; }
-		public bool Remove { get; [UsedImplicitly] set; }
-	}
-
-	[HttpPost("update-release")]
-	public async Task UpdateRelease([FromBody] TicketModel ticketModel, Guid gameSessionId, Guid teamId)
-	{
-		var requestContext = RequestContextFactory.Build(Request);
-		await teamService.PatchDayAsync(
-			requestContext,
-			gameSessionId,
-			teamId,
-			ReleaseTicketsCommand.Create(ticketModel.TicketId, ticketModel.Remove));
 	}
 
 	[HttpGet("4/2")]
@@ -233,21 +180,6 @@ public class DayStepsController : Controller
 		return View(stepModel);
 	}
 
-	[HttpPost("update-sprint-backlog")]
-	public async Task UpdateSprintBacklog([FromBody] TicketModel ticketModel, Guid gameSessionId, Guid teamId)
-	{
-		var requestContext = RequestContextFactory.Build(Request);
-
-		await teamService.PatchDayAsync(
-			requestContext,
-			gameSessionId,
-			teamId,
-			new UpdateSprintBacklogCommand
-			{
-				TicketIds = [ticketModel.TicketId], Remove = ticketModel.Remove
-			});
-	}
-
 	[HttpGet("5/2")]
 	public async Task<IActionResult> Step5Stage2(Guid gameSessionId, Guid teamId)
 	{
@@ -264,41 +196,6 @@ public class DayStepsController : Controller
 		return View(ticketCheckStepModel);
 	}
 
-	[HttpPost("update-cfd")]
-	public async Task UpdateCfd([FromBody] CfdDayDataModel cfdDayDataModel, Guid gameSessionId, Guid teamId)
-	{
-		var requestContext = RequestContextFactory.Build(Request);
-
-		await PatchDayAsync(UpdateCfdContainerPatchType.Released, cfdDayDataModel.Released);
-		await PatchDayAsync(UpdateCfdContainerPatchType.ToDeploy, cfdDayDataModel.ToDeploy);
-		await PatchDayAsync(UpdateCfdContainerPatchType.WithTesters, cfdDayDataModel.WithTesters);
-		await PatchDayAsync(UpdateCfdContainerPatchType.WithProgrammers, cfdDayDataModel.WithProgrammers);
-		await PatchDayAsync(UpdateCfdContainerPatchType.WithAnalysts, cfdDayDataModel.WithAnalysts);
-		return;
-
-		async Task PatchDayAsync(UpdateCfdContainerPatchType patchType, int value)
-		{
-			await teamService.PatchDayAsync(
-				requestContext,
-				gameSessionId,
-				teamId,
-				new UpdateCfdCommand
-				{
-					PatchType = patchType, Value = value
-				});
-		}
-	}
-
-	public class CfdDayDataModel
-	{
-		public int Released { get; [UsedImplicitly] set; }
-		public int ToDeploy { get; [UsedImplicitly] set; }
-		public int WithTesters { get; [UsedImplicitly] set; }
-		public int WithProgrammers { get; [UsedImplicitly] set; }
-		public int WithAnalysts { get; [UsedImplicitly] set; }
-	}
-
-
 	[HttpGet("6/1")]
 	public async Task<IActionResult> Step6Stage1(Guid gameSessionId, Guid teamId)
 	{
@@ -313,14 +210,6 @@ public class DayStepsController : Controller
 		cfdGraphStepModel.CfdGraphDto = cfdGraphDto;
 		
 		return View(cfdGraphStepModel);
-	}
-
-	[HttpPost("end-day")]
-	public async Task EndDay(Guid gameSessionId, Guid teamId)
-	{
-		var requestContext = RequestContextFactory.Build(Request);
-		
-		await teamService.PatchDayAsync(requestContext, gameSessionId, teamId, new EndDayCommand());
 	}
 
 	private async Task<T> FillWithCredentialsAsync<T>(
