@@ -18,16 +18,31 @@ public class HomeController : Controller
 	{
 		if (!RequestContextFactory.TryBuild(ControllerContext.HttpContext.Request, out var requestContext))
 		{
-			var userId = await userService.CreateNewUser("Аноним");
-
-			requestContext = new RequestContext();
-			requestContext.AddHeader(RequestContextKeys.UserId, userId.ToString());
-			
-			Response.Cookies.Append(RequestContextKeys.UserId, userId.ToString());
+			requestContext = await ProvideNewUser(requestContext);
 		}
 
-		var user = await userService.GetUserById(requestContext!.GetUserId());
-		return View((object)user!.Name);
+		try
+		{
+			var user = await userService.GetUserById(requestContext!.GetUserId());
+			return View((object)user!.Name);
+		}
+		catch (InvalidOperationException e)
+		{
+			var recreatedRequestContext = await ProvideNewUser(new RequestContext());
+			var user = await userService.GetUserById(recreatedRequestContext!.GetUserId());
+			return View((object)user!.Name);
+		}
+	}
+
+	private async Task<RequestContext> ProvideNewUser(RequestContext? requestContext)
+	{
+		var userId = await userService.CreateNewUser("Аноним");
+
+		requestContext = new RequestContext();
+		requestContext.AddHeader(RequestContextKeys.UserId, userId.ToString());
+			
+		Response.Cookies.Append(RequestContextKeys.UserId, userId.ToString());
+		return requestContext;
 	}
 
 	[HttpGet("add-username")]

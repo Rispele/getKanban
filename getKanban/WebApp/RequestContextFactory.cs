@@ -12,7 +12,7 @@ public class RequestContextFactory
 
 	public static bool TryBuild(HttpRequest request, out RequestContext? requestContext)
 	{
-		var userId = FindUserId(request);
+		var userId = FindRequestUserId(request);
 
 		if (userId is null)
 		{
@@ -36,10 +36,10 @@ public class RequestContextFactory
 	
 	private static Guid GetUserIdOrThrow(HttpRequest request)
 	{
-		return FindUserId(request) ?? throw new KeyNotFoundException();
+		return FindRequestUserId(request) ?? throw new KeyNotFoundException();
 	}
 	
-	private static Guid? FindUserId(HttpRequest request)
+	private static Guid? FindRequestUserId(HttpRequest request)
 	{
 		var value = request.Cookies[RequestContextKeys.UserId];
 		return value is null
