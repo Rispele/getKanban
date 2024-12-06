@@ -31,7 +31,7 @@
     setSwitchEvent("prev", connection, "@Model.GameSessionId", "@Model.TeamId", 7, 0);
     
     document.getElementById("next-day").addEventListener('click', function () {
-        fetch(`/@Model.GameSessionId/@Model.TeamId/step/end-day`, {
+        fetch(`/@Model.GameSessionId/@Model.TeamId/api/end-day`, {
             method: 'POST',
             headers: { "Content-Type": "application/json" },
         }).then(function () {

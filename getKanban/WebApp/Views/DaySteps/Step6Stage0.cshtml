@@ -59,7 +59,7 @@
         const withProgrammers = document.getElementById('with-programmers').value;
         const withAnalysts = document.getElementById('with-analysts').value;
         
-        fetch("/@Model.GameSessionId/@Model.TeamId/step/update-cfd", {
+        fetch("/@Model.GameSessionId/@Model.TeamId/api/update-cfd", {
             method: 'POST',
             headers: {
                 "Content-Type": "application/json"

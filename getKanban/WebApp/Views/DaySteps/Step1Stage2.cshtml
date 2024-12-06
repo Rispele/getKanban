@@ -63,7 +63,7 @@
 <script>
     const connection = setupHubConnection(new signalR.HubConnectionBuilder(), "@Model.GameSessionId", "@Model.TeamId");
     document.getElementById("roll").addEventListener('click', function () { 
-        fetch(`/@Model.GameSessionId/@Model.TeamId/step/roll`)
+        fetch(`/@Model.GameSessionId/@Model.TeamId/api/roll`)
             .then(function (request) {
                 connection.invoke("ChangePage", "@Model.GameSessionId", "@Model.TeamId", 2, 0)
                     .then(function () {
@@ -82,7 +82,7 @@
         draggable.addEventListener('dragend', function () {
             const teamMemberId = draggable.id;
             const roleTo = draggable.parentElement.id.toString();
-            fetch("/@Model.GameSessionId/@Model.TeamId/step/save-roles-transformation", {
+            fetch("/@Model.GameSessionId/@Model.TeamId/api/save-roles-transformation", {
                 method: 'POST',
                 headers: {
                     "Content-Type": "application/json"
