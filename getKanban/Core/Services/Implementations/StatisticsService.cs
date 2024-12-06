@@ -1,8 +1,12 @@
 ﻿using Core.DbContexts.Extensions;
+using Core.Dtos;
 using Core.Dtos.DayStatistics;
+using Core.Dtos.Statistics;
 using Core.Services.Contracts;
+using Domain;
 using Domain.DbContexts;
 using Domain.Game;
+using Domain.Game.Days;
 using Domain.Game.Teams;
 using Domain.Game.Tickets;
 
@@ -17,7 +21,7 @@ public class StatisticsService : IStatisticsService
 		this.context = context;
 	}
 
-	public async Task<TeamStatisticDto> EvaluateProfitsAsync(Guid gameSessionId, Guid teamId)
+	public async Task<TeamStatisticDto> CollectStatistic(Guid gameSessionId, Guid teamId)
 	{
 		var team = await context.GetTeamAsync(gameSessionId, teamId);
 
@@ -25,44 +29,48 @@ public class StatisticsService : IStatisticsService
 		var clientsGainedPerDay = EvaluateClientsGainedPerDay(takenTickets, team.CurrentDay.Number);
 		var profitPerClientPerDay = team.Days.ToDictionary(day => day.Number, day => day.DaySettings.ProfitPerClient);
 
-		var firstDayNumber = team.Days.Select(d => d.Number).Min();
-		var currentDayNumber = team.CurrentDay.Number;
-		var clientsPerDay = EvaluateClientPerDay(firstDayNumber, currentDayNumber, clientsGainedPerDay);
+		var clientsPerDay = EvaluateClientPerDay(team, clientsGainedPerDay);
 		var profitGainedPerDay = EvaluateProfitGainedPerDay(profitPerClientPerDay, clientsPerDay);
 
 		var dayStats = ConvertToDayStatisticDto(
-			firstDayNumber,
-			currentDayNumber,
+			team,
 			clientsGainedPerDay,
 			profitGainedPerDay,
 			profitPerClientPerDay);
-		
-		return new TeamStatisticDto
-		{
-			TeamId = teamId,
-			DayStatistics = dayStats,
-			Penalty = EvaluatePenalty(team),
-			BonusProfit = EvaluateBonusProfit(team)
-		};
-	}
-	
 
-	private static List<DayStatisticDto> ConvertToDayStatisticDto(
-		int firstDayNumber,
-		int currentDayNumber,
+		return TeamStatisticDto.Create(
+			team.Id,
+			dayStats,
+			EvaluatePenalty(team),
+			EvaluateBonusProfit(team));
+	}
+
+	public CfdStatisticDto CollectCfdStatistic(Day day)
+	{
+		var cfdContainer = day.UpdateCfdContainer;
+
+		return CfdStatisticDto.Create(
+			cfdContainer.WithAnalysts ?? 0,
+			cfdContainer.WithProgrammers ?? 0,
+			cfdContainer.WithTesters ?? 0,
+			cfdContainer.ToDeploy ?? 0,
+			cfdContainer.Released ?? 0);
+	}
+
+	private List<DayStatisticDto> ConvertToDayStatisticDto(
+		Team team,
 		Dictionary<int, int> clientsGainedPerDay,
 		Dictionary<int, int> profitGainedPerDay,
 		Dictionary<int, int> profitPerClientPerDay)
 	{
-		return Enumerable.Range(firstDayNumber, currentDayNumber - firstDayNumber + 1)
+		return team.Days
 			.Select(
-				dayNumber => new DayStatisticDto
-				{
-					DayNumber = dayNumber,
-					ClientsGained = clientsGainedPerDay[dayNumber],
-					ProfitGained = profitGainedPerDay[dayNumber],
-					ProfitPerClient = profitPerClientPerDay[dayNumber]
-				})
+				day => DayStatisticDto.Create(
+					dayNumber: day.Number,
+					clientsGained: clientsGainedPerDay[day.Number],
+					profitGained: profitGainedPerDay[day.Number],
+					profitPerClient: profitPerClientPerDay[day.Number],
+					cfdStatistic: CollectCfdStatistic(day)))
 			.ToList();
 	}
 
@@ -91,23 +99,20 @@ public class StatisticsService : IStatisticsService
 			.ToDictionary(tuple => tuple.dayNumber, tuple => tuple.profit);
 	}
 
-	private Dictionary<int, int> EvaluateClientPerDay(
-		int firstDayNumber,
-		int currentDayNumber,
-		Dictionary<int, int> clientsGainedPerDay)
+	private Dictionary<int, int> EvaluateClientPerDay(Team team, Dictionary<int, int> clientsGainedPerDay)
 	{
 		var currentClients = 0;
 		var clientsPerDay = new Dictionary<int, int>();
-		for (var i = firstDayNumber; i <= currentDayNumber; i++)
+		foreach (var day in team.Days)
 		{
-			if (clientsGainedPerDay.TryGetValue(i, out var clients))
+			var dayNumber = day.Number;
+			if (clientsGainedPerDay.TryGetValue(dayNumber, out var clients))
 			{
 				currentClients += clients;
 			}
 
-			clientsPerDay[i] = currentClients;
+			clientsPerDay[dayNumber] = currentClients;
 		}
-
 		return clientsPerDay;
 	}
 

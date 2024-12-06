@@ -1,8 +1,9 @@
-﻿using Core.Dtos.DayStatistics;
+﻿using Core.Dtos;
+using Core.Dtos.DayStatistics;
 
 namespace Core.Services.Contracts;
 
 public interface IStatisticsService
 {
-	public Task<TeamStatisticDto> EvaluateProfitsAsync(Guid gameSessionId, Guid teamId);
+	public Task<TeamStatisticDto> CollectStatistic(Guid gameSessionId, Guid teamId);
 }

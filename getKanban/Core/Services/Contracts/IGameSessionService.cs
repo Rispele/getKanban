@@ -31,8 +31,6 @@ public interface IGameSessionService
 
 	public Task<UserDto> GetCurrentUser(RequestContext requestContext);
 
-	public Task<CfdGraphDto> GetCfdDataForTeam(Guid sessionId, Guid teamId);
-
 	public Task<List<Ticket>> GetTicketsToRelease(Guid sessionId, Guid teamId);
 
 	public Task<List<Ticket>> GetBacklogTickets(Guid sessionId, Guid teamId);

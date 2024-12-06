@@ -1,84 +1,74 @@
+@using Core.Dtos.DayStatistics
 @model WebApp.Models.DayStepModels.CfdGraphStepModel
 
 <div class="stepHeader">
     <h1 class="fs-1 fw- text-center">Команда @Html.Raw(Model.TeamName). День @Model.DayNumber</h1>
 </div>
 
-@foreach (var pair in Model.CfdGraphDto.GraphPointsPerLabel)
-{
-    <p>@pair.Key - - - @string.Join(" ", pair.Value)</p>
-}
+@* @{ *@
+@*     CollectCfdStatisticPerStep(d => d.CfdStatistic.WithAnalysts, "Аналитики"); *@
+@*     CollectCfdStatisticPerStep(d => d.CfdStatistic.WithProgrammers, "Разработчики"); *@
+@*     CollectCfdStatisticPerStep(d => d.CfdStatistic.WithTesters, "Тестировщики"); *@
+@*     CollectCfdStatisticPerStep(d => d.CfdStatistic.ToDeploy, "Готово к поставке"); *@
+@*     CollectCfdStatisticPerStep(d => d.CfdStatistic.Released, "Поставлено"); *@
+@* } *@
+
 @functions
 {
-    private int Set(Dictionary<string,List<(int, int)>> val)
+    @* private void CollectCfdStatisticPerStep(Func<DayStatisticDto, int> getter, string groupName) *@
+    @* { *@
+    @*     <p>@groupName - - - @string.Join(" ", Model.TeamStatistic.DayStatistics.Select(getter))</p> *@
+    @* } *@
+
+    private void RenderGraph()
     {
-        var p = 10;
-        foreach (var key in val.Keys)
-        {
-            val[key] = new List<(int, int)>();
-            for (int i = 9; i < 15; i++)
-            {
-                val[key].Add((i, p));
-            }
+        var rows = new [] {"[8,2,4,4,1,0]"}.Concat(Model.TeamStatistic.DayStatistics.Select(CfdStatisticToString));
+        var table = $"[{string.Join(",", rows)}]";
+        <script type="text/javascript">
+            const graphBlock = document.getElementById("graphdiv3");
+            const data = @table;
+            console.log(data);
+            const options = {
+                stackedGraph: true,
+                labels: ["День", "В аналитике", "В разработке", "В тестировании", "Готово к поставке", "Поставлено"],
+                dateWindow : [8, 22],
+                
+                highlightCircleSize: 2,
+                strokeWidth: 1,
 
-            p += 5;
-        }
+                highlightSeriesOpts: {
+                    strokeWidth: 3,
+                    strokeBorderWidth: 1,
+                    highlightCircleSize: 5
+                }
+            };
 
-        return 1;
+            Dygraph.onDOMready(function onDOMready() {
+                const g3 = new Dygraph(graphBlock, data, options);
+            });
+        </script>
     }
 }
-@foreach (var pair in Model.CfdGraphDto.GraphPointsPerLabel)
-{
-    @Set(Model.CfdGraphDto.GraphPointsPerLabel)
+@functions {
+    private static string CfdStatisticToString(DayStatisticDto t)
+    {
+        return $"[{t.DayNumber}," +
+               $"{t.CfdStatistic.WithAnalysts}," +
+               $"{t.CfdStatistic.WithProgrammers}," +
+               $"{t.CfdStatistic.WithTesters}," +
+               $"{t.CfdStatistic.ToDeploy}," +
+               $"{t.CfdStatistic.Released}]";
+    }
 }
 
-<script type="text/javascript" src="~/js/dygraph/dygraph.min.js"></script>
+
+<script type="text/javascript" src="~/js/dygraph/dygraph.min.js">
+        
+        </script>
 <link rel="stylesheet" type="text/css" href="~/css/dygraph.min.css"/>
 
 <div id="graphdiv3" style="width:500px; height:300px;"></div>
-
-<script type="text/javascript">
-    const graphBlock = document.getElementById("graphdiv3");
-    let data = "X,";
-    @foreach (var key in Model.CfdGraphDto.GraphPointsPerLabel.Keys)
-    {
-        @:data = data + "@Html.Raw(key)" + ","
-    }
-    data = data.substring(0, data.length - 1) + "\n";
-    @for(var i = 0; i < Model.CfdGraphDto.GraphPointsPerLabel.First().Value.Count; i++)
-    {
-        <text>
-            if (data[data.length - 1] === '\n')
-            {
-                data = data + "@Model.CfdGraphDto.GraphPointsPerLabel.First().Value[i].Item1" + ",";
-            }
-        </text>
-        @foreach (var pair in Model.CfdGraphDto.GraphPointsPerLabel)
-        {
-            <text>
-                data = data + "@pair.Value[i].Item2" + ",";
-            </text>
-        }
-        <text>
-            data = data.substring(0, data.length - 1) + "\n";
-        </text>
-    }
-    
-    //"X,Значение\n" +
-    //    "2008-05-07,75\n" +
-    //    "2008-05-08,70\n" +
-    //    "2008-05-09,80\n";
-    const options = {
-        //zoomCallback: function() {this.resetZoom()},
-        //valueRange: [0, 50],
-        stackedGraph: true
-    };
-    
-    Dygraph.onDOMready(function onDOMready() {
-        const g3 = new Dygraph(graphBlock, data, options);
-    });
-</script>
-
+@{ RenderGraph(); }
 <button class="stepControlButtons position-relative rightButton" id="next">
     <p class="fs-6">Далее</p>
 </button>

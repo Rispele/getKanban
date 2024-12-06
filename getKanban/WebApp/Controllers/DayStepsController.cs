@@ -1,9 +1,6 @@
 ﻿using Core.RequestContexts;
 using Core.Services.Contracts;
 using Domain.Game.Days.Commands;
-using Domain.Game.Days.DayContainers;
-using Domain.Game.Days.DayContainers.TeamMembers;
-using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
 using WebApp.Models.DayStepModels;
 
@@ -14,11 +11,16 @@ public class DayStepsController : Controller
 {
 	private readonly IGameSessionService gameSessionService;
 	private readonly ITeamService teamService;
+	private readonly IStatisticsService statisticsService;
 
-	public DayStepsController(IGameSessionService gameSessionService, ITeamService teamService)
+	public DayStepsController(
+		IGameSessionService gameSessionService,
+		ITeamService teamService,
+		IStatisticsService statisticsService)
 	{
 		this.gameSessionService = gameSessionService;
 		this.teamService = teamService;
+		this.statisticsService = statisticsService;
 	}
 
 	[HttpGet("{pageNumber:int}")]
@@ -201,15 +203,15 @@ public class DayStepsController : Controller
 	{
 		var requestContext = RequestContextFactory.Build(Request);
 		
-		var cfdGraphDto = await gameSessionService.GetCfdDataForTeam(gameSessionId, teamId);
+		var teamStatistic = await statisticsService.CollectStatistic(gameSessionId, teamId);
 		
-		var cfdGraphStepModel = await FillWithCredentialsAsync<CfdGraphStepModel>(
+		var stepModel = await FillWithCredentialsAsync<CfdGraphStepModel>(
 			requestContext,
 			gameSessionId,
 			teamId);
-		cfdGraphStepModel.CfdGraphDto = cfdGraphDto;
+		stepModel.TeamStatistic = teamStatistic;
 		
-		return View(cfdGraphStepModel);
+		return View(stepModel);
 	}
 
 	private async Task<T> FillWithCredentialsAsync<T>(
