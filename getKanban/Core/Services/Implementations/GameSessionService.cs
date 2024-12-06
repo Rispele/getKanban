@@ -16,14 +16,10 @@ namespace Core.Services.Implementations;
 public class GameSessionService : IGameSessionService
 {
 	private readonly DomainContext context;
-	private readonly ConnectionsContext connectionsContext;
 
-	public GameSessionService(
-		DomainContext context,
-		ConnectionsContext connectionsContext)
+	public GameSessionService(DomainContext context)
 	{
 		this.context = context;
-		this.connectionsContext = connectionsContext;
 	}
 
 	public async Task<Guid> CreateGameSession(
@@ -154,27 +150,6 @@ public class GameSessionService : IGameSessionService
 			Id = user.Id,
 			Name = user.Name
 		};
-	}
-
-	public async Task<CfdGraphDto> GetCfdDataForTeam(Guid sessionId, Guid teamId)
-	{
-		var team = await context.GetTeamAsync(sessionId, teamId);
-		var cfd = team.CfdContainers.OrderBy(x => x.Version).ToList();
-
-		var result = new CfdGraphDto();
-		var i = 0;
-		var initialDayNumber = team.Days.Select(x => x.Number).Min();
-		foreach (var day in cfd)
-		{
-			result.GraphPointsPerLabel["Работа аналитиков"].Add((initialDayNumber + i, day.WithAnalysts!.Value));
-			result.GraphPointsPerLabel["Работа разработчиков"].Add((initialDayNumber + i, day.WithProgrammers!.Value));
-			result.GraphPointsPerLabel["Работа тестировщиков"].Add((initialDayNumber + i, day.WithTesters!.Value));
-			result.GraphPointsPerLabel["Готовы к поставке"].Add((initialDayNumber + i, day.ToDeploy!.Value));
-			result.GraphPointsPerLabel["Поставлено"].Add((initialDayNumber + i, day.Released!.Value));
-			i++;
-		}
-
-		return result;
 	}
 
 	public async Task<List<Ticket>> GetTicketsToRelease(Guid sessionId, Guid teamId)

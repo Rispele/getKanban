@@ -1,8 +1,9 @@
 ﻿using Core.Dtos;
+using Core.Dtos.DayStatistics;
 
 namespace WebApp.Models.DayStepModels;
 
 public class CfdGraphStepModel : StepModel
 {
-	public CfdGraphDto CfdGraphDto { get; set; }
+	public TeamStatisticDto TeamStatistic { get; set; }
 }
