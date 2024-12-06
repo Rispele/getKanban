@@ -1,6 +1,5 @@
 ﻿using Core.RequestContexts;
 using Core.Services.Contracts;
-using Microsoft.AspNetCore.Http.Headers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApp.Controllers;

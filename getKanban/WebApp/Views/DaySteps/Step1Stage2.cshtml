@@ -62,8 +62,16 @@
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
     const connection = setupHubConnection(new signalR.HubConnectionBuilder(), "@Model.GameSessionId", "@Model.TeamId");
-    setSwitchEvent("roll", connection, "@Model.GameSessionId", "@Model.TeamId", 2, 0);
-    
+    document.getElementById("roll").addEventListener('click', function () { 
+        fetch(`/@Model.GameSessionId/@Model.TeamId/step/roll`)
+            .then(function (request) {
+                connection.invoke("ChangePage", "@Model.GameSessionId", "@Model.TeamId", 2, 0)
+                    .then(function () {
+                        window.location.href = `/@Model.GameSessionId/@Model.TeamId/step/2/0`;
+                    });
+            }) 
+    });
+        
     connection.on("NotifyUpdateRole", function (teamMemberId, roleTo) {
         const draggable = document.getElementById(teamMemberId.toString());
         document.getElementById(roleTo).appendChild(draggable);
