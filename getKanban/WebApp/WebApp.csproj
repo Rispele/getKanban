@@ -68,8 +68,4 @@
       <AdditionalFiles Include="Views\Shared\_ValidationScriptsPartial.cshtml" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Models\" />
-    </ItemGroup>
-
 </Project>
