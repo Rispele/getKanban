@@ -1,4 +1,5 @@
-﻿<script src="/js/signalr/dist/browser/signalr.js"></script>
+﻿<script src="/js/error.js"></script>
+<script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
     const hubConnection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
     hubConnection.on("Created", inviteCode =>
@@ -7,17 +8,27 @@
     hubConnection.start();
     
     async function createGameSession() {
-        const sessionName = document.getElementById("sessionName").value;
-        const teamsCount = parseInt(document.getElementById("teamsCount").value);
-        if (teamsCount > 0) {
-            fetch(`/session/create-session?sessionName=${sessionName}&teamsCount=${teamsCount}`)
-                .then(sessionId => sessionId.json()
-                    .then(sessionId => {
-                        window.location.href = `/session/${sessionId}`
-                    }
-                )
-            );
+        const teamsCountString = document.getElementById("teamsCount").value
+        if (teamsCountString.length === 0) {
+            showError("Число команд должно быть заполнено");
+            return;
         }
+        const teamsCount = parseInt(teamsCountString);
+        if (teamsCount <= 0) {
+            showError("Число команд должно быть положительным");
+            return;
+        }
+        const sessionName = document.getElementById("sessionName").value;
+        if (sessionName.length === 0) {
+            showError("Название игры должно быть заполнено");
+            return;
+        }
+        
+        fetch(`/session/create-session?sessionName=${sessionName}&teamsCount=${teamsCount}`)
+            .then(sessionId => sessionId.json())
+            .then(sessionId => {
+                window.location.href = `/session/${sessionId}`
+            });
     }
 </script>
 
@@ -27,7 +38,7 @@
     </div>
 
     <div class="authorizationButtons">
-        <input type="number" class="text-center authorizationButtonsTemplate authorizationCommandName" id="teamsCount" placeholder="Число команд">
+        <input type="number" min="1" class="text-center authorizationButtonsTemplate authorizationCommandName" id="teamsCount" placeholder="Число команд">
         <input type="text" class="text-center authorizationButtonsTemplate authorizationCommandName" id="sessionName" placeholder="Название игры">
         <button class="authorizationButtonsTemplate authorizationButton" onclick="createGameSession()">Создать игру</button>
     </div>

@@ -1,5 +1,6 @@
 ﻿@model string
 
+<script src="/js/error.js"></script>
 <script>
     function redirectCreate() {
         redirect("create-menu");
@@ -11,36 +12,23 @@
     function redirect(endpoint) {
         const userName = document.getElementsByClassName("authorizationCommandName")[0].value.toString();
         if (userName.length === 0) {
-            alert("Введите своё имя");
+            showError("Имя должно быть заполнено");
             return;
         }
         fetch(`/add-username?name=${userName}`)
-            .then(r => {
+            .then(function () {
                 window.location.href = `/session/${endpoint}`
             });
     }
 </script>
 
-@* Authorization container *@
 <div class="text-center authorizationContainer centered-100">
-
-    @* Authorization header container *@
     <div class="authorizationHeader">
-
-        @* Authorization header *@
         <h1 class="display-3">getKanban</h1>
     </div>
-
-    @* Authorization buttons container*@
     <div class="authorizationButtons">
-
-        @* Input your name *@
         <input type="text" class="text-center authorizationButtonsTemplate authorizationCommandName" value="@Model" placeholder="Ваше имя"/>
-
-        @* Game create button *@
         <button class="authorizationButtonsTemplate authorizationButton" onclick="redirectCreate()">Создать игру</button>
-
-        @* Game join button *@
         <button class="authorizationButtonsTemplate authorizationButton" onclick="redirectJoin()">Присоединиться к игре</button>
     </div>
 </div>

@@ -1,4 +1,6 @@
-﻿namespace Core.Helpers;
+﻿using System.Text.RegularExpressions;
+
+namespace Core.Helpers;
 
 public static class InviteCodeHelper
 {
@@ -24,5 +26,13 @@ public static class InviteCodeHelper
 	{
 		var (_, teamId) = SplitInviteCode(inviteCode);
 		return teamId;
+	}
+
+	public static bool ValidateInviteCode(string inviteCode)
+	{
+		const string pattern = """
+		                       ^([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\.([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$
+		                       """;
+		return Regex.IsMatch(inviteCode, pattern);
 	}
 }

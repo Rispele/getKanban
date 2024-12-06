@@ -31,10 +31,14 @@ public class SessionController : Controller
 	}
 
 	[HttpGet("join")]
-	public async Task<Guid> JoinLobbyMenu(string inviteCode)
+	public async Task<Guid?> JoinLobbyMenu(string inviteCode)
 	{
 		var requestContext = RequestContextFactory.Build(Request);
 		var addParticipantResult = await gameSessionService.AddParticipantAsync(requestContext, inviteCode);
+		if (addParticipantResult is null)
+		{
+			return null;
+		}
 		
 		if (addParticipantResult.Updated)
 		{
@@ -63,11 +67,11 @@ public class SessionController : Controller
 	}
 	
 	[HttpGet("check")]
-	public async Task<bool> CheckForOpenedGame(string invite)
+	public async Task<bool> CheckForOpenedGame(string inviteCode)
 	{
 		var session = await gameSessionService.FindGameSession(
 			RequestContextFactory.Build(Request),
-			invite,
+			inviteCode,
 			ignorePermissions: false);
 		return session is not null;
 	}

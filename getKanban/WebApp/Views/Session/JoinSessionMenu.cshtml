@@ -1,19 +1,30 @@
-﻿<script src="/js/signalr/dist/browser/signalr.js"></script>
+﻿<script src="/js/error.js"></script>
+<script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
     async function joinSession() {
         const inviteCode = document.getElementById("inviteCode").value.toString();
-        if (inviteCode.length === 0) return;
+        if (inviteCode.length === 0) {
+            showError("Код приглашения должен быть заполнен");
+            return;
+        }
         
-        const isGameOpened = await fetch(`/session/check?invite=${inviteCode}`);
-        if ((await isGameOpened.text()) !== 'true') return;
+        const hasAccess = await fetch(`/session/check?inviteCode=${inviteCode}`)
+            .then(response => response.json())
+            .then(response => {
+                if (response !== true) {
+                    showError("Сессия с данным кодом приглашения не была найдена");
+                    return false;
+                }
+                return true;
+            });
         
-        await fetch(`/session/join?inviteCode=${inviteCode}`, {redirect: "follow"})
-            .then(sessionId => sessionId.json()
+        if (hasAccess) {
+            await fetch(`/session/join?inviteCode=${inviteCode}`, {redirect: "follow"})
+                .then(sessionId => sessionId.json())
                 .then(sessionId => {
-                        window.location.href = `/session/${sessionId}`
-                    }
-                )
-            );
+                    window.location.href = `/session/${sessionId}`
+                });
+        }
     }
 </script>
 

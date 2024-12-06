@@ -45,10 +45,14 @@ public class GameSessionService : IGameSessionService
 		string inviteCode,
 		bool ignorePermissions)
 	{
+		if (!InviteCodeHelper.ValidateInviteCode(inviteCode))
+		{
+			return null;
+		}
 		var sessionId = InviteCodeHelper.ResolveGameSessionId(inviteCode);
 		var session = await context.FindGameSessionsAsync(sessionId);
 
-		if (session is null)
+		if (session?.EnsureHasInviteCodeAccess(inviteCode) is null)
 		{
 			return null;
 		}
@@ -66,16 +70,34 @@ public class GameSessionService : IGameSessionService
 		Guid sessionId,
 		bool ignorePermissions)
 	{
-		return await FindGameSession(requestContext, $"{sessionId}.{Guid.NewGuid()}", ignorePermissions);
+		var userId = requestContext.GetUserId();
+		var session = await context.FindGameSessionsAsync(sessionId);
+		if (session?.EnsureHasAccess(userId) is null)
+		{
+			return null;
+		}
+		var participantRole = ignorePermissions
+			? ParticipantRole.Creator
+			: session.EnsureHasAccess(userId);
+
+		return GameSessionDtoConverter.For(participantRole!.Value).Convert(session);
 	}
 
-	public async Task<AddParticipantResult> AddParticipantAsync(
+	public async Task<AddParticipantResult?> AddParticipantAsync(
 		RequestContext requestContext,
 		string inviteCode)
 	{
+		if (!InviteCodeHelper.ValidateInviteCode(inviteCode))
+		{
+			return null;
+		}
 		var gameSessionId = InviteCodeHelper.ResolveGameSessionId(inviteCode);
 
-		var session = await context.GetGameSessionsAsync(gameSessionId);
+		var session = await context.FindGameSessionsAsync(gameSessionId);
+		if (session?.EnsureHasInviteCodeAccess(inviteCode) is null)
+		{
+			return null;
+		}
 		var user = await context.GetUserAsync(requestContext.GetUserId());
 
 		var (teamId, updated) = session.AddByInviteCode(user, inviteCode);
