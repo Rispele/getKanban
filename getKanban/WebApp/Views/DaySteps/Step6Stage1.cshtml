@@ -4,8 +4,6 @@
     <h1 class="fs-1 fw- text-center">Команда @Html.Raw(Model.TeamName). День @Model.DayNumber</h1>
 </div>
 
-<p>@string.Join(" ", Model.CfdGraphDto.DaysToShow)</p>
-<p>@string.Join(" ", Model.CfdGraphDto.TotalTasksToShow)</p>
 @foreach (var pair in Model.CfdGraphDto.GraphPointsPerLabel)
 {
     <p>@pair.Key - - - @string.Join(" ", pair.Value)</p>

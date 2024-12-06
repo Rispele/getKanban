@@ -159,34 +159,18 @@ public class GameSessionService : IGameSessionService
 	public async Task<CfdGraphDto> GetCfdDataForTeam(Guid sessionId, Guid teamId)
 	{
 		var team = await context.GetTeamAsync(sessionId, teamId);
-		var cfd = team.CfdContainers.ToList();
+		var cfd = team.CfdContainers.OrderBy(x => x.Version).ToList();
 
 		var result = new CfdGraphDto();
 		var i = 0;
+		var initialDayNumber = team.Days.Select(x => x.Number).Min();
 		foreach (var day in cfd)
 		{
-			if (!result.GraphPointsPerLabel.ContainsKey("Работа аналитиков"))
-				result.GraphPointsPerLabel["Работа аналитиков"] = [];
-			if (!result.GraphPointsPerLabel.ContainsKey("Работа разработчиков"))
-				result.GraphPointsPerLabel["Работа разработчиков"] = [];
-			if (!result.GraphPointsPerLabel.ContainsKey("Работа тестировщиков"))
-				result.GraphPointsPerLabel["Работа тестировщиков"] = [];
-			if (!result.GraphPointsPerLabel.ContainsKey("Готовы к поставке"))
-				result.GraphPointsPerLabel["Готовы к поставке"] = [];
-			if (!result.GraphPointsPerLabel.ContainsKey("Поставлено"))
-				result.GraphPointsPerLabel["Поставлено"] = [];
-
-			result.DaysToShow.Add(9 + i);
-			result.TotalTasksToShow.Add(day.WithAnalysts!.Value);
-			result.TotalTasksToShow.Add(day.WithProgrammers!.Value);
-			result.TotalTasksToShow.Add(day.WithTesters!.Value);
-			result.TotalTasksToShow.Add(day.ToDeploy!.Value);
-			result.TotalTasksToShow.Add(day.Released!.Value);
-			result.GraphPointsPerLabel["Работа аналитиков"].Add((9 + i, day.WithAnalysts!.Value));
-			result.GraphPointsPerLabel["Работа разработчиков"].Add((9 + i, day.WithProgrammers!.Value));
-			result.GraphPointsPerLabel["Работа тестировщиков"].Add((9 + i, day.WithTesters!.Value));
-			result.GraphPointsPerLabel["Готовы к поставке"].Add((9 + i, day.ToDeploy!.Value));
-			result.GraphPointsPerLabel["Поставлено"].Add((9 + i, day.Released!.Value));
+			result.GraphPointsPerLabel["Работа аналитиков"].Add((initialDayNumber + i, day.WithAnalysts!.Value));
+			result.GraphPointsPerLabel["Работа разработчиков"].Add((initialDayNumber + i, day.WithProgrammers!.Value));
+			result.GraphPointsPerLabel["Работа тестировщиков"].Add((initialDayNumber + i, day.WithTesters!.Value));
+			result.GraphPointsPerLabel["Готовы к поставке"].Add((initialDayNumber + i, day.ToDeploy!.Value));
+			result.GraphPointsPerLabel["Поставлено"].Add((initialDayNumber + i, day.Released!.Value));
 			i++;
 		}
 
