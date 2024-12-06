@@ -59,7 +59,7 @@
         const withProgrammers = document.getElementById('with-programmers').value;
         const withAnalysts = document.getElementById('with-analysts').value;
         
-        fetch("/step/update-cfd", {
+        fetch("/@Model.GameSessionId/@Model.TeamId/step/update-cfd", {
             method: 'POST',
             headers: {
                 "Content-Type": "application/json"
@@ -72,9 +72,9 @@
                 withAnalysts: withAnalysts
             })
         }).then(function () {
-            connection.invoke("ChangePage", "@Model.TeamId", 6, 1)
+            connection.invoke("ChangePage", "@Model.GameSessionId", "@Model.TeamId", 6, 1)
                 .then(function () {
-                    window.location.href = `/step/6/1`;
+                    window.location.href = `/@Model.GameSessionId/@Model.TeamId/step/6/1`;
                 });
         });
     });

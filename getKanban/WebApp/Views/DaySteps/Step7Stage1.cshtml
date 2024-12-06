@@ -31,13 +31,13 @@
     setSwitchEvent("prev", connection, "@Model.GameSessionId", "@Model.TeamId", 7, 0);
     
     document.getElementById("next-day").addEventListener('click', function () {
-        fetch(`/step/end-day`, {
+        fetch(`/@Model.GameSessionId/@Model.TeamId/step/end-day`, {
             method: 'POST',
             headers: { "Content-Type": "application/json" },
         }).then(function () {
-            connection.invoke("ChangePage", "@Model.TeamId", 1, 0)
+            connection.invoke("ChangePage", "@Model.GameSessionId", "@Model.TeamId", 1, 0)
                 .then(function () {
-                    window.location.href = `/step/1`;
+                    window.location.href = `/@Model.GameSessionId/@Model.TeamId/step/1`;
                 });
         })
     });

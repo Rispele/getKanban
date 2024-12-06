@@ -74,14 +74,14 @@
         draggable.addEventListener('dragend', function () {
             const teamMemberId = draggable.id;
             const roleTo = draggable.parentElement.id.toString();
-            fetch("/step/save-roles-transformation", {
+            fetch("/@Model.GameSessionId/@Model.TeamId/step/save-roles-transformation", {
                 method: 'POST',
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify([teamMemberId, roleTo])
             }).then(function () {
-                connection.invoke("UpdateRole", "@Model.TeamId", parseInt(teamMemberId), roleTo);
+                connection.invoke("UpdateRole", "@Model.GameSessionId", "@Model.TeamId", parseInt(teamMemberId), roleTo);
             });
         });
     }

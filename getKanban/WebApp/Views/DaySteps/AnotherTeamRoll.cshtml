@@ -18,7 +18,7 @@
 <script src="~/js/setup-hub-connection.js"></script>
 <script>
     document.getElementById('roll').addEventListener('click', function () {
-        fetch(`/step/another-team-roll`, {
+        fetch(`/@Model.GameSessionId/@Model.TeamId/step/another-team-roll`, {
             method: 'POST',
             headers: {"Content-Type": "application/json"}
         })

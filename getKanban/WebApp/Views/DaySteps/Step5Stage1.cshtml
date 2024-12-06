@@ -92,14 +92,14 @@
             const remove = !this.checked;
             const ticketId = this.parentElement.getElementsByClassName('checkboxCardNumber')[0].textContent;
             console.log(ticketId);
-            fetch("/step/update-sprint-backlog", {
+            fetch("/@Model.GameSessionId/@Model.TeamId/step/update-sprint-backlog", {
                 method: 'POST',
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({ ticketId: ticketId, remove: remove })
             }).then(function () {
-                connection.invoke("UpdateTicketChoice", "@Model.TeamId", ticketId);
+                connection.invoke("UpdateTicketChoice", "@Model.GameSessionId", "@Model.TeamId", ticketId);
             });
         });
     }

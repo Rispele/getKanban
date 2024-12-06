@@ -68,26 +68,6 @@
     </button>
 </div>
 
-    @* <div class="container2"> *@
-    @* *@
-    @*     @foreach (var ticketId in Model.ticketIds) *@
-    @*     { *@
-    @*         <div> *@
-    @*             <input type="checkbox" class="checkboxCardInput" id="@ticketId"> *@
-    @*             <label for="@ticketId" class="checkboxCardContainer"> *@
-    @*                 <div class="checkboxCardContent"> *@
-    @*                     <h2 class="checkboxCardNumber">@ticketId</h2> *@
-    @*                     <div class="lines"> *@
-    @*                         <div class="line full"></div> *@
-    @*                         <div class="line half"></div> *@
-    @*                         <div class="line half"></div> *@
-    @*                     </div> *@
-    @*                 </div> *@
-    @*             </label> *@
-    @*         </div> *@
-    @*     } *@
-    @* </div> *@
-
 <script src="~/js/page-switch.js"></script>
 <script src="~/js/setup-hub-connection.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
@@ -111,14 +91,14 @@
             const remove = !this.checked;
             const ticketId = this.parentElement.getElementsByClassName('checkboxCardNumber')[0].textContent;
             console.log(ticketId);
-            fetch("/step/update-release", {
+            fetch("/@Model.GameSessionId/@Model.TeamId/step/update-release", {
                 method: 'POST',
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({ TicketId: ticketId, Remove: remove })
             }).then(function () {
-                connection.invoke("UpdateTicketChoice", "@Model.TeamId", ticketId);
+                connection.invoke("UpdateTicketChoice", "@Model.GameSessionId", "@Model.TeamId", ticketId);
             });
         });
     }
