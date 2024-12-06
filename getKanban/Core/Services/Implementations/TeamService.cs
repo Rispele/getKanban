@@ -21,15 +21,17 @@ public class TeamService : ITeamService
 	}
 
 	public async Task<DayDto> PatchDayAsync(
-		UserCredentialsDto userCredentialsDto,
+		RequestContext requestContext,
+		Guid gameSessionId,
+		Guid teamId,
 		DayCommand dayCommand)
 	{
-		var team = await context.GetTeamAsync(userCredentialsDto.SessionId, userCredentialsDto.TeamId);
+		var userId = requestContext.GetUserId();
+		var team = await context.GetTeamAsync(gameSessionId, teamId);
 
-		if (!team.HasAccess(userCredentialsDto.UserId))
+		if (!team.HasAccess(userId))
 		{
-			throw new InvalidOperationException(
-				$"User with id: {userCredentialsDto.UserId} do not have access to this team.");
+			throw new InvalidOperationException($"User with id: {userId} do not have access to this team.");
 		}
 
 		team.ExecuteCommand(dayCommand);

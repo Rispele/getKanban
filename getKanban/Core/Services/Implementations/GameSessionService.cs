@@ -156,50 +156,6 @@ public class GameSessionService : IGameSessionService
 		};
 	}
 
-	public async Task<UserCredentialsDto> GetUserCredentials(RequestContext requestContext)
-	{
-		var currentSessionId = await FindCurrentSessionId(requestContext);
-		if (currentSessionId is null)
-		{
-			throw new InvalidOperationException();
-		}
-
-		var currentUser = await GetCurrentUser(requestContext);
-		var currentTeam = await GetCurrentTeam(requestContext, currentSessionId!.Value);
-
-		return new UserCredentialsDto()
-		{
-			SessionId = currentSessionId!.Value,
-			TeamId = currentTeam.Id,
-			UserId = currentUser.Id
-		};
-	}
-
-	public async Task<Guid?> FindCurrentSessionId(RequestContext requestContext)
-	{
-		var user = await context.GetUserAsync(requestContext.GetUserId());
-		var sessions = context.GameSessions.ToList();
-		foreach (var session in sessions)
-		{
-			var teamsParticipants = session.Teams.ToList().SelectMany(x => x.Players.Participants);
-			var angelsParticipants = session.Angels.Participants;
-
-			var teamParticipant = teamsParticipants.SingleOrDefault(x => x.User.Id == user.Id);
-			if (teamParticipant != default)
-			{
-				return session.Id;
-			}
-
-			var angelsParticipant = angelsParticipants.SingleOrDefault(x => x.User.Id == user.Id);
-			if (angelsParticipant != default)
-			{
-				return session.Id;
-			}
-		}
-
-		return null;
-	}
-
 	public async Task<CfdGraphDto> GetCfdDataForTeam(Guid sessionId, Guid teamId)
 	{
 		var team = await context.GetTeamAsync(sessionId, teamId);
@@ -210,15 +166,15 @@ public class GameSessionService : IGameSessionService
 		foreach (var day in cfd)
 		{
 			if (!result.GraphPointsPerLabel.ContainsKey("Работа аналитиков"))
-				result.GraphPointsPerLabel["Работа аналитиков"] = new List<(int, int)>();
+				result.GraphPointsPerLabel["Работа аналитиков"] = [];
 			if (!result.GraphPointsPerLabel.ContainsKey("Работа разработчиков"))
-				result.GraphPointsPerLabel["Работа разработчиков"] = new List<(int, int)>();
+				result.GraphPointsPerLabel["Работа разработчиков"] = [];
 			if (!result.GraphPointsPerLabel.ContainsKey("Работа тестировщиков"))
-				result.GraphPointsPerLabel["Работа тестировщиков"] = new List<(int, int)>();
+				result.GraphPointsPerLabel["Работа тестировщиков"] = [];
 			if (!result.GraphPointsPerLabel.ContainsKey("Готовы к поставке"))
-				result.GraphPointsPerLabel["Готовы к поставке"] = new List<(int, int)>();
+				result.GraphPointsPerLabel["Готовы к поставке"] = [];
 			if (!result.GraphPointsPerLabel.ContainsKey("Поставлено"))
-				result.GraphPointsPerLabel["Поставлено"] = new List<(int, int)>();
+				result.GraphPointsPerLabel["Поставлено"] = [];
 
 			result.DaysToShow.Add(9 + i);
 			result.TotalTasksToShow.Add(day.WithAnalysts!.Value);
@@ -268,41 +224,5 @@ public class GameSessionService : IGameSessionService
 			.Select(t => new Ticket(t.Id, int.MaxValue, null));
 
 		return ticketsTakenThisDay.Concat(ticketsNotTaken).ToList();
-	}
-
-	public async Task<HubConnection?> FindCurrentConnection(Guid userId)
-	{
-		return await connectionsContext.FindCurrentConnection(userId);
-	}
-
-	public async Task<HubConnection> SaveCurrentConnection(Guid userId, string lobbyId, string hubConnectionId)
-	{
-		var connection = await connectionsContext.FindCurrentConnection(userId);
-		if (connection is null)
-		{
-			connection = new HubConnection
-			{
-				UserId = userId,
-				LobbyId = lobbyId,
-				HubConnectionId = hubConnectionId
-			};
-			connectionsContext.HubConnections.Add(connection);
-			await connectionsContext.SaveChangesAsync();
-			return connection;
-		}
-
-		connection.LobbyId = lobbyId;
-		connection.HubConnectionId = hubConnectionId;
-		await connectionsContext.SaveChangesAsync();
-		return connection;
-	}
-
-	public async Task RemoveConnection(Guid userId)
-	{
-		await connectionsContext.HubConnections
-			.AsNoTracking()
-			.Where(x => x.UserId == userId)
-			.ExecuteDeleteAsync();
-		await connectionsContext.SaveChangesAsync();
 	}
 }
