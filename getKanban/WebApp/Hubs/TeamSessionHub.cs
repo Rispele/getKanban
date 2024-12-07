@@ -42,6 +42,12 @@ public class TeamSessionHub : Hub
 			await Clients.OthersInGroup(groupId).SendAsync("NotifyUpdateTicketChoice", ticketId);
 		}
 	}
+
+	public async Task RollbackToDay(Guid gameSessionId, Guid teamId, int dayNumber)
+	{
+		var groupId = GetGroupId(gameSessionId, teamId);
+		await Clients.OthersInGroup(groupId).SendAsync("NotifyRollbackToDay", gameSessionId, teamId, dayNumber);
+	}
 	
 	private async Task AddCurrentConnectionToLobbyGroupAsync(string groupId)
 	{

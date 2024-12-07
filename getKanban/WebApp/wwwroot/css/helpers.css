@@ -140,7 +140,7 @@
     text-align: center;
 }
 
-.retry {
+.restart {
     width: 15px;
     height: 15px;
 
@@ -148,9 +148,11 @@
 
     bottom: 20px;
     right: 15px;
+
+    cursor: pointer;
 }
 
-.copy {
+.settings {
     width: 15px;
     height: 15px;
 
@@ -158,6 +160,8 @@
 
     top: 20px;
     right: 15px;
+
+    cursor: pointer;
 }
 
 .delete {

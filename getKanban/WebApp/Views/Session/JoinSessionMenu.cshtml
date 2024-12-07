@@ -8,28 +8,16 @@
             return;
         }
         
-        const hasAccess = await fetch(`/session/check?inviteCode=${inviteCode}`)
-            .then(response => response.json())
-            .then(response => {
-                if (response !== true) {
-                    showMessage("Сессия с данным кодом приглашения не была найдена");
-                    return false;
+        await fetch(`/session/join?inviteCode=${inviteCode}`, {redirect: "follow"})
+            .then(sessionId => sessionId.json())
+            .then(sessionId => {
+                if (sessionId.length === 0) {
+                    showMessage("Невозможно присоединиться к сессии с данным кодом приглашения");
+                    return;
                 }
-                return true;
+                
+                window.location.href = `/session/${sessionId}`;
             });
-        
-        if (hasAccess) {
-            await fetch(`/session/join?inviteCode=${inviteCode}`, {redirect: "follow"})
-                .then(sessionId => sessionId.json())
-                .then(sessionId => {
-                    if (sessionId.length === 0) {
-                        showMessage("Невозможно присоединиться к сессии с данным кодом приглашения");
-                        return;
-                    }
-                    
-                    window.location.href = `/session/${sessionId}`;
-                });
-        }
     }
 </script>
 

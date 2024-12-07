@@ -1,15 +1,11 @@
-﻿using Core.DbContexts;
-using Core.DbContexts.Extensions;
+﻿using Core.DbContexts.Extensions;
 using Core.Dtos;
 using Core.Dtos.Converters;
-using Core.Entities;
 using Core.Helpers;
 using Core.RequestContexts;
 using Core.Services.Contracts;
 using Domain.DbContexts;
 using Domain.Game;
-using Domain.Game.Tickets;
-using Microsoft.EntityFrameworkCore;
 
 namespace Core.Services.Implementations;
 
@@ -117,14 +113,14 @@ public class GameSessionService : IGameSessionService
 			participantAdded);
 	}
 	
-	public async Task<bool> RemoveParticipantAsync(RequestContext requestContext, Guid sessionId, Guid userId)
+	public async Task<bool> RemoveParticipantAsync(RequestContext requestContext, Guid sessionId)
 	{
 		var session = await context.FindGameSessionsAsync(sessionId);
 		if (session is null)
 		{
 			return false;
 		}
-		var user = await context.GetUserAsync(userId);
+		var user = await context.GetUserAsync(requestContext.GetUserId());
 
 		var angelsRemoved = session.Angels.RemoveParticipant(user);
 		var teamsRemoved = session.Teams.Any(x => x.Players.RemoveParticipant(user));
@@ -163,11 +159,6 @@ public class GameSessionService : IGameSessionService
 		};
 	}
 
-	public Guid GetTeamInviteId(string inviteCode)
-	{
-		return InviteCodeHelper.SplitInviteCode(inviteCode).teamId;
-	}
-
 	public async Task UpdateTeamName(Guid sessionId, Guid teamId, string name)
 	{
 		var team = await context.GetTeamAsync(sessionId, teamId);
@@ -189,38 +180,5 @@ public class GameSessionService : IGameSessionService
 			Id = user.Id,
 			Name = user.Name
 		};
-	}
-
-	public async Task<List<Ticket>> GetTicketsToRelease(Guid sessionId, Guid teamId)
-	{
-		var team = await context.GetTeamAsync(sessionId, teamId);
-		var tickets = team.BuildTakenTickets();
-
-		var previousDayNumber = team.CurrentDay.Number - 1;
-		return tickets
-			.Where(x => x.IsInWork(previousDayNumber))
-			.Where(
-				x => team.CurrentDay.ReleaseTicketContainer.CanReleaseNotImmediatelyTickets
-				  || TicketDescriptors.GetByTicketId(x.id).CanBeReleasedImmediately)
-			.ToList();
-	}
-
-	public async Task<List<Ticket>> GetBacklogTickets(Guid sessionId, Guid teamId)
-	{
-		var team = await context.GetTeamAsync(sessionId, teamId);
-
-		var tickets = team.BuildTakenTickets();
-
-		var currentDayNumber = team.CurrentDay.Number;
-		var previousDayNumber = currentDayNumber - 1;
-		var ticketsTakenThisDay = tickets
-			.Where(ticket => !ticket.IsTaken(previousDayNumber) && ticket.IsTaken(currentDayNumber))
-			.ToList();
-
-		var ticketsNotTaken = TicketDescriptors.AllTicketDescriptors
-			.Where(x => tickets.All(t => t.id != x.Id))
-			.Select(t => new Ticket(t.Id, int.MaxValue, null));
-
-		return ticketsTakenThisDay.Concat(ticketsNotTaken).ToList();
 	}
 }

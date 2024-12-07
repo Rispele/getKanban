@@ -129,7 +129,7 @@ public partial class Team
 		var somethingToReleaseImmediately =
 			takenTickets.Any(t => TicketDescriptors.GetByTicketId(t).CanBeReleasedImmediately);
 		var shouldUpdateSpringBacklog = endOfReleaseCycle || dayNumber >= Settings.UpdateSprintBacklogEveryDaySince;
-		var anotherTeamAppeared = dayNumber > Settings.AnotherTeamShouldWorkSince
+		var anotherTeamAppeared = dayNumber >= Settings.AnotherTeamShouldWorkSince
 		                       && BuildAnotherTeamScores(daysToProcess) < Settings.ScoresAnotherTeamShouldGain;
 
 		var scenario = ScenarioBuilder.Create()
@@ -157,5 +157,23 @@ public partial class Team
 		};
 
 		return new Day(daySettings, scenario);
+	}
+
+	public bool RollbackToDay(int dayNumber)
+	{
+		if (days.IsNullOrEmpty())
+		{
+			return false;
+		}
+
+		if (dayNumber > days.MaxBy(x => x.Number)!.Number)
+		{
+			return false;
+		}
+		
+		days.RemoveAll(x => x.Number >= dayNumber);
+		currentDayNumber = dayNumber;
+		days.Add(ConfigureDay(currentDayNumber, days));
+		return true;
 	}
 }

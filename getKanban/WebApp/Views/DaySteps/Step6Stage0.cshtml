@@ -51,6 +51,7 @@
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
     const connection = setupHubConnection(new signalR.HubConnectionBuilder(), "@Model.GameSessionId", "@Model.TeamId");
+    setRollbackEvent(connection);
     
     document.getElementById('save-cfd').addEventListener('click', function () {
         const released = document.getElementById('released').value;

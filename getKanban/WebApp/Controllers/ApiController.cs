@@ -2,6 +2,7 @@
 using Domain.Game.Days.Commands;
 using Domain.Game.Days.DayContainers;
 using Domain.Game.Days.DayContainers.TeamMembers;
+using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
 using WebApp.Models.DayStepModels;
 
@@ -11,10 +12,12 @@ namespace WebApp.Controllers;
 public class ApiController : Controller
 {
 	private readonly ITeamService teamService;
+	private readonly IDomainInteractionService domainInteractionService;
 
-	public ApiController(ITeamService teamService)
+	public ApiController(ITeamService teamService, IDomainInteractionService domainInteractionService)
 	{
 		this.teamService = teamService;
+		this.domainInteractionService = domainInteractionService;
 	}
 	
 	[HttpPost("another-team-roll")]
@@ -110,5 +113,21 @@ public class ApiController : Controller
 		var requestContext = RequestContextFactory.Build(Request);
 		
 		await teamService.PatchDayAsync(requestContext, gameSessionId, teamId, new EndDayCommand());
+	}
+
+	[HttpPost("restart-day")]
+	public async Task RestartDay([FromBody] RestartDayModel restartDayModel)
+	{
+		await domainInteractionService.RestartDay(
+			restartDayModel.SessionId,
+			restartDayModel.TeamId,
+			restartDayModel.DayNumber);
+	}
+
+	public class RestartDayModel
+	{
+		public Guid SessionId { get; [UsedImplicitly] set; }
+		public Guid TeamId { get; [UsedImplicitly] set; }
+		public int DayNumber { get; [UsedImplicitly] set; }
 	}
 }

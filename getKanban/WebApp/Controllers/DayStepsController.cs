@@ -12,15 +12,18 @@ public class DayStepsController : Controller
 	private readonly IGameSessionService gameSessionService;
 	private readonly ITeamService teamService;
 	private readonly IStatisticsService statisticsService;
+	private readonly IDomainInteractionService domainInteractionService;
 
 	public DayStepsController(
 		IGameSessionService gameSessionService,
 		ITeamService teamService,
-		IStatisticsService statisticsService)
+		IStatisticsService statisticsService,
+		IDomainInteractionService domainInteractionService)
 	{
 		this.gameSessionService = gameSessionService;
 		this.teamService = teamService;
 		this.statisticsService = statisticsService;
+		this.domainInteractionService = domainInteractionService;
 	}
 
 	[HttpGet("{pageNumber:int}")]
@@ -98,7 +101,7 @@ public class DayStepsController : Controller
 					dayNumber: currentDay.Number));
 		}
 
-		var ticketIds = await gameSessionService.GetTicketsToRelease(gameSessionId, teamId);
+		var ticketIds = await domainInteractionService.GetTicketsToRelease(gameSessionId, teamId);
 		var pageTypeNumber = (ticketIds.Any(x => x.id.Contains('S')) ? 1 : 0)
 		                   + (ticketIds.Any(x => x.id.Contains('I')) ? 1 : 0)
 		                   + (ticketIds.Any(x => x.id.Contains('E') || x.id.Contains('F')) ? 1 : 0);
@@ -160,7 +163,7 @@ public class DayStepsController : Controller
 					dayNumber: currentDay.Number));
 		}
 
-		var ticketIds = await gameSessionService.GetBacklogTickets(gameSessionId, teamId);
+		var ticketIds = await domainInteractionService.GetBacklogTickets(gameSessionId, teamId);
 		var pageTypeNumber = (ticketIds.Any(x => x.id.Contains('S')) ? 1 : 0) +
 		                     (ticketIds.Any(x => x.id.Contains('I')) ? 1 : 0) +
 		                     (ticketIds.Any(x => x.id.Contains('E') || x.id.Contains('F')) ? 1 : 0);

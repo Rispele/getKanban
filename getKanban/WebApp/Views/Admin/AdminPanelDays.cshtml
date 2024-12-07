@@ -41,9 +41,9 @@
         <div class="checkboxCardsMargin">
             <div class="checkboxCardContainer currentDayStyle">
                 <div class="checkboxCardContent">
-                    <h2 class="checkboxCardNumber">День 12</h2>
-                    <img class="retry" src="images/restart_button.png" alt="retry">
-                    <img class="copy" src="images/copy_button.jpg" alt="copy">
+                    <h2 class="checkboxCardNumber">День @Model.CurrentDay.Number</h2>
+                    <img class="restart" src="/images/restart_button.svg" alt="restart">
+                    <img class="settings" src="/images/settings_button.svg" alt="settings">
                 </div>
             </div>
         </div>
@@ -62,8 +62,29 @@
     </div>
 </div>
 
+<script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
-    document.getElementById("day-edit").addEventListener('click', function () {
-        window.location.href = `/admin/edit?sessionId=@Model.SessionId&teamId=@Model.TeamId&dayNumber=@Model.CurrentDay.Number`;
+    const connection = new signalR.HubConnectionBuilder().withUrl("/teamSessionHub").build();
+    connection.start()
+    
+    document.getElementsByClassName("restart")[0].addEventListener('click', function () {
+        fetch("/@Model.SessionId/@Model.TeamId/api/restart-day", {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                SessionId: "@Model.SessionId",
+                TeamId: "@Model.TeamId",
+                DayNumber: @Model.CurrentDay.Number,
+            })
+        })
+        .then(function () {
+            connection.invoke("RollbackToDay", "@Model.SessionId", "@Model.TeamId", @Model.CurrentDay.Number)
+            .then(function () {
+                window.location.href = `/admin?sessionId=@Model.SessionId`;
+            });
+        });
     });
+
 </script>

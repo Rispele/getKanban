@@ -21,6 +21,7 @@ builder.Services.AddScoped<DomainContext>();
 builder.Services.AddScoped<ConnectionsContext>();
 builder.Services.AddScoped<DayDtoConverter>();
 builder.Services.AddScoped<IGameSessionService, GameSessionService>();
+builder.Services.AddScoped<IDomainInteractionService, DomainInteractionService>();
 builder.Services.AddScoped<ITeamService, TeamService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IStatisticsService, StatisticsService>();

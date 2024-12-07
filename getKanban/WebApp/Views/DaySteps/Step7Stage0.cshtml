@@ -30,4 +30,5 @@
     const connection = setupHubConnection(new signalR.HubConnectionBuilder(), "@Model.GameSessionId", "@Model.TeamId");
     setSwitchEvent("prev", connection, "@Model.GameSessionId", "@Model.TeamId", 6, 1);
     setSwitchEvent("next", connection, "@Model.GameSessionId", "@Model.TeamId", 7, 1);
+    setRollbackEvent(connection);
 </script>

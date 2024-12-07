@@ -29,6 +29,7 @@
 <script>
     const connection = setupHubConnection(new signalR.HubConnectionBuilder(), "@Model.GameSessionId", "@Model.TeamId");
     setSwitchEvent("prev", connection, "@Model.GameSessionId", "@Model.TeamId", 7, 0);
+    setRollbackEvent(connection);
     
     document.getElementById("next-day").addEventListener('click', function () {
         fetch(`/@Model.GameSessionId/@Model.TeamId/api/end-day`, {

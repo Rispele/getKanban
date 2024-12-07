@@ -75,6 +75,7 @@
     const connection = setupHubConnection(new signalR.HubConnectionBuilder(), "@Model.GameSessionId", "@Model.TeamId");
     setSwitchEvent("prev", connection, "@Model.GameSessionId", "@Model.TeamId", 4, 0);
     setSwitchEvent("next", connection, "@Model.GameSessionId", "@Model.TeamId", 4, 2);
+    setRollbackEvent(connection);
     
     connection.on("NotifyUpdateTicketChoice", function (ticketId) {
         const ticket = document.getElementById(ticketId);

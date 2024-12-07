@@ -6,3 +6,9 @@
             });
     });
 }
+
+function setRollbackEvent(connection) {
+    connection.on("NotifyRollbackToDay", function (sessionId, teamId, dayNumber) {
+        window.location.href = `/${sessionId}/${teamId}/step/1/0`;
+    });
+}

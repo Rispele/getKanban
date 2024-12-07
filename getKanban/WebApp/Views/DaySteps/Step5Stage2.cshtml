@@ -8,7 +8,7 @@
         Если вы ошиблись, вернитесь назад и скорректируйте выбор.</h1>
     <hr class="divider">
     <div class="container2">
-        @foreach (var ticketId in Model.TicketIds)
+        @foreach (var ticketId in Model.TicketIds.OrderBy(x => x))
         {
             <div>
                 <input type="checkbox" class="checkboxCardInput" id="checkbox2">
@@ -42,4 +42,5 @@
     const connection = setupHubConnection(new signalR.HubConnectionBuilder(), "@Model.GameSessionId", "@Model.TeamId");
     setSwitchEvent("prev", connection, "@Model.GameSessionId", "@Model.TeamId", 5, 1);
     setSwitchEvent("next", connection, "@Model.GameSessionId", "@Model.TeamId", 6, 0);
+    setRollbackEvent(connection);
 </script>

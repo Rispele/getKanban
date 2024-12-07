@@ -67,9 +67,9 @@ public class StatisticsService : IStatisticsService
 			.Select(
 				day => DayStatisticDto.Create(
 					dayNumber: day.Number,
-					clientsGained: clientsGainedPerDay[day.Number],
-					profitGained: profitGainedPerDay[day.Number],
-					profitPerClient: profitPerClientPerDay[day.Number],
+					clientsGained: clientsGainedPerDay.GetValueOrDefault(day.Number),
+					profitGained: profitGainedPerDay.GetValueOrDefault(day.Number),
+					profitPerClient: profitPerClientPerDay.GetValueOrDefault(day.Number),
 					cfdStatistic: CollectCfdStatistic(day)))
 			.ToList();
 	}

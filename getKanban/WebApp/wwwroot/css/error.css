@@ -1,15 +1,19 @@
 ﻿.card {
-    display: block;
+
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    
     height: 70px;
     overflow: hidden;
     border: none;
 }
 
 .error-card {
-    display: inline-block;
     
     /*position: fixed;*/
-    position: absolute;
+    position: fixed;
+    top: 20px;
     right: 20px;
     padding: 15px;
     background-color: #f8d7da;
@@ -21,10 +25,12 @@
     transition: opacity 0.5s;
 }
 .message-card {
-    display: inline-block;
-    
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
     /*position: fixed;*/
     position: absolute;
+    top: 20px;
     right: 20px;
     
     padding: 15px;

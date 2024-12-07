@@ -18,7 +18,7 @@ public class LobbyHub : Hub
 	{
 		var requestContext = RequestContextFactory.Build(Context);
 		var currentUser = await gameSessionService.GetCurrentUser(requestContext);
-		await gameSessionService.RemoveParticipantAsync(requestContext, gameSessionId, currentUser.Id);
+		await gameSessionService.RemoveParticipantAsync(requestContext, gameSessionId);
 
 		var groupId = GetGroupId(gameSessionId);
 		await RemoveCurrentConnectionFromLobbyGroupAsync(groupId);
