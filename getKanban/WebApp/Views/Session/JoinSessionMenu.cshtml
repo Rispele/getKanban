@@ -4,7 +4,7 @@
     async function joinSession() {
         const inviteCode = document.getElementById("inviteCode").value.toString();
         if (inviteCode.length === 0) {
-            showError("Код приглашения должен быть заполнен");
+            showMessage("Код приглашения должен быть заполнен");
             return;
         }
         
@@ -12,7 +12,7 @@
             .then(response => response.json())
             .then(response => {
                 if (response !== true) {
-                    showError("Сессия с данным кодом приглашения не была найдена");
+                    showMessage("Сессия с данным кодом приглашения не была найдена");
                     return false;
                 }
                 return true;
@@ -22,7 +22,12 @@
             await fetch(`/session/join?inviteCode=${inviteCode}`, {redirect: "follow"})
                 .then(sessionId => sessionId.json())
                 .then(sessionId => {
-                    window.location.href = `/session/${sessionId}`
+                    if (sessionId.length === 0) {
+                        showMessage("Невозможно присоединиться к сессии с данным кодом приглашения");
+                        return;
+                    }
+                    
+                    window.location.href = `/session/${sessionId}`;
                 });
         }
     }

@@ -1,4 +1,5 @@
 using Core.Dtos;
+using Core.Helpers;
 using Core.Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -24,9 +25,10 @@ public class SessionController : Controller
 	{
 		var requestContext = RequestContextFactory.Build(Request);
 		var session = await gameSessionService.FindGameSession(requestContext, sessionId, ignorePermissions: false);
+		var currentTeam = await gameSessionService.GetCurrentTeam(requestContext, sessionId);
 
 		return session is { IsRecruitmentFinished: false }
-			? RedirectToAction("LobbyMenu", new { sessionId = session.Id })
+			? RedirectToAction("LobbyMenu", new { sessionId = session.Id, teamId = currentTeam.Id })
 			: View("Error", "Запрашиваемая сессия не была найдена или закрыта.");
 	}
 
@@ -40,16 +42,24 @@ public class SessionController : Controller
 			return null;
 		}
 		
-		if (addParticipantResult.Updated)
-		{
-			await hub.Clients.Group($"lobby-{addParticipantResult.GameSession.Id}").SendAsync(
-				"NotifyJoined",
-				addParticipantResult.UpdatedTeamId.ToString(),
-				addParticipantResult.User.Id.ToString(),
-				addParticipantResult.User.Name);
-		}
+		// if (addParticipantResult.Updated)
+		// {
+		// 	await hub.Clients.Group($"lobby-{addParticipantResult.GameSession.Id}").SendAsync(
+		// 		"NotifyJoined",
+		// 		addParticipantResult.UpdatedTeamId.ToString(),
+		// 		addParticipantResult.User.Id.ToString(),
+		// 		addParticipantResult.User.Name);
+		// }
 
 		return addParticipantResult.GameSession.Id;
+	}
+
+	[HttpGet("leave")]
+	public async Task<bool> LeaveLobbyMenu(Guid sessionId)
+	{
+		var requestContext = RequestContextFactory.Build(Request);
+		var user = await gameSessionService.GetCurrentUser(requestContext);
+		return await gameSessionService.RemoveParticipantAsync(requestContext, sessionId, user.Id);
 	}
 
 	[HttpGet("join-menu")]
@@ -58,11 +68,25 @@ public class SessionController : Controller
 	[HttpGet("create-menu")]
 	public IActionResult CreateSessionMenu() => View();
 
-	[HttpGet("{sessionId:guid}/lobby-menu")]
-	public async Task<IActionResult> LobbyMenu(Guid sessionId)
+	[HttpGet("{sessionId:guid}/{teamId:guid}/lobby-menu")]
+	public async Task<IActionResult> LobbyMenu(Guid sessionId, Guid teamId)
 	{
 		var requestContext = RequestContextFactory.Build(Request);
-		var session = await gameSessionService.FindGameSession(requestContext, sessionId, ignorePermissions: false);
+		var session = await gameSessionService.FindGameSession(requestContext,
+			InviteCodeHelper.ConcatInviteCode(sessionId, teamId), ignorePermissions: false);
+		if (session is null)
+		{
+			return View("Error", "Невозможно подключиться к сессии");
+		}
+		var currentUser = await gameSessionService.GetCurrentUser(requestContext);
+		if (session!.Angels.Participants.Users.All(x => x.Id != currentUser.Id)
+		    && session.Teams.All(x => x.Participants.Users.All(p => p.Id != currentUser.Id)))
+		{
+			await JoinLobbyMenu(InviteCodeHelper.ConcatInviteCode(sessionId, teamId));
+			session = await gameSessionService.FindGameSession(requestContext,
+				InviteCodeHelper.ConcatInviteCode(sessionId, teamId), ignorePermissions: false);
+		}
+		
 		return View(session);
 	}
 	
@@ -86,7 +110,14 @@ public class SessionController : Controller
 	[HttpGet("get-current-team")]
 	public async Task<TeamDto?> GetCurrentTeam(Guid sessionId)
 	{
-		return await gameSessionService.GetCurrentTeam(RequestContextFactory.Build(Request), sessionId);
+		try
+		{
+			return await gameSessionService.GetCurrentTeam(RequestContextFactory.Build(Request), sessionId);
+		}
+		catch (InvalidOperationException e)
+		{
+			return null;
+		}
 	}
 
 	[HttpGet("get-team-invite")]

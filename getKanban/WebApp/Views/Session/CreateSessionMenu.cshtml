@@ -1,26 +1,20 @@
 ﻿<script src="/js/error.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
-    const hubConnection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
-    hubConnection.on("Created", inviteCode =>
-        window.location.href = `/session?invite=${inviteCode}`
-    );
-    hubConnection.start();
-    
     async function createGameSession() {
         const teamsCountString = document.getElementById("teamsCount").value
         if (teamsCountString.length === 0) {
-            showError("Число команд должно быть заполнено");
+            showMessage("Число команд должно быть заполнено");
             return;
         }
         const teamsCount = parseInt(teamsCountString);
         if (teamsCount <= 0) {
-            showError("Число команд должно быть положительным");
+            showMessage("Число команд должно быть положительным");
             return;
         }
         const sessionName = document.getElementById("sessionName").value;
         if (sessionName.length === 0) {
-            showError("Название игры должно быть заполнено");
+            showMessage("Название игры должно быть заполнено");
             return;
         }
         

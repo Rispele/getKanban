@@ -18,6 +18,8 @@ public interface IGameSessionService
 	public Task<GameSessionDto?> FindGameSession(RequestContext requestContext, Guid sessionId, bool ignorePermissions);
 
 	public Task<AddParticipantResult?> AddParticipantAsync(RequestContext requestContext, string inviteCode);
+	
+	public Task<bool> RemoveParticipantAsync(RequestContext requestContext, Guid sessionId, Guid userId);
 
 	public Task StartGameAsync(RequestContext requestContext, Guid gameSessionId);
 

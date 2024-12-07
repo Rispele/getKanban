@@ -1,26 +1,16 @@
 ﻿@using Domain.Game
 @model Core.Dtos.GameSessionDto
 
-@* Header *@
 <div class="commandEditorHeader text-center">
     <h1 class="display-4 fw-bold">getKanban: "@Model.Name"</h1>
 </div>
 
-@* Windows *@
 <div class="commandEditorContainer centered-25">
-
-    @* Command windows *@
     <div class="commandEditorLWindow commandEditorWindowsHeight commandEditorBorderStyle commandEditorBorderWidth commandEditorBorderRadius">
-
         @foreach (var team in Model.Teams)
         {
-            @* Command window template *@
             <div class="commandEditorCommandContainer commandEditorBorderRadius">
-
-                @* Command header container *@
                 <div class="commandEditorHeaders text-center" id="headers-@team.Id"></div>
-
-                @* Players in command *@
                 <div class="commandEditorNamesContainer text-center" id="@team.Id">
                     @foreach (var player in team.Participants.Users)
                     {
@@ -30,14 +20,8 @@
             </div>
         }
     </div>
-
-    @* Angels *@
     <div class="commandEditorSWindow commandEditorWindowsHeight commandEditorBorderStyle commandEditorBorderWidth commandEditorBorderRadius">
-
-        @* Angels header container *@
         <div class="commandEditorHeaders text-center" id="headers-@Model.Angels.Id"></div>
-
-        @* Angels Name *@
         <div class="commandEditorNamesContainer angelsEditor text-center" id="@Model.Angels.Id">
             @foreach (var player in Model.Angels.Participants.Users)
             {
@@ -54,10 +38,42 @@
     </form>
 }
 
+<script src="/js/error.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script type="module" async="async">
     const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
-    await connection.start().then(_ => connection.invoke("Join", "@Model.Id"));
+    let shouldLeave = true;
+    await connection.start()
+    .then(function () {
+        let path = window.location.pathname.split("session/")[1];
+        path = path.split("/lobby-menu")[0];
+        const inviteCode = path.replace("/", ".");
+    
+        connection.invoke("CheckPlayerJoined", inviteCode);
+        connection.on("NotifyPlayerCheck", function (hasJoined) {
+            if (!hasJoined) {
+                fetch(`/session/join?inviteCode=${inviteCode}`, {redirect: "follow"})
+                    .then(sessionId => sessionId.json())
+                    .then(sessionId => {
+                        if (sessionId.length === 0) {
+                            showMessage("Невозможно присоединиться к сессии с данным кодом приглашения");
+                            return;
+                        }
+                        window.location.href = `/session/${sessionId}`;
+                    });
+            }
+        });
+    })
+    .then(function () {
+        connection.invoke("JoinGame", "@Model.Id");
+    });
+
+    connection.on("NotifyLeft", function (userId) {
+        const playerElement = document.getElementById(userId.toString());
+        const playerName = playerElement.textContent;
+        playerElement.remove();
+        showMessage(`Игрок ${playerName} покидает игру`, false);
+    });
     connection.on("NotifyJoined", function (teamId, userId, userName) {
         const playerElement = document.createElement("p");
         playerElement.setAttribute("class", "fs-6");
@@ -65,8 +81,11 @@
         const team = document.getElementById(teamId);
         team.appendChild(playerElement);
         playerElement.textContent = userName.toString();
+        const teamName = document.getElementById(`headers-${teamId}`).innerText;
+        showMessage(`Игрок ${userName.toString()} присоединяется к команде "${teamName}"`, false);
     });
     connection.on("NotifyStarted", async function () {
+        shouldLeave = false;
         await fetch("/session/get-current-team?sessionId=@Model.Id")
             .then(async response => {
                 const teamDto = JSON.parse(await response.text());
@@ -77,6 +96,9 @@
                 }
             })
     });
+    connection.on("NotifyRenamed", function (teamId, teamName) {
+        refreshTeamsHeaders(teamId, teamName)
+    });
     
     const startButton = document.getElementById("start");
     if (startButton !== null && startButton !== undefined) {
@@ -85,10 +107,6 @@
                 .then(function () {});
         });
     }
-
-    connection.on("NotifyRenamed", function (teamId, teamName) {
-        refreshTeamsHeaders(teamId, teamName)
-    });
 
     const currentTeamJson = await fetch("/session/get-current-team?sessionId=@Model.Id")
         .then(r => r.text())
@@ -102,6 +120,12 @@
     let currentTeamId = currentTeamJson["id"];
     let currentTeamName = currentTeamJson["name"];
     let currentTeamLink = currentTeamJson["participants"]["inviteCode"];
+
+    window.onbeforeunload = function () {
+        if (shouldLeave) {
+            connection.invoke("LeaveGame", "@Model.Id");
+        }
+    };
 
     const teamLinks = [];
     const teamIds = [];
@@ -154,10 +178,10 @@
             const input = document.createElement("input");
             input.setAttribute("id", `edit-input-${teamId}`);
 
-            const button = document.createElement("button");
-            button.setAttribute("id", `edit-submit-${teamId}`);
-            button.innerText = "save";
-            button.addEventListener("click", function () {
+            const saveButton = document.createElement("button");
+            saveButton.setAttribute("id", `edit-submit-${teamId}`);
+            saveButton.innerText = "Сохранить";
+            saveButton.addEventListener("click", function () {
                 const teamName = input.value.toString();
                 if (teamName.length > 0) {
                     fetch(`/session/update-team-name?sessionId=@Model.Id&teamId=${teamId}&name=${teamName}`)
@@ -169,10 +193,18 @@
                         });
                 }
             });
+            
+            const backButton = document.createElement("button");
+            backButton.setAttribute("id", `edit-back-${teamId}`);
+            backButton.innerText = "Назад";
+            backButton.addEventListener("click", function () {
+                refreshTeamsHeaders();
+            });
 
             const editBlock = getOrCreateEditBlock(teamId)
-            editBlock.appendChild(button);
+            editBlock.appendChild(saveButton);
             editBlock.appendChild(input);
+            editBlock.appendChild(backButton);
         }
     }
 

@@ -62,6 +62,12 @@ public class ParticipantsContainer
 		participants.Add(new Participant(user, participantRole));
 		return true;
 	}
+
+	public bool RemoveParticipant(User user)
+	{
+		var removed = participants.RemoveAll(x => x.User.Id == user.Id);
+		return removed > 0;
+	}
 	
 	public bool MatchInviteCode(string inviteCode)
 	{

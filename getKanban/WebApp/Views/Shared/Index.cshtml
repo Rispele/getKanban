@@ -12,7 +12,7 @@
     function redirect(endpoint) {
         const userName = document.getElementsByClassName("authorizationCommandName")[0].value.toString();
         if (userName.length === 0) {
-            showError("Имя должно быть заполнено");
+            showMessage("Имя должно быть заполнено");
             return;
         }
         fetch(`/add-username?name=${userName}`)

@@ -116,6 +116,23 @@ public class GameSessionService : IGameSessionService
 			teamId,
 			participantAdded);
 	}
+	
+	public async Task<bool> RemoveParticipantAsync(RequestContext requestContext, Guid sessionId, Guid userId)
+	{
+		var session = await context.FindGameSessionsAsync(sessionId);
+		if (session is null)
+		{
+			return false;
+		}
+		var user = await context.GetUserAsync(userId);
+
+		var angelsRemoved = session.Angels.RemoveParticipant(user);
+		var teamsRemoved = session.Teams.Any(x => x.Players.RemoveParticipant(user));
+
+		await context.SaveChangesAsync();
+		
+		return angelsRemoved || teamsRemoved;
+	}
 
 	public async Task StartGameAsync(RequestContext requestContext, Guid gameSessionId)
 	{
