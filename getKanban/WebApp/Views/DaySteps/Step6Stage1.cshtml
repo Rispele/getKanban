@@ -5,30 +5,27 @@
     <h1 class="fs-1 fw- text-center">Команда @Html.Raw(Model.TeamName). День @Model.DayNumber</h1>
 </div>
 
-@* @{ *@
-@*     CollectCfdStatisticPerStep(d => d.CfdStatistic.WithAnalysts, "Аналитики"); *@
-@*     CollectCfdStatisticPerStep(d => d.CfdStatistic.WithProgrammers, "Разработчики"); *@
-@*     CollectCfdStatisticPerStep(d => d.CfdStatistic.WithTesters, "Тестировщики"); *@
-@*     CollectCfdStatisticPerStep(d => d.CfdStatistic.ToDeploy, "Готово к поставке"); *@
-@*     CollectCfdStatisticPerStep(d => d.CfdStatistic.Released, "Поставлено"); *@
-@* } *@
-
 @functions
 {
-    @* private void CollectCfdStatisticPerStep(Func<DayStatisticDto, int> getter, string groupName) *@
-    @* { *@
-    @*     <p>@groupName - - - @string.Join(" ", Model.TeamStatistic.DayStatistics.Select(getter))</p> *@
-    @* } *@
-
-    private void RenderGraph()
+    private void RenderDiagram()
     {
-        var rows = new [] {"[8,2,4,4,1,0]"}.Concat(Model.TeamStatistic.DayStatistics.Select(CfdStatisticToString));
-        var table = $"[{string.Join(",", rows)}]";
+        var dayStatistics = Model.TeamStatistic.DayStatistics;
+        var rowsForCfd = new[] { "[8,2,4,4,1,0]" }.Concat(dayStatistics.Select(CfdStatisticToString));
+        var tableForCfd = $"[{string.Join(",", rowsForCfd)}]";
+        
+        var rowsForControlDiagram = dayStatistics
+            .SelectMany(d => d.TicketsReleased)
+            .Select((ticket, i) => $"[{i}, {ticket.releaseDay - ticket.takingDay}]");
+        var tableForDiagram = $"[{string.Join(",", rowsForControlDiagram)}]";
+
+        var rowsForDistributionDiagram = dayStatistics
+            .SelectMany(d => d.TicketsReleased)
+            .GroupBy(t => t.releaseDay - t.takingDay)
+            .Select(g => $"[{g.Key}, {g.Count()}]");
+        var tableForDistributionDiagram = $"[{string.Join(",", rowsForDistributionDiagram)}]";
+        
         <script type="text/javascript">
-            const graphBlock = document.getElementById("graphdiv3");
-            const data = @table;
-            console.log(data);
-            const options = {
+            const optionsForCfd = {
                 stackedGraph: true,
                 labels: ["День", "В аналитике", "В разработке", "В тестировании", "Готово к поставке", "Поставлено"],
                 dateWindow : [8, 22],
@@ -43,13 +40,51 @@
                 }
             };
 
+            const optionsForControlDiagram = {
+                labels: ["День", "За сколько дней поставили"],
+                dateWindow : [0, @Math.Max(10, dayStatistics.Count)],
+
+                highlightCircleSize: 2,
+                strokeWidth: 1,
+
+                highlightSeriesOpts: {
+                    strokeWidth: 3,
+                    strokeBorderWidth: 1,
+                    highlightCircleSize: 5
+                }
+            };
+
+            const optionsForDistributionDiagram = {
+                labels: ["За сколько дней поставили", "Кол-во задач"],
+                dateWindow : [0, @Math.Max(10, dayStatistics.Count)],
+
+                highlightCircleSize: 2,
+                strokeWidth: 1,
+
+                highlightSeriesOpts: {
+                    strokeWidth: 3,
+                    strokeBorderWidth: 1,
+                    highlightCircleSize: 5
+                }
+            };
+
             Dygraph.onDOMready(function onDOMready() {
-                const g3 = new Dygraph(graphBlock, data, options);
+                new Dygraph(
+                    document.getElementById("cfd"),
+                    @tableForCfd, 
+                    optionsForCfd);
+                new Dygraph(
+                    document.getElementById("control-diagram"),
+                    @tableForDiagram, 
+                    optionsForControlDiagram);
+                new Dygraph(
+                    document.getElementById("distribution-diagram"),
+                    @tableForDistributionDiagram,
+                    optionsForDistributionDiagram);
             });
         </script>
     }
-}
-@functions {
+
     private static string CfdStatisticToString(DayStatisticDto t)
     {
         return $"[{t.DayNumber}," +
@@ -61,14 +96,17 @@
     }
 }
 
-
-<script type="text/javascript" src="~/js/dygraph/dygraph.min.js">
-        
-        </script>
+<script type="text/javascript" src="~/js/dygraph/dygraph.min.js"></script>
 <link rel="stylesheet" type="text/css" href="~/css/dygraph.min.css"/>
 
-<div id="graphdiv3" style="width:500px; height:300px;"></div>
-@{ RenderGraph(); }
+<div class="diagram-container" style="width: 50%; height: 100%; display: flex; flex-direction: column;">
+    <div id="cfd" style="width:500px; height:300px;"></div>
+    <div id="control-diagram" style="width:500px; height:300px;"></div>
+    <div id="distribution-diagram" style="width:500px; height:300px;"></div>
+</div>
+@{
+    RenderDiagram();
+}
 <button class="stepControlButtons position-relative rightButton" id="next">
     <p class="fs-6">Далее</p>
 </button>

@@ -34,6 +34,7 @@ public class StatisticsService : IStatisticsService
 
 		var dayStats = ConvertToDayStatisticDto(
 			team,
+			takenTickets,
 			clientsGainedPerDay,
 			profitGainedPerDay,
 			profitPerClientPerDay);
@@ -59,10 +60,15 @@ public class StatisticsService : IStatisticsService
 
 	private List<DayStatisticDto> ConvertToDayStatisticDto(
 		Team team,
+		HashSet<Ticket> takenTickets,
 		Dictionary<int, int> clientsGainedPerDay,
 		Dictionary<int, int> profitGainedPerDay,
 		Dictionary<int, int> profitPerClientPerDay)
 	{
+		var releasedTickets = takenTickets
+			.Where(t => t.IsReleasedAnyDate())
+			.GroupBy(t => t.releaseDay!.Value)
+			.ToDictionary(t => t.Key, t => t.ToList());
 		return team.Days
 			.Select(
 				day => DayStatisticDto.Create(
@@ -70,7 +76,8 @@ public class StatisticsService : IStatisticsService
 					clientsGained: clientsGainedPerDay.GetValueOrDefault(day.Number),
 					profitGained: profitGainedPerDay.GetValueOrDefault(day.Number),
 					profitPerClient: profitPerClientPerDay.GetValueOrDefault(day.Number),
-					cfdStatistic: CollectCfdStatistic(day)))
+					cfdStatistic: CollectCfdStatistic(day),
+					ticketsReleased: releasedTickets.GetValueOrDefault(day.Number) ?? []))
 			.ToList();
 	}
 
