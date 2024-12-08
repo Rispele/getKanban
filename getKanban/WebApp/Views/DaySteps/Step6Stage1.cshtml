@@ -13,8 +13,8 @@
         var maxDayNumber = dayStatistics.Select(t => t.DayNumber).Max();
         var rowsForCfd = new[]
             {
-                "[\"День\", \"В аналитике\", \"В разработке\", \"В тестировании\", \"Готово к поставке\", \"Поставлено\"]",
-                "[8,2,4,4,1,0]"
+                "[\"День\", \"Поставлено\", \"Готово к поставке\", \"В тестировании\", \"В разработке\", \"В аналитике\"]",
+                "[8,0,1,4,4,2]"
             }
             .Concat(dayStatistics.Select(CfdStatisticToString));
         var tableForCfd = $"[{string.Join(",", rowsForCfd)}]";
@@ -26,7 +26,7 @@
 
         var ticketsCountPerWorkDaysCount = dayStatistics
             .SelectMany(d => d.TicketsReleased)
-            .GroupBy(t => t.releaseDay.Value - t.takingDay)
+            .GroupBy(t => t.releaseDay!.Value - t.takingDay)
             .Select(t => (t.Key, t.Count()))
             .ToArray();
         var maxWorkDays = ticketsCountPerWorkDaysCount.Select(t => t.Key).Max();
@@ -79,15 +79,15 @@
     private static string CfdStatisticToString(DayStatisticDto t)
     {
         return $"[{t.DayNumber}," +
-               $"{t.CfdStatistic.WithAnalysts}," +
-               $"{t.CfdStatistic.WithProgrammers}," +
-               $"{t.CfdStatistic.WithTesters}," +
+               $"{t.CfdStatistic.Released}," +
                $"{t.CfdStatistic.ToDeploy}," +
-               $"{t.CfdStatistic.Released}]";
+               $"{t.CfdStatistic.WithTesters}," +
+               $"{t.CfdStatistic.WithProgrammers}," +
+               $"{t.CfdStatistic.WithAnalysts}]";
     }
 }
 
-<div class="diagram-container" style="width: 75%; height: 100%; display: flex; flex-direction: column;">
+<div class="diagram-container" style="margin-top: 12.5%; width: 75%; height: 100%; display: flex; flex-direction: column;">
     <div id="cfd" style="width: 100%; height: 33%;"></div>
     <div id="control-diagram" style="width: 100%; height: 33%;"></div>
     <div id="distribution-diagram" style="width: 100%; height: 33%;"></div>

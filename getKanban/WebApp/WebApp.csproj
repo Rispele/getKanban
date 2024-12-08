@@ -45,6 +45,7 @@
       <_ContentIncludedByDefault Remove="Pages\Templates\Step1-1PageTemplate.cshtml" />
       <_ContentIncludedByDefault Remove="Pages\Templates\Step1-2PageTemplate.cshtml" />
       <_ContentIncludedByDefault Remove="Pages\Templates\Step4PageTemplate.cshtml" />
+      <_ContentIncludedByDefault Remove="wwwroot\js\dygraph\dygraph.min.js" />
     </ItemGroup>
 
     <ItemGroup>
