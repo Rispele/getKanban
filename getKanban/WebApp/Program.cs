@@ -1,3 +1,5 @@
+using System.Text.Encodings.Web;
+using System.Text.Unicode;
 using Core.DbContexts;
 using Core.Dtos;
 using Core.Dtos.Converters;
@@ -5,6 +7,7 @@ using Core.Helpers;
 using Core.Services.Contracts;
 using Core.Services.Implementations;
 using Domain.DbContexts;
+using Microsoft.Extensions.WebEncoders;
 using WebApp.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,14 +28,7 @@ builder.Services.AddScoped<IDomainInteractionService, DomainInteractionService>(
 builder.Services.AddScoped<ITeamService, TeamService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IStatisticsService, StatisticsService>();
-
-// builder.Services.AddTransient<HtmlPageHandler>();
-
-// var connection = builder.Configuration.GetConnectionString("DefaultConnection");
-
 var app = builder.Build();
-
-// var loggerFactory = app.Services.GetService<ILoggerFactory>();
 
 if (!app.Environment.IsDevelopment())
 {

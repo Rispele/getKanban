@@ -10,78 +10,69 @@
     private void RenderDiagram()
     {
         var dayStatistics = Model.TeamStatistic.DayStatistics;
-        var rowsForCfd = new[] { "[8,2,4,4,1,0]" }.Concat(dayStatistics.Select(CfdStatisticToString));
+        var maxDayNumber = dayStatistics.Select(t => t.DayNumber).Max();
+        var rowsForCfd = new[]
+            {
+                "[\"День\", \"В аналитике\", \"В разработке\", \"В тестировании\", \"Готово к поставке\", \"Поставлено\"]",
+                "[8,2,4,4,1,0]"
+            }
+            .Concat(dayStatistics.Select(CfdStatisticToString));
         var tableForCfd = $"[{string.Join(",", rowsForCfd)}]";
-        
-        var rowsForControlDiagram = dayStatistics
-            .SelectMany(d => d.TicketsReleased)
-            .Select((ticket, i) => $"[{i}, {ticket.releaseDay - ticket.takingDay}]");
+
+        var ticketsReleased = dayStatistics.SelectMany(d => d.TicketsReleased).ToArray();
+        var rowsForControlDiagram = new[] { "[\"Номер задачи\"", "\"За сколько поставили\"]" }
+            .Concat(ticketsReleased.Select((ticket, i) => $"[{i}, {ticket.releaseDay - ticket.takingDay}]"));
         var tableForDiagram = $"[{string.Join(",", rowsForControlDiagram)}]";
 
-        var rowsForDistributionDiagram = dayStatistics
+        var ticketsCountPerWorkDaysCount = dayStatistics
             .SelectMany(d => d.TicketsReleased)
-            .GroupBy(t => t.releaseDay - t.takingDay)
-            .Select(g => $"[{g.Key}, {g.Count()}]");
+            .GroupBy(t => t.releaseDay.Value - t.takingDay)
+            .Select(t => (t.Key, t.Count()))
+            .ToArray();
+        var maxWorkDays = ticketsCountPerWorkDaysCount.Select(t => t.Key).Max();
+        var rowsForDistributionDiagram = new[] { "[\"Дней в работе\"", "\"Кол-во задач\"]" }
+            .Concat(ticketsCountPerWorkDaysCount.Select(g => $"[{g.Key}, {g.Item2}]"));
         var tableForDistributionDiagram = $"[{string.Join(",", rowsForDistributionDiagram)}]";
-        
+
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
         <script type="text/javascript">
+          google.charts.load('current', {'packages':['corechart']});
+          google.charts.setOnLoadCallback(drawCharts);
+
+          function drawCharts() {
+            const dataForCfd = google.visualization.arrayToDataTable(@Html.Raw(tableForCfd));
             const optionsForCfd = {
-                stackedGraph: true,
-                labels: ["День", "В аналитике", "В разработке", "В тестировании", "Готово к поставке", "Поставлено"],
-                dateWindow : [8, 22],
-                
-                highlightCircleSize: 2,
-                strokeWidth: 1,
-
-                highlightSeriesOpts: {
-                    strokeWidth: 3,
-                    strokeBorderWidth: 1,
-                    highlightCircleSize: 5
-                }
+              title: 'Кумулятивная диаграмма',
+              hAxis: {title: 'День', ticks: @Html.Raw($"[{string.Join(",", Enumerable.Range(8, Math.Max(18, maxDayNumber) - 7))}]"), minValue: 8, maxValue: @Math.Max(18, maxDayNumber) },
+              vAxis: {minValue: 0},
+              isStacked: true
             };
 
+            const dataForControlDiagram = google.visualization.arrayToDataTable(@Html.Raw(tableForDiagram));
             const optionsForControlDiagram = {
-                labels: ["День", "За сколько дней поставили"],
-                dateWindow : [0, @Math.Max(10, dayStatistics.Count)],
-
-                highlightCircleSize: 2,
-                strokeWidth: 1,
-
-                highlightSeriesOpts: {
-                    strokeWidth: 3,
-                    strokeBorderWidth: 1,
-                    highlightCircleSize: 5
-                }
+                title: 'Контрольная диагамма',
+                hAxis: {title: 'Поставленные задачи (в порядке релиза)', ticks: @Html.Raw($"[{string.Join(",", Enumerable.Range(0, Math.Max(10, ticketsReleased.Length) + 1))}]"), minValue: 0, maxValue: @Math.Max(10, ticketsReleased.Length)},
+                vAxis: {title: 'За сколько поставили', minValue: 0},
+                legend: { position: "none" },
             };
 
+            const dataForDistributionDiagram = google.visualization.arrayToDataTable(@Html.Raw(tableForDistributionDiagram));
             const optionsForDistributionDiagram = {
-                labels: ["За сколько дней поставили", "Кол-во задач"],
-                dateWindow : [0, @Math.Max(10, dayStatistics.Count)],
-
-                highlightCircleSize: 2,
-                strokeWidth: 1,
-
-                highlightSeriesOpts: {
-                    strokeWidth: 3,
-                    strokeBorderWidth: 1,
-                    highlightCircleSize: 5
-                }
+                title: 'Распределение времени выполнения',
+                hAxis: {title: 'За сколько поставили', ticks: @Html.Raw($"[{string.Join(",", Enumerable.Range(0, Math.Max(10, maxWorkDays) + 1))}]"), minValue: 0, maxValue: @Math.Max(10, maxWorkDays)},
+                vAxis: {title: 'Кол-во поставленных задач', minValue: 0},
+                legend: { position: "none" },
             };
 
-            Dygraph.onDOMready(function onDOMready() {
-                new Dygraph(
-                    document.getElementById("cfd"),
-                    @tableForCfd, 
-                    optionsForCfd);
-                new Dygraph(
-                    document.getElementById("control-diagram"),
-                    @tableForDiagram, 
-                    optionsForControlDiagram);
-                new Dygraph(
-                    document.getElementById("distribution-diagram"),
-                    @tableForDistributionDiagram,
-                    optionsForDistributionDiagram);
-            });
+            const cfdChart = new google.visualization.AreaChart(document.getElementById('cfd'));
+            cfdChart.draw(dataForCfd, optionsForCfd);
+            
+            const controlChar = new google.visualization.AreaChart(document.getElementById('control-diagram'));
+            controlChar.draw(dataForControlDiagram, optionsForControlDiagram);
+
+            const distributionDiagram = new google.visualization.ColumnChart(document.getElementById('distribution-diagram'));
+            distributionDiagram.draw(dataForDistributionDiagram, optionsForDistributionDiagram);
+          }
         </script>
     }
 
@@ -96,13 +87,10 @@
     }
 }
 
-<script type="text/javascript" src="~/js/dygraph/dygraph.min.js"></script>
-<link rel="stylesheet" type="text/css" href="~/css/dygraph.min.css"/>
-
-<div class="diagram-container" style="width: 50%; height: 100%; display: flex; flex-direction: column;">
-    <div id="cfd" style="width:500px; height:300px;"></div>
-    <div id="control-diagram" style="width:500px; height:300px;"></div>
-    <div id="distribution-diagram" style="width:500px; height:300px;"></div>
+<div class="diagram-container" style="width: 75%; height: 100%; display: flex; flex-direction: column;">
+    <div id="cfd" style="width: 100%; height: 33%;"></div>
+    <div id="control-diagram" style="width: 100%; height: 33%;"></div>
+    <div id="distribution-diagram" style="width: 100%; height: 33%;"></div>
 </div>
 @{
     RenderDiagram();
