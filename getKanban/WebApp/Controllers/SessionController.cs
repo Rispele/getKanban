@@ -1,4 +1,3 @@
-using Core.Dtos;
 using Core.Helpers;
 using Core.Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
@@ -58,13 +57,6 @@ public class SessionController : Controller
 		return addParticipantResult.GameSession.Id;
 	}
 
-	[HttpGet("leave")]
-	public async Task<bool> LeaveLobbyMenu(Guid sessionId)
-	{
-		var requestContext = RequestContextFactory.Build(Request);
-		return await gameSessionService.RemoveParticipantAsync(requestContext, sessionId);
-	}
-
 	[HttpGet("{sessionId:guid}/{teamId:guid}/lobby-menu")]
 	public async Task<IActionResult> LobbyMenu(Guid sessionId, Guid teamId)
 	{
@@ -76,7 +68,7 @@ public class SessionController : Controller
 			return View("Error", "Невозможно подключиться к сессии");
 		}
 		var currentUser = await gameSessionService.GetCurrentUser(requestContext);
-		if (session!.Angels.Participants.Users.All(x => x.Id != currentUser.Id)
+		if (session.Angels.Participants.Users.All(x => x.Id != currentUser.Id)
 		    && session.Teams.All(x => x.Participants.Users.All(p => p.Id != currentUser.Id)))
 		{
 			await JoinLobbyMenu(InviteCodeHelper.ConcatInviteCode(sessionId, teamId));
@@ -97,25 +89,5 @@ public class SessionController : Controller
 	{
 		var requestContext = RequestContextFactory.Build(Request);
 		return gameSessionService.CreateGameSession(requestContext, sessionName, teamsCount);
-	}
-
-	[HttpGet("get-current-team")]
-	public async Task<TeamDto?> GetCurrentTeam(Guid sessionId)
-	{
-		var requestContext = RequestContextFactory.Build(Request);
-		try
-		{
-			return await gameSessionService.GetCurrentTeam(requestContext, sessionId);
-		}
-		catch (InvalidOperationException e)
-		{
-			return null;
-		}
-	}
-
-	[HttpGet("update-team-name")]
-	public async Task UpdateTeamName(Guid sessionId, Guid teamId, string name)
-	{
-		await gameSessionService.UpdateTeamName(sessionId, teamId, name);
 	}
 }

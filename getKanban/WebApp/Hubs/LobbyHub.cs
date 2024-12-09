@@ -1,6 +1,4 @@
-using Core.Helpers;
 using Core.Services.Contracts;
-using Domain.Game.Tickets;
 using Microsoft.AspNetCore.SignalR;
 
 namespace WebApp.Hubs;
@@ -41,7 +39,7 @@ public class LobbyHub : Hub
 		await base.OnDisconnectedAsync(exception);
 	}
 
-	public async Task CloseGame(Guid gameSessionId)
+	public async Task CloseLobby(Guid gameSessionId)
 	{
 		await gameSessionService.CloseGameSession(gameSessionId);
 
@@ -50,7 +48,7 @@ public class LobbyHub : Hub
 		await Clients.OthersInGroup(groupId).SendAsync("NotifyClosed");
 	}
 	
-	public async Task LeaveGame(Guid gameSessionId)
+	public async Task LeaveLobby(Guid gameSessionId)
 	{
 		var requestContext = RequestContextFactory.Build(Context);
 		var currentUser = await gameSessionService.GetCurrentUser(requestContext);
@@ -61,7 +59,7 @@ public class LobbyHub : Hub
 		await Clients.OthersInGroup(groupId).SendAsync("NotifyLeft", currentUser.Id);
 	}
 	
-	public async Task JoinGame(Guid gameSessionId)
+	public async Task JoinLobby(Guid gameSessionId)
 	{
 		var requestContext = RequestContextFactory.Build(Context);
 		var currentUser = await gameSessionService.GetCurrentUser(requestContext);
@@ -77,7 +75,7 @@ public class LobbyHub : Hub
 		}
 	}
 	
-	public async Task CheckPlayerJoined(string inviteCode)
+	public async Task CheckPlayerJoinedSession(string inviteCode)
 	{
 		var requestContext = RequestContextFactory.Build(Context);
 		var currentUser = await gameSessionService.GetCurrentUser(requestContext);
@@ -91,7 +89,7 @@ public class LobbyHub : Hub
 		await Clients.Caller.SendAsync("NotifyPlayerCheck", true, currentUser.Id);
 	}
 
-	public async Task RemovePlayer(Guid sessionId, Guid userId)
+	public async Task RemovePlayerFromSessionAndLobby(Guid sessionId, Guid userId)
 	{
 		var requestContext = RequestContextFactory.Build(Context);
 		var removed = await gameSessionService.RemoveParticipantAsync(requestContext, sessionId, userId);
@@ -101,9 +99,9 @@ public class LobbyHub : Hub
 		}
 	}
 
-	public async Task UpdateName(Guid sessionId, Guid teamId)
+	public async Task UpdateName(Guid sessionId, Guid teamId, string teamName)
 	{
-		var teamName = await gameSessionService.GetTeamName(sessionId, teamId);
+		await gameSessionService.UpdateTeamName(sessionId, teamId, teamName);
 		var groupId = GetGroupId(sessionId);
 
 		await Clients.Group(groupId).SendAsync("NotifyRenamed", teamId.ToString(), teamName);
