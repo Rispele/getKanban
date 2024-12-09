@@ -12,3 +12,9 @@ function setRollbackEvent(connection) {
         window.location.href = `/${sessionId}/${teamId}/step/1/0`;
     });
 }
+
+async function checkPageAvailable(sessionId, teamId, event) {
+    return await fetch(`/${sessionId}/${teamId}/api/check-available?event=${event}`)
+        .then(available => available.json())
+        .then(available => { return available; });
+}

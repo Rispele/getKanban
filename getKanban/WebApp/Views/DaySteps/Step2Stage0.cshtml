@@ -93,7 +93,9 @@
 <script src="~/js/page-switch.js"></script>
 <script src="~/js/setup-hub-connection.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
-<script>
+<script type="module">
+    
+    
     const connection = setupHubConnection(new signalR.HubConnectionBuilder(), "@Model.GameSessionId", "@Model.TeamId");
     setSwitchEvent("next", connection, "@Model.GameSessionId", "@Model.TeamId", 3, 0);
     setRollbackEvent(connection);

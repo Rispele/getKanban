@@ -83,6 +83,11 @@ public class SessionController : Controller
 			session = await gameSessionService.FindGameSession(requestContext,
 				InviteCodeHelper.ConcatInviteCode(sessionId, teamId), ignorePermissions: false);
 		}
+
+		if (session is not null)
+		{
+			session.RequesterId = currentUser.Id;
+		}
 		
 		return View(session);
 	}

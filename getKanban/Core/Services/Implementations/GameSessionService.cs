@@ -113,7 +113,7 @@ public class GameSessionService : IGameSessionService
 		var participantRole = session.EnsureHasAnyAccess(user.Id, inviteCode);
 		var sessionDto = GameSessionDtoConverter.For(participantRole).Convert(session);
 
-		var participantAdded = teamId.Equals(Guid.Empty) && participantRole == ParticipantRole.Angel
+		var participantAdded = teamId.Equals(sessionDto.Angels.Id) && participantRole == ParticipantRole.Angel
 			? sessionDto.Angels.Participants.Users.Single(x => x.Id == user.Id)
 			: sessionDto.Teams
 				.Single(t => t.Id == teamId)

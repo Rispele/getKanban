@@ -43,6 +43,12 @@ public class TeamSessionHub : Hub
 		}
 	}
 
+	public async Task FinishDay(Guid gameSessionId, Guid teamId)
+	{
+		var groupId = GetGroupId(gameSessionId, teamId);
+		await Clients.Group(groupId).SendAsync("NotifyDayFinished", gameSessionId, teamId);
+	}
+
 	public async Task RollbackToDay(Guid gameSessionId, Guid teamId, int dayNumber)
 	{
 		var groupId = GetGroupId(gameSessionId, teamId);

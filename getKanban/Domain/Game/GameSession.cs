@@ -85,7 +85,7 @@ public class GameSession
 			.AddParticipantIfMatchInviteCode(inviteCode, user, ParticipantRole.Angel);
 		if (angelsUpdateResult.matched)
 		{
-			return (Guid.Empty, angelsUpdateResult.updated);
+			return (Angels.PublicId, angelsUpdateResult.updated);
 		}
 
 		foreach (var team in teams)

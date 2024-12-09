@@ -41,7 +41,7 @@
             @foreach (var player in Model.Angels.Participants.Users)
             {
                 <p class="fs-6" id="@player.Id">@player.Name
-                @if (isAdmin)
+                @if (isAdmin && player.Id != Model.RequesterId)
                 {
                     <img src="/images/remove_button.svg" alt="edit" width="20" height="20" style="cursor:pointer" id="remove-@player.Id">
                 }
@@ -129,6 +129,14 @@ else
     });
     connection.on("NotifyConnectionLost", function (userId) {
         const playerElement = document.getElementById(userId);
+        
+        const images = playerElement.getElementsByTagName("img");
+        for (let img of images) {
+            if (img.id === `connection-lost-${userId}`) {
+                img.remove();
+            }
+        }
+        
         const connectionLostIcon = buildIcon(`connection-lost-${userId}`, "/images/disconnected_icon.svg");
         playerElement.appendChild(connectionLostIcon);
     });
@@ -150,8 +158,6 @@ else
         
         const team = document.getElementById(teamId);
         
-        const disconnectedIcon = buildIcon(`disconnected-${userId}`, "/images/disconnected_icon.svg");
-        
         if (isCurrentUserAdmin) {
             const removeButton = buildIcon(`remove-${userId}`, "/images/remove_button.svg");
             removeButton.addEventListener('click', function () {
@@ -160,7 +166,6 @@ else
             playerElement.appendChild(removeButton);
         }
         
-        playerElement.appendChild(disconnectedIcon);
         team.appendChild(playerElement);
         
         const teamName = document.getElementById(`headers-${teamId}`).innerText;
@@ -252,7 +257,7 @@ else
         }
 
         if (isCurrentUserAdmin) {
-            @foreach (var id in allPlayerIds)
+            @foreach (var id in allPlayerIds.Except([Model.RequesterId]))
             {
                 <text>
                     document.getElementById('remove-@id').addEventListener('click', function () {

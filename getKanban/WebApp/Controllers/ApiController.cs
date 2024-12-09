@@ -1,4 +1,5 @@
 ﻿using Core.Services.Contracts;
+using Domain;
 using Domain.Game.Days.Commands;
 using Domain.Game.Days.DayContainers;
 using Domain.Game.Days.DayContainers.TeamMembers;
@@ -122,6 +123,34 @@ public class ApiController : Controller
 			restartDayModel.SessionId,
 			restartDayModel.TeamId,
 			restartDayModel.DayNumber);
+	}
+
+	[HttpGet("check-available")]
+	public async Task<bool> CheckPageAvailable(Guid gameSessionId, Guid teamId, string @event)
+	{
+		var requestContext = RequestContextFactory.Build(Request);
+		var currentDay = await teamService.GetCurrentDayAsync(requestContext, gameSessionId, teamId);
+		
+		switch (@event)
+		{
+			case "roll":
+				return currentDay.RollDiceContainer is null ||
+				       currentDay.RollDiceContainer.DiceRollResults.IsNullOrEmpty();
+			case "update-role":
+				return currentDay.TeamMembersContainer.TeamRoleUpdates.Count == 7;
+			case "another-team-roll":
+				return currentDay.WorkAnotherTeamContainer is null ||
+				       currentDay.WorkAnotherTeamContainer.DiceNumber == default ||
+				       currentDay.WorkAnotherTeamContainer.ScoresNumber == default;
+			default:
+				return false;
+		}
+	}
+	
+	[HttpGet("error")]
+	public async Task<IActionResult> Error(string message)
+	{
+		return View("Error", message);
 	}
 
 	public class RestartDayModel

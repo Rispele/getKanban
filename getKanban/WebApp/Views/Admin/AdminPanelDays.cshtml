@@ -1,26 +1,5 @@
 ﻿@model Core.Dtos.AdminPanelDaysDto
 
-@* <div> *@
-@*     <p>Команда: @Model.TeamName</p> *@
-@*     <img src="/images/edit_button.png"> *@
-@* *@
-@*     @for (var i = Model.StartDayNumber; i < Model.CurrentDay.Number; i++) *@
-@*     { *@
-@*         <p class="finished">День @i</p> *@
-@*     } *@
-@*      *@
-@*     <img src="/images/restart_button.png"> *@
-@*     <p class="inProcess">День @Model.CurrentDay.Number</p> *@
-@*     <img src="/images/edit_button.png" id="day-edit"> *@
-@*      *@
-@*     @for (var i = Model.CurrentDay.Number + 1; i < Model.FinishDayNumber + 1; i++) *@
-@*     { *@
-@*         <p class="notStartedYet">День @i</p> *@
-@*     } *@
-@* *@
-@*     <button class="back-button">Назад</button> *@
-@* </div> *@
-
 <div class="container4">
     <h1 class="fs-1 text-center">Команда: @Model.TeamName</h1>
     <h1 class="fs-4 text-center">Выберите день для изменения</h1>
@@ -62,10 +41,17 @@
     </div>
 </div>
 
+<script src="~/js/setup-hub-connection.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
-    const connection = new signalR.HubConnectionBuilder().withUrl("/teamSessionHub").build();
-    connection.start()
+    const connection = setupHubConnection(new signalR.HubConnectionBuilder(), "@Model.SessionId", "@Model.TeamId", false);
+    connection.start();
+    
+    connection.on("NotifyDayFinished", function (sessionId, teamId) {
+        if (sessionId === "@Model.SessionId" && teamId === "@Model.TeamId") {
+            window.location.reload();
+        }
+    });
     
     document.getElementsByClassName("restart")[0].addEventListener('click', function () {
         fetch("/@Model.SessionId/@Model.TeamId/api/restart-day", {

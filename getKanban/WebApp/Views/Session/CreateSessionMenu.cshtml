@@ -1,5 +1,21 @@
-﻿<script src="/js/signalr/dist/browser/signalr.js"></script>
+﻿<div class="text-center authorizationContainer centered-100">
+    <div class="authorizationHeader">
+        <h1 class="fs-2 fw-normal">Создание игры</h1>
+    </div>
+
+    <div class="authorizationButtons">
+        <input type="number" min="1" class="text-center authorizationButtonsTemplate authorizationCommandName" id="teamsCount" placeholder="Число команд">
+        <input type="text" class="text-center authorizationButtonsTemplate authorizationCommandName" id="sessionName" placeholder="Название игры">
+        <button class="authorizationButtonsTemplate authorizationButton" onclick="createGameSession()">Создать игру</button>
+    </div>
+</div>
+
+<script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
+    document.getElementById("teamsCount").addEventListener("keypress", (e) => {
+        if (e.which < 48 || e.which > 57) { e.preventDefault(); }
+    });
+    
     async function createGameSession() {
         const teamsCountString = document.getElementById("teamsCount").value
         if (teamsCountString.length === 0) {
@@ -23,16 +39,5 @@
                 window.location.href = `/session/${sessionId}`
             });
     }
+
 </script>
-
-<div class="text-center authorizationContainer centered-100">
-    <div class="authorizationHeader">
-        <h1 class="fs-2 fw-normal">Создание игры</h1>
-    </div>
-
-    <div class="authorizationButtons">
-        <input type="number" min="1" class="text-center authorizationButtonsTemplate authorizationCommandName" id="teamsCount" placeholder="Число команд">
-        <input type="text" class="text-center authorizationButtonsTemplate authorizationCommandName" id="sessionName" placeholder="Название игры">
-        <button class="authorizationButtonsTemplate authorizationButton" onclick="createGameSession()">Создать игру</button>
-    </div>
-</div>
