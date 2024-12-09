@@ -68,8 +68,8 @@ public class ParticipantsContainer
 		var removed = participants.RemoveAll(x => x.User.Id == user.Id);
 		return removed > 0;
 	}
-	
-	public bool MatchInviteCode(string inviteCode)
+
+	private bool MatchInviteCode(string inviteCode)
 	{
 		return InviteCode == inviteCode;
 	}

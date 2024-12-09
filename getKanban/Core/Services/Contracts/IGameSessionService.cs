@@ -8,6 +8,8 @@ public interface IGameSessionService
 {
 	public Task<Guid> CreateGameSession(RequestContext requestContext, string name, long teamsCount);
 
+	public Task CloseGameSession(Guid sessionId);
+	
 	public Task<GameSessionDto?> FindGameSession(
 		RequestContext requestContext,
 		string inviteCode,
@@ -15,7 +17,7 @@ public interface IGameSessionService
 
 	public Task<AddParticipantResult?> AddParticipantAsync(RequestContext requestContext, string inviteCode);
 	
-	public Task<bool> RemoveParticipantAsync(RequestContext requestContext, Guid sessionId);
+	public Task<bool> RemoveParticipantAsync(RequestContext requestContext, Guid sessionId, Guid? userId = null);
 
 	public Task StartGameAsync(RequestContext requestContext, Guid gameSessionId);
 
@@ -26,4 +28,6 @@ public interface IGameSessionService
 	public Task<string> GetTeamName(Guid sessionId, Guid teamId);
 
 	public Task<UserDto> GetCurrentUser(RequestContext requestContext);
+	
+	public Task<List<GameSessionDto>> GetSessionsUserAttachedTo(RequestContext requestContext);
 }

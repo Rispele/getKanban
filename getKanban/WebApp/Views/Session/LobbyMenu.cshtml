@@ -1,6 +1,16 @@
 ﻿@using Domain.Game
 @model Core.Dtos.GameSessionDto
 
+@{ var isAdmin = ((Model.RequesterRole & ParticipantRole.Creator) == ParticipantRole.Creator); }
+@{
+    var allPlayerIds = Model.Teams
+        .SelectMany(x => x.Participants.Users)
+        .Select(x => x.Id)
+        .Concat(
+            Model.Angels.Participants.Users
+                .Select(x => x.Id));
+}
+
 <div class="commandEditorHeader text-center">
     <h1 class="display-4 fw-bold">getKanban: "@Model.Name"</h1>
 </div>
@@ -14,7 +24,12 @@
                 <div class="commandEditorNamesContainer text-center" id="@team.Id">
                     @foreach (var player in team.Participants.Users)
                     {
-                        <p class="fs-6" id="@player.Id">@player.Name</p>
+                        <p class="fs-6" id="@player.Id">@player.Name
+                        @if (isAdmin)
+                        {
+                            <img src="/images/remove_button.svg" alt="edit" width="20" height="20" style="cursor:pointer" id="remove-@player.Id">
+                        }
+                        </p>
                     }
                 </div>
             </div>
@@ -25,24 +40,41 @@
         <div class="commandEditorNamesContainer angelsEditor text-center" id="@Model.Angels.Id">
             @foreach (var player in Model.Angels.Participants.Users)
             {
-                <p class="fs-6" id="@player.Id">@player.Name</p>
+                <p class="fs-6" id="@player.Id">@player.Name
+                @if (isAdmin)
+                {
+                    <img src="/images/remove_button.svg" alt="edit" width="20" height="20" style="cursor:pointer" id="remove-@player.Id">
+                }
+                </p>
             }
         </div>
     </div>
 </div>
 
-@if ((Model.RequesterRole & ParticipantRole.Creator) == ParticipantRole.Creator)
+<button class="commandEditorButtonsTemplate authorizationButton" type="button" id="disconnect">Разорвать соединение</button>
+<button class="commandEditorButtonsTemplate authorizationButton" type="button" id="connect">Установить соединение</button>
+
+@if (isAdmin)
 {
+    <form class="text-center">
+        <button class="commandEditorButtonsTemplate authorizationButton" type="button" id="close">Закрыть игру</button>
+    </form>
     <form class="text-center">
         <button class="commandEditorButtonsTemplate authorizationButton" type="button" id="start">Начать игру</button>
     </form>
 }
+else
+{
+    <form class="text-center">
+        <button class="commandEditorButtonsTemplate authorizationButton" type="button" id="leave">Покинуть игру</button>
+    </form>
+}
 
-<script src="/js/error.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script type="module" async="async">
+    const isCurrentUserAdmin = @(((Model.RequesterRole & ParticipantRole.Creator) == ParticipantRole.Creator).ToString().ToLower());
+    
     const connection = new signalR.HubConnectionBuilder().withUrl("/lobbyHub").build();
-    let shouldLeave = true;
     await connection.start()
     .then(function () {
         let path = window.location.pathname.split("session/")[1];
@@ -50,7 +82,7 @@
         const inviteCode = path.replace("/", ".");
     
         connection.invoke("CheckPlayerJoined", inviteCode);
-        connection.on("NotifyPlayerCheck", function (hasJoined) {
+        connection.on("NotifyPlayerCheck", function (hasJoined, userId) {
             if (!hasJoined) {
                 fetch(`/session/join?inviteCode=${inviteCode}`, {redirect: "follow"})
                     .then(sessionId => sessionId.json())
@@ -60,7 +92,7 @@
                             return;
                         }
                         window.location.href = `/session/${sessionId}`;
-                    });
+                    })
             }
         });
     })
@@ -68,24 +100,73 @@
         connection.invoke("JoinGame", "@Model.Id");
     });
 
+    connection.on("NotifyClosed", function () {
+        window.location.href = "/";
+    });
     connection.on("NotifyLeft", function (userId) {
+        const cookieUserId = document.cookie
+            .split("; ")
+            .find((row) => row.startsWith("userId="))
+            ?.split("=")[1];
+        if (userId === cookieUserId) {
+            window.location.href = "/";
+            return;
+        }
         const playerElement = document.getElementById(userId.toString());
         const playerName = playerElement.textContent;
         playerElement.remove();
         showMessage(`Игрок ${playerName} покидает игру`, false);
     });
+    connection.on("NotifyConnectionRestore", function (userId) {
+        const playerElement = document.getElementById(userId);
+        
+        const images = playerElement.getElementsByTagName("img");
+        for (let img of images) {
+            if (img.id === `connection-lost-${userId}`) {
+                img.remove();
+            }
+        }
+    });
+    connection.on("NotifyConnectionLost", function (userId) {
+        const playerElement = document.getElementById(userId);
+        const connectionLostIcon = buildIcon(`connection-lost-${userId}`, "/images/disconnected_icon.svg");
+        playerElement.appendChild(connectionLostIcon);
+    });
     connection.on("NotifyJoined", function (teamId, userId, userName) {
+        const teamBlock = document.getElementById(teamId);
+        const teamPlayers = teamBlock.getElementsByClassName("fs-6");
+        for (let pl of teamPlayers) {
+            if (pl.id === userId) { return; }
+        }
+        let playerElementInOtherTeam = document.getElementById(userId.toString());
+        if (playerElementInOtherTeam !== null && playerElementInOtherTeam !== undefined) {
+            playerElementInOtherTeam.remove();
+        }
+    
         const playerElement = document.createElement("p");
         playerElement.setAttribute("class", "fs-6");
         playerElement.setAttribute("id", userId.toString());
-        const team = document.getElementById(teamId);
-        team.appendChild(playerElement);
         playerElement.textContent = userName.toString();
+        
+        const team = document.getElementById(teamId);
+        
+        const disconnectedIcon = buildIcon(`disconnected-${userId}`, "/images/disconnected_icon.svg");
+        
+        if (isCurrentUserAdmin) {
+            const removeButton = buildIcon(`remove-${userId}`, "/images/remove_button.svg");
+            removeButton.addEventListener('click', function () {
+                connection.invoke("RemovePlayer", "@Model.Id", userId);
+            });
+            playerElement.appendChild(removeButton);
+        }
+        
+        playerElement.appendChild(disconnectedIcon);
+        team.appendChild(playerElement);
+        
         const teamName = document.getElementById(`headers-${teamId}`).innerText;
         showMessage(`Игрок ${userName.toString()} присоединяется к команде "${teamName}"`, false);
     });
     connection.on("NotifyStarted", async function () {
-        shouldLeave = false;
         await fetch("/session/get-current-team?sessionId=@Model.Id")
             .then(async response => {
                 const teamDto = JSON.parse(await response.text());
@@ -108,6 +189,29 @@
         });
     }
 
+    const leaveButton = document.getElementById("leave");
+    if (leaveButton !== null && leaveButton !== undefined) {
+        leaveButton.addEventListener('click', function () {
+            connection.invoke("LeaveGame", "@Model.Id")
+                .then(function () { window.location.href = "/" });
+        });
+    }
+
+    const closeButton = document.getElementById("close");
+    if (closeButton !== null && closeButton !== undefined) {
+        closeButton.addEventListener('click', function () {
+            connection.invoke("CloseGame", "@Model.Id")
+                .then(function () { window.location.href = "/" });
+        });
+    }
+
+    document.getElementById('disconnect').addEventListener('click', function () {
+        connection.stop();
+    });
+    document.getElementById('connect').addEventListener('click', function () {
+        connection.start();
+    });
+
     const currentTeamJson = await fetch("/session/get-current-team?sessionId=@Model.Id")
         .then(r => r.text())
         .then(data => {
@@ -121,11 +225,11 @@
     let currentTeamName = currentTeamJson["name"];
     let currentTeamLink = currentTeamJson["participants"]["inviteCode"];
 
-    window.onbeforeunload = function () {
-        if (shouldLeave) {
-            connection.invoke("LeaveGame", "@Model.Id");
-        }
-    };
+    //window.onbeforeunload = function () {
+    //    if (shouldLeave) {
+    //        connection.invoke("LeaveGame", "@Model.Id");
+    //    }
+    //};
 
     const teamLinks = [];
     const teamIds = [];
@@ -146,15 +250,23 @@
         if (renameTeamId !== null) {
             teamNames[teamIds.indexOf(renameTeamId)] = renameTeamName;
         }
-        const isCurrentUserAdmin = @(((Model.RequesterRole & ParticipantRole.Creator) == ParticipantRole.Creator).ToString().ToLower());
 
         if (isCurrentUserAdmin) {
+            @foreach (var id in allPlayerIds)
+            {
+                <text>
+                    document.getElementById('remove-@id').addEventListener('click', function () {
+                        connection.invoke("RemovePlayer", "@Model.Id", "@id");
+                    });
+                </text>
+            }
+        
             for (let i = 0; i < teamIds.length; i++) {
                 recreateEditBlock(teamIds[i]);
             }
             placeTeamNameEditButtons(teamIds.filter(function (x) {return x !== "@Model.Angels.Id"}));
             placeTeamNames(teamIds, teamNames);
-            placeTeamLinks(teamIds, teamLinks);
+            placeTeamLinks(teamNames, teamIds, teamLinks);
         } else if (currentTeamId !== null) {
             for (let i = 0; i < teamIds.length; i++) {
                 recreateEditBlock(teamIds[i]);
@@ -166,7 +278,7 @@
 
     function placeTeamNameEditButtons(teamIds) {
         for (let teamId of teamIds) {
-            const icon = buildIcon(`edit-button-${teamId}`, "/images/edit_button.png");
+            const icon = buildIcon(`edit-button-${teamId}`, "/images/edit_button.svg");
             icon.addEventListener("click", function () { replaceWithInput(teamId) });
             getOrCreateEditBlock(teamId).appendChild(icon);
         }
@@ -217,23 +329,24 @@
         }
     }
 
-    function placeTeamLinks(teamIds, teamInviteLinks) {
+    function placeTeamLinks(teamNames, teamIds, teamInviteLinks) {
         for (let i = 0; i < teamIds.length; i++) {
-            const teamIcon = buildIcon(`link-${teamInviteLinks[i]}`, "/images/copy_button.jpg");
+            const teamIcon = buildIcon(`link-${teamInviteLinks[i]}`, "/images/link_button.svg");
             teamIcon.addEventListener('click', function () {
                 navigator.clipboard.writeText(teamInviteLinks[i])
-                    .then(() => console.log(`Text copied: ${teamInviteLinks[i]}`))
+                    .then(() => showMessage(`Код приглашения в команду "${teamNames[i]}" скопирован`, false))
             });
             getOrCreateEditBlock(teamIds[i]).appendChild(teamIcon);
         }
     }
 
-    function buildIcon(iconId, imgPath) {
+    function buildIcon(iconId, imgPath, clickable=true) {
         const image = document.createElement("img");
         image.setAttribute("src", imgPath);
         image.setAttribute("alt", "edit");
         image.setAttribute("width", "20");
         image.setAttribute("height", "20");
+        if (clickable) image.setAttribute("style", "cursor:pointer");
         image.setAttribute("id", iconId);
         return image;
     }
@@ -254,4 +367,5 @@
         let editBlock = document.getElementById(`edit-${teamId}`);
         return editBlock !== null && editBlock !== undefined ? editBlock : recreateEditBlock(teamId);
     }
+
 </script>

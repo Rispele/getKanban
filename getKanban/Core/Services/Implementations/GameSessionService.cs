@@ -4,6 +4,7 @@ using Core.Dtos.Converters;
 using Core.Helpers;
 using Core.RequestContexts;
 using Core.Services.Contracts;
+using Domain;
 using Domain.DbContexts;
 using Domain.Game;
 
@@ -30,6 +31,12 @@ public class GameSessionService : IGameSessionService
 		await context.SaveChangesAsync();
 
 		return gameSession.Id;
+	}
+
+	public async Task CloseGameSession(Guid sessionId)
+	{
+		context.GameSessions.Remove(context.GameSessions.Single(x => x.Id == sessionId));
+		await context.SaveChangesAsync();
 	}
 
 	public async Task<GameSessionDto?> FindGameSession(
@@ -93,6 +100,13 @@ public class GameSessionService : IGameSessionService
 		var user = await context.GetUserAsync(requestContext.GetUserId());
 
 		var (teamId, updated) = session.AddByInviteCode(user, inviteCode);
+		if (teamId != session.Angels.PublicId)
+		{
+			session.Angels.RemoveParticipant(user);
+		}
+		var removedFromOtherTeams = session.Teams
+			.Where(x => x.Id != teamId)
+			.Any(x => x.Players.RemoveParticipant(user));
 
 		await context.SaveChangesAsync();
 
@@ -113,14 +127,14 @@ public class GameSessionService : IGameSessionService
 			participantAdded);
 	}
 	
-	public async Task<bool> RemoveParticipantAsync(RequestContext requestContext, Guid sessionId)
+	public async Task<bool> RemoveParticipantAsync(RequestContext requestContext, Guid sessionId, Guid? userId = null)
 	{
 		var session = await context.FindGameSessionsAsync(sessionId);
 		if (session is null)
 		{
 			return false;
 		}
-		var user = await context.GetUserAsync(requestContext.GetUserId());
+		var user = await context.GetUserAsync(userId ?? requestContext.GetUserId());
 
 		var angelsRemoved = session.Angels.RemoveParticipant(user);
 		var teamsRemoved = session.Teams.Any(x => x.Players.RemoveParticipant(user));
@@ -180,5 +194,12 @@ public class GameSessionService : IGameSessionService
 			Id = user.Id,
 			Name = user.Name
 		};
+	}
+
+	public async Task<List<GameSessionDto>> GetSessionsUserAttachedTo(RequestContext requestContext)
+	{
+		var currentUser = await GetCurrentUser(requestContext);
+		var sessions = await context.GetCurrentSession(currentUser.Id);
+		return sessions.Select(x => GameSessionDtoConverter.For(ParticipantRole.Player).Convert(x)).ToList();
 	}
 }

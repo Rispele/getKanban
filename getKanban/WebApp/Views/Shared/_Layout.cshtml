@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/css/commandEditor.css" asp-append-version="true"/>
-    <link rel="stylesheet" href="~/css/error.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="~/css/popup.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/css/game.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/css/gameStepPages.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/css/checkboxPages.css" asp-append-version="true"/>
@@ -51,6 +51,8 @@
     </main>
 </div>
 
+<div class="notification-container"></div>
+
 <footer class="border-top footer text-muted">
     <div class="container">
         &copy; 2024 - WebApp - <a asp-area="" asp-page="/Privacy">Privacy</a>
@@ -63,6 +65,7 @@
 <script src="~/js/drag-and-drop.js" asp-append-version="true"></script>
 <script src="~/js/page-switch.js" asp-append-version="true"></script>
 <script src="~/js/setup-hub-connection.js" asp-append-version="true"></script>
+<script src="~/js/popup.js" asp-append-version="true"></script>
 
 @await RenderSectionAsync("Scripts", required: false)
 </body>
