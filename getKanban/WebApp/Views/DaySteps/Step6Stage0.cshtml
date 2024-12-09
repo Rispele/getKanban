@@ -52,6 +52,18 @@
 <script>
     const connection = setupHubConnection(new signalR.HubConnectionBuilder(), "@Model.GameSessionId", "@Model.TeamId");
     setRollbackEvent(connection);
+
+    const invocation = (rowId, value) => { connection.invoke(`CfdTableUpdate`, `@Model.GameSessionId`, `@Model.TeamId`, rowId, parseInt(value)) };
+
+    document.getElementById(`released`).addEventListener(`change`, () => {invocation(`released`, document.getElementById('released').value)});
+    document.getElementById(`to-deploy`).addEventListener(`change`, () => {invocation(`to-deploy`, document.getElementById('to-deploy').value)});
+    document.getElementById(`with-testers`).addEventListener(`change`, () => {invocation(`with-testers`, document.getElementById('with-testers').value)});
+    document.getElementById(`with-programmers`).addEventListener(`change`, () => {invocation(`with-programmers`, document.getElementById('with-programmers').value)});
+    document.getElementById(`with-analysts`).addEventListener(`change`, () => {invocation(`with-analysts`, document.getElementById('with-analysts').value)});
+
+    connection.on(`NotifyCfdTableUpdated`, (rowId, value) => {
+        document.getElementById(rowId).value = value;
+    });
     
     document.getElementById('save-cfd').addEventListener('click', function () {
         const released = document.getElementById('released').value;

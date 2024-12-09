@@ -54,6 +54,18 @@ public class TeamSessionHub : Hub
 		var groupId = GetGroupId(gameSessionId, teamId);
 		await Clients.OthersInGroup(groupId).SendAsync("NotifyRollbackToDay", gameSessionId, teamId, dayNumber);
 	}
+
+	public async Task CfdTableUpdate(Guid gameSessionId, Guid teamId, string rowId, int value)
+	{
+		var groupId = GetGroupId(gameSessionId, teamId);
+		await Clients.Group(groupId).SendAsync("NotifyCfdTableUpdated", rowId, value);
+	}
+	
+	public async Task AnotherTeamDiceRoll(Guid gameSessionId, Guid teamId, int diceNumber, int scoresNumber)
+	{
+		var groupId = GetGroupId(gameSessionId, teamId);
+		await Clients.Group(groupId).SendAsync("NotifyAnotherTeamDiceRolled", diceNumber, scoresNumber);
+	}
 	
 	private async Task AddCurrentConnectionToLobbyGroupAsync(string groupId)
 	{

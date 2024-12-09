@@ -5,6 +5,7 @@ using Domain.Game.Days.DayContainers;
 using Domain.Game.Days.DayContainers.TeamMembers;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
+using WebApp.Models;
 using WebApp.Models.DayStepModels;
 
 namespace WebApp.Controllers;
@@ -22,7 +23,7 @@ public class ApiController : Controller
 	}
 	
 	[HttpPost("another-team-roll")]
-	public async Task AnotherTeamRoll(Guid gameSessionId, Guid teamId)
+	public async Task<AnotherTeamDiceRollModel> AnotherTeamRoll(Guid gameSessionId, Guid teamId)
 	{
 		var requestContext = RequestContextFactory.Build(Request);
 		await teamService.PatchDayAsync(
@@ -30,6 +31,12 @@ public class ApiController : Controller
 			gameSessionId,
 			teamId,
 			new WorkAnotherTeamDayCommand());
+		var currentDay = await teamService.GetCurrentDayAsync(requestContext, gameSessionId, teamId);
+		return new AnotherTeamDiceRollModel()
+		{
+			DiceNumber = currentDay.WorkAnotherTeamContainer!.DiceNumber,
+			ScoresNumber = currentDay.WorkAnotherTeamContainer.ScoresNumber
+		};
 	}
 	
 	[HttpPost("save-roles-transformation")]

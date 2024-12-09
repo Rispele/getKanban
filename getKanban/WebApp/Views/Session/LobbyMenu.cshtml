@@ -1,11 +1,12 @@
 ﻿@using Domain.Game
 @model Core.Dtos.GameSessionDto
 
-@{ var isAdmin = ((Model.RequesterRole & ParticipantRole.Creator) == ParticipantRole.Creator); }
-@{ var currentTeam = Model.Angels.Participants.Users.SingleOrDefault(x => x.Id == Model.RequesterId) != default
-       ? Model.Angels
-       : Model.Teams.SingleOrDefault(x => x.Participants.Users.SingleOrDefault(u => u.Id == Model.RequesterId) != default);}
 @{
+    var isAdmin = ((Model.RequesterRole & ParticipantRole.Creator) == ParticipantRole.Creator); 
+    var currentTeam = Model.Angels.Participants.Users.SingleOrDefault(x => x.Id == Model.RequesterId) != default
+       ? Model.Angels
+       : Model.Teams.SingleOrDefault(x => x.Participants.Users.SingleOrDefault(u => u.Id == Model.RequesterId) != default);
+
     var allPlayerIds = Model.Teams
         .SelectMany(x => x.Participants.Users)
         .Select(x => x.Id)
@@ -77,14 +78,14 @@ else
 
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script type="module" async="async">
-    document.getElementById(`disconnect`).addEventListener(`click`, () => {lobbyHubConnection.stop();});
-    document.getElementById(`connect`).addEventListener(`click`, () => {lobbyHubConnection.start();});
-
     const teamLinks = @Html.Raw(Json.Serialize(Model.Teams.Select(x => x.Participants.InviteCode).Concat([Model.Angels.Participants.InviteCode])));
     const teamIds = @Html.Raw(Json.Serialize(Model.Teams.Select(x => x.Id).Concat([Model.Angels.Id])));
     const teamNames = @Html.Raw(Json.Serialize(Model.Teams.Select(x => x.Name).Concat([Model.Angels.Name])));
     
     const lobbyHubConnection = new signalR.HubConnectionBuilder().withUrl(`/lobbyHub`).build();
+
+    document.getElementById(`disconnect`).addEventListener(`click`, () => {lobbyHubConnection.stop();});
+    document.getElementById(`connect`).addEventListener(`click`, () => {lobbyHubConnection.start();});
 
     lobbyHubConnection.on(`NotifyClosed`, () => {window.location.href = `/`;});
     lobbyHubConnection.on(`NotifyLeft`, userId => {
@@ -99,7 +100,7 @@ else
     });
     lobbyHubConnection.on(`NotifyConnectionRestore`, userId => {
         if (userId === `@Model.RequesterId`) {
-            showMessage("Соединение с игрой восстановлено");
+            showMessage(`Соединение с игрой восстановлено`);
         }
         const playerElement = document.getElementById(userId);
         const images = playerElement.getElementsByTagName(`img`);
@@ -107,7 +108,7 @@ else
     });
     lobbyHubConnection.on(`NotifyConnectionLost`, userId => {
         if (userId === `@Model.RequesterId`) {
-            showMessage("Соединение с игрой потеряно");
+            showMessage(`Соединение с игрой потеряно`);
         }
         const playerElement = document.getElementById(userId);
         const images = playerElement.getElementsByTagName(`img`);
@@ -233,9 +234,7 @@ else
             saveButton.innerText = `Сохранить`;
             saveButton.addEventListener(`click`, () => {
                 const teamName = input.value;
-                if (teamName.length <= 0) {
-                    return;
-                }
+                if (teamName.length <= 0) return;
                 
                 lobbyHubConnection.invoke(`UpdateName`, `@Model.Id`, teamId, teamName)
                 .then(() => {
@@ -249,7 +248,7 @@ else
             backButton.innerText = `Назад`;
             backButton.addEventListener(`click`, () => {refreshTeamsHeaders();});
 
-            const editBlock = getOrCreateEditBlock(teamId)
+            const editBlock = getOrCreateEditBlock(teamId);
             editBlock.appendChild(saveButton);
             editBlock.appendChild(input);
             editBlock.appendChild(backButton);
@@ -259,7 +258,7 @@ else
     function placeTeamNames(teamIds, teamNames) {
         for (let i = 0; i < teamIds.length; i++) {
             const text = document.createElement(`p`);
-            text.setAttribute(`id`, `edit-name-${teamIds[i]}`)
+            text.setAttribute(`id`, `edit-name-${teamIds[i]}`);
             text.innerText = teamNames[i];
             getOrCreateEditBlock(teamIds[i]).appendChild(text);
         }

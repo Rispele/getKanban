@@ -73,9 +73,11 @@ public static class DomainContextExtensions
 		
 		var sessionAngels = angels.Where(
 			t => t.Participants.SingleOrDefault(p => p.User.Id == userId) != default).ToList();
+
+		var result = new List<GameSession>();
+		
 		if (sessionTeams.Count > 0)
 		{
-			var result = new List<GameSession>();
 			foreach (var sessionTeam in sessionTeams)
 			{
 				foreach (var sess in gameSessionContext.GameSessions)
@@ -90,19 +92,16 @@ public static class DomainContextExtensions
 					}
 				}
 			}
-			return result;
 		}
 
 		if (sessionAngels.Count > 0)
 		{
-			var result = new List<GameSession>();
 			foreach (var angelsTeam in sessionAngels)
 			{
 				result.AddRange(gameSessionContext.GameSessions.Where(x => x.Angels.PublicId == angelsTeam.PublicId));
 			}
-			return result;
 		}
 
-		return null;
+		return result;
 	}
 }

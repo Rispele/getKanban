@@ -200,6 +200,6 @@ public class GameSessionService : IGameSessionService
 	{
 		var currentUser = await GetCurrentUser(requestContext);
 		var sessions = await context.GetCurrentSession(currentUser.Id);
-		return sessions.Select(x => GameSessionDtoConverter.For(ParticipantRole.Player).Convert(x)).ToList();
+		return sessions.Select(x => GameSessionDtoConverter.For(ParticipantRole.Creator).Convert(x)).ToList();
 	}
 }

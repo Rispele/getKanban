@@ -5,25 +5,36 @@
 </div>
 
 <div class="infoContainer height-large centered-100">
-    <h1 class="fs-4 text-center">
-        Петя
-    </h1>
-
-    <button class="stepControlButtons rightButton" id="roll">
-        Кинуть за петю
-    </button>
+    <h1 class="fs-4 text-center"></h1>
 </div>
+
+<button class="stepControlButtons rightButton" id="roll">Кинуть за петю</button>
 
 <script src="~/js/page-switch.js"></script>
 <script src="~/js/setup-hub-connection.js"></script>
+<script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
+    const connection = setupHubConnection(new signalR.HubConnectionBuilder(), "@Model.GameSessionId", "@Model.TeamId");
+    
     document.getElementById('roll').addEventListener('click', function () {
         fetch(`/@Model.GameSessionId/@Model.TeamId/api/another-team-roll`, {
             method: 'POST',
             headers: {"Content-Type": "application/json"}
         })
-        .then(function () {
-            window.location.href = `/@Model.GameSessionId/@Model.TeamId/step/1/0`
+        .then(dice => dice.json())
+        .then(dice => {
+            connection.invoke(`AnotherTeamDiceRoll`, `@Model.GameSessionId`, `@Model.TeamId`, dice[`diceNumber`], dice[`scoresNumber`]);
         });
+    });
+    
+    connection.on('NotifyAnotherTeamDiceRolled', (diceNumber, scoresNumber) => {
+        document.getElementsByClassName(`fs-4`)[0].textContent = `Значение на кубике: ${diceNumber}\nЧисло очков: ${scoresNumber}`
+        document.getElementById(`roll`).remove();
+        const nextButton = document.createElement(`button`);
+        nextButton.setAttribute(`class`, `stepControlButtons rightButton`);
+        nextButton.setAttribute(`id`, `next`);
+        nextButton.textContent = `Далее`;
+        document.body.appendChild(nextButton);
+        setSwitchEvent("next", connection, "@Model.GameSessionId", "@Model.TeamId", 1, 0);
     });
 </script>
