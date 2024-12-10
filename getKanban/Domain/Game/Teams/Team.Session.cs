@@ -74,7 +74,7 @@ public partial class Team
 			.Concat(takenTickets).ToHashSet();
 	}
 
-	public bool IsTicketDeadlineNotExceeded(string ticketId, int deadlineInclusive)
+	public bool IsTicketDeadlineNotExceededAtReleaseDay(string ticketId, int deadlineInclusive)
 	{
 		var ticket = BuildTakenTickets().SingleOrDefault(t => t.id == ticketId);
 		if (ticket == null || ticket.IsInWork(deadlineInclusive))

@@ -2,7 +2,7 @@
 
 public static class TicketDescriptors
 {
-	public const int DefaultClientOffRate = -2;
+	public const int DefaultClientOffRate = 2;
 	public const int ZeroClientOffRate = 0;
 
 	public static readonly TicketDescriptor S01 = new(nameof(S01), 21, DefaultClientOffRate);

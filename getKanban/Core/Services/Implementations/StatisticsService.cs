@@ -43,7 +43,7 @@ public class StatisticsService : IStatisticsService
 			team.Id,
 			dayStats,
 			EvaluatePenalty(team),
-			EvaluateBonusProfit(team));
+			EvaluateBonusProfit(takenTickets, team));
 	}
 
 	public CfdStatisticDto CollectCfdStatistic(Day day)
@@ -85,15 +85,17 @@ public class StatisticsService : IStatisticsService
 	{
 		return TicketDescriptors.AllTicketDescriptors
 			.Where(t => t.Penalty != null)
-			.Where(t => !team.IsTicketDeadlineNotExceeded(t.Id, t.Penalty!.Deadline))
+			.Where(t => !team.IsTicketDeadlineNotExceededAtReleaseDay(t.Id, t.Penalty!.Deadline))
 			.Sum(t => t.Penalty!.Size);
 	}
 
-	private int EvaluateBonusProfit(Team team)
+	private int EvaluateBonusProfit(HashSet<Ticket> takenTickets, Team team)
 	{
-		return TicketDescriptors.AllTicketDescriptors
+		return takenTickets
+			.Where(t => t.IsReleased(team.CurrentDay.Number))
+			.Select(t => TicketDescriptors.GetByTicketId(t.id))
 			.Where(t => t.Bonus != null)
-			.Where(t => team.IsTicketDeadlineNotExceeded(t.Id, t.Bonus!.Deadline))
+			.Where(t => team.IsTicketDeadlineNotExceededAtReleaseDay(t.Id, t.Bonus!.Deadline))
 			.Sum(t => t.Bonus!.Size);
 	}
 

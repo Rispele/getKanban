@@ -105,6 +105,18 @@ public class DayStepsController : Controller
 		var pageTypeNumber = (ticketIds.Any(x => x.id.Contains('S')) ? 1 : 0)
 		                   + (ticketIds.Any(x => x.id.Contains('I')) ? 1 : 0)
 		                   + (ticketIds.Any(x => x.id.Contains('E') || x.id.Contains('F')) ? 1 : 0);
+
+		if (pageTypeNumber == 0)
+		{
+			return View(
+				"Step5Stage0",
+				await FillWithCredentialsAsync<StepModel>(
+					requestContext,
+					gameSessionId,
+					teamId,
+					dayNumber: currentDay.Number));
+		}
+		
 		var pageType = pageTypeNumber switch
 		{
 			1 => "Single",
