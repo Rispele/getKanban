@@ -25,9 +25,12 @@
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script type="module">
     if (await checkPageAvailable("@Model.GameSessionId", "@Model.TeamId", "roll") !== true ||
-        await checkPageAvailable("@Model.GameSessionId", "@Model.TeamId", "update-role") !== true) {
-        const errorMessage = "Страница недоступна после распределения ролей или броска кубиков для команды";
-        window.location.href = `/@Model.GameSessionId/@Model.TeamId/api/error?message=${errorMessage}`;
+        await checkPageAvailable("@Model.GameSessionId", "@Model.TeamId", "update-role") !== true
+    ) {
+        const response = await fetch(`/@Model.GameSessionId/@Model.TeamId/api/get-current-step`);
+        const page = await response.text();
+        console.log(page);
+        window.location.href = `/@Model.GameSessionId/@Model.TeamId/step/${page}`;
     }
     
     const connection = setupHubConnection(new signalR.HubConnectionBuilder(), "@Model.GameSessionId", "@Model.TeamId");

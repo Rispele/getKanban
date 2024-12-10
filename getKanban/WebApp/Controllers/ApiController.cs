@@ -1,10 +1,11 @@
 ﻿using Core.Services.Contracts;
-using Domain;
 using Domain.Game.Days.Commands;
 using Domain.Game.Days.DayContainers;
 using Domain.Game.Days.DayContainers.TeamMembers;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using WebApp.Hubs;
 using WebApp.Models;
 using WebApp.Models.DayStepModels;
 
@@ -15,6 +16,7 @@ public class ApiController : Controller
 {
 	private readonly ITeamService teamService;
 	private readonly IDomainInteractionService domainInteractionService;
+	private readonly IHubContext<TeamSessionHub> teamSessionHub;
 
 	public ApiController(ITeamService teamService, IDomainInteractionService domainInteractionService)
 	{
@@ -146,7 +148,37 @@ public class ApiController : Controller
 			_ => false
 		};
 	}
-	
+
+	[HttpGet("get-current-step")]
+	public async Task<string> GetCurrentStep(Guid gameSessionId, Guid teamId)
+	{
+		var requestContext = RequestContextFactory.Build(Request);
+		var currentDay = await teamService.GetCurrentDayAsync(requestContext, gameSessionId, teamId);
+		var awaitedCommands = currentDay.AwaitedCommands;
+		if (awaitedCommands.Any(t => t.CommandType == DayCommandType.WorkAnotherTeam))
+		{
+			return "1/0";
+		}
+		if (awaitedCommands.Any(t => t.CommandType == DayCommandType.UpdateTeamRoles))
+		{
+			return "1/1";
+		}
+		if (awaitedCommands.Any(t => t.CommandType == DayCommandType.ReleaseTickets))
+		{
+			return "4/0";
+		}
+		if (awaitedCommands.Any(t => t.CommandType == DayCommandType.UpdateSprintBacklog))
+		{
+			return "5/0";
+		}
+		if (awaitedCommands.Any(t => t.CommandType == DayCommandType.UpdateCfd))
+		{
+			return "6/0";
+		}
+
+		throw new InvalidOperationException();
+	}
+
 	[HttpGet("error")]
 	public async Task<IActionResult> Error(string message)
 	{

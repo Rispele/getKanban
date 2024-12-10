@@ -8,7 +8,7 @@
     <h1 class="fs-4 text-center">
         Стендап-совещание
     </h1>
-    
+
     <div class="info height-small centered-100">
         <p class="fs-5 fw-normal">Отсортируйте тикеты в колонках.</p>
         <p class="fs-5 fw-normal">Определите будете ли вы менять распределение членов команды по функциям</p>
@@ -24,9 +24,12 @@
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script type="module">
     if (await checkPageAvailable("@Model.GameSessionId", "@Model.TeamId", "roll") !== true ||
-        await checkPageAvailable("@Model.GameSessionId", "@Model.TeamId", "update-role") !== true) {
-        const errorMessage = "Страница недоступна после распределения ролей или броска кубиков для команды";
-        window.location.href = `/@Model.GameSessionId/@Model.TeamId/api/error?message=${errorMessage}`;
+        await checkPageAvailable("@Model.GameSessionId", "@Model.TeamId", "update-role") !== true
+    ) {
+        const response = await fetch(`/@Model.GameSessionId/@Model.TeamId/api/get-current-step`);
+        const page = await response.text();
+        console.log(page);
+        window.location.href = `/@Model.GameSessionId/@Model.TeamId/step/${page}`;
     }
     
     const connection = setupHubConnection(new signalR.HubConnectionBuilder(), "@Model.GameSessionId", "@Model.TeamId");
