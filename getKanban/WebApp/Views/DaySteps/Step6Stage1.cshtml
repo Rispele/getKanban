@@ -7,6 +7,42 @@
 
 @functions
 {
+    private void RenderDayResult()
+    {
+        var dayByNumber = Model.TeamStatistic.DayStatistics.ToDictionary(d => d.DayNumber);
+        <div class="scrollable-container" style="position: absolute; right: 0;">
+            @foreach (var data in Model.TeamStatistic.DayStatistics.OrderByDescending(t => t.DayNumber))
+            {
+                <div class="finishDayResult dayLineStyle text-center">
+                    <h1 class="fs-6">День @data.DayNumber</h1>
+                </div>
+
+                <div class="finishDayRe sultContainer">
+                    <div class="finishDayResult">
+                        <p class="fs-6">Получили клиентов: @data.ClientsGained</p>
+                    </div>
+
+                    @if (dayByNumber.TryGetValue(data.DayNumber - 1, out var prev) && prev.ProfitPerClient != data.ProfitPerClient)
+                    {
+                        <div class="finishDayResult monetChangeLineStyle">
+                            <p class="fs-6">Деньги за клиента: @(prev.ProfitPerClient)$ -> @(data.ProfitPerClient)$</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="finishDayResult monetChangeLineStyle">
+                            <p class="fs-6">Деньги за клиента: @(data.ProfitPerClient)$</p>
+                        </div>
+                    }
+
+                    <div class="finishDayResult">
+                        <p class="fs-6">Получили денег: @(data.ProfitGained)$</p>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
     private void RenderDiagram()
     {
         var dayStatistics = Model.TeamStatistic.DayStatistics;
@@ -87,10 +123,17 @@
     }
 }
 
-<div class="diagram-container" style="margin-top: 12.5%; width: 75%; height: 100%; display: flex; flex-direction: column;">
-    <div id="cfd" style="width: 100%; height: 33%;"></div>
-    <div id="control-diagram" style="width: 100%; height: 33%;"></div>
-    <div id="distribution-diagram" style="width: 100%; height: 33%;"></div>
+<div class="centered-100" style="display: flex; flex-direction: row; flex-wrap: wrap; position: relative;">
+    <div class="diagram-container" style="width: 50%; height: 100%; display: flex; flex-direction: column;">
+        <div id="cfd" style="width: 100%; height: 33%;"></div>
+        <div id="control-diagram" style="width: 100%; height: 33%;"></div>
+        <div id="distribution-diagram" style="width: 100%; height: 33%;"></div>
+    </div>
+    <div style="width: 300px">
+        Всего клиентов: @Model.TeamStatistic.TotalClientsGained
+        Всего денег: @Model.TeamStatistic.TotalProfitGained
+        @{ RenderDayResult(); }
+    </div>
 </div>
 @{
     RenderDiagram();
@@ -98,7 +141,6 @@
 <button class="stepControlButtons position-relative rightButton" id="next">
     <p class="fs-6">Далее</p>
 </button>
-
 <script src="~/js/page-switch.js"></script>
 <script src="~/js/setup-hub-connection.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
