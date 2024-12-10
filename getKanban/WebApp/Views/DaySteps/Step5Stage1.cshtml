@@ -93,7 +93,7 @@
         const checked = checkbox.checked;
         if (checked) {
             const ticketId = checkbox.parentElement.getElementsByClassName('checkboxCardNumber')[0].textContent;
-            checkedTickets.push(parseInt(ticketId.substring(1)));
+            if (ticketId.startsWith(`S`)) checkedTickets.push(parseInt(ticketId.substring(1)));
         }
     }
     
