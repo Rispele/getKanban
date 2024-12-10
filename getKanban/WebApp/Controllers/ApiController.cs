@@ -137,21 +137,14 @@ public class ApiController : Controller
 	{
 		var requestContext = RequestContextFactory.Build(Request);
 		var currentDay = await teamService.GetCurrentDayAsync(requestContext, gameSessionId, teamId);
-		
-		switch (@event)
+			
+		return @event switch
 		{
-			case "roll":
-				return currentDay.RollDiceContainer is null ||
-				       currentDay.RollDiceContainer.DiceRollResults.IsNullOrEmpty();
-			case "update-role":
-				return currentDay.TeamMembersContainer.TeamRoleUpdates.Count == 7;
-			case "another-team-roll":
-				return currentDay.WorkAnotherTeamContainer is null ||
-				       currentDay.WorkAnotherTeamContainer.DiceNumber == default ||
-				       currentDay.WorkAnotherTeamContainer.ScoresNumber == default;
-			default:
-				return false;
-		}
+			"roll" => currentDay.AwaitedCommands.Any(t => t.CommandType == DayCommandType.RollDice),
+			"update-role" => currentDay.AwaitedCommands.Any(t => t.CommandType == DayCommandType.UpdateTeamRoles),
+			"another-team-roll" => currentDay.AwaitedCommands.Any(t => t.CommandType == DayCommandType.WorkAnotherTeam),
+			_ => false
+		};
 	}
 	
 	[HttpGet("error")]
