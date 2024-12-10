@@ -28,6 +28,4 @@ public interface IGameSessionService
 	public Task<string> GetTeamName(Guid sessionId, Guid teamId);
 
 	public Task<UserDto> GetCurrentUser(RequestContext requestContext);
-	
-	public Task<List<GameSessionDto>> GetSessionsUserAttachedTo(RequestContext requestContext);
 }

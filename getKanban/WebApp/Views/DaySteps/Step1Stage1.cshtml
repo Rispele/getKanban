@@ -31,7 +31,15 @@
     }
     
     const connection = setupHubConnection(new signalR.HubConnectionBuilder(), "@Model.GameSessionId", "@Model.TeamId");
-    setSwitchEvent("roll", connection, "@Model.GameSessionId", "@Model.TeamId", 2, 0);
+    document.getElementById("roll").addEventListener('click', () => {
+        fetch(`/@Model.GameSessionId/@Model.TeamId/api/roll`)
+            .then(() => {
+                connection.invoke("ChangePage", "@Model.GameSessionId", "@Model.TeamId", 2, 0)
+                    .then(() => {
+                        window.location.href = `/@Model.GameSessionId/@Model.TeamId/step/2/0`;
+                    });
+            })
+    });
     setSwitchEvent("change", connection, "@Model.GameSessionId", "@Model.TeamId", 1, 2);
     setRollbackEvent(connection);
 </script>

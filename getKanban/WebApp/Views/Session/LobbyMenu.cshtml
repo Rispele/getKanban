@@ -1,7 +1,11 @@
-﻿@using Domain.Game
+﻿@using Core.RequestContexts
+@using Domain.Game
+@using Microsoft.AspNetCore.Mvc.TagHelpers
 @model Core.Dtos.GameSessionDto
 
 @{
+    Context.Response.Cookies.Append(RequestContextKeys.SessionId, Model.Id.ToString());
+    
     var isAdmin = ((Model.RequesterRole & ParticipantRole.Creator) == ParticipantRole.Creator); 
     var currentTeam = Model.Angels.Participants.Users.SingleOrDefault(x => x.Id == Model.RequesterId) != default
        ? Model.Angels

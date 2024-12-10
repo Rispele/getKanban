@@ -29,8 +29,14 @@ public class RequestContextFactory
 	{
 		var requestContext = new RequestContext();
 		var userId = GetUserIdOrThrow(request);
-		
 		requestContext.AddHeader(RequestContextKeys.UserId, userId.ToString());
+		
+		var sessionId = TryGetSessionId(request);
+		if (sessionId is not null)
+		{
+			requestContext.AddHeader(RequestContextKeys.SessionId, sessionId.ToString());
+		}
+		
 		return requestContext;
 	}
 	
@@ -39,9 +45,22 @@ public class RequestContextFactory
 		return FindRequestUserId(request) ?? throw new KeyNotFoundException();
 	}
 	
+	private static Guid? TryGetSessionId(HttpRequest request)
+	{
+		return FindRequestSessionId(request);
+	}
+	
 	private static Guid? FindRequestUserId(HttpRequest request)
 	{
 		var value = request.Cookies[RequestContextKeys.UserId];
+		return value is null
+			? null
+			: Guid.Parse(value);
+	}
+
+	private static Guid? FindRequestSessionId(HttpRequest request)
+	{
+		var value = request.Cookies[RequestContextKeys.SessionId];
 		return value is null
 			? null
 			: Guid.Parse(value);

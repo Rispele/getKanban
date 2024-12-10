@@ -1,4 +1,5 @@
 using Core.Helpers;
+using Core.RequestContexts;
 using Core.Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
 
@@ -79,6 +80,8 @@ public class SessionController : Controller
 		if (session is not null)
 		{
 			session.RequesterId = currentUser.Id;
+			requestContext.AddHeader(RequestContextKeys.SessionId, sessionId.ToString());
+			Response.Cookies.Append(RequestContextKeys.SessionId, sessionId.ToString());
 		}
 		
 		return View(session);

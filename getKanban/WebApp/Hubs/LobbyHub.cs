@@ -1,3 +1,4 @@
+using Core.RequestContexts;
 using Core.Services.Contracts;
 using Microsoft.AspNetCore.SignalR;
 
@@ -16,11 +17,10 @@ public class LobbyHub : Hub
 	{
 		var requestContext = RequestContextFactory.Build(Context);
 		var currentUser = await gameSessionService.GetCurrentUser(requestContext);
-		var userSessions = await gameSessionService.GetSessionsUserAttachedTo(requestContext);
-
-		foreach (var session in userSessions)
+		if (requestContext.Headers.TryGetValue(RequestContextKeys.SessionId, out var sessionId))
 		{
-			await Clients.Group(GetGroupId(session.Id)).SendAsync("NotifyConnectionRestore", currentUser.Id);
+			var sessionToNotifyId = Guid.Parse(sessionId ?? throw new InvalidOperationException());
+			await Clients.Group(GetGroupId(sessionToNotifyId)).SendAsync("NotifyConnectionRestore", currentUser.Id);
 		}
 		await base.OnConnectedAsync();
 	}
@@ -29,13 +29,11 @@ public class LobbyHub : Hub
 	{
 		var requestContext = RequestContextFactory.Build(Context);
 		var currentUser = await gameSessionService.GetCurrentUser(requestContext);
-		var userSessions = await gameSessionService.GetSessionsUserAttachedTo(requestContext);
-
-		foreach (var session in userSessions)
+		if (requestContext.Headers.TryGetValue(RequestContextKeys.SessionId, out var sessionId))
 		{
-			await Clients.Group(GetGroupId(session.Id)).SendAsync("NotifyConnectionLost", currentUser.Id);
+			var sessionToNotifyId = Guid.Parse(sessionId ?? throw new InvalidOperationException());
+			await Clients.Group(GetGroupId(sessionToNotifyId)).SendAsync("NotifyConnectionLost", currentUser.Id);
 		}
-		
 		await base.OnDisconnectedAsync(exception);
 	}
 

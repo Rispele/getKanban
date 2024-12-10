@@ -196,11 +196,4 @@ public class GameSessionService : IGameSessionService
 			Name = user.Name
 		};
 	}
-
-	public async Task<List<GameSessionDto>> GetSessionsUserAttachedTo(RequestContext requestContext)
-	{
-		var currentUser = await GetCurrentUser(requestContext);
-		var sessions = await context.GetCurrentSession(currentUser.Id);
-		return sessions.Select(x => GameSessionDtoConverter.For(ParticipantRole.Creator).Convert(x)).ToList();
-	}
 }
