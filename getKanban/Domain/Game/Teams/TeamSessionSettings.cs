@@ -14,6 +14,8 @@ public class TeamSessionSettings
 	
 	public IReadOnlyList<(int dayFrom, int profitPerClient)> ProfitPerClientPerDay { get; init; } = null!;
 	
+	public int MaxDayNumber { get; init; }
+	
 	public int ReleaseCycleLength { get; init; }
 
 	public int UpdateSprintBacklogEveryDaySince { get; init; }
@@ -72,7 +74,8 @@ public class TeamSessionSettings
 			ProgrammersNumber = 3,
 			DefaultTestersNumber = 2,
 			IncreasedTestersNumber = 3,
-			IncreaseTestersNumberSince = 15
+			IncreaseTestersNumberSince = 15,
+			MaxDayNumber = 18
 		};
 	}
 }

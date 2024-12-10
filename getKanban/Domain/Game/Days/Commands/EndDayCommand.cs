@@ -19,7 +19,10 @@ public class EndDayCommand : DayCommand
 
 		day.EndDay();
 
-		team.AddNextDay();
+		if (team.Settings.MaxDayNumber < day.Number)
+		{
+			team.AddNextDay();
+		}
 		day.PostDayEvent(CommandType, null);
 	}
 

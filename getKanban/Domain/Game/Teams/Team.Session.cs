@@ -17,6 +17,9 @@ public partial class Team
 
 	public IReadOnlyList<Day> Days => days;
 
+	public bool IsTeamSessionEnded =>
+		currentDayNumber == Settings.MaxDayNumber && CurrentDay.CurrentlyAwaitedCommands.Count == 0;
+
 	public Day CurrentDay
 	{
 		get
@@ -150,7 +153,7 @@ public partial class Team
 			AnalystsCount = Settings.AnalystsNumber,
 			ProgrammersCount = Settings.ProgrammersNumber,
 			TestersCount = testersNumber,
-			
+
 			CanReleaseNotImmediately = isReleaseDay,
 
 			ProfitPerClient = Settings.GetProfitPerDay(dayNumber)
@@ -170,7 +173,7 @@ public partial class Team
 		{
 			return false;
 		}
-		
+
 		days.RemoveAll(x => x.Number >= dayNumber);
 		currentDayNumber = dayNumber;
 		days.Add(ConfigureDay(currentDayNumber, days));
