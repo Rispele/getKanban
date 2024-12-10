@@ -83,9 +83,7 @@ public class GameSessionService : IGameSessionService
 		return GameSessionDtoConverter.For(participantRole!.Value).Convert(session);
 	}
 
-	public async Task<AddParticipantResult?> AddParticipantAsync(
-		RequestContext requestContext,
-		string inviteCode)
+	public async Task<AddParticipantResult?> AddParticipantAsync(RequestContext requestContext, string inviteCode)
 	{
 		if (!InviteCodeHelper.ValidateInviteCode(inviteCode))
 		{
@@ -101,14 +99,6 @@ public class GameSessionService : IGameSessionService
 		var user = await context.GetUserAsync(requestContext.GetUserId());
 
 		var (teamId, updated) = session.AddByInviteCode(user, inviteCode);
-		if (teamId != session.Angels.PublicId)
-		{
-			session.Angels.RemoveParticipant(user);
-		}
-		var removedFromOtherTeams = session.Teams
-			.Where(x => x.Id != teamId)
-			.Any(x => x.Players.RemoveParticipant(user));
-
 		await context.TrySaveChangesAsync();
 
 		var participantRole = session.EnsureHasAnyAccess(user.Id, inviteCode);
