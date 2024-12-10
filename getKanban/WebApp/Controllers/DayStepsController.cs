@@ -1,4 +1,5 @@
-﻿using Core.RequestContexts;
+﻿using Core.Helpers;
+using Core.RequestContexts;
 using Core.Services.Contracts;
 using Domain.Game.Days.Commands;
 using Microsoft.AspNetCore.Mvc;
@@ -227,6 +228,31 @@ public class DayStepsController : Controller
 		stepModel.TeamStatistic = teamStatistic;
 		
 		return View(stepModel);
+	}
+
+	[HttpGet("game-result")]
+	public async Task<IActionResult> WinnersPage(Guid gameSessionId, Guid teamId)
+	{
+		var requestContext = RequestContextFactory.Build(Request);
+		var session = await gameSessionService.FindGameSession(
+			requestContext,
+			InviteCodeHelper.ConcatInviteCode(gameSessionId, teamId),
+			ignorePermissions: true);
+
+		var model = new GameResultModel() { TeamResultModels = [] };
+
+		foreach (var team in session!.Teams)
+		{
+			var statistic = await statisticsService.CollectStatistic(gameSessionId, teamId);
+			model.TeamResultModels.Add(new TeamResultModel()
+			{
+				TeamName = team.Name,
+				ClientsCount = statistic.TotalClientsGained,
+				MoneyCount = statistic.TotalProfitGained
+			});
+		}
+		
+		return View(model);
 	}
 
 	private async Task<T> FillWithCredentialsAsync<T>(

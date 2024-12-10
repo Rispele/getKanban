@@ -1,0 +1,40 @@
+﻿@model WebApp.Models.DayStepModels.GameResultModel
+
+@{
+    var clientWinnerTeamName = Model.TeamResultModels.MaxBy(x => x.ClientsCount)!.TeamName;
+    var moneyWinnerTeamName = Model.TeamResultModels.MaxBy(x => x.MoneyCount)!.TeamName;
+
+    string GetTeamClassName(string teamName) =>
+        (clientWinnerTeamName == teamName, moneyWinnerTeamName == teamName) switch
+        {
+            ((true, true)) => "finalMegaWinner",
+            ((true, false)) => "finalClientWinnerStyle",
+            ((false, true)) => "finalMoneyWinnerStyle",
+            ((false, false)) => "finalLooserStyle"
+        };
+}
+
+<div class="container7">
+    @foreach (var teamResult in Model.TeamResultModels)
+    {
+        <div class="finalCommandContainer">
+            <div class="finalCommandResult"></div>
+
+            <div class="finalCommand @Html.Raw(GetTeamClassName(teamResult.TeamName))">
+                <h class="fs-5 fw-bold text-center">@Html.Raw(teamResult.TeamName)</h>
+                <h class="fs-6 fw-normal text-center">Клиенты: @teamResult.ClientsCount</h>
+                <h class="fs-6 fw-normal text-center">Деньги: @(teamResult.MoneyCount)$</h>
+            </div>
+        </div>
+    }
+</div>
+
+<button class="stepControlButtons rightButton" id="next">
+    Выйти в меню
+</button>
+
+<script>
+    document.getElementById(`next`).addEventListener(`click`, () => {
+        window.location.href = `/`;
+    });
+</script>
