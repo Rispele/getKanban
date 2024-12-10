@@ -82,7 +82,7 @@
     setSwitchEvent("next", connection, "@Model.GameSessionId", "@Model.TeamId", 5, 2);
     setRollbackEvent(connection);
     
-    connection.on("NotifyUpdateTicketChoice", function (ticketId) {
+    connection.on("NotifyTicketTakenToSpringBacklog", function (ticketId) {
         const ticket = document.getElementById(ticketId);
         ticket.checked = !ticket.checked;
     });
@@ -130,7 +130,7 @@
                     box.checked = !box.checked;
                     return;
                 }
-                connection.invoke("UpdateTicketChoice", "@Model.GameSessionId", "@Model.TeamId", ticketId);
+                connection.invoke("NotifyTicketTakenToSpringBacklog", "@Model.GameSessionId", "@Model.TeamId", ticketId);
             });
         });
     }

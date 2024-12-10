@@ -125,7 +125,7 @@ public class LobbyHub : Hub
 		await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupId);
 	}
 
-	private static string GetGroupId(Guid gameSessionId)
+	public static string GetGroupId(Guid gameSessionId)
 	{
 		return $"lobby-{gameSessionId}";
 	}

@@ -78,7 +78,7 @@
     setSwitchEvent("next", connection, "@Model.GameSessionId", "@Model.TeamId", 4, 2);
     setRollbackEvent(connection);
     
-    connection.on("NotifyUpdateTicketChoice", function (ticketId) {
+    connection.on("NotifyTicketReleased", function (ticketId) {
         const ticket = document.getElementById(ticketId);
         ticket.checked = !ticket.checked;
     });
@@ -124,7 +124,7 @@
                 },
                 body: JSON.stringify({ TicketId: ticketId, Remove: remove })
             }).then(function () {
-                connection.invoke("UpdateTicketChoice", "@Model.GameSessionId", "@Model.TeamId", ticketId);
+                connection.invoke("NotifyTicketReleased", "@Model.GameSessionId", "@Model.TeamId", ticketId);
             });
         });
     }
