@@ -43,7 +43,7 @@
         {
             FillTickets(
                 Model.TicketIds.Where(x => x.id.Contains("S")),
-                "checkboxCardStyle1", 
+                "checkboxCardStyle1",
                 "Обычные");
         }
 
@@ -51,7 +51,7 @@
         {
             FillTickets(
                 Model.TicketIds.Where(x => x.id.Contains("I")),
-                "checkboxCardStyle2", 
+                "checkboxCardStyle2",
                 "Инфраструктурные");
         }
 
@@ -99,8 +99,9 @@
     
     for (let checkbox of checkboxes) {
         checkbox.addEventListener('change', function () {
-            const remove = !this.checked;
-            const ticketId = this.parentElement.getElementsByClassName('checkboxCardNumber')[0].textContent;
+            const box = this;
+            const remove = !box.checked;
+            const ticketId = box.parentElement.getElementsByClassName('checkboxCardNumber')[0].textContent;
             if (ticketId.startsWith(`S`)) {
                 if (!remove && (checkedTickets.length === 0 ||
                     parseInt(ticketId.substring(1)) === checkedTickets[checkedTickets.length - 1] + 1)) {
@@ -123,7 +124,12 @@
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({ ticketId: ticketId, remove: remove })
-            }).then(function () {
+            }).then(function (response) {
+                if (!response.ok) {
+                    console.log("Shit");
+                    box.checked = !box.checked;
+                    return;
+                }
                 connection.invoke("UpdateTicketChoice", "@Model.GameSessionId", "@Model.TeamId", ticketId);
             });
         });

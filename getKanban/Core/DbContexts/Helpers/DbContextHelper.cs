@@ -4,41 +4,24 @@ namespace Core.DbContexts.Helpers;
 
 public static class DbContextHelper
 {
-	public static async Task<int> TrySaveChangesAsync(this DbContext context, int tryCount = 3)
+	public static async Task<int> TrySaveChangesAsync(this DbContext context, int triesCount = 3)
 	{
-		var result = 0;
-		var retriesRemaining = tryCount;
-		var success = false;
-		do
+		var tryNumber = 1;
+		while (true)
 		{
 			try
 			{
-				result = await context.SaveChangesAsync();
-				success = true;
+				return await context.SaveChangesAsync();
 			}
-			catch (Exception e) when
-				(e is DbUpdateConcurrencyException or DbUpdateException)
+			catch (Exception exception) when (exception is DbUpdateConcurrencyException or DbUpdateException)
 			{
-				var operationTypeName = e switch
+				if (tryNumber >= triesCount)
 				{
-					DbUpdateConcurrencyException => "Concurrent DB update",
-					DbUpdateException => "DB update",
-					_ => string.Empty
-				};
-				if (retriesRemaining == tryCount)
-				{
-					Console.WriteLine($"{operationTypeName} failed: {e.Message}");
-				}
-				if (retriesRemaining == 0)
-				{
-					Console.WriteLine($"{operationTypeName} failed after {tryCount} tries.");
 					throw;
 				}
-				
-				Console.WriteLine($"{operationTypeName} retry: {tryCount - retriesRemaining + 1} try.");
-			}
-		} while (!success || retriesRemaining-- != 0);
 
-		return result;
+				tryNumber++;
+			}
+		}
 	}
 }

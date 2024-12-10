@@ -11,7 +11,8 @@ public class
 	{
 		builder.ConfigureAsFreezableDayContainer();
 		builder.Property("ticketIds").HasColumnType("json").HasConversion(new ListConverter<string>());
-
+		
+		builder.Ignore("descriptors");
 		builder.Ignore(e => e.TicketIds);
 	}
 }

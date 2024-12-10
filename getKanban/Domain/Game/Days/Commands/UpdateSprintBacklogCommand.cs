@@ -1,5 +1,6 @@
 ﻿using Domain.DomainExceptions;
 using Domain.Game.Teams;
+using Domain.Game.Tickets;
 
 namespace Domain.Game.Days.Commands;
 
@@ -14,6 +15,12 @@ public class UpdateSprintBacklogCommand : DayCommand
 	internal override void Execute(Team team, Day day)
 	{
 		day.EnsureCanPostEvent(CommandType);
+		var previousDayLastTicketNumber = team.PreviousDay?.UpdateSprintBacklogContainer.TicketIds
+			.Select(TicketDescriptors.GetByTicketId)
+			.Where(t => t.ShouldBeTakenSequentially)
+			.MaxBy(t => t.Number)
+			?.Number ?? team.Settings.InitiallyTakenTickets
+			.Select(t => TicketDescriptors.GetByTicketId(t.id)).MaxBy(t => t.Number)?.Number;
 
 		foreach (var ticketId in TicketIds)
 		{
@@ -24,7 +31,7 @@ public class UpdateSprintBacklogCommand : DayCommand
 			else
 			{
 				EnsureCanTakeTickets(team);
-				day.UpdateSprintBacklogContainer.Update(ticketId);
+				day.UpdateSprintBacklogContainer.Update(previousDayLastTicketNumber, ticketId);
 			}
 		}
 
