@@ -68,6 +68,7 @@
     </button>
 </div>
 
+<script src="~/js/popup.js"></script>
 <script src="~/js/page-switch.js"></script>
 <script src="~/js/setup-hub-connection.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
@@ -85,12 +86,34 @@
         console.log("reload")
         window.location.reload();
     });
-    
+
     const checkboxes = document.getElementsByClassName('checkboxCardInput');
+    const checkedTickets = [];
+    for (let checkbox of checkboxes) {
+        const checked = checkbox.checked;
+        if (checked) {
+            const ticketId = checkbox.parentElement.getElementsByClassName('checkboxCardNumber')[0].textContent;
+            checkedTickets.push(parseInt(ticketId.substring(1)));
+        }
+    }
+    
     for (let checkbox of checkboxes) {
         checkbox.addEventListener('change', function () {
             const remove = !this.checked;
             const ticketId = this.parentElement.getElementsByClassName('checkboxCardNumber')[0].textContent;
+            if (!remove && (checkedTickets.length === 0 ||
+                ticketId.startsWith(`S`) && parseInt(ticketId.substring(1)) === checkedTickets[checkedTickets.length - 1] + 1)) {
+                checkedTickets.push(parseInt(ticketId.substring(1)))    
+            } else if (remove && (checkedTickets.length === 1 ||
+                parseInt(ticketId.substring(1)) === checkedTickets[checkedTickets.length - 1])) {
+                const index = checkedTickets.indexOf(parseInt(ticketId.substring(1)));
+                if (index > -1) {checkedTickets.splice(index, 1);}
+            } else {
+                this.checked = !this.checked;
+                showMessage(`Нельзя выбирать стандартные тикеты не в порядке возрастания их номеров`);
+                return;
+            }
+            
             console.log(ticketId);
             fetch("/@Model.GameSessionId/@Model.TeamId/api/update-release", {
                 method: 'POST',
