@@ -1,4 +1,5 @@
 ﻿using Core.DbContexts;
+using Core.DbContexts.Helpers;
 using Domain;
 using Domain.DbContexts;
 using Domain.Game;
@@ -137,7 +138,7 @@ public class Concurrency_Test
 		session.Entity.Start();
 		actions.ForEach(a => a(context, session.Entity));
 
-		await context.SaveChangesAsync();
+		await context.TrySaveChangesAsync();
 		return session.Entity;
 	}
 

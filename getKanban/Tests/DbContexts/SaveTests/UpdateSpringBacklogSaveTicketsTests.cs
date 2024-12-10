@@ -1,4 +1,5 @@
 ﻿using Core.DbContexts;
+using Core.DbContexts.Helpers;
 using Domain;
 using Domain.DbContexts;
 using Domain.Game;
@@ -31,7 +32,7 @@ public class UpdateSpringBacklogSaveTicketsTests
 			Remove = false
 		};
 		session.Teams.Single().ExecuteCommand(command);
-		await context.SaveChangesAsync();
+		await context.TrySaveChangesAsync();
 		
 		var context2 = ConfigureDbContext();
 		var sessionFromDb = context2.Find<GameSession>(session.Id);
@@ -47,7 +48,7 @@ public class UpdateSpringBacklogSaveTicketsTests
 		session.Entity.Start();
 		actions.ForEach(a => a(session.Entity));
 
-		await context.SaveChangesAsync();
+		await context.TrySaveChangesAsync();
 		return session.Entity;
 	}
 

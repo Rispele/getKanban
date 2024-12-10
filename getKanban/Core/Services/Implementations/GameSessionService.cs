@@ -1,4 +1,5 @@
 ﻿using Core.DbContexts.Extensions;
+using Core.DbContexts.Helpers;
 using Core.Dtos;
 using Core.Dtos.Converters;
 using Core.Helpers;
@@ -28,7 +29,7 @@ public class GameSessionService : IGameSessionService
 		var gameSession = new GameSession(user, name, teamsCount);
 
 		context.GameSessions.Add(gameSession);
-		await context.SaveChangesAsync();
+		await context.TrySaveChangesAsync();
 
 		return gameSession.Id;
 	}
@@ -36,7 +37,7 @@ public class GameSessionService : IGameSessionService
 	public async Task CloseGameSession(Guid sessionId)
 	{
 		context.GameSessions.Remove(context.GameSessions.Single(x => x.Id == sessionId));
-		await context.SaveChangesAsync();
+		await context.TrySaveChangesAsync();
 	}
 
 	public async Task<GameSessionDto?> FindGameSession(
@@ -108,7 +109,7 @@ public class GameSessionService : IGameSessionService
 			.Where(x => x.Id != teamId)
 			.Any(x => x.Players.RemoveParticipant(user));
 
-		await context.SaveChangesAsync();
+		await context.TrySaveChangesAsync();
 
 		var participantRole = session.EnsureHasAnyAccess(user.Id, inviteCode);
 		var sessionDto = GameSessionDtoConverter.For(participantRole).Convert(session);
@@ -139,7 +140,7 @@ public class GameSessionService : IGameSessionService
 		var angelsRemoved = session.Angels.RemoveParticipant(user);
 		var teamsRemoved = session.Teams.Any(x => x.Players.RemoveParticipant(user));
 
-		await context.SaveChangesAsync();
+		await context.TrySaveChangesAsync();
 		
 		return angelsRemoved || teamsRemoved;
 	}
@@ -153,7 +154,7 @@ public class GameSessionService : IGameSessionService
 		await context.CloseRecruitmentAsync(gameSessionId);
 		session.Start();
 
-		await context.SaveChangesAsync();
+		await context.TrySaveChangesAsync();
 	}
 
 	public async Task<TeamDto> GetCurrentTeam(RequestContext requestContext, Guid gameSessionId)
@@ -177,7 +178,7 @@ public class GameSessionService : IGameSessionService
 	{
 		var team = await context.GetTeamAsync(sessionId, teamId);
 		team.Name = name;
-		await context.SaveChangesAsync();
+		await context.TrySaveChangesAsync();
 	}
 
 	public async Task<string> GetTeamName(Guid sessionId, Guid teamId)

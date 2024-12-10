@@ -72,6 +72,15 @@
         const withProgrammers = document.getElementById('with-programmers').value;
         const withAnalysts = document.getElementById('with-analysts').value;
         
+        if (released === null || released === undefined || released.length === 0 ||
+            toDeploy === null || toDeploy === undefined || toDeploy.length === 0 ||
+            withTesters === null || withTesters === undefined || withTesters.length === 0 ||
+            withProgrammers === null || withProgrammers === undefined || withProgrammers.length === 0 ||
+            withAnalysts === null || withAnalysts === undefined || withAnalysts.length === 0) {
+            showMessage("Должны быть заполнены все поля таблицы");
+            return;
+        }
+        
         fetch("/@Model.GameSessionId/@Model.TeamId/api/update-cfd", {
             method: 'POST',
             headers: {

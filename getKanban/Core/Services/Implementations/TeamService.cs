@@ -1,5 +1,6 @@
 ﻿using Core.DbContexts;
 using Core.DbContexts.Extensions;
+using Core.DbContexts.Helpers;
 using Core.Dtos;
 using Core.Dtos.Converters;
 using Core.RequestContexts;
@@ -36,7 +37,7 @@ public class TeamService : ITeamService
 
 		team.ExecuteCommand(dayCommand);
 
-		await context.SaveChangesAsync();
+		await context.TrySaveChangesAsync();
 
 		return dayDtoConverter.Convert(team, team.CurrentDay);
 	}

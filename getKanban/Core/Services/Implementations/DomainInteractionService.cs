@@ -1,4 +1,5 @@
 ﻿using Core.DbContexts.Extensions;
+using Core.DbContexts.Helpers;
 using Core.Services.Contracts;
 using Domain.DbContexts;
 using Domain.Game;
@@ -52,7 +53,7 @@ public class DomainInteractionService : IDomainInteractionService
 	{
 		var team = await context.GetTeamAsync(sessionId, teamId);
 		var rolled = team.RollbackToDay(dayNumber);
-		await context.SaveChangesAsync();
+		await context.TrySaveChangesAsync();
 		return rolled;
 	}
 }

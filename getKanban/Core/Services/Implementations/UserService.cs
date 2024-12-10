@@ -1,4 +1,5 @@
 ﻿using Core.DbContexts.Extensions;
+using Core.DbContexts.Helpers;
 using Core.Dtos;
 using Core.Dtos.Converters;
 using Core.Services.Contracts;
@@ -22,7 +23,7 @@ public class UserService : IUserService
 
 		context.Users.Add(user);
 
-		await context.SaveChangesAsync();
+		await context.TrySaveChangesAsync();
 
 		return user.Id;
 	}
@@ -52,6 +53,6 @@ public class UserService : IUserService
 
 		user.Name = userName;
 
-		await context.SaveChangesAsync();
+		await context.TrySaveChangesAsync();
 	}
 }
