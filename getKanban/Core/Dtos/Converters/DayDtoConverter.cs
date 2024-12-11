@@ -27,7 +27,8 @@ public class DayDtoConverter
 			Convert(day.UpdateCfdContainer),
 			Convert(day.CurrentlyAwaitedCommands),
 			day.Status,
-			day.Number);
+			day.Number,
+			day.DaySettings.EndDayEventMessage);
 	}
 
 	private WorkAnotherTeamContainerDto? Convert(WorkAnotherTeamContainer? container)

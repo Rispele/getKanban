@@ -276,14 +276,12 @@ public class DayStepsController : Controller
 	{
 		var requestContext = RequestContextFactory.Build(Request);
 		var team = await gameSessionService.GetCurrentTeam(requestContext, gameSessionId);
+		var day = await teamService.GetCurrentDayAsync(requestContext, gameSessionId, teamId);
 		var model = await FillWithCredentialsAsync<FinishGameStepModel>(requestContext, gameSessionId, teamId);
 
-		if (team.IsTeamSessionEnded)
-		{
-			model.ShouldFinishGame = true;
-		}
-
-		model.ShouldFinishGame = false;
+		model.ShouldFinishGame = team.IsTeamSessionEnded;
+		model.IsLastDay = team.IsLastDay;
+		model.EndDayEventMessage = day.EndDayEventMessage;
 		return View(model);
 	}
 

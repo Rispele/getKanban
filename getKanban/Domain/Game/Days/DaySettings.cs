@@ -17,4 +17,6 @@ public class DaySettings
 	public bool CanReleaseNotImmediately { get; init; }
 	
 	public int ProfitPerClient { get; init; }
+	
+	public string EndDayEventMessage { get; init; }
 }
