@@ -3,7 +3,7 @@
 
 <meta charset="UTF-8">
 <div class="stepHeader">
-    <h1 class="fs-1 fw- text-center">Команда @Html.Raw(Model.TeamName). День @Model.DayNumber</h1>
+    <h1 class="fs-1 text-center">Команда @Html.Raw(Model.TeamName). День @Model.DayNumber</h1>
 </div>
 <div class="table-container">
     <table>
@@ -22,7 +22,7 @@
                     @foreach (var member in Model.TeamMemberDtos.Where(x => x.CurrentRole == role))
                     {
                         <div class="draggable" draggable="true" id="@member.Id">
-                            <div class="textContainer">
+                            <div class="rolesTextContainer">
                                 <div class="text fs-6 fw-bolder">
                                     @{
                                         switch (member.InitialRole)

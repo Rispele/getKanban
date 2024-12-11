@@ -1,5 +1,6 @@
 ﻿.table-container {
-    width: 1240px;
+    width: 100%;
+    max-width: 1240px;
     height: auto;
     overflow: hidden;
     border: none;
@@ -8,7 +9,7 @@
 }
 
 table {
-    width: 1240px;
+    width: 100%;
     min-height: 500px;
     height: fit-content;
     border-collapse: collapse;
@@ -37,7 +38,7 @@ tbody td {
 }
 
 .dropzone {
-    width: 410px;
+    width: 90%;
     min-height: 400px;
     height: fit-content;
     padding: 10px;
@@ -55,7 +56,7 @@ table tr:last-child td:first-child {
 
 
 .draggable {
-    width: 350px;
+    width: 90%;
     height: 80px;
     background-color: #E6E6E6;
     border-radius: 20px;
@@ -64,19 +65,19 @@ table tr:last-child td:first-child {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding-left: 45px;
+    padding-left: 10%;
     position: relative;
     cursor: grab;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    margin: 10px 30px;
+    margin: 10px 5%;
 }
 
 .draggable:active {
     cursor: grabbing;
 }
 
-.textContainer {
-    width: 200px;
+.rolesTextContainer {
+    width: 80%;
     height: fit-content;
 }
 

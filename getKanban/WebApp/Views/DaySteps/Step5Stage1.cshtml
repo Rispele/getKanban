@@ -10,7 +10,9 @@
     private void FillTickets(IEnumerable<Ticket> tickets, string cardStyle, string containerName)
     {
         <div class="@Html.Raw($"checkboxContainer{Model.PageType}Version")">
-            <h1 class="title">@containerName</h1>
+            <div class="textContainer">
+                <h1 class="title">@containerName</h1>
+            </div>
             <hr class="divider">
 
             @foreach (var ticket in tickets)
