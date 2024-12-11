@@ -56,9 +56,10 @@
         var tableForCfd = $"[{string.Join(",", rowsForCfd)}]";
 
         var ticketsReleased = dayStatistics.SelectMany(d => d.TicketsReleased).ToArray();
-        var rowsForControlDiagram = new[] { "[\"Номер задачи\"", "\"За сколько поставили\"]" }
-            .Concat(ticketsReleased.Select((ticket, i) => $"[{i}, {ticket.releaseDay - ticket.takingDay}]"));
-        var tableForDiagram = $"[{string.Join(",", rowsForControlDiagram)}]";
+        var rowsForControlDiagram = new[] { $"[\"Номер задачи\", \"За сколько поставили\"]{(ticketsReleased.Length > 0 ? "" : ", [0, 0]")}" }
+            .Concat(ticketsReleased.Select((ticket, i) => $"[{i}, {ticket.releaseDay - ticket.takingDay}]"))
+            .ToList();
+        var tableForControlDiagram = $"[{string.Join(",", rowsForControlDiagram)}]";
 
         var ticketsCountPerWorkDaysCount = dayStatistics
             .SelectMany(d => d.TicketsReleased)
@@ -67,7 +68,7 @@
             .ToArray();
         var keys = ticketsCountPerWorkDaysCount.Select(t => t.Key).ToList();
         var maxWorkDays = keys.Count > 0 ? keys.Max() : 9;
-        var rowsForDistributionDiagram = new[] { "[\"Дней в работе\"", "\"Кол-во задач\"]" }
+        var rowsForDistributionDiagram = new[] { "[\"Дней в работе\"", $"\"Кол-во задач\"]{(ticketsCountPerWorkDaysCount.Length > 0 ? "" : ", [0, 0]")}" }
             .Concat(ticketsCountPerWorkDaysCount.Select(g => $"[{g.Key}, {g.Item2}]"));
         var tableForDistributionDiagram = $"[{string.Join(",", rowsForDistributionDiagram)}]";
 
@@ -85,7 +86,7 @@
               isStacked: true
             };
 
-            const dataForControlDiagram = google.visualization.arrayToDataTable(@Html.Raw(tableForDiagram));
+            const dataForControlDiagram = google.visualization.arrayToDataTable(@Html.Raw(tableForControlDiagram));
             const optionsForControlDiagram = {
                 title: 'Контрольная диагамма',
                 hAxis: {title: 'Поставленные задачи (в порядке релиза)', ticks: @Html.Raw($"[{string.Join(",", Enumerable.Range(0, Math.Max(10, ticketsReleased.Length) + 1))}]"), minValue: 0, maxValue: @Math.Max(10, ticketsReleased.Length)},
