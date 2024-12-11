@@ -8,10 +8,10 @@ namespace Domain.Game.Days.DayContainers.TeamMembers;
 [EntityTypeConfiguration(typeof(TeamMembersContainerEntityTypeConfiguration))]
 public class TeamMembersContainer : DayContainer
 {
-	private readonly bool lockTesters;
 	private readonly List<TeamMember> teamMembers = null!;
 
 	public IReadOnlyList<TeamMember> TeamMembers => teamMembers;
+	public bool LockTesters { get; }
 
 	[UsedImplicitly]
 	private TeamMembersContainer()
@@ -24,7 +24,7 @@ public class TeamMembersContainer : DayContainer
 		int testersCount,
 		bool lockTesters)
 	{
-		this.lockTesters = lockTesters;
+		LockTesters = lockTesters;
 		teamMembers = [];
 
 		Enumerable.Range(0, analystsCount).ForEach(_ => teamMembers.Add(new TeamMember(TeamRole.Analyst)));
@@ -34,14 +34,14 @@ public class TeamMembersContainer : DayContainer
 
 	internal void UpdateTeamMemberRole(long teamMemberId, TeamRole to)
 	{
-		if (to == TeamRole.Tester && lockTesters)
+		if (to == TeamRole.Tester && LockTesters)
 		{
 			throw new DomainException("Could not change role, because testers are locked");
 		}
 		
 		var teamMember = teamMembers.Single(t => t.Id == teamMemberId);
 		
-		if (teamMember.InitialRole == TeamRole.Tester && lockTesters)
+		if (teamMember.InitialRole == TeamRole.Tester && LockTesters)
 		{
 			throw new DomainException("Could not change role, because testers are locked");
 		}

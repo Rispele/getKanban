@@ -39,10 +39,13 @@ public class StatisticsService : IStatisticsService
 			profitGainedPerDay,
 			profitPerClientPerDay);
 
+		var (profitPenalty, clientsPenalty) = EvaluatePenalty(team);
+
 		return TeamStatisticDto.Create(
 			team.Id,
 			dayStats,
-			EvaluatePenalty(team),
+			profitPenalty,
+			clientsPenalty,
 			EvaluateBonusProfit(takenTickets, team));
 	}
 
@@ -81,12 +84,25 @@ public class StatisticsService : IStatisticsService
 			.ToList();
 	}
 
-	private int EvaluatePenalty(Team team)
+	private (int profitPenalty, int clientsPenalty) EvaluatePenalty(Team team)
 	{
-		return TicketDescriptors.AllTicketDescriptors
+		var ticketsPenalty = TicketDescriptors.AllTicketDescriptors
 			.Where(t => t.Penalty != null)
-			.Where(t => !team.IsTicketDeadlineNotExceededAtReleaseDay(t.Id, t.Penalty!.Deadline))
+			.Where(t => !team.IsTicketDeadlineNotExceededAtReleaseDay(t.Id, t.Penalty!.Deadline - 1))
 			.Sum(t => t.Penalty!.Size);
+
+		if (team.IsLastDay)
+		{
+			var tasksResultedInPenalty = team.BuildTakenTickets()
+				.Where(t => t.IsInWork(team.CurrentDay.Number))
+				.Count(t => t.takingDay <= team.Settings.DayBeforeInclusiveNotReleasedTasksTakenResultsInPenalty);
+
+			var clientsPenalty = tasksResultedInPenalty * team.Settings.ClientsPenaltyPerTaskNotReleased;
+
+			return (ticketsPenalty + clientsPenalty * team.Settings.ProfitPenaltyPerClient, clientsPenalty);
+		}
+
+		return (ticketsPenalty, 0);
 	}
 
 	private int EvaluateBonusProfit(HashSet<Ticket> takenTickets, Team team)
@@ -122,6 +138,7 @@ public class StatisticsService : IStatisticsService
 
 			clientsPerDay[dayNumber] = currentClients;
 		}
+
 		return clientsPerDay;
 	}
 
