@@ -10,9 +10,8 @@
     <div class="container2">
         @foreach (var ticketId in Model.TicketIds.OrderBy(x => x))
         {
-            <div>
-                <input type="checkbox" class="checkboxCardInput" id="checkbox2">
-                <label for="checkbox2" class="checkboxCardContainer">
+            <div class="checkboxCardsMargin">
+                <div class="checkboxCardContainer">
                     <div class="checkboxCardContent">
                         <h2 class="checkboxCardNumber">@ticketId</h2>
                         <div class="lines">
@@ -21,7 +20,7 @@
                             <div class="line half"></div>
                         </div>
                     </div>
-                </label>
+                </div>
             </div>
         }
     </div>
