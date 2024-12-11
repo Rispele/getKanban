@@ -44,8 +44,8 @@ public class StatisticsService : IStatisticsService
 		return TeamStatisticDto.Create(
 			team.Id,
 			dayStats,
-			clientsPenalty,
 			profitPenalty,
+			clientsPenalty,
 			EvaluateBonusProfit(takenTickets, team));
 	}
 
@@ -88,7 +88,7 @@ public class StatisticsService : IStatisticsService
 	{
 		var ticketsPenalty = TicketDescriptors.AllTicketDescriptors
 			.Where(t => t.Penalty != null)
-			.Where(t => !team.IsTicketDeadlineNotExceededAtReleaseDay(t.Id, t.Penalty!.Deadline))
+			.Where(t => !team.IsTicketDeadlineNotExceededAtReleaseDay(t.Id, t.Penalty!.Deadline - 1))
 			.Sum(t => t.Penalty!.Size);
 
 		if (team.IsLastDay)
