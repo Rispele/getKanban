@@ -58,7 +58,7 @@
 }
 
 .graphPageInput {
-    width: 57px;
+    max-width: 60px;
     height: 100%;
 
     text-align: center;
