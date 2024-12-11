@@ -15,12 +15,14 @@ public class UpdateSprintBacklogCommand : DayCommand
 	internal override void Execute(Team team, Day day)
 	{
 		day.EnsureCanPostEvent(CommandType);
-		var previousDayLastTicketNumber = team.PreviousDay?.UpdateSprintBacklogContainer.TicketIds
+		var previousDayLastTicketNumber = team.Days
+			.SelectMany(t => t.UpdateSprintBacklogContainer.TicketIds)
 			.Select(TicketDescriptors.GetByTicketId)
 			.Where(t => t.ShouldBeTakenSequentially)
 			.MaxBy(t => t.Number)
 			?.Number ?? team.Settings.InitiallyTakenTickets
-			.Select(t => TicketDescriptors.GetByTicketId(t.id)).MaxBy(t => t.Number)?.Number;
+			.Select(t => TicketDescriptors.GetByTicketId(t.id))
+			.MaxBy(t => t.Number)?.Number;
 
 		foreach (var ticketId in TicketIds)
 		{
