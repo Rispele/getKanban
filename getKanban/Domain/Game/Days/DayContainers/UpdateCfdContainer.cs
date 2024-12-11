@@ -66,8 +66,8 @@ public class UpdateCfdContainer : FreezableDayContainer
 	internal static UpdateCfdContainer None =>
 		new(
 			0,
-			0,
-			0,
-			0,
-			0);
+			1,
+			4,
+			4,
+			2);
 }
