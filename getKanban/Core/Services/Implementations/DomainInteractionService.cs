@@ -42,7 +42,7 @@ public class DomainInteractionService : IDomainInteractionService
 			.Where(ticket => !ticket.IsTaken(previousDayNumber) && ticket.IsTaken(currentDayNumber))
 			.ToList();
 
-		var ticketsNotTaken = TicketDescriptors.AllTicketDescriptors
+		var ticketsNotTaken = team.Settings.GetTicketsAllowed(team.CurrentDay.Number)
 			.Where(x => tickets.All(t => t.id != x.Id))
 			.Select(t => new Ticket(t.Id, int.MaxValue, null));
 

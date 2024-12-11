@@ -11,11 +11,11 @@ public class TeamSessionSettings
 	public long Id { get; }
 
 	public IReadOnlyList<Ticket> InitiallyTakenTickets { get; init; } = null!;
-	
+
 	public IReadOnlyList<(int dayFrom, int profitPerClient)> ProfitPerClientPerDay { get; init; } = null!;
-	
+
 	public int MaxDayNumber { get; init; }
-	
+
 	public int ReleaseCycleLength { get; init; }
 
 	public int UpdateSprintBacklogEveryDaySince { get; init; }
@@ -33,16 +33,26 @@ public class TeamSessionSettings
 	public int IncreasedTestersNumber { get; init; }
 
 	public int IncreaseTestersNumberSince { get; init; }
-	
+
 	public int LockTestersSince { get; init; }
-	
+
 	public int LockTestersBeforeInclusive { get; init; }
-	
+
 	public int DayBeforeInclusiveNotReleasedTasksTakenResultsInPenalty { get; init; }
 
 	public int ClientsPenaltyPerTaskNotReleased { get; init; }
 
 	public int ProfitPenaltyPerClient { get; init; }
+
+	public Dictionary<int, List<TicketDescriptor>> TicketsAppearedByDay { get; init; } = null!;
+
+	public List<TicketDescriptor> GetTicketsAllowed(int dayNumber)
+	{
+		return TicketsAppearedByDay
+			.Where(t => t.Key <= dayNumber)
+			.SelectMany(t => t.Value)
+			.ToList();
+	}
 	
 	public int GetProfitPerDay(int dayNumber)
 	{
@@ -56,7 +66,7 @@ public class TeamSessionSettings
 	{
 		return LockTestersSince <= dayNumber && dayNumber <= LockTestersBeforeInclusive;
 	}
-	
+
 	public static TeamSessionSettings Default()
 	{
 		return new TeamSessionSettings
@@ -75,7 +85,8 @@ public class TeamSessionSettings
 				Ticket.Create(TicketDescriptors.S10.Id, 6),
 				Ticket.Create(TicketDescriptors.S11.Id, 6)
 			],
-			ProfitPerClientPerDay = [
+			ProfitPerClientPerDay =
+			[
 				(0, 10),
 				(9, 15),
 				(12, 20),
@@ -95,7 +106,14 @@ public class TeamSessionSettings
 			MaxDayNumber = 18,
 			DayBeforeInclusiveNotReleasedTasksTakenResultsInPenalty = 9,
 			ClientsPenaltyPerTaskNotReleased = 10,
-			ProfitPenaltyPerClient = 50
+			ProfitPenaltyPerClient = 50,
+			TicketsAppearedByDay = new Dictionary<int, List<TicketDescriptor>>
+			{
+				[0] = TicketDescriptors.AllTicketDescriptors
+					.Where(t => t.Id != TicketDescriptors.BusinessTask.Id)
+					.ToList(),
+				[16] = [TicketDescriptors.BusinessTask]
+			}
 		};
 	}
 }
