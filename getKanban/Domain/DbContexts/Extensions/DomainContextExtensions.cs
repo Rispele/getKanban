@@ -19,6 +19,7 @@ public static class DomainContextExtensions
 		return context.GameSessions
 			.Where(g => g.Id == gameSessionId)
 			.Take(1)
+			.AsSplitQuery()
 			.FirstOrDefaultAsync();
 	}
 
@@ -33,6 +34,7 @@ public static class DomainContextExtensions
 		return teamsContext.Teams
 			.Where(t => t.GameSessionId == gameSessionId && t.Id == teamId)
 			.Take(1)
+			.AsSplitQuery()
 			.FirstOrDefaultAsync();
 	}
 
