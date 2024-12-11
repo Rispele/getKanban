@@ -54,7 +54,8 @@ public class Day
 		TeamMembersContainer = new TeamMembersContainer(
 			settings.AnalystsCount,
 			settings.ProgrammersCount,
-			settings.TestersCount);
+			settings.TestersCount,
+			settings.LockTesters);
 		UpdateCfdContainer = new UpdateCfdContainer();
 		ReleaseTicketContainer = new ReleaseTicketContainer(settings.CanReleaseNotImmediately);
 		UpdateSprintBacklogContainer = new UpdateSprintBacklogContainer();

@@ -17,6 +17,8 @@ public class DaySettings
 	public bool CanReleaseNotImmediately { get; init; }
 	
 	public int ProfitPerClient { get; init; }
+
+	public string EndDayEventMessage { get; init; } = string.Empty;
 	
-	public string EndDayEventMessage { get; init; }
+	public bool LockTesters { get; init; }
 }

@@ -159,7 +159,8 @@ public partial class Team
 			CanReleaseNotImmediately = isReleaseDay,
 
 			ProfitPerClient = Settings.GetProfitPerDay(dayNumber),
-			EndDayEventMessage = EndDayEventMessages.GetByDayNumber(dayNumber)
+			EndDayEventMessage = EndDayEventMessages.GetByDayNumber(dayNumber),
+			LockTesters = Settings.ShouldLockTesters(dayNumber)
 		};
 
 		return new Day(daySettings, scenario);

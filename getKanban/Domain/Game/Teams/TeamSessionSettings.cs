@@ -33,6 +33,9 @@ public class TeamSessionSettings
 	public int IncreasedTestersNumber { get; init; }
 
 	public int IncreaseTestersNumberSince { get; init; }
+	
+	public int LockTestersSince { get; init; }
+	public int LockTestersBeforeInclusive { get; init; }
 
 	public int GetProfitPerDay(int dayNumber)
 	{
@@ -40,6 +43,11 @@ public class TeamSessionSettings
 			.Where(t => t.dayFrom < dayNumber)
 			.MaxBy(t => t.dayFrom)
 			.profitPerClient;
+	}
+
+	public bool ShouldLockTesters(int dayNumber)
+	{
+		return LockTestersSince <= dayNumber && dayNumber <= LockTestersBeforeInclusive;
 	}
 	
 	public static TeamSessionSettings Default()
@@ -74,6 +82,8 @@ public class TeamSessionSettings
 			ProgrammersNumber = 3,
 			DefaultTestersNumber = 2,
 			IncreasedTestersNumber = 3,
+			LockTestersSince = 12,
+			LockTestersBeforeInclusive = 14,
 			IncreaseTestersNumberSince = 15,
 			MaxDayNumber = 18
 		};
