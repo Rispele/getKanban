@@ -45,7 +45,7 @@ else
         window.location.href = `/${sessionId}/${teamId}/step/game-result`;
     });
     
-    if (@(Model.ShouldFinishGame.ToString().ToLower()) {
+    if (@(Model.ShouldFinishGame.ToString().ToLower())) {
         document.getElementById("next-day").addEventListener('click', function () {
             fetch(`/@Model.GameSessionId/@Model.TeamId/api/end-day`, {
                 method: 'POST',
