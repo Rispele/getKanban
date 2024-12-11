@@ -61,16 +61,22 @@
 <script src="~/js/setup-hub-connection.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script type="module">
+    const connection = setupHubConnection(new signalR.HubConnectionBuilder(), "@Model.GameSessionId", "@Model.TeamId");
+    
     if (await checkPageAvailable("@Model.GameSessionId", "@Model.TeamId", "roll") !== true ||
         await checkPageAvailable("@Model.GameSessionId", "@Model.TeamId", "update-role") !== true
     ) {
         const response = await fetch(`/@Model.GameSessionId/@Model.TeamId/api/get-current-step`);
         const page = await response.text();
         console.log(page);
-        window.location.href = `/@Model.GameSessionId/@Model.TeamId/step/${page}`;
+        const pageNumber = parseInt(page.split('/')[0]);
+        const stageNumber = parseInt(page.split('/')[1]);
+        connection.invoke("ChangePage", "@Model.GameSessionId", "@Model.TeamId", pageNumber, stageNumber)
+            .then(() => {
+                window.location.href = `/@Model.GameSessionId/@Model.TeamId/step/${page}`;
+            });
     }
     
-    const connection = setupHubConnection(new signalR.HubConnectionBuilder(), "@Model.GameSessionId", "@Model.TeamId");
     setRollbackEvent(connection);
     
     document.getElementById("roll").addEventListener('click', () => { 
@@ -88,20 +94,28 @@
         document.getElementById(roleTo).appendChild(draggable);
     });
     
+    const testerMemberIds = @Html.Raw(Json.Serialize(Model.TeamMemberDtos.Where(x => x.CurrentRole == TeamRoleDto.Tester).Select(x => x.Id.ToString())));
+    const shouldLockTesters = await fetch(`/@Model.GameSessionId/@Model.TeamId/api/should-lock-testers`);
+    
     const draggables = document.getElementsByClassName('draggable');
     for (let draggable of draggables) {
         draggable.addEventListener('dragend', () => {
             const teamMemberId = draggable.id;
             const roleTo = draggable.parentElement.id.toString();
-            fetch("/@Model.GameSessionId/@Model.TeamId/api/save-roles-transformation", {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify([teamMemberId, roleTo])
-            }).then(() => {
-                connection.invoke("UpdateRole", "@Model.GameSessionId", "@Model.TeamId", parseInt(teamMemberId), roleTo);
-            });
+            
+            if (shouldLockTesters && (testerMemberIds.indexOf(teamMemberId) >= 0 || roleTo === `Tester`)) {
+                showMessage(`В этот день тестировщики не могут менять свою роль и другие роли не могут меняться на роль тестировщиков`);
+            } else {
+                fetch("/@Model.GameSessionId/@Model.TeamId/api/save-roles-transformation", {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify([teamMemberId, roleTo])
+                }).then(() => {
+                    connection.invoke("UpdateRole", "@Model.GameSessionId", "@Model.TeamId", parseInt(teamMemberId), roleTo);
+                });
+            }
         });
     }
 </script>

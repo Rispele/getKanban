@@ -8,6 +8,7 @@ using Core.Services.Contracts;
 using Domain;
 using Domain.DbContexts;
 using Domain.Game;
+using Domain.Game.Days.Commands;
 
 namespace Core.Services.Implementations;
 
@@ -49,6 +50,7 @@ public class GameSessionService : IGameSessionService
 		{
 			return null;
 		}
+
 		var sessionId = InviteCodeHelper.ResolveGameSessionId(inviteCode);
 		var session = await context.FindGameSessionsAsync(sessionId);
 
@@ -76,6 +78,7 @@ public class GameSessionService : IGameSessionService
 		{
 			return null;
 		}
+
 		var participantRole = ignorePermissions
 			? ParticipantRole.Creator
 			: session.EnsureHasAccess(userId);
@@ -89,6 +92,7 @@ public class GameSessionService : IGameSessionService
 		{
 			return null;
 		}
+
 		var gameSessionId = InviteCodeHelper.ResolveGameSessionId(inviteCode);
 
 		var session = await context.FindGameSessionsAsync(gameSessionId);
@@ -96,6 +100,7 @@ public class GameSessionService : IGameSessionService
 		{
 			return null;
 		}
+
 		var user = await context.GetUserAsync(requestContext.GetUserId());
 
 		var (teamId, updated) = session.AddByInviteCode(user, inviteCode);
@@ -117,7 +122,7 @@ public class GameSessionService : IGameSessionService
 			teamId,
 			participantAdded);
 	}
-	
+
 	public async Task<bool> RemoveParticipantAsync(RequestContext requestContext, Guid sessionId, Guid? userId = null)
 	{
 		var session = await context.FindGameSessionsAsync(sessionId);
@@ -125,13 +130,14 @@ public class GameSessionService : IGameSessionService
 		{
 			return false;
 		}
+
 		var user = await context.GetUserAsync(userId ?? requestContext.GetUserId());
 
 		var angelsRemoved = session.Angels.RemoveParticipant(user);
 		var teamsRemoved = session.Teams.Any(x => x.Players.RemoveParticipant(user));
 
 		await context.TrySaveChangesAsync();
-		
+
 		return angelsRemoved || teamsRemoved;
 	}
 
@@ -185,5 +191,21 @@ public class GameSessionService : IGameSessionService
 			Id = user.Id,
 			Name = user.Name
 		};
+	}
+
+	public async Task<bool> ShouldLockTestersForTeam(
+		RequestContext requestContext,
+		Guid gameSessionId,
+		Guid teamId,
+		int dayNumber)
+	{
+		var team = await context.GetTeamAsync(gameSessionId, teamId);
+		return team.Settings.ShouldLockTesters(dayNumber);
+	}
+
+	public async Task<bool> CheckValidCfd(RequestContext requestContext, Guid gameSessionId, Guid teamId)
+	{
+		var team = await context.GetTeamAsync(gameSessionId, teamId);
+		return team.CurrentlyAwaitedCommands.Any(x => x.CommandType is DayCommandType.EndDay);
 	}
 }

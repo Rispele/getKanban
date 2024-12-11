@@ -13,31 +13,31 @@
             <div class="rowName">
                 <p class="text-center fs-6 text-top-margin">Работа аналитиков</p>
             </div>
-            <input type="number" class="graphPageInput rowStyle1" placeholder="0" id="with-analysts">
+            <input type="number" class="graphPageInput rowStyle1" placeholder="-" id="with-analysts">
         </div>
         <div class="row-60 rowStyle2">
             <div class="rowName">
                 <p class="text-center fs-6 text-top-margin">Работа разработчиков</p>
             </div>
-            <input type="number" class="graphPageInput rowStyle2" placeholder="0" id="with-programmers">
+            <input type="number" class="graphPageInput rowStyle2" placeholder="-" id="with-programmers">
         </div>
         <div class="row-60 rowStyle3">
             <div class="rowName">
                 <p class="text-center fs-6 text-top-margin">Работа тестировщиков</p>
             </div>
-            <input type="number" class="graphPageInput rowStyle3" placeholder="0" id="with-testers">
+            <input type="number" class="graphPageInput rowStyle3" placeholder="-" id="with-testers">
         </div>
         <div class="row-60 rowStyle4">
             <div class="rowName">
                 <p class="text-center fs-6 text-top-margin">Готовы к поставке</p>
             </div>
-            <input type="number" class="graphPageInput rowStyle4" placeholder="0" id="to-deploy">
+            <input type="number" class="graphPageInput rowStyle4" placeholder="-" id="to-deploy">
         </div>
         <div class="row-60 rowStyle5">
             <div class="rowName">
                 <p class="text-center fs-6 text-top-margin">Поставлено</p>
             </div>
-            <input type="number" class="graphPageInput rowStyle5" placeholder="0" id="released">
+            <input type="number" class="graphPageInput rowStyle5" placeholder="-" id="released">
         </div>
     </div>
 
@@ -49,17 +49,35 @@
 <script src="~/js/page-switch.js"></script>
 <script src="~/js/setup-hub-connection.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
-<script>
+<script type="module">
     const connection = setupHubConnection(new signalR.HubConnectionBuilder(), "@Model.GameSessionId", "@Model.TeamId");
     setRollbackEvent(connection);
 
-    const invocation = (rowId, value) => { connection.invoke(`CfdTableUpdate`, `@Model.GameSessionId`, `@Model.TeamId`, rowId, parseInt(value)) };
+    const invocation = (rowId, value, valueName) => {
+        const intValue = parseInt(value);
+        if (intValue < 0) {
+            showMessage(`Поля таблицы должны принимать неотрицательные значения`);
+        } else if (value === null || value === undefined || value.length === 0) {
+            showMessage(`Все поля таблицы должны быть заполнены значением 0 или больше`);
+        } else {
+            fetch("/@Model.GameSessionId/@Model.TeamId/api/update-cfd", {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({PatchType: valueName, Value: intValue})
+                }
+            ).then(() => {
+                connection.invoke(`CfdTableUpdate`, `@Model.GameSessionId`, `@Model.TeamId`, rowId, parseInt(value));
+            });
+        }
+    };
 
-    document.getElementById(`released`).addEventListener(`change`, () => {invocation(`released`, document.getElementById('released').value)});
-    document.getElementById(`to-deploy`).addEventListener(`change`, () => {invocation(`to-deploy`, document.getElementById('to-deploy').value)});
-    document.getElementById(`with-testers`).addEventListener(`change`, () => {invocation(`with-testers`, document.getElementById('with-testers').value)});
-    document.getElementById(`with-programmers`).addEventListener(`change`, () => {invocation(`with-programmers`, document.getElementById('with-programmers').value)});
-    document.getElementById(`with-analysts`).addEventListener(`change`, () => {invocation(`with-analysts`, document.getElementById('with-analysts').value)});
+    document.getElementById(`released`).addEventListener(`change`, () => {invocation(`released`, document.getElementById('released').value, `Released`)});
+    document.getElementById(`to-deploy`).addEventListener(`change`, () => {invocation(`to-deploy`, document.getElementById('to-deploy').value, `ToDeploy`)});
+    document.getElementById(`with-testers`).addEventListener(`change`, () => {invocation(`with-testers`, document.getElementById('with-testers').value, `WithTesters`)});
+    document.getElementById(`with-programmers`).addEventListener(`change`, () => {invocation(`with-programmers`, document.getElementById('with-programmers').value, `WithProgrammers`)});
+    document.getElementById(`with-analysts`).addEventListener(`change`, () => {invocation(`with-analysts`, document.getElementById('with-analysts').value, `WithAnalysts`)});
 
     connection.on(`NotifyCfdTableUpdated`, (rowId, value) => {
         document.getElementById(rowId).value = value;
@@ -72,32 +90,26 @@
         const withProgrammers = document.getElementById('with-programmers').value;
         const withAnalysts = document.getElementById('with-analysts').value;
         
-        if (released === null || released === undefined || released.length === 0 ||
-            toDeploy === null || toDeploy === undefined || toDeploy.length === 0 ||
-            withTesters === null || withTesters === undefined || withTesters.length === 0 ||
-            withProgrammers === null || withProgrammers === undefined || withProgrammers.length === 0 ||
-            withAnalysts === null || withAnalysts === undefined || withAnalysts.length === 0) {
-            showMessage("Должны быть заполнены все поля таблицы");
+        if (released === null || released === undefined || released.length === 0 || parseInt(released) < 0 ||
+            toDeploy === null || toDeploy === undefined || toDeploy.length === 0 || parseInt(toDeploy) < 0 ||
+            withTesters === null || withTesters === undefined || withTesters.length === 0 || parseInt(withTesters) < 0 ||
+            withProgrammers === null || withProgrammers === undefined || withProgrammers.length === 0 || parseInt(withProgrammers) < 0 ||
+            withAnalysts === null || withAnalysts === undefined || withAnalysts.length === 0 || parseInt(withAnalysts) < 0) {
+            showMessage(`Все поля таблицы должны быть заполнены значением 0 или больше`);
             return;
         }
         
-        fetch("/@Model.GameSessionId/@Model.TeamId/api/update-cfd", {
-            method: 'POST',
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                released: released,
-                toDeploy: toDeploy,
-                withTesters: withTesters,
-                withProgrammers: withProgrammers,
-                withAnalysts: withAnalysts
-            })
-        }).then(() => {
-            connection.invoke("ChangePage", "@Model.GameSessionId", "@Model.TeamId", 6, 1)
-                .then(() => {
-                    window.location.href = `/@Model.GameSessionId/@Model.TeamId/step/6/1`;
-                });
+        fetch(`/@Model.GameSessionId/@Model.TeamId/api/check-valid-cfd`)
+        .then(isValid => isValid.json())
+        .then(isValid => {
+            if (!isValid) {
+                showMessage(`Поля таблицы содержат невалидные значения. Диаграмма CFD не может быть заполнена`);
+            } else {
+                connection.invoke("ChangePage", "@Model.GameSessionId", "@Model.TeamId", 6, 1)
+                    .then(() => {
+                        window.location.href = `/@Model.GameSessionId/@Model.TeamId/step/6/1`;
+                    });
+            }
         });
     });
 </script>
