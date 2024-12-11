@@ -230,6 +230,22 @@ public class DayStepsController : Controller
 		return View(stepModel);
 	}
 
+	[HttpGet("7/1")]
+	public async Task<IActionResult> Step7Stage1(Guid gameSessionId, Guid teamId)
+	{
+		var requestContext = RequestContextFactory.Build(Request);
+		var team = await gameSessionService.GetCurrentTeam(requestContext, gameSessionId);
+		var model = await FillWithCredentialsAsync<FinishGameStepModel>(requestContext, gameSessionId, teamId);
+		
+		if (team.IsTeamSessionEnded)
+		{
+			model.ShouldFinishGame = true;
+		}
+
+		model.ShouldFinishGame = false;
+		return View(model);
+	}
+
 	[HttpGet("game-result")]
 	public async Task<IActionResult> WinnersPage(Guid gameSessionId, Guid teamId)
 	{
@@ -246,9 +262,11 @@ public class DayStepsController : Controller
 			var statistic = await statisticsService.CollectStatistic(gameSessionId, teamId);
 			model.TeamResultModels.Add(new TeamResultModel()
 			{
+				TeamId = team.Id,
 				TeamName = team.Name,
 				ClientsCount = statistic.TotalClientsGained,
-				MoneyCount = statistic.TotalProfitGained
+				MoneyCount = statistic.TotalProfitGained,
+				IsTeamSessionEnded = team.IsTeamSessionEnded
 			});
 		}
 		

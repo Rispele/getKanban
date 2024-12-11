@@ -21,7 +21,8 @@ public class TeamDtoConverter
 			{
 				Id = team.Id,
 				Name = team.Name,
-				Participants = Convert(team.Players)
+				Participants = Convert(team.Players),
+				IsTeamSessionEnded = team.IsTeamSessionEnded
 			};
 	}
 

@@ -14,26 +14,83 @@
         };
 }
 
-<div class="container7">
-    @foreach (var teamResult in Model.TeamResultModels)
-    {
-        <div class="finalCommandContainer">
-            <div class="finalCommandResult"></div>
-
-            <div class="finalCommand @Html.Raw(GetTeamClassName(teamResult.TeamName))">
-                <h class="fs-5 fw-bold text-center">@Html.Raw(teamResult.TeamName)</h>
-                <h class="fs-6 fw-normal text-center">Клиенты: @teamResult.ClientsCount</h>
-                <h class="fs-6 fw-normal text-center">Деньги: @(teamResult.MoneyCount)$</h>
-            </div>
-        </div>
-    }
-</div>
+<div class="container7"></div>
 
 <button class="stepControlButtons rightButton" id="next">
     Выйти в меню
 </button>
 
 <script>
+    showWaitMessage(@Model.TeamResultModels.Where(x => x.IsTeamSessionEnded).ToList().Count);
+    
+    const connection = new signalR.HubConnectionBuilder().withUrl(`/lobbyHub`).build();
+    
+    const finishedTeams = @(Html.Raw(Json.Serialize(Model.TeamResultModels
+        .Where(x => x.IsTeamSessionEnded)
+        .Select(x => x.TeamId))));
+        
+    function showWaitMessage(finishedTeamsCount) {
+        const container = document.getElementsByClassName(`container7`)[0];
+        container.innerHTML = ``;
+        
+        const waitMessage = document.createElement(`p`);
+        waitMessage.textContent = `Ожидаем завершения игры всеми командами...`;
+        const teamsToWaitMessage = document.createElement(`p`);
+        teamsToWaitMessage.textContent = `Команд, завершивших игру: ${finishedTeamsCount}/@Model.TeamResultModels.Count`;
+    }
+    
+    function tryBuildResultElements() {
+        if (finishedTeams.length === @Model.TeamResultModels.Count &&
+            @(Model.TeamResultModels.All(x => x.IsTeamSessionEnded).ToString().ToLower()) {
+            
+            const container = document.getElementsByClassName(`container7`)[0];
+            container.innerHTML = ``;
+            
+            @foreach (var teamResult in Model.TeamResultModels)
+            {
+                <text>
+                const finalCommandContainer = document.createElement(`div`);
+                finalCommandContainer.className = `finalCommandContainer`;
+
+                const finalCommandResult = document.createElement(`div`);
+                finalCommandResult.className = `finalCommandResult`;
+
+                const finalCommand = document.createElement(`div`);
+                finalCommand.className = `finalCommand @Html.Raw(GetTeamClassName(teamResult.TeamName))`;
+                const teamName = document.createElement(`h`);
+                teamName.className = `fs-5 fw-bold text-center`;
+                teamName.textContent = `@Html.Raw(teamResult.TeamName)`;
+                const clientsCount = document.createElement(`h`);
+                clientsCount.className = `fs-6 fw-normal text-center`;
+                clientsCount.textContent = `Клиенты: @teamResult.ClientsCount`;
+                const moneyCount = document.createElement(`h`);
+                moneyCount.className = `fs-6 fw-normal text-center`;
+                moneyCount.textContent = `Деньги: @teamResult.MoneyCount`;
+
+                finalCommand.appendChild(teamName);
+                finalCommand.appendChild(clientsCount);
+                finalCommand.appendChild(moneyCount);
+                finalCommandContainer.appendChild(finalCommandResult);
+                finalCommandContainer.appendChild(finalCommand);
+                container.appendChild(finalCommandContainer);
+                </text>
+            }
+        }
+    }
+    
+    connection.start()
+    .then(() => {
+        connection.invoke(`TeamGameResultReveal`, `@Model.SessionId`, `@Model.RequesterTeamId`);
+    });
+    
+    connection.on(`NotifyTeamGameResultAppeared`, (teamId) => {
+        if (finishedTeams.indexOf(teamId) < 0) {
+            finishedTeams.push(teamId);
+        }
+        showWaitMessage(finishedTeams.length);
+        tryBuildResultElements();
+    });
+    
     document.getElementById(`next`).addEventListener(`click`, () => {
         window.location.href = `/`;
     });
