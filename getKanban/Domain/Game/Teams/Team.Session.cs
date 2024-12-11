@@ -17,8 +17,9 @@ public partial class Team
 
 	public IReadOnlyList<Day> Days => days;
 
-	public bool IsTeamSessionEnded =>
-		currentDayNumber == Settings.MaxDayNumber && CurrentDay.CurrentlyAwaitedCommands.Count == 0;
+	public bool IsTeamSessionEnded => IsLastDay && CurrentDay.CurrentlyAwaitedCommands.Count == 0;
+	
+	public bool IsLastDay => currentDayNumber == Settings.MaxDayNumber;
 
 	public Day CurrentDay
 	{
