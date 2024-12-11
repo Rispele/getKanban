@@ -103,10 +103,6 @@
 }
 
 @media (min-width: 1500px) {
-    .container-1 {
-        width: 30%;
-    }
-
     .stepControlButtonsNonGlobal {
         width: 30%;
     }
@@ -121,10 +117,6 @@
 }
 
 @media (max-width: 1000px) {
-    .container-1 {
-        width: 90%;
-    }
-
     .stepControlButtonsNonGlobal {
         width: 40%;
     }
