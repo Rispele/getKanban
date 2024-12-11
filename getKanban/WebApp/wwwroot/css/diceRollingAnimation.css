@@ -1,0 +1,166 @@
+.cont {
+    z-index: 2;
+
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    background-color: white;
+
+    width: 100%;
+    height: 100vh;
+
+    animation: toNonVis 3s forwards;
+}
+
+.dice-container {
+    width: 150px;
+    height: 150px;
+    perspective: 1000px;
+}
+
+.dice {
+    width: 150px;
+    height: 150px;
+    position: relative;
+    transform-style: preserve-3d;
+    animation: bigger 3s forwards;
+}
+
+.face {
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    background: white;
+    border: 2px solid #ccc;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.dot {
+    width: 20px;
+    height: 20px;
+    background-color: black;
+    border-radius: 50%;
+    position: absolute;
+}
+
+.center {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.top-left {
+    top: 20%;
+    left: 20%;
+}
+
+.top-right {
+    top: 20%;
+    right: 20%;
+}
+
+.middle-left {
+    top: 50%;
+    left: 20%;
+    transform: translateY(-50%);
+}
+
+.middle-right {
+    top: 50%;
+    right: 20%;
+    transform: translateY(-50%);
+}
+
+.bottom-left {
+    bottom: 20%;
+    left: 20%;
+}
+
+.bottom-right {
+    bottom: 20%;
+    right: 20%;
+}
+
+/* Расположение граней в 3D */
+.one {
+    transform: rotateY(0deg) translateZ(75px);
+    animation: fade 3s forwards;
+}
+.two {
+    transform: rotateY(90deg) translateZ(75px);
+    animation: fade 3s forwards;
+}
+.three {
+    transform: rotateY(180deg) translateZ(75px);
+    animation: fade 3s forwards;
+}
+.four {
+    transform: rotateY(-90deg) translateZ(75px);
+    animation: fade 3s forwards;
+}
+.five {
+    transform: rotateX(90deg) translateZ(75px);
+    animation: fade 3s forwards;
+}
+.six {
+    transform: rotateX(-90deg) translateZ(75px);
+    animation: fade 3s forwards;
+}
+
+@keyframes fade {
+    0% {
+        opacity: 1;
+    }
+    40% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes toNonVis {
+    0% {
+        opacity: 1;
+        visibility: visible;
+    }
+    40% {
+        opacity: 1;
+        visibility: visible;
+    }
+    100% {
+        opacity: 0;
+        visibility: hidden;
+    }
+}
+
+@keyframes bigger {
+    from {
+        visibility: visible;
+        transform: rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1);
+    }
+    to {
+        visibility: hidden;
+        transform: rotateX(360deg) rotateY(360deg) scale3d(10, 10, 10);
+    }
+    /*0% {*/
+    /*    transform: rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1);*/
+    /*}*/
+    /*50% {*/
+    /*    transform: rotateX(180deg) rotateY(180deg) scale3d(3, 3, 3);*/
+    /*}*/
+    /*100% {*/
+    /*    transform: rotateX(360deg) rotateY(360deg) scale3d(10, 10, 10);*/
+    /*    opacity: 0;*/
+    /*}*/
+}
