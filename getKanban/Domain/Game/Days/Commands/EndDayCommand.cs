@@ -19,7 +19,7 @@ public class EndDayCommand : DayCommand
 
 		day.EndDay();
 
-		if (team.Settings.MaxDayNumber < day.Number)
+		if (day.Number < team.Settings.MaxDayNumber)
 		{
 			team.AddNextDay();
 		}
