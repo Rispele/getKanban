@@ -22,7 +22,7 @@
                 <div class="checkboxCardContent">
                     <h2 class="checkboxCardNumber">День @Model.CurrentDay.Number</h2>
                     <img class="restart" src="/images/restart_button.svg" alt="restart">
-                    <img class="settings" src="/images/settings_button.svg" alt="settings">
+                    @* <img class="settings" src="/images/settings_button.svg" alt="settings"> *@
                 </div>
             </div>
         </div>
@@ -47,13 +47,13 @@
     const connection = setupHubConnection(new signalR.HubConnectionBuilder(), "@Model.SessionId", "@Model.TeamId", false);
     connection.start();
     
-    connection.on("NotifyDayFinished", function (sessionId, teamId) {
+    connection.on("NotifyDayFinished", (sessionId, teamId) => {
         if (sessionId === "@Model.SessionId" && teamId === "@Model.TeamId") {
             window.location.reload();
         }
     });
     
-    document.getElementsByClassName("restart")[0].addEventListener('click', function () {
+    document.getElementsByClassName("restart")[0].addEventListener('click', () => {
         fetch("/@Model.SessionId/@Model.TeamId/api/restart-day", {
             method: 'POST',
             headers: {
@@ -65,9 +65,9 @@
                 DayNumber: @Model.CurrentDay.Number,
             })
         })
-        .then(function () {
+        .then(() => {
             connection.invoke("RollbackToDay", "@Model.SessionId", "@Model.TeamId", @Model.CurrentDay.Number)
-            .then(function () {
+            .then(() => {
                 window.location.href = `/admin?sessionId=@Model.SessionId`;
             });
         });

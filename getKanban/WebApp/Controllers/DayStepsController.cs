@@ -82,6 +82,47 @@ public class DayStepsController : Controller
 		return View(stepModel);
 	}
 
+	[HttpGet("4")]
+	[HttpGet("4/0")]
+	public async Task<IActionResult> Step4Stage0(Guid gameSessionId, Guid teamId)
+	{
+		var requestContext = RequestContextFactory.Build(Request);
+		var currentDay = await teamService.GetCurrentDayAsync(requestContext, gameSessionId, teamId);
+
+		var shouldShowReleaseTickets = currentDay.AwaitedCommands
+			.Any(x => x is { CommandType: DayCommandType.ReleaseTickets });
+		var shouldShowUpdateSprintBacklogTickets = currentDay.AwaitedCommands
+			.Any(x => x is { CommandType: DayCommandType.UpdateSprintBacklog });
+
+		return (shouldShowReleaseTickets, shouldShowUpdateSprintBacklogTickets) switch
+		{
+			(true, true) =>
+				View(
+					$"Step4Stage0",
+					await FillWithCredentialsAsync<StepModel>(requestContext, gameSessionId, teamId)),
+			(true, false) =>
+				View(
+					$"Step4Stage0",
+					await FillWithCredentialsAsync<StepModel>(requestContext, gameSessionId, teamId)),
+			(false, true) =>
+				View(
+					"Step5Stage0",
+					await FillWithCredentialsAsync<StepModel>(
+						requestContext,
+						gameSessionId,
+						teamId,
+						dayNumber: currentDay.Number)),
+			(false, false) =>
+				View(
+					"Step6Stage0",
+					await FillWithCredentialsAsync<StepModel>(
+						requestContext,
+						gameSessionId,
+						teamId,
+						dayNumber: currentDay.Number))
+		};
+	}
+
 	[HttpGet("4/1")]
 	public async Task<IActionResult> Step4Stage1(Guid gameSessionId, Guid teamId)
 	{
@@ -104,8 +145,8 @@ public class DayStepsController : Controller
 
 		var ticketIds = await domainInteractionService.GetTicketsToRelease(gameSessionId, teamId);
 		var pageTypeNumber = (ticketIds.Any(x => x.id.Contains('S')) ? 1 : 0)
-		                   + (ticketIds.Any(x => x.id.Contains('I')) ? 1 : 0)
-		                   + (ticketIds.Any(x => x.id.Contains('E') || x.id.Contains('F')) ? 1 : 0);
+		                     + (ticketIds.Any(x => x.id.Contains('I')) ? 1 : 0)
+		                     + (ticketIds.Any(x => x.id.Contains('E') || x.id.Contains('F')) ? 1 : 0);
 
 		if (pageTypeNumber == 0)
 		{
@@ -117,7 +158,7 @@ public class DayStepsController : Controller
 					teamId,
 					dayNumber: currentDay.Number));
 		}
-		
+
 		var pageType = pageTypeNumber switch
 		{
 			1 => "Single",
@@ -218,15 +259,15 @@ public class DayStepsController : Controller
 	public async Task<IActionResult> Step6Stage1(Guid gameSessionId, Guid teamId)
 	{
 		var requestContext = RequestContextFactory.Build(Request);
-		
+
 		var teamStatistic = await statisticsService.CollectStatistic(gameSessionId, teamId);
-		
+
 		var stepModel = await FillWithCredentialsAsync<CfdGraphStepModel>(
 			requestContext,
 			gameSessionId,
 			teamId);
 		stepModel.TeamStatistic = teamStatistic;
-		
+
 		return View(stepModel);
 	}
 
@@ -236,7 +277,7 @@ public class DayStepsController : Controller
 		var requestContext = RequestContextFactory.Build(Request);
 		var team = await gameSessionService.GetCurrentTeam(requestContext, gameSessionId);
 		var model = await FillWithCredentialsAsync<FinishGameStepModel>(requestContext, gameSessionId, teamId);
-		
+
 		if (team.IsTeamSessionEnded)
 		{
 			model.ShouldFinishGame = true;
@@ -260,16 +301,17 @@ public class DayStepsController : Controller
 		foreach (var team in session!.Teams)
 		{
 			var statistic = await statisticsService.CollectStatistic(gameSessionId, teamId);
-			model.TeamResultModels.Add(new TeamResultModel()
-			{
-				TeamId = team.Id,
-				TeamName = team.Name,
-				ClientsCount = statistic.TotalClientsGained,
-				MoneyCount = statistic.TotalProfitGained,
-				IsTeamSessionEnded = team.IsTeamSessionEnded
-			});
+			model.TeamResultModels.Add(
+				new TeamResultModel()
+				{
+					TeamId = team.Id,
+					TeamName = team.Name,
+					ClientsCount = statistic.TotalClientsGained,
+					MoneyCount = statistic.TotalProfitGained,
+					IsTeamSessionEnded = team.IsTeamSessionEnded
+				});
 		}
-		
+
 		return View(model);
 	}
 

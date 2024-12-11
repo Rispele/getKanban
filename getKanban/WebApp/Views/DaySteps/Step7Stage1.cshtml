@@ -48,14 +48,14 @@ else
     if (@((!Model.ShouldFinishGame).ToString().ToLower())) {
         const nextDayButton = document.getElementById("next-day");
         if (nextDayButton !== null && nextDayButton !== undefined) {
-            nextDayButton.addEventListener('click', function () {
+            nextDayButton.addEventListener('click', () => {
                 fetch(`/@Model.GameSessionId/@Model.TeamId/api/end-day`, {
                     method: 'POST',
                     headers: { "Content-Type": "application/json" },
-                }).then(function () {
+                }).then(() => {
                     connection.invoke("FinishDay", "@Model.GameSessionId", "@Model.TeamId");
                     connection.invoke("ChangePage", "@Model.GameSessionId", "@Model.TeamId", 1, 0)
-                        .then(function () {
+                        .then(() => {
                             window.location.href = `/@Model.GameSessionId/@Model.TeamId/step/1`;
                         });
                 })
@@ -64,9 +64,9 @@ else
     } else {
         const finishGameButton = document.getElementById("finish-game");
         if (finishGameButton !== null && finishGameButton !== undefined) {
-            finishGameButton.addEventListener('click', function () {
+            finishGameButton.addEventListener('click', () => {
                 connection.invoke("ShowGameResult", "@Model.GameSessionId", "@Model.TeamId")
-                    .then(function () {
+                    .then(() => {
                         window.location.href = `/@Model.GameSessionId/@Model.TeamId/step/game-result`;
                     });
             });

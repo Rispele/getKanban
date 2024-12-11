@@ -1,6 +1,6 @@
 ﻿@model Core.Dtos.AdminPanelTeamsDto
 
-<h1 class="fs-1 fw-bold text-center centered-25">getKanban: "@Model.GameSessionName"</h1>
+<h1 class="fs-1 fw-bold text-center centered-25">getKanban: @Model.GameSessionName</h1>
 <h2 class="fs-3 fw-normal text-center">Выберите команду, которой нужна помощь</h2>
 
 @* <div class="text-center authorizationContainer centered-100"> *@
@@ -28,7 +28,7 @@
     @foreach (var team in Model.Teams)
     {
         <text>
-            document.getElementById("@team.Id").addEventListener('click', function () {
+            document.getElementById("@team.Id").addEventListener('click', () => {
                 window.location.href = `/admin/days?sessionId=@Model.GameSessionId&teamId=@team.Id`;
             });
         </text>

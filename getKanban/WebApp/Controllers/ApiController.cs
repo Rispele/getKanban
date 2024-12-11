@@ -102,6 +102,9 @@ public class ApiController : Controller
 		await PatchDayAsync(UpdateCfdContainerPatchType.WithTesters, cfdDayDataModel.WithTesters);
 		await PatchDayAsync(UpdateCfdContainerPatchType.WithProgrammers, cfdDayDataModel.WithProgrammers);
 		await PatchDayAsync(UpdateCfdContainerPatchType.WithAnalysts, cfdDayDataModel.WithAnalysts);
+		
+		// await ... getCurrentDay -> awaitedCommands
+		
 		return;
 
 		async Task PatchDayAsync(UpdateCfdContainerPatchType patchType, int value)
@@ -115,6 +118,8 @@ public class ApiController : Controller
 					PatchType = patchType, Value = value
 				});
 		}
+		
+		
 	}
 	
 	[HttpPost("end-day")]

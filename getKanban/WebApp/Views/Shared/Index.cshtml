@@ -15,7 +15,7 @@
             return;
         }
         fetch(`/add-username?name=${userName}`)
-            .then(function () {
+            .then(() => {
                 window.location.href = `/session/${endpoint}`
             });
     }

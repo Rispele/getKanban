@@ -16,7 +16,7 @@
 <script>
     const connection = setupHubConnection(new signalR.HubConnectionBuilder(), "@Model.GameSessionId", "@Model.TeamId");
     
-    document.getElementById('roll').addEventListener('click', function () {
+    document.getElementById('roll').addEventListener('click', () => {
         fetch(`/@Model.GameSessionId/@Model.TeamId/api/another-team-roll`, {
             method: 'POST',
             headers: {"Content-Type": "application/json"}

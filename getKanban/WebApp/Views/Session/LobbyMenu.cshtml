@@ -20,7 +20,7 @@
 }
 
 <div class="commandEditorHeader text-center">
-    <h1 class="display-4 fw-bold">getKanban: "@Model.Name"</h1>
+    <h1 class="display-4 fw-bold">getKanban: @Model.Name</h1>
 </div>
 
 <div class="commandEditorContainer centered-25">
@@ -61,9 +61,6 @@
     </div>
 </div>
 
-<button class="commandEditorButtonsTemplate authorizationButton" type="button" id="disconnect">Разорвать соединение</button>
-<button class="commandEditorButtonsTemplate authorizationButton" type="button" id="connect">Установить соединение</button>
-
 @if (isAdmin)
 {
     <form class="text-center">
@@ -87,9 +84,6 @@ else
     const teamNames = @Html.Raw(Json.Serialize(Model.Teams.Select(x => x.Name).Concat([Model.Angels.Name])));
     
     const lobbyHubConnection = new signalR.HubConnectionBuilder().withUrl(`/lobbyHub`).build();
-
-    document.getElementById(`disconnect`).addEventListener(`click`, () => {lobbyHubConnection.stop();});
-    document.getElementById(`connect`).addEventListener(`click`, () => {lobbyHubConnection.start();});
 
     lobbyHubConnection.on(`NotifyClosed`, () => {window.location.href = `/`;});
     lobbyHubConnection.on(`NotifyLeft`, userId => {

@@ -9,5 +9,9 @@ public class WorkAnotherTeamContainerEntityTypeConfiguration : IEntityTypeConfig
 	public void Configure(EntityTypeBuilder<WorkAnotherTeamContainer> builder)
 	{
 		builder.ConfigureAsDayContainer();
+
+		builder.Property(x => x.DiceNumber);
+		builder.Property(x => x.ScoresNumber);
+
 	}
 }

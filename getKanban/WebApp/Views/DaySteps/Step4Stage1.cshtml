@@ -80,20 +80,20 @@
     setSwitchEvent("next", connection, "@Model.GameSessionId", "@Model.TeamId", 4, 2);
     setRollbackEvent(connection);
     
-    connection.on("NotifyTicketReleased", function (ticketId) {
+    connection.on("NotifyTicketReleased", (ticketId) => {
         const ticket = document.getElementById(ticketId);
         ticket.checked = !ticket.checked;
     });
-    connection.on("NotifyTicketsToReleaseUpdated", function() {
+    connection.on("NotifyTicketsToReleaseUpdated", () => {
         console.log("reload")
         window.location.reload();
     });
 
     const checkboxes = document.getElementsByClassName('checkboxCardInput');
     for (let checkbox of checkboxes) {
-        checkbox.addEventListener('change', function () {
-            const remove = !this.checked;
-            const ticketId = this.parentElement.getElementsByClassName('checkboxCardNumber')[0].textContent;
+        checkbox.addEventListener('change', () => {
+            const remove = !checkbox.checked;
+            const ticketId = checkbox.parentElement.getElementsByClassName('checkboxCardNumber')[0].textContent;
             console.log(ticketId);
             fetch("/@Model.GameSessionId/@Model.TeamId/api/update-release", {
                 method: 'POST',
@@ -101,7 +101,7 @@
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({ TicketId: ticketId, Remove: remove })
-            }).then(function () {
+            }).then(() => {
                 connection.invoke("NotifyTicketReleased", "@Model.GameSessionId", "@Model.TeamId", ticketId);
             });
         });

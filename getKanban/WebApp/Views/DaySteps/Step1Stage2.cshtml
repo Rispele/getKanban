@@ -73,24 +73,24 @@
     const connection = setupHubConnection(new signalR.HubConnectionBuilder(), "@Model.GameSessionId", "@Model.TeamId");
     setRollbackEvent(connection);
     
-    document.getElementById("roll").addEventListener('click', function () { 
+    document.getElementById("roll").addEventListener('click', () => { 
         fetch(`/@Model.GameSessionId/@Model.TeamId/api/roll`)
-            .then(function () {
+            .then(() => {
                 connection.invoke("ChangePage", "@Model.GameSessionId", "@Model.TeamId", 2, 0)
-                    .then(function () {
+                    .then(() => {
                         window.location.href = `/@Model.GameSessionId/@Model.TeamId/step/2/0`;
                     });
             }) 
     });
         
-    connection.on("NotifyUpdateRole", function (teamMemberId, roleTo) {
+    connection.on("NotifyUpdateRole", (teamMemberId, roleTo) => {
         const draggable = document.getElementById(teamMemberId.toString());
         document.getElementById(roleTo).appendChild(draggable);
     });
     
     const draggables = document.getElementsByClassName('draggable');
     for (let draggable of draggables) {
-        draggable.addEventListener('dragend', function () {
+        draggable.addEventListener('dragend', () => {
             const teamMemberId = draggable.id;
             const roleTo = draggable.parentElement.id.toString();
             fetch("/@Model.GameSessionId/@Model.TeamId/api/save-roles-transformation", {
@@ -99,7 +99,7 @@
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify([teamMemberId, roleTo])
-            }).then(function () {
+            }).then(() => {
                 connection.invoke("UpdateRole", "@Model.GameSessionId", "@Model.TeamId", parseInt(teamMemberId), roleTo);
             });
         });

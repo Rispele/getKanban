@@ -65,7 +65,7 @@
         document.getElementById(rowId).value = value;
     });
     
-    document.getElementById('save-cfd').addEventListener('click', function () {
+    document.getElementById('save-cfd').addEventListener('click', () => {
         const released = document.getElementById('released').value;
         const toDeploy = document.getElementById('to-deploy').value;
         const withTesters = document.getElementById('with-testers').value;
@@ -93,9 +93,9 @@
                 withProgrammers: withProgrammers,
                 withAnalysts: withAnalysts
             })
-        }).then(function () {
+        }).then(() => {
             connection.invoke("ChangePage", "@Model.GameSessionId", "@Model.TeamId", 6, 1)
-                .then(function () {
+                .then(() => {
                     window.location.href = `/@Model.GameSessionId/@Model.TeamId/step/6/1`;
                 });
         });
