@@ -65,7 +65,8 @@
             .GroupBy(t => t.releaseDay!.Value - t.takingDay)
             .Select(t => (t.Key, t.Count()))
             .ToArray();
-        var maxWorkDays = ticketsCountPerWorkDaysCount.Select(t => t.Key).Max();
+        var keys = ticketsCountPerWorkDaysCount.Select(t => t.Key).ToList();
+        var maxWorkDays = keys.Count > 0 ? keys.Max() : 9;
         var rowsForDistributionDiagram = new[] { "[\"Дней в работе\"", "\"Кол-во задач\"]" }
             .Concat(ticketsCountPerWorkDaysCount.Select(g => $"[{g.Key}, {g.Item2}]"));
         var tableForDistributionDiagram = $"[{string.Join(",", rowsForDistributionDiagram)}]";
