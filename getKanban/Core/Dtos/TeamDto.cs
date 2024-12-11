@@ -9,4 +9,6 @@ public class TeamDto
 	public ParticipantsDto Participants { get; init; } = null!;
 
 	public bool IsTeamSessionEnded { get; set; }
+	
+	public bool IsLastDay { get; set; }
 }

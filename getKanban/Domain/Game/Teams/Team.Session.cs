@@ -3,6 +3,7 @@ using Domain.Game.Days;
 using Domain.Game.Days.Commands;
 using Domain.Game.Days.DayContainers;
 using Domain.Game.Days.DayContainers.TeamMembers;
+using Domain.Game.Days.EndDayEvents;
 using Domain.Game.Days.Scenarios;
 using Domain.Game.Tickets;
 
@@ -157,7 +158,9 @@ public partial class Team
 
 			CanReleaseNotImmediately = isReleaseDay,
 
-			ProfitPerClient = Settings.GetProfitPerDay(dayNumber)
+			ProfitPerClient = Settings.GetProfitPerDay(dayNumber),
+			EndDayEventMessage = EndDayEventMessages.GetByDayNumber(dayNumber),
+			LockTesters = Settings.ShouldLockTesters(dayNumber)
 		};
 
 		return new Day(daySettings, scenario);

@@ -14,6 +14,7 @@ public class DayDto
 	public int AnalystsNumber { get; }
 	public int ProgrammersNumber { get; }
 	public int TestersNumber { get; }
+	public string EndDayEventMessage { get; }
 	public WorkAnotherTeamContainerDto? WorkAnotherTeamContainer { get; }
 	public TeamMembersContainerDto TeamMembersContainer { get; }
 	public RollDiceContainerDto? RollDiceContainer { get; }
@@ -40,7 +41,8 @@ public class DayDto
 		UpdateCfdContainerDto updateCfdContainer,
 		IReadOnlyList<AwaitedEventsDto> awaitedCommands,
 		DayStatus status,
-		int number)
+		int number,
+		string endDayEventMessage)
 	{
 		FullId = fullId;
 		AnalystsNumber = analystsNumber;
@@ -55,5 +57,6 @@ public class DayDto
 		AwaitedCommands = awaitedCommands;
 		Status = status;
 		Number = number;
+		EndDayEventMessage = endDayEventMessage;
 	}
 }
