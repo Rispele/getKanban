@@ -93,12 +93,12 @@
     const checkedTickets = [];
     let minTicketId = 10000;
     for (let checkbox of checkboxes) {
-        const checked = checkbox.checked;
-        if (checked) {
-            const ticketId = checkbox.parentElement.getElementsByClassName('checkboxCardNumber')[0].textContent;
-            if (ticketId.startsWith(`S`)) {
+        const ticketId = checkbox.parentElement.getElementsByClassName('checkboxCardNumber')[0].textContent;
+        if (ticketId.startsWith(`S`)) {
+            minTicketId = Math.min(minTicketId, parseInt(ticketId.substring(1)));
+            const checked = checkbox.checked;
+            if (checked) {
                 checkedTickets.push(parseInt(ticketId.substring(1)));
-                minTicketId = Math.min(minTicketId, parseInt(ticketId.substring(1)));
             }
         }
     }
