@@ -179,6 +179,60 @@ public class ApiController : Controller
 		throw new InvalidOperationException();
 	}
 
+	[HttpGet("skip")]
+	public async Task<IActionResult> Skip(Guid gameSessionId, Guid teamId, int dayTo, int step = 1)
+	{
+		for (var i = 9; i < dayTo + 1; i++)
+		{
+			if (i == dayTo && step == 1)
+			{
+				return Redirect($"/{gameSessionId}/{teamId}/step/{step}");
+			}
+			
+			var requestContext = RequestContextFactory.Build(Request);
+			var currentDay = await teamService.GetCurrentDayAsync(requestContext, gameSessionId, teamId);
+
+			var shouldRollForAnotherTeam = currentDay.AwaitedCommands
+				.Any(x => x is { CommandType: DayCommandType.WorkAnotherTeam });
+			if (shouldRollForAnotherTeam)
+			{
+				await AnotherTeamRoll(gameSessionId, teamId);
+			}
+
+			await RollDices(gameSessionId, teamId);
+			
+			if (i == dayTo && step == 2)
+			{
+				return Redirect($"/{gameSessionId}/{teamId}/step/{step}");
+			}
+			
+			// Выбор тикетов скипаем в любом случае
+
+			if (i == dayTo && step == 5)
+			{
+				return Redirect($"/{gameSessionId}/{teamId}/step/{step}");
+			}
+			
+			await UpdateCfd(new CfdDayDataModel()
+			{
+				WithAnalysts = i,
+				WithProgrammers = i + 1,
+				WithTesters = i + 2,
+				ToDeploy = i + 3,
+				Released = i + 4
+			}, gameSessionId, teamId);
+
+			if (i == dayTo && step == 7)
+			{
+				return Redirect($"/{gameSessionId}/{teamId}/step/{step}");
+			}
+
+			await EndDay(gameSessionId, teamId);
+		}
+
+		return null;
+	}
+
 	[HttpGet("error")]
 	public async Task<IActionResult> Error(string message)
 	{
