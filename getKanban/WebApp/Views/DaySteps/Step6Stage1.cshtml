@@ -131,8 +131,10 @@
         <div id="distribution-diagram" style="width: 100%; height: 33%;"></div>
     </div>
     <div style="width: 300px">
-        Всего клиентов: @Model.TeamStatistic.TotalClientsGained
-        Всего денег: @Model.TeamStatistic.TotalProfitGained
+        Всего клиентов (с учетом штрафов): @Model.TeamStatistic.TotalClientsGained
+        Всего денег (с учетом штрафов): @Model.TeamStatistic.TotalProfitGained
+        Штраф по клиентам: @Model.TeamStatistic.ClientsPenalty
+        Штраф по деньгам: @Model.TeamStatistic.Penalty
         @{ RenderDayResult(); }
     </div>
 </div>

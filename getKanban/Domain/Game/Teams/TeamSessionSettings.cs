@@ -35,8 +35,15 @@ public class TeamSessionSettings
 	public int IncreaseTestersNumberSince { get; init; }
 	
 	public int LockTestersSince { get; init; }
+	
 	public int LockTestersBeforeInclusive { get; init; }
+	
+	public int DayBeforeInclusiveNotReleasedTasksTakenResultsInPenalty { get; init; }
 
+	public int ClientsPenaltyPerTaskNotReleased { get; init; }
+
+	public int ProfitPenaltyPerClient { get; init; }
+	
 	public int GetProfitPerDay(int dayNumber)
 	{
 		return ProfitPerClientPerDay
@@ -85,7 +92,10 @@ public class TeamSessionSettings
 			LockTestersSince = 12,
 			LockTestersBeforeInclusive = 14,
 			IncreaseTestersNumberSince = 15,
-			MaxDayNumber = 18
+			MaxDayNumber = 18,
+			DayBeforeInclusiveNotReleasedTasksTakenResultsInPenalty = 9,
+			ClientsPenaltyPerTaskNotReleased = 10,
+			ProfitPenaltyPerClient = 50
 		};
 	}
 }
