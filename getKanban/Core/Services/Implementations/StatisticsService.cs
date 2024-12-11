@@ -91,13 +91,18 @@ public class StatisticsService : IStatisticsService
 			.Where(t => !team.IsTicketDeadlineNotExceededAtReleaseDay(t.Id, t.Penalty!.Deadline))
 			.Sum(t => t.Penalty!.Size);
 
-		var tasksResultedInPenalty = team.BuildTakenTickets()
-			.Where(t => t.IsInWork(team.CurrentDay.Number))
-			.Count(t => t.takingDay <= team.Settings.DayBeforeInclusiveNotReleasedTasksTakenResultsInPenalty);
+		if (team.IsLastDay)
+		{
+			var tasksResultedInPenalty = team.BuildTakenTickets()
+				.Where(t => t.IsInWork(team.CurrentDay.Number))
+				.Count(t => t.takingDay <= team.Settings.DayBeforeInclusiveNotReleasedTasksTakenResultsInPenalty);
 
-		var clientsPenalty = tasksResultedInPenalty * team.Settings.ClientsPenaltyPerTaskNotReleased;
+			var clientsPenalty = tasksResultedInPenalty * team.Settings.ClientsPenaltyPerTaskNotReleased;
 
-		return (ticketsPenalty + clientsPenalty * team.Settings.ProfitPenaltyPerClient, clientsPenalty);
+			return (ticketsPenalty + clientsPenalty * team.Settings.ProfitPenaltyPerClient, clientsPenalty);
+		}
+
+		return (ticketsPenalty, 0);
 	}
 
 	private int EvaluateBonusProfit(HashSet<Ticket> takenTickets, Team team)

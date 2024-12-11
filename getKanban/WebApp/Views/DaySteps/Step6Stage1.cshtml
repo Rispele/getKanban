@@ -126,15 +126,17 @@
 
 <div class="centered-100" style="display: flex; flex-direction: row; flex-wrap: wrap; position: relative;">
     <div class="diagram-container" style="width: 50%; height: 100%; display: flex; flex-direction: column;">
-        <div id="cfd" style="width: 100%; height: 33%;"></div>
-        <div id="control-diagram" style="width: 100%; height: 33%;"></div>
-        <div id="distribution-diagram" style="width: 100%; height: 33%;"></div>
+        <div id="cfd" style="width: 90%; height: 33%;"></div>
+        <div id="control-diagram" style="width: 90%; height: 33%;"></div>
+        <div id="distribution-diagram" style="width: 90%; height: 33%;"></div>
     </div>
-    <div style="width: 300px">
-        Всего клиентов (с учетом штрафов): @Model.TeamStatistic.TotalClientsGained
-        Всего денег (с учетом штрафов): @Model.TeamStatistic.TotalProfitGained
-        Штраф по клиентам: @Model.TeamStatistic.ClientsPenalty
-        Штраф по деньгам: @Model.TeamStatistic.Penalty
+    <div style="width: 50%; height: 100%; display: flex; flex-direction: column;">
+        <div>
+            <p class="fs-6">Всего клиентов (с учетом штрафов): @Model.TeamStatistic.TotalClientsGained</p>
+            <p class="fs-6">Штраф по клиентам: @Model.TeamStatistic.ClientsPenalty</p>
+            <p class="fs-6">Всего денег (с учетом штрафов): @Model.TeamStatistic.TotalProfitGained</p>
+            <p class="fs-6">Штраф по деньгам: @Model.TeamStatistic.Penalty</p>
+        </div>
         @{ RenderDayResult(); }
     </div>
 </div>

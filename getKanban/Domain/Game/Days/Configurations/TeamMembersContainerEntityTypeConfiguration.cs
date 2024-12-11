@@ -15,6 +15,8 @@ public class TeamMembersContainerEntityTypeConfiguration : IEntityTypeConfigurat
 			.HasMany<TeamMember>("teamMembers")
 			.WithOne();
 
+		builder.Property(t => t.LockTesters);
+
 		builder.Ignore(t => t.TeamMembers);
 
 		builder.Navigation("teamMembers").AutoInclude();
