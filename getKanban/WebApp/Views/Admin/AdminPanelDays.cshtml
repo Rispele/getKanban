@@ -1,4 +1,5 @@
-﻿@model Core.Dtos.AdminPanelDaysDto
+﻿@using Core.Dtos.DayStatistics
+@model Core.Dtos.AdminPanelDaysDto
 
 <div class="container4">
     <h1 class="fs-1 text-center">Команда: @Model.TeamName</h1>
@@ -37,9 +38,116 @@
                 </div>
             </div>
         }
-
     </div>
 </div>
+
+<div class="centered-100" style="display: flex; flex-direction: row; flex-wrap: wrap; position: relative;">
+    <div class="diagram-container" style="width: 50%; height: 100%; display: flex; flex-direction: column;">
+        <div id="cfd" style="width: 90%; height: 33%;"></div>
+        <div id="control-diagram" style="width: 90%; height: 33%;"></div>
+        <div id="distribution-diagram" style="width: 90%; height: 33%;"></div>
+    </div>
+</div>
+
+@{
+    RenderDiagram();
+}
+
+@functions
+{
+    private void RenderDiagram()
+    {
+        if (Model.TeamStatistic is null)
+        {
+            return;
+        }
+
+        var dayStatistics = Model.TeamStatistic.DayStatistics;
+        var maxDayNumber = dayStatistics.Select(t => t.DayNumber).Max();
+        var rowsForCfd = new[]
+            {
+                "[\"День\", \"Поставлено\", \"Готово к поставке\", \"В тестировании\", \"В разработке\", \"В аналитике\"]",
+                "[8,0,1,4,4,2]"
+            }
+            .Concat(dayStatistics.Select(CfdStatisticToString))
+            .ToList();
+
+        if (rowsForCfd.Select(x => x.Split(",").Where(x => !string.IsNullOrEmpty(x)).ToList().Count).ToHashSet().Count != 1)
+        {
+            return;
+        }
+        
+        var tableForCfd = $"[{string.Join(",", rowsForCfd)}]";
+
+        var ticketsReleased = dayStatistics.SelectMany(d => d.TicketsReleased).ToArray();
+        var rowsForControlDiagram = new[] { $"[\"Номер задачи\", \"За сколько поставили\"]{(ticketsReleased.Length > 0 ? "" : ", [0, 0]")}" }
+            .Concat(ticketsReleased.Select((ticket, i) => $"[{i}, {ticket.releaseDay - ticket.takingDay}]"))
+            .ToList();
+        var tableForControlDiagram = $"[{string.Join(",", rowsForControlDiagram)}]";
+
+        var ticketsCountPerWorkDaysCount = dayStatistics
+            .SelectMany(d => d.TicketsReleased)
+            .GroupBy(t => t.releaseDay!.Value - t.takingDay)
+            .Select(t => (t.Key, t.Count()))
+            .ToArray();
+        var keys = ticketsCountPerWorkDaysCount.Select(t => t.Key).ToList();
+        var maxWorkDays = keys.Count > 0 ? keys.Max() : 9;
+        var rowsForDistributionDiagram = new[] { "[\"Дней в работе\"", $"\"Кол-во задач\"]{(ticketsCountPerWorkDaysCount.Length > 0 ? "" : ", [0, 0]")}" }
+            .Concat(ticketsCountPerWorkDaysCount.Select(g => $"[{g.Key}, {g.Item2}]"));
+        var tableForDistributionDiagram = $"[{string.Join(",", rowsForDistributionDiagram)}]";
+
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script type="text/javascript">
+            google.charts.load('current', {'packages':['corechart']});
+            google.charts.setOnLoadCallback(drawCharts);
+
+            function drawCharts() {
+                const dataForCfd = google.visualization.arrayToDataTable(@Html.Raw(tableForCfd));
+                const optionsForCfd = {
+                    title: 'Кумулятивная диаграмма',
+                    hAxis: {title: 'День', ticks: @Html.Raw($"[{string.Join(",", Enumerable.Range(8, Math.Max(18, maxDayNumber) - 7))}]"), minValue: 8, maxValue: @Math.Max(18, maxDayNumber) },
+                    vAxis: {minValue: 0},
+                    isStacked: true
+                };
+
+                const dataForControlDiagram = google.visualization.arrayToDataTable(@Html.Raw(tableForControlDiagram));
+                const optionsForControlDiagram = {
+                    title: 'Контрольная диагамма',
+                    hAxis: {title: 'Поставленные задачи (в порядке релиза)', ticks: @Html.Raw($"[{string.Join(",", Enumerable.Range(0, Math.Max(10, ticketsReleased.Length) + 1))}]"), minValue: 0, maxValue: @Math.Max(10, ticketsReleased.Length)},
+                    vAxis: {title: 'За сколько поставили', minValue: 0},
+                    legend: { position: "none" },
+                };
+
+                const dataForDistributionDiagram = google.visualization.arrayToDataTable(@Html.Raw(tableForDistributionDiagram));
+                const optionsForDistributionDiagram = {
+                    title: 'Распределение времени выполнения',
+                    hAxis: {title: 'За сколько поставили', ticks: @Html.Raw($"[{string.Join(",", Enumerable.Range(0, Math.Max(10, maxWorkDays) + 1))}]"), minValue: 0, maxValue: @Math.Max(10, maxWorkDays)},
+                    vAxis: {title: 'Кол-во поставленных задач', minValue: 0},
+                    legend: { position: "none" },
+                };
+
+                const cfdChart = new google.visualization.AreaChart(document.getElementById('cfd'));
+                cfdChart.draw(dataForCfd, optionsForCfd);
+
+                const controlChar = new google.visualization.AreaChart(document.getElementById('control-diagram'));
+                controlChar.draw(dataForControlDiagram, optionsForControlDiagram);
+
+                const distributionDiagram = new google.visualization.ColumnChart(document.getElementById('distribution-diagram'));
+                distributionDiagram.draw(dataForDistributionDiagram, optionsForDistributionDiagram);
+            }
+        </script>
+    }
+
+    private static string CfdStatisticToString(DayStatisticDto t)
+    {
+        return $"[{t.DayNumber}," +
+               $"{t.CfdStatistic.Released}," +
+               $"{t.CfdStatistic.ToDeploy}," +
+               $"{t.CfdStatistic.WithTesters}," +
+               $"{t.CfdStatistic.WithProgrammers}," +
+               $"{t.CfdStatistic.WithAnalysts}]";
+    }
+}
 
 <script src="~/js/setup-hub-connection.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>

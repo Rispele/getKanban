@@ -113,7 +113,7 @@ public class DayStepsController : Controller
 						teamId,
 						dayNumber: currentDay.Number)),
 			(false, false) =>
-				await Step6Stage0(gameSessionId, teamId)
+				Redirect($"/{gameSessionId}/{teamId}/step/6/0")
 		};
 	}
 
@@ -202,7 +202,7 @@ public class DayStepsController : Controller
 
 		if (!shouldShowTickets)
 		{
-			return await Step6Stage0(gameSessionId, teamId);
+			return Redirect($"/{gameSessionId}/{teamId}/step/6/0");
 		}
 
 		var ticketIds = await domainInteractionService.GetBacklogTickets(gameSessionId, teamId);

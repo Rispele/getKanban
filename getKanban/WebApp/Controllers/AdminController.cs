@@ -13,11 +13,13 @@ public class AdminController : Controller
 {
 	private readonly IGameSessionService gameSessionService;
 	private readonly DomainContext context;
+	private readonly IStatisticsService statisticsService;
 
-	public AdminController(IGameSessionService gameSessionService, DomainContext context)
+	public AdminController(IGameSessionService gameSessionService, DomainContext context, IStatisticsService statisticsService)
 	{
 		this.gameSessionService = gameSessionService;
 		this.context = context;
+		this.statisticsService = statisticsService;
 	}
 	
 	[HttpGet("")]
@@ -52,6 +54,8 @@ public class AdminController : Controller
 		}
 
 		var currentDay = team.CurrentDay;
+
+		var teamStatistic = await statisticsService.CollectStatistic(session.Id, teamId);
 		
 		return View(new AdminPanelDaysDto
 		{
@@ -60,7 +64,8 @@ public class AdminController : Controller
 			TeamName = session.Teams.SingleOrDefault(x => x.Id == teamId)?.Name!,
 			CurrentDay = new DayDtoConverter().Convert(team, currentDay),
 			StartDayNumber = 9,
-			FinishDayNumber = 18
+			FinishDayNumber = 18,
+			TeamStatistic = teamStatistic
 		});
 	}
 

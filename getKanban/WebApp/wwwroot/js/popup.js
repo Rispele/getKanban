@@ -2,7 +2,11 @@
     const popup = document.createElement('div');
     popup.className = 'popup-card';
     popup.className += isError ? ' fail' : ' success';
-    popup.textContent = message;
+    if (message.indexOf("\n") >= 0) {
+        popup.innerHTML = message.replace(/(\r\n|\n|\r)/gm, "<br>");
+    } else {
+        popup.textContent = message;
+    }
 
     document.getElementsByClassName('notification-container')[0].appendChild(popup);
 

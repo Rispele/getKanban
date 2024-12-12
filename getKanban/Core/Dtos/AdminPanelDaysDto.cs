@@ -1,4 +1,6 @@
-﻿namespace Core.Dtos;
+﻿using Core.Dtos.DayStatistics;
+
+namespace Core.Dtos;
 
 public class AdminPanelDaysDto
 {
@@ -13,4 +15,6 @@ public class AdminPanelDaysDto
 	public int StartDayNumber { get; init; }
 	
 	public int FinishDayNumber { get; init; }
+	
+	public TeamStatisticDto? TeamStatistic { get; set; }
 }

@@ -141,7 +141,7 @@
         .then(isValid => isValid.json())
         .then(isValid => {
             if (!isValid) {
-                showMessage(`Поля таблицы содержат невалидные значения. Диаграмма CFD не может быть заполнена`);
+                showMessage(`Поля таблицы содержат невалидные значения. Кумулятивная диаграмма не может быть заполнена`);
             } else {
                 connection.invoke("ChangePage", "@Model.GameSessionId", "@Model.TeamId", 6, 1)
                     .then(() => {

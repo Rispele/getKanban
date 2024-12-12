@@ -117,8 +117,8 @@
                     const index = checkedTickets.indexOf(parseInt(ticketId.substring(1)));
                     if (index > -1) {checkedTickets.splice(index, 1);}
                 } else {
-                    this.checked = !this.checked;
-                    showMessage(`Нельзя выбирать стандартные тикеты не в порядке возрастания их номеров`);
+                    checkbox.checked = !checkbox.checked;
+                    showMessage(`Нельзя выбирать стандартные тикеты не в порядке возрастания их номеров.\nПозволяется начать выбор только с тикета с наименьшим номером`);
                     return;
                 }
             }
