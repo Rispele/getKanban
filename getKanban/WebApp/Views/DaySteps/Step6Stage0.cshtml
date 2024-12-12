@@ -1,4 +1,4 @@
-@model WebApp.Models.DayStepModels.StepModel
+@model WebApp.Models.DayStepModels.CfdTableStepModel
 
 <div class="stepHeader">
     <h1 class="fs-1 fw- text-center">Команда @Html.Raw(Model.TeamName). День @Model.DayNumber</h1>
@@ -7,37 +7,75 @@
     <h1 class="title">Заполните таблицу, отметив сколько тикетов на доске на данный момент</h1>
     <h1 class="title">Цвет колонки соответствует цвету стрелки.</h1>
     <hr class="divider">
-    
+
     <div class="mine_table">
         <div class="row-60 rowStyle1">
             <div class="rowName">
                 <p class="text-center fs-6 text-top-margin">Работа аналитиков</p>
             </div>
-            <input type="number" class="graphPageInput rowStyle1" placeholder="-" id="with-analysts">
+            @if (Model.WithAnalysts.HasValue)
+            {
+                <input type="number" class="graphPageInput rowStyle1" placeholder="-" value="@Model.WithAnalysts.Value" id="with-analysts">
+            }
+            else
+            {
+                <input type="number" class="graphPageInput rowStyle1" placeholder="-" id="with-analysts">
+            }
         </div>
         <div class="row-60 rowStyle2">
             <div class="rowName">
                 <p class="text-center fs-6 text-top-margin">Работа разработчиков</p>
             </div>
-            <input type="number" class="graphPageInput rowStyle2" placeholder="-" id="with-programmers">
+            @if (Model.WithProgrammers.HasValue)
+            {
+                <input type="number" class="graphPageInput rowStyle2" placeholder="-" value="@Model.WithProgrammers.Value" id="with-programmers">
+            }
+            else
+            {
+                <input type="number" class="graphPageInput rowStyle2" placeholder="-" id="with-programmers">
+            }
         </div>
         <div class="row-60 rowStyle3">
             <div class="rowName">
                 <p class="text-center fs-6 text-top-margin">Работа тестировщиков</p>
             </div>
-            <input type="number" class="graphPageInput rowStyle3" placeholder="-" id="with-testers">
+
+            @if (Model.WithTesters.HasValue)
+            {
+                <input type="number" class="graphPageInput rowStyle3" placeholder="-" value="@Model.WithTesters.Value" id="with-testers">
+            }
+            else
+            {
+                <input type="number" class="graphPageInput rowStyle3" placeholder="-" id="with-testers">
+            }
         </div>
         <div class="row-60 rowStyle4">
             <div class="rowName">
                 <p class="text-center fs-6 text-top-margin">Готовы к поставке</p>
             </div>
-            <input type="number" class="graphPageInput rowStyle4" placeholder="-" id="to-deploy">
+
+            @if (Model.ToDeploy.HasValue)
+            {
+                <input type="number" class="graphPageInput rowStyle4" placeholder="-" value="@Model.ToDeploy.Value" id="to-deploy">
+            }
+            else
+            {
+                <input type="number" class="graphPageInput rowStyle4" placeholder="-" id="to-deploy">
+            }
         </div>
         <div class="row-60 rowStyle5">
             <div class="rowName">
                 <p class="text-center fs-6 text-top-margin">Поставлено</p>
             </div>
-            <input type="number" class="graphPageInput rowStyle5" placeholder="-" id="released">
+
+            @if (Model.Released.HasValue)
+            {
+                <input type="number" class="graphPageInput rowStyle5" placeholder="-" value="@Model.Released.Value" id="released">
+            }
+            else
+            {
+                <input type="number" class="graphPageInput rowStyle5" placeholder="-" id="released">
+            }
         </div>
     </div>
 

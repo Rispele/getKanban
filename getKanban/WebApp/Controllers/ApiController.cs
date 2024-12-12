@@ -105,16 +105,16 @@ public class ApiController : Controller
 	}
 
 	[HttpPost("update-cfd")]
-	public async Task UpdateCfd([FromBody] CfdDayDataModel cfdDayDataModel, Guid gameSessionId, Guid teamId)
+	public async Task UpdateCfd([FromBody] CfdEntryModel cfdEntryModel, Guid gameSessionId, Guid teamId)
 	{
 		var requestContext = RequestContextFactory.Build(Request);
-		var patchType = Enum.Parse<UpdateCfdContainerPatchType>(cfdDayDataModel.PatchType);
+		var patchType = Enum.Parse<UpdateCfdContainerPatchType>(cfdEntryModel.PatchType);
 		
 		await teamService.PatchDayAsync(
 			requestContext,
 			gameSessionId,
 			teamId,
-			new UpdateCfdCommand { PatchType = patchType, Value = cfdDayDataModel.Value });
+			new UpdateCfdCommand { PatchType = patchType, Value = cfdEntryModel.Value });
 	}
 
 	[HttpPost("end-day")]
@@ -238,11 +238,11 @@ public class ApiController : Controller
 				return Redirect($"/{gameSessionId}/{teamId}/step/{step}");
 			}
 
-			await UpdateCfd(new CfdDayDataModel() { PatchType = "WithAnalysts", Value = i }, gameSessionId, teamId);
-			await UpdateCfd(new CfdDayDataModel() { PatchType = "WithProgrammers", Value = i + 1 }, gameSessionId, teamId);
-			await UpdateCfd(new CfdDayDataModel() { PatchType = "WithTesters", Value = i + 2 }, gameSessionId, teamId);
-			await UpdateCfd(new CfdDayDataModel() { PatchType = "ToDeploy", Value = i + 3 }, gameSessionId, teamId);
-			await UpdateCfd(new CfdDayDataModel() { PatchType = "Released", Value = i + 4 }, gameSessionId, teamId);
+			await UpdateCfd(new CfdEntryModel() { PatchType = "WithAnalysts", Value = i }, gameSessionId, teamId);
+			await UpdateCfd(new CfdEntryModel() { PatchType = "WithProgrammers", Value = i + 1 }, gameSessionId, teamId);
+			await UpdateCfd(new CfdEntryModel() { PatchType = "WithTesters", Value = i + 2 }, gameSessionId, teamId);
+			await UpdateCfd(new CfdEntryModel() { PatchType = "ToDeploy", Value = i + 3 }, gameSessionId, teamId);
+			await UpdateCfd(new CfdEntryModel() { PatchType = "Released", Value = i + 4 }, gameSessionId, teamId);
 
 			if (i == dayTo && step == 7)
 			{

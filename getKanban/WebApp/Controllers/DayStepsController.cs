@@ -113,13 +113,7 @@ public class DayStepsController : Controller
 						teamId,
 						dayNumber: currentDay.Number)),
 			(false, false) =>
-				View(
-					"Step6Stage0",
-					await FillWithCredentialsAsync<StepModel>(
-						requestContext,
-						gameSessionId,
-						teamId,
-						dayNumber: currentDay.Number))
+				await Step6Stage0(gameSessionId, teamId)
 		};
 	}
 
@@ -208,13 +202,7 @@ public class DayStepsController : Controller
 
 		if (!shouldShowTickets)
 		{
-			return View(
-				"Step6Stage0",
-				await FillWithCredentialsAsync<StepModel>(
-					requestContext,
-					gameSessionId,
-					teamId,
-					dayNumber: currentDay.Number));
+			return await Step6Stage0(gameSessionId, teamId);
 		}
 
 		var ticketIds = await domainInteractionService.GetBacklogTickets(gameSessionId, teamId);
@@ -253,6 +241,34 @@ public class DayStepsController : Controller
 			dayNumber: currentDay.Number);
 		ticketCheckStepModel.TicketIds = ticketIds;
 		return View(ticketCheckStepModel);
+	}
+
+	[HttpGet("6")]
+	[HttpGet("6/0")]
+	public async Task<IActionResult> Step6Stage0(Guid gameSessionId, Guid teamId)
+	{
+		var requestContext = RequestContextFactory.Build(Request);
+
+		var currentDay = await teamService.GetCurrentDayAsync(requestContext, gameSessionId, teamId);
+		var teamStatistic = await statisticsService.CollectStatistic(gameSessionId, teamId);
+
+		var stepModel = await FillWithCredentialsAsync<CfdTableStepModel>(
+			requestContext,
+			gameSessionId,
+			teamId);
+		var currentDayStatistic = teamStatistic.DayStatistics
+			.SingleOrDefault(x => x.DayNumber == currentDay.Number);
+		if (currentDayStatistic is not null)
+		{
+			stepModel.Released = currentDayStatistic.CfdStatistic.Released;
+			stepModel.ToDeploy = currentDayStatistic.CfdStatistic.ToDeploy;
+			stepModel.WithAnalysts = currentDayStatistic.CfdStatistic.WithAnalysts;
+			stepModel.WithProgrammers = currentDayStatistic.CfdStatistic.WithProgrammers;
+			stepModel.WithTesters = currentDayStatistic.CfdStatistic.WithTesters;
+		}
+
+		return View(stepModel);
+		
 	}
 
 	[HttpGet("6/1")]

@@ -54,11 +54,11 @@ public class StatisticsService : IStatisticsService
 		var cfdContainer = day.UpdateCfdContainer;
 
 		return CfdStatisticDto.Create(
-			cfdContainer.WithAnalysts ?? 0,
-			cfdContainer.WithProgrammers ?? 0,
-			cfdContainer.WithTesters ?? 0,
-			cfdContainer.ToDeploy ?? 0,
-			cfdContainer.Released ?? 0);
+			cfdContainer.WithAnalysts,
+			cfdContainer.WithProgrammers,
+			cfdContainer.WithTesters,
+			cfdContainer.ToDeploy,
+			cfdContainer.Released);
 	}
 
 	private List<DayStatisticDto> ConvertToDayStatisticDto(
