@@ -36,7 +36,14 @@ public static class TeamSessionScenarioExtensions
 					.AwaitCommands(DayCommandType.UpdateCfd, DayCommandType.EndDay)
 					.RemoveAwaited(DayCommandType.UpdateCfd)
 					.WithValidationMethod("IsCfdValid"))
-			.For(DayCommandType.EndDay, b => b);
+			.For(
+				DayCommandType.EndDay,
+				b => b
+					.RemoveAwaited(
+						DayCommandType.ReleaseTickets,
+						DayCommandType.UpdateSprintBacklog,
+						DayCommandType.UpdateCfd,
+						DayCommandType.EndDay));
 		return scenarioBuilder;
 	}
 
