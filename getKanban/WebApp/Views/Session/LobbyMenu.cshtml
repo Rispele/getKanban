@@ -299,3 +299,27 @@ else
         return editBlock !== null && editBlock !== undefined ? editBlock : recreateEditBlock(teamId);
     }
 </script>
+
+<script>
+    const container = document.querySelector('.commandEditorLWindow');
+    
+    function updateLastInColumn() {
+        const items = Array.from(container.children);
+
+        const itemWidth = items[0].offsetWidth;
+        const itemsPerRow = Math.floor(container.offsetWidth / itemWidth);
+
+        items.forEach((item, index) => {
+            if ((index + 1) % itemsPerRow === 0) {
+                item.style.borderRight = "none";
+            }
+            else {
+                item.style.borderRight = "1px dashed #CAC4D0"
+            }
+        });
+    }
+
+    updateLastInColumn();
+
+    window.addEventListener('resize', updateLastInColumn);
+</script>
