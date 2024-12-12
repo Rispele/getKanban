@@ -4,7 +4,7 @@
     </div>
 
     <div class="authorizationButtons">
-        <input type="number" min="1" max="8" onkeyup="imposeMinMax(this)" class="text-center authorizationButtonsTemplate authorizationCommandName" id="teamsCount" placeholder="Число команд">
+        <input type="text" onkeypress="return imposeMinMax(event)" class="text-center authorizationButtonsTemplate authorizationCommandName" id="teamsCount" placeholder="Число команд">
         <input type="text" class="text-center authorizationButtonsTemplate authorizationCommandName" id="sessionName" placeholder="Название игры">
         <button class="authorizationButtonsTemplate authorizationButton" onclick="createGameSession()">Создать игру</button>
     </div>
@@ -12,17 +12,14 @@
 
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
-    const teamsCount = document.getElementById("teamsCount");
-
-    function imposeMinMax(el){
-        if(el.value !== ""){
-            if(parseInt(el.value) < parseInt(el.min)){
-                el.value = el.min;
-            }
-            if(parseInt(el.value) > parseInt(el.max)){
-                el.value = el.max;
-            }
+    function imposeMinMax(evt){
+        evt = (evt) ? evt : window.event;
+        let charCode = (evt.which) ? evt.which : evt.keyCode;
+        if (charCode > 31 && (charCode < 49 || charCode > 56)) {
+            return false;
         }
+        document.getElementById("teamsCount").value = ``;
+        return true;
     }
     
     async function createGameSession() {
