@@ -1,8 +1,11 @@
 ﻿@using Core.Dtos.DayStatistics
 @model Core.Dtos.AdminPanelDaysDto
 
+<div class="stepHeader">
+    <h1 class="fs-1 text-center">Команда @Html.Raw(Model.TeamName)r</h1>
+</div>
+
 <div class="container4">
-    <h1 class="fs-1 text-center">Команда: @Model.TeamName</h1>
     <h1 class="fs-4 text-center">Выберите день для изменения</h1>
     <hr class="divider">
     <div class="container2">

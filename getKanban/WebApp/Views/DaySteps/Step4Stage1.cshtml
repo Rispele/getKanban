@@ -1,6 +1,10 @@
 @using Domain.Game
 @model WebApp.Models.DayStepModels.TicketChoiceStepModel
 
+<div class="stepHeader">
+    <h1 class="fs-1 text-center">Команда @Html.Raw(Model.TeamName). День @Model.DayNumber</h1>
+</div>
+
 @functions
 {
     private void FillTickets(IEnumerable<Ticket> tickets, string cardStyle, string containerName)

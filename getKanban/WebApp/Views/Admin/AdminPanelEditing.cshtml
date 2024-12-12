@@ -1,8 +1,12 @@
 ﻿@model Core.Dtos.AdminPanelDayEditDto
 
+<div class="stepHeader">
+    <h1 class="fs-1 text-center">Команда @Html.Raw(Model.TeamName). День @Model.DayNumber</h1>
+</div>
+
 <div>
-    <p>Команда: @Model.TeamName</p>
-    <p>День @Model.DayNumber</p>
+    @* <p>Команда: @Model.TeamName</p> *@
+    @* <p>День @Model.DayNumber</p> *@
     <p>Порядок назначения ролей</p>
     <p>Таблица распределения ролей</p>
 
