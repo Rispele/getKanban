@@ -12,6 +12,18 @@
 }
 
 .infoContainer {
+    width: 60%;
+    max-width: 1000px;
+
+    background-color: #E6E6E6;
+
+    border-color: black;
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 50px;
+}
+
+.infoContainer2 {
     width: 100%;
 
     background-color: #E6E6E6;
@@ -28,31 +40,6 @@
 }
 
 .stepControlButtons {
-    position: absolute;
-    
-    bottom: 50px;
-    
-    width: 20%;
-    min-width: 50px;
-    max-width: 100px;
-    height: 40px;
-
-    border-radius: 15px;
-
-    background-color: #363636;
-
-    color: white;
-}
-
-.rightButton {
-    right: 5%;
-}
-
-.leftButton {
-    left: 5%;
-}
-
-.stepControlButtonsNonGlobal {
     margin-top: 40px;
 
     width: 20%;
@@ -65,12 +52,12 @@
     color: white;
 }
 
-.leftButtonNonGlobal {
+.leftButton {
     margin-left: 10%;
     /*margin-right: 130px;*/
 }
 
-.rightButtonNonGlobal {
+.rightButton {
     margin-left: 40%;
 }
 
@@ -103,29 +90,33 @@
 }
 
 @media (min-width: 1500px) {
-    .stepControlButtonsNonGlobal {
+    .stepControlButtons {
         width: 30%;
     }
 
-    .leftButtonNonGlobal {
+    .leftButton {
         margin-left: 10%;
     }
 
-    .rightButtonNonGlobal {
+    .rightButton {
         margin-left: 20%;
     }
 }
 
 @media (max-width: 1000px) {
-    .stepControlButtonsNonGlobal {
+    .infoContainer {
+        width: 80%;
+    }
+
+    .stepControlButtons {
         width: 40%;
     }
 
-    .leftButtonNonGlobal {
+    .leftButton {
         margin-left: 5%;
     }
 
-    .rightButtonNonGlobal {
+    .rightButton {
         margin-left: 10%;
     }
 }
