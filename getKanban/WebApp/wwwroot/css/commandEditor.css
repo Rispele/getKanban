@@ -44,6 +44,28 @@
     align-content: center;
 
     border-bottom: 1px dashed #CAC4D0;
+    
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.teamName {
+    width: calc(100% - 50px);
+    min-height: 50px;
+    height: fit-content;
+}
+
+.teamManageButtons {
+    width: 50px;
+    min-height: 50px;
+    height: fit-content;
+    
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    
+    column-gap: 19px;
 }
 
 .commandEditorCommandContainer {
