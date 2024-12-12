@@ -126,17 +126,34 @@
 }
 
 <div class="container8 centered-100">
-    <div class="diagram-container" style="width: 50%; height: 100%; display: flex; flex-direction: column;">
-        <div id="cfd" style="width: 90%; height: 33%;"></div>
-        <div id="control-diagram" style="width: 90%; height: 33%;"></div>
-        <div id="distribution-diagram" style="width: 90%; height: 33%;"></div>
+    <h1 class="title">Ознакомьтесь с итогами дня</h1>
+    <hr class="divider">
+    <div class="diagram-container">
+        <div class="diagram" id="cfd"></div>
+        <div class="diagram" id="control-diagram"></div>
+        <div class="diagram" id="distribution-diagram"></div>
     </div>
-    <div style="width: 50%; height: 100%; display: flex; flex-direction: column;">
-        <div>
-            <p class="fs-6">Всего клиентов (с учетом штрафов): @Model.TeamStatistic.TotalClientsGained</p>
-            <p class="fs-6">Штраф по клиентам: @Model.TeamStatistic.ClientsPenalty</p>
-            <p class="fs-6">Всего денег (с учетом штрафов): @Model.TeamStatistic.TotalProfitGained</p>
-            <p class="fs-6">Штраф по деньгам: @Model.TeamStatistic.Penalty</p>
+    <div class="allDayResults">
+        <div class="finishDayResult dayLineStyle text-center">
+            <h1 class="fs-6">Итого</h1>
+        </div>
+
+        <div class="finishDayResultContainer">
+            <div class="finishDayResult">
+                <p class="fs-6">Всего клиентов: @Model.TeamStatistic.TotalClientsGained</p>
+            </div>
+            
+            <div class="finishDayResult moneyChangeLineStyle">
+                <p class="fs-6">Штраф по клиентам составил: @Model.TeamStatistic.ClientsPenalty</p>
+            </div>
+
+            <div class="finishDayResult">
+                <p class="fs-6">Всего денег: @Model.TeamStatistic.TotalProfitGained</p>
+            </div>
+
+            <div class="finishDayResult moneyChangeLineStyle">
+                <p class="fs-6">Штраф по деньгам составил: @Model.TeamStatistic.Penalty</p>
+            </div>
         </div>
         @{ RenderDayResult(); }
     </div>

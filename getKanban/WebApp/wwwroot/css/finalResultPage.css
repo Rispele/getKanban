@@ -1,11 +1,27 @@
+.allDayResults {
+    width: 40%;
+    min-width: 100px;
+    min-height: 240px;
+    height: fit-content;
+
+    max-height: 900px;
+
+    margin-left: 10%;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
 .scrollable-container {
     overflow-y: scroll;
     overflow-x: hidden;
 
-    width: 300px;
-    min-height: 120px;
-    height: fit-content;
-    max-height: 300px;
+    width: 100%;
+    min-height: 240px;
+    height: calc(50vw / 2 - 120px);
+
+    max-height: 680px;
 }
 
 .finishDayResultContainer {
@@ -22,7 +38,8 @@
 
 .finishDayResult {
     width: 100%;
-    height: 30px;
+    min-height: 30px;
+    height: fit-content;
 
     border: 1px solid black;
 }
@@ -31,6 +48,42 @@
     background-color: #6c757d;
 }
 
-.monetChangeLineStyle {
+.moneyChangeLineStyle {
     background-color: lightgrey;
+}
+
+/*----------------------------------------------------------------------*/
+
+.container8 {
+    width: 100vw;
+    max-width: 1200px;
+    height: fit-content;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+
+}
+
+.diagram-container {
+    width: 50vw;
+    max-width: 600px;
+    height: fit-content;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.diagram {
+    width: 100%;
+    min-width: 200px;
+    max-width: 600px;
+    height: calc(50vw / 2);
+    min-height: 100px;
+    max-height: 300px;
+
+
+    box-shadow: 0 0 16px 10px rgba(0, 0, 0, 0.1);
+
+    margin-bottom: calc(50vw / 10);
 }
