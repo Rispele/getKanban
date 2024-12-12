@@ -33,35 +33,35 @@
                 </div>
             </div>
 
-            <div class="scrollable-container" style="position: absolute; right: 0;">
+            <div class="scrollable-container">
                 @foreach (var data in Model.TeamStatistic.DayStatistics.OrderByDescending(t => t.DayNumber))
                 {
-                <div class="finishDayResult dayLineStyle text-center">
-                    <h1 class="fs-6">День @data.DayNumber</h1>
-                </div>
-
-                <div class="finishDayRe sultContainer">
-                    <div class="finishDayResult">
-                        <p class="fs-6">Получили клиентов: @data.ClientsGained</p>
+                    <div class="finishDayResult dayLineStyle text-center">
+                        <h1 class="fs-6">День @data.DayNumber</h1>
                     </div>
 
-                    @if (dayByNumber.TryGetValue(data.DayNumber - 1, out var prev) && prev.ProfitPerClient != data.ProfitPerClient)
-                    {
-                    <div class="finishDayResult monetChangeLineStyle">
-                        <p class="fs-6">Деньги за клиента: @(prev.ProfitPerClient)$ -> @(data.ProfitPerClient)$</p>
-                    </div>
-                    }
-                    else
-                    {
-                    <div class="finishDayResult monetChangeLineStyle">
-                        <p class="fs-6">Деньги за клиента: @(data.ProfitPerClient)$</p>
-                    </div>
-                    }
+                    <div class="finishDayRe sultContainer">
+                        <div class="finishDayResult">
+                            <p class="fs-6">Получили клиентов: @data.ClientsGained</p>
+                        </div>
 
-                    <div class="finishDayResult">
-                        <p class="fs-6">Получили денег: @(data.ProfitGained)$</p>
+                        @if (dayByNumber.TryGetValue(data.DayNumber - 1, out var prev) && prev.ProfitPerClient != data.ProfitPerClient)
+                        {
+                        <div class="finishDayResult monetChangeLineStyle">
+                            <p class="fs-6">Деньги за клиента: @(prev.ProfitPerClient)$ -> @(data.ProfitPerClient)$</p>
+                        </div>
+                        }
+                        else
+                        {
+                        <div class="finishDayResult monetChangeLineStyle">
+                            <p class="fs-6">Деньги за клиента: @(data.ProfitPerClient)$</p>
+                        </div>
+                        }
+
+                        <div class="finishDayResult">
+                            <p class="fs-6">Получили денег: @(data.ProfitGained)$</p>
+                        </div>
                     </div>
-                </div>
                 }
             </div>
         </div>
