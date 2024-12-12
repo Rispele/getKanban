@@ -28,7 +28,9 @@
         @foreach (var team in Model.Teams)
         {
             <div class="commandEditorCommandContainer commandEditorBorderRadius">
-                <div class="commandEditorHeaders text-center" id="headers-@team.Id"></div>
+                <div class="commandEditorHeaders text-center edit-@team.Id" id="headers-@team.Id">
+                    
+                </div>
                 <div class="commandEditorNamesContainer text-center" id="@team.Id">
                     @foreach (var player in team.Participants.Users)
                     {
@@ -45,7 +47,9 @@
         }
     </div>
     <div class="commandEditorSWindow commandEditorWindowsHeight commandEditorBorderStyle commandEditorBorderWidth commandEditorBorderRadius">
-        <div class="commandEditorHeaders text-center" id="headers-@Model.Angels.Id"></div>
+        <div class="commandEditorHeaders text-center edit-@Model.Angels.Id" id="headers-@Model.Angels.Id">
+            
+        </div>
         <div class="commandEditorNamesContainer angelsEditor text-center" id="@Model.Angels.Id">
             @foreach (var player in Model.Angels.Participants.Users)
             {
@@ -202,12 +206,12 @@ else
                 </text>
             }
 
-            for (let teamId of teamIds) recreateEditBlock(teamId);
-            placeTeamNameEditButtons(teamIds.filter((x) => {return x !== `@Model.Angels.Id`}));
+            for (let teamId of teamIds) recreateEditHeaderBlock(teamId);
             placeTeamNames(teamIds, teamNames);
+            placeTeamNameEditButtons(teamIds.filter((x) => {return x !== `@Model.Angels.Id`}));
             placeTeamLinks(teamNames, teamIds, teamLinks);
         } else if (@((currentTeam is not null).ToString().ToLower())) {
-            for (let teamId of teamIds) recreateEditBlock(teamId);
+            for (let teamId of teamIds) recreateEditHeaderBlock(teamId);
             if (@((currentTeam is not null && currentTeam.Id != Model.Angels.Id).ToString().ToLower())) placeTeamNameEditButtons([`@currentTeam!.Id`]);
             placeTeamNames(teamIds, teamNames);
         }
@@ -217,7 +221,7 @@ else
         for (let teamId of teamIds) {
             const icon = buildIcon(`edit-button-${teamId}`, `/images/edit_button.svg`);
             icon.addEventListener(`click`, () => { replaceWithInput(teamId) });
-            getOrCreateEditBlock(teamId).appendChild(icon);
+            document.getElementsByClassName(`edit-${teamId}`)[0].appendChild(icon);
         }
 
         function replaceWithInput(teamId){
@@ -245,20 +249,17 @@ else
             backButton.setAttribute(`id`, `edit-back-${teamId}`);
             backButton.innerText = `Назад`;
             backButton.addEventListener(`click`, () => {refreshTeamsHeaders();});
-
-            const editBlock = getOrCreateEditBlock(teamId);
-            editBlock.appendChild(saveButton);
-            editBlock.appendChild(input);
-            editBlock.appendChild(backButton);
+            
+            headersBlock.appendChild(saveButton);
+            headersBlock.appendChild(input);
+            headersBlock.appendChild(backButton);
         }
     }
 
     function placeTeamNames(teamIds, teamNames) {
         for (let i = 0; i < teamIds.length; i++) {
-            const text = document.createElement(`p`);
-            text.setAttribute(`id`, `edit-name-${teamIds[i]}`);
-            text.innerText = teamNames[i];
-            getOrCreateEditBlock(teamIds[i]).appendChild(text);
+            
+            getOrCreateEditBlock(teamIds[i]).innerText = teamNames[i];
         }
     }
 
@@ -284,19 +285,16 @@ else
         return image;
     }
 
-    function recreateEditBlock(teamId) {
-        let editBlock = document.getElementById(`edit-${teamId}`);
-        if (editBlock !== null && editBlock !== undefined) {editBlock.remove();}
-        editBlock = document.createElement(`p`);
-        editBlock.setAttribute(`class`, `fs-6`);
-        editBlock.setAttribute(`id`, `edit-${teamId}`);
-        document.getElementById(`headers-${teamId}`).appendChild(editBlock);
-        return editBlock;
+    function recreateEditHeaderBlock(teamId) {
+        let editHeaderBlock = document.getElementsByClassName(`edit-${teamId}`)[0];
+        if (editHeaderBlock !== null && editHeaderBlock !== undefined) {editHeaderBlock.innerHTML = ``; editHeaderBlock.textContent = ``;}
+        
+        return editHeaderBlock;
     }
 
     function getOrCreateEditBlock(teamId) {
-        let editBlock = document.getElementById(`edit-${teamId}`);
-        return editBlock !== null && editBlock !== undefined ? editBlock : recreateEditBlock(teamId);
+        let editBlock = document.getElementsByClassName(`edit-${teamId}`)[0];
+        return editBlock !== null && editBlock !== undefined ? editBlock : recreateEditHeaderBlock(teamId);
     }
 </script>
 
