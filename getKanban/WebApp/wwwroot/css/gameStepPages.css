@@ -40,6 +40,31 @@
 }
 
 .stepControlButtons {
+    position: absolute;
+
+    bottom: 50px;
+
+    width: 20%;
+    min-width: 50px;
+    max-width: 100px;
+    height: 40px;
+
+    border-radius: 15px;
+
+    background-color: #363636;
+
+    color: white;
+}
+
+.rightButton {
+    right: 5%;
+}
+
+.leftButton {
+    left: 5%;
+}
+
+.stepControlButtonsNonGlobal {
     margin-top: 40px;
 
     width: 20%;
@@ -52,12 +77,12 @@
     color: white;
 }
 
-.leftButton {
+.leftButtonNonGlobal {
     margin-left: 10%;
     /*margin-right: 130px;*/
 }
 
-.rightButton {
+.rightButtonNonGlobal {
     margin-left: 40%;
 }
 
@@ -90,15 +115,15 @@
 }
 
 @media (min-width: 1500px) {
-    .stepControlButtons {
+    .stepControlButtonsNonGlobal {
         width: 30%;
     }
 
-    .leftButton {
+    .leftButtonNonGlobal {
         margin-left: 10%;
     }
 
-    .rightButton {
+    .rightButtonNonGlobal {
         margin-left: 20%;
     }
 }
@@ -107,16 +132,16 @@
     .infoContainer {
         width: 80%;
     }
-
-    .stepControlButtons {
+    
+    .stepControlButtonsNonGlobal {
         width: 40%;
     }
 
-    .leftButton {
+    .leftButtonNonGlobal {
         margin-left: 5%;
     }
 
-    .rightButton {
+    .rightButtonNonGlobal {
         margin-left: 10%;
     }
 }
