@@ -29,7 +29,7 @@
         {
             <div class="commandEditorCommandContainer commandEditorBorderRadius">
                 <div class="commandEditorHeaders text-center edit-@team.Id" id="headers-@team.Id">
-                    
+                    <div class="teamManageButtons manage-@team.Id"></div>
                 </div>
                 <div class="commandEditorNamesContainer text-center" id="@team.Id">
                     @foreach (var player in team.Participants.Users)
@@ -48,7 +48,7 @@
     </div>
     <div class="commandEditorSWindow commandEditorWindowsHeight commandEditorBorderStyle commandEditorBorderWidth commandEditorBorderRadius">
         <div class="commandEditorHeaders text-center edit-@Model.Angels.Id" id="headers-@Model.Angels.Id">
-            
+            <div class="teamManageButtons manage-@Model.Angels.Id"></div>
         </div>
         <div class="commandEditorNamesContainer angelsEditor text-center" id="@Model.Angels.Id">
             @foreach (var player in Model.Angels.Participants.Users)
@@ -212,8 +212,8 @@ else
             placeTeamLinks(teamNames, teamIds, teamLinks);
         } else if (@((currentTeam is not null).ToString().ToLower())) {
             for (let teamId of teamIds) recreateEditHeaderBlock(teamId);
-            if (@((currentTeam is not null && currentTeam.Id != Model.Angels.Id).ToString().ToLower())) placeTeamNameEditButtons([`@currentTeam!.Id`]);
             placeTeamNames(teamIds, teamNames);
+            if (@((currentTeam is not null && currentTeam.Id != Model.Angels.Id).ToString().ToLower())) placeTeamNameEditButtons([`@currentTeam!.Id`]);
         }
     }
 
@@ -221,7 +221,7 @@ else
         for (let teamId of teamIds) {
             const icon = buildIcon(`edit-button-${teamId}`, `/images/edit_button.svg`);
             icon.addEventListener(`click`, () => { replaceWithInput(teamId) });
-            document.getElementsByClassName(`edit-${teamId}`)[0].appendChild(icon);
+            document.getElementsByClassName(`manage-${teamId}`)[0].appendChild(icon);
         }
 
         function replaceWithInput(teamId){
@@ -258,8 +258,7 @@ else
 
     function placeTeamNames(teamIds, teamNames) {
         for (let i = 0; i < teamIds.length; i++) {
-            
-            getOrCreateEditBlock(teamIds[i]).innerText = teamNames[i];
+            getOrCreateEditBlock(teamIds[i]).innerHTML = `${teamNames[i]}<div class="teamManageButtons manage-${teamIds[i]}"></div>`
         }
     }
 
@@ -268,9 +267,9 @@ else
             const teamIcon = buildIcon(`link-${teamInviteLinks[i]}`, `/images/link_button.svg`);
             teamIcon.addEventListener(`click`, () => {
                 navigator.clipboard.writeText(teamInviteLinks[i])
-                    .then(() => showMessage(`Код приглашения в команду "${teamNames[i]}" скопирован`, false))
+                    .then(() => showMessage(`Код приглашения в команду ${teamNames[i]} скопирован`, false))
             });
-            getOrCreateEditBlock(teamIds[i]).appendChild(teamIcon);
+            document.getElementsByClassName(`manage-${teamIds[i]}`)[0].appendChild(teamIcon);
         }
     }
 
@@ -287,7 +286,11 @@ else
 
     function recreateEditHeaderBlock(teamId) {
         let editHeaderBlock = document.getElementsByClassName(`edit-${teamId}`)[0];
-        if (editHeaderBlock !== null && editHeaderBlock !== undefined) {editHeaderBlock.innerHTML = ``; editHeaderBlock.textContent = ``;}
+        if (editHeaderBlock !== null && editHeaderBlock !== undefined) {
+            editHeaderBlock.innerHTML = ``;
+            editHeaderBlock.textContent = `<div class="teamManageButtons manage-${teamId}"></div>`;
+            editHeaderBlock.innerHTML = `<div class="teamManageButtons manage-${teamId}"></div>`;
+        }
         
         return editHeaderBlock;
     }
