@@ -1,22 +1,19 @@
-﻿<script src="/js/signalr/dist/browser/signalr.js"></script>
+﻿<script src="/js/fetchJSON.js"></script>
+<script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
     async function joinSession() {
         const inviteCode = document.getElementById("inviteCode").value.toString();
         if (inviteCode.length === 0) {
-            showMessage("Код приглашения должен быть заполнен");
+            showMessage("Код приглашения должен быть заполнен", MessageType.ERROR);
             return;
         }
         
-        await fetch(`/session/join?inviteCode=${inviteCode}`, {redirect: "follow"})
-            .then(sessionId => sessionId.json())
-            .then(sessionId => {
-                if (sessionId.length === 0) {
-                    showMessage("Невозможно присоединиться к сессии с данным кодом приглашения");
-                    return;
-                }
-                
-                window.location.href = `/session/${sessionId}`;
-            });
+        const sessionId = await fetchJSON(`/session/join?inviteCode=${inviteCode}`, {redirect: "follow"})
+        if (sessionId.length === 0) {
+            showMessage("Невозможно присоединиться к сессии с данным кодом приглашения", MessageType.ERROR);
+            return;
+        }
+        window.location.href = `/session/${sessionId}`;
     }
 </script>
 

@@ -10,6 +10,7 @@
     </div>
 </div>
 
+<script src="~/js/fetchJSON.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script>
     function imposeMinMax(evt){
@@ -25,28 +26,21 @@
     async function createGameSession() {
         const teamsCountString = document.getElementById("teamsCount").value
         if (teamsCountString.length === 0) {
-            showMessage("Число команд должно быть заполнено");
+            showMessage("Число команд должно быть заполнено", MessageType.ERROR);
             return;
         }
         const teamsCount = parseInt(teamsCountString);
         if (teamsCount <= 0) {
-            showMessage("Число команд должно быть положительным");
+            showMessage("Число команд должно быть положительным", MessageType.ERROR);
             return;
         }
         const sessionName = document.getElementById("sessionName").value;
         if (sessionName.length === 0) {
-            showMessage("Название игры должно быть заполнено");
+            showMessage("Название игры должно быть заполнено", MessageType.ERROR);
             return;
         }
         
-        fetch(`/session/create-session?sessionName=${sessionName}&teamsCount=${teamsCount}`)
-            .then(sessionId => sessionId.json())
-            .then(sessionId => {
-                window.location.href = `/session/${sessionId}`
-            });
+        const sessionId = await fetchJSON(`/session/create-session?sessionName=${sessionName}&teamsCount=${teamsCount}`);
+        window.location.href = `/session/${sessionId}`
     }
-
-
-
-
 </script>

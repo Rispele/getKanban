@@ -18,7 +18,7 @@
     Назад
 </button>
 
-@if (Model.ShouldFinishGame)
+@if (Model.IsLastDay)
 {
     <button class="stepControlButtons rightButton" id="finish-game">
         Закончить игру
@@ -31,7 +31,7 @@ else
     </button>
 }
 
-
+<script src="~/js/fetchJSON.js"></script>
 <script src="~/js/page-switch.js"></script>
 <script src="~/js/setup-hub-connection.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
@@ -44,30 +44,23 @@ else
         window.location.href = `/${sessionId}/${teamId}/step/game-result`;
     });
     
-    if (@((!Model.ShouldFinishGame).ToString().ToLower())) {
+    if (@((!Model.IsLastDay).ToString().ToLower())) {
         const nextDayButton = document.getElementById("next-day");
         if (nextDayButton !== null && nextDayButton !== undefined) {
-            nextDayButton.addEventListener('click', () => {
-                fetch(`/@Model.GameSessionId/@Model.TeamId/api/end-day`, {
-                    method: 'POST',
-                    headers: { "Content-Type": "application/json" },
-                }).then(() => {
-                    connection.invoke("FinishDay", "@Model.GameSessionId", "@Model.TeamId");
-                    connection.invoke("ChangePage", "@Model.GameSessionId", "@Model.TeamId", 1, 0)
-                        .then(() => {
-                            window.location.href = `/@Model.GameSessionId/@Model.TeamId/step/1`;
-                        });
-                })
+            nextDayButton.addEventListener('click', async () => {
+                await fetchPostJSON(`/@Model.GameSessionId/@Model.TeamId/api/end-day`);
+                await connection.invoke("FinishDay", "@Model.GameSessionId", "@Model.TeamId");
+                await connection.invoke("ChangePage", "@Model.GameSessionId", "@Model.TeamId", 1, 0)
+                window.location.href = `/@Model.GameSessionId/@Model.TeamId/step/1`;
             });
         }
     } else {
         const finishGameButton = document.getElementById("finish-game");
         if (finishGameButton !== null && finishGameButton !== undefined) {
-            finishGameButton.addEventListener('click', () => {
-                connection.invoke("ShowGameResult", "@Model.GameSessionId", "@Model.TeamId")
-                    .then(() => {
-                        window.location.href = `/@Model.GameSessionId/@Model.TeamId/step/game-result`;
-                    });
+            finishGameButton.addEventListener('click', async () => {
+                await fetchPostJSON(`/@Model.GameSessionId/@Model.TeamId/api/end-day`);
+                await connection.invoke("ShowGameResult", "@Model.GameSessionId", "@Model.TeamId")
+                window.location.href = `/@Model.GameSessionId/@Model.TeamId/step/game-result`;
             });
         }
     }

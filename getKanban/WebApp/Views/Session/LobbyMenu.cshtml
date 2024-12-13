@@ -6,11 +6,14 @@
 @{
     Context.Response.Cookies.Append(RequestContextKeys.SessionId, Model.Id.ToString());
     
-    var isAdmin = ((Model.RequesterRole & ParticipantRole.Creator) == ParticipantRole.Creator); 
+    var isAdmin = ((Model.RequesterRole & ParticipantRole.Creator) == ParticipantRole.Creator);
     var currentTeam = Model.Angels.Participants.Users.SingleOrDefault(x => x.Id == Model.RequesterId) != default
        ? Model.Angels
-       : Model.Teams.SingleOrDefault(x => x.Participants.Users.SingleOrDefault(u => u.Id == Model.RequesterId) != default);
-
+       : Model.Teams.Single(x => x.Participants.Users.SingleOrDefault(u => u.Id == Model.RequesterId) != default);
+    var allTeams = Model.Teams.Concat([Model.Angels]).ToArray();
+    var isCurrentTeamAngels = currentTeam.Name == "Ангелы";
+    var pageToRedirectWhenGameStarted = isCurrentTeamAngels ? $"/admin?sessionId={Model.Id}" : $"/{Model.Id}/{currentTeam.Id}/step/1";
+    
     var allPlayerIds = Model.Teams
         .SelectMany(x => x.Participants.Users)
         .Select(x => x.Id)
@@ -28,13 +31,11 @@
         @foreach (var team in Model.Teams)
         {
             <div class="commandEditorCommandContainer commandEditorBorderRadius">
-                <div class="commandEditorHeaders text-center edit-@team.Id" id="headers-@team.Id">
-                    <div class="teamManageButtons manage-@team.Id"></div>
-                </div>
-                <div class="commandEditorNamesContainer text-center" id="@team.Id">
+                <div class="commandEditorHeaders text-center" id="team-header-@team.Id"></div>
+                <div class="commandEditorNamesContainer text-center" id="team-@team.Id">
                     @foreach (var player in team.Participants.Users)
                     {
-                        <p class="fs-6" id="@player.Id">
+                        <p class="fs-6" id="user-@player.Id">
                             @player.Name
                             @if (isAdmin)
                             {
@@ -47,13 +48,11 @@
         }
     </div>
     <div class="commandEditorSWindow commandEditorWindowsHeight commandEditorBorderStyle commandEditorBorderWidth commandEditorBorderRadius">
-        <div class="commandEditorHeaders text-center edit-@Model.Angels.Id" id="headers-@Model.Angels.Id">
-            <div class="teamManageButtons manage-@Model.Angels.Id"></div>
-        </div>
-        <div class="commandEditorNamesContainer angelsEditor text-center" id="@Model.Angels.Id">
+        <div class="commandEditorHeaders text-center" id="team-header-@Model.Angels.Id"></div>
+        <div class="commandEditorNamesContainer angelsEditor text-center" id="team-@Model.Angels.Id">
             @foreach (var player in Model.Angels.Participants.Users)
             {
-                <p class="fs-6" id="@player.Id">
+                <p class="fs-6" id="user-@player.Id">
                     @player.Name
                     @if (isAdmin && player.Id != Model.RequesterId)
                     {
@@ -81,195 +80,228 @@ else
     </form>
 }
 
+<script src="~/js/fetchJSON.js"></script>
+<script src="~/js/value-helper.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script type="module" async="async">
+    const gameSessionId = `@Model.Id`;
+    const currentTeamId = `@currentTeam.Id`;
+    const currentUserId = `@Model.RequesterId`;
+    const otherUserIds = @Html.Raw(Json.Serialize(allPlayerIds.Except([Model.RequesterId]).ToArray()));
+    const pageToRedirectWhenGameStarted = `@pageToRedirectWhenGameStarted`;
+    const baseUrl = `/${gameSessionId}/${currentTeamId}/api`;
     const teamLinks = @Html.Raw(Json.Serialize(Model.Teams.Select(x => x.Participants.InviteCode).Concat([Model.Angels.Participants.InviteCode])));
-    const teamIds = @Html.Raw(Json.Serialize(Model.Teams.Select(x => x.Id).Concat([Model.Angels.Id])));
+    const allTeamIds = @Html.Raw(Json.Serialize(Model.Teams.Select(x => x.Id).Concat([Model.Angels.Id])));
     const teamNames = @Html.Raw(Json.Serialize(Model.Teams.Select(x => x.Name).Concat([Model.Angels.Name])));
+    const allTeamIdsExceptAngels = allTeamIds.filter((x) => {return x !== `@Model.Angels.Id`});
     
     const lobbyHubConnection = new signalR.HubConnectionBuilder().withUrl(`/lobbyHub`).build();
 
-    lobbyHubConnection.on(`NotifyClosed`, () => {window.location.href = `/`;});
-    lobbyHubConnection.on(`NotifyLeft`, userId => {
-        if (userId === `@Model.RequesterId`) {
+    lobbyHubConnection.on(`NotifyCloseGame`, () => {window.location.href = `/`;});
+    lobbyHubConnection.on(`NotifyLeaveGame`, userId => {
+        if (userId === currentUserId) {
             window.location.href = `/`;
             return;
         }
-        const playerElement = document.getElementById(userId);
+        const playerElement = document.getElementById(`user-${userId}`);
         const playerName = playerElement.textContent;
         playerElement.remove();
-        showMessage(`Игрок ${playerName} покидает игру`, false);
+        showMessage(`Игрок ${playerName} покидает игру`, MessageType.NOTIFICATION);
     });
-    lobbyHubConnection.on(`NotifyConnectionRestore`, userId => {
-        if (userId === `@Model.RequesterId`) {
-            showMessage(`Соединение с игрой восстановлено`);
+    lobbyHubConnection.on(`NotifyStartGame`, () => {
+        window.location.href = pageToRedirectWhenGameStarted;
+    });
+    lobbyHubConnection.on(`NotifyUpdateTeamName`, (teamId, teamName) => {
+        teamNames[allTeamIds.indexOf(teamId)] = teamName;
+        refreshTeamsHeaders();
+    });
+    lobbyHubConnection.on(`NotifyConnectionUpdate`, (userId, isConnected) => {
+        if (userId === currentUserId) {
+            showMessage(`Соединение с игрой ${isConnected ? `потеряно` : `восстановлено`}`, isConnected ? MessageType.ERROR : MessageType.SUCCESS);
         }
-        const playerElement = document.getElementById(userId);
-        const images = playerElement.getElementsByTagName(`img`);
-        for (let img of images) {if (img.id === `connection-lost-${userId}`) {img.remove();}}
-    });
-    lobbyHubConnection.on(`NotifyConnectionLost`, userId => {
-        if (userId === `@Model.RequesterId`) {
-            showMessage(`Соединение с игрой потеряно`);
+        const playerElement = document.getElementById(`user-${userId}`);
+        const connectionLostIcon = document.getElementById(`connection-lost-${userId}`);
+        if (hasValue(connectionLostIcon)) { connectionLostIcon.remove(); }
+        if (!isConnected) {
+            const connectionLostIcon = buildIcon(`connection-lost-${userId}`, `/images/disconnected_icon.svg`);
+            playerElement.appendChild(connectionLostIcon);
         }
-        const playerElement = document.getElementById(userId);
-        const images = playerElement.getElementsByTagName(`img`);
-        for (let img of images) {if (img.id === `connection-lost-${userId}`) {img.remove();}}
-        const connectionLostIcon = buildIcon(`connection-lost-${userId}`, `/images/disconnected_icon.svg`);
-        playerElement.appendChild(connectionLostIcon);
     });
-    lobbyHubConnection.on(`NotifyJoined`, (teamId, userId, userName) => {
-        const teamBlock = document.getElementById(teamId);
-        const teamPlayers = teamBlock.getElementsByClassName(`fs-6`);
-        for (let pl of teamPlayers) {if (pl.id === userId) { return; }}
+    lobbyHubConnection.on(`NotifyJoinGame`, (teamId, userId, userName) => {
+        const teamBlock = document.getElementById(`team-${teamId}`);
+        const teamUsers = teamBlock.getElementsByClassName(`fs-6`);
+        for (let user of teamUsers) {if (user.id === `user-${userId}`) { return; }}
         
-        let playerElementInOtherTeam = document.getElementById(userId);
-        if (playerElementInOtherTeam !== null && playerElementInOtherTeam !== undefined) {playerElementInOtherTeam.remove();}
+        const userInOtherTeam = document.getElementById(`user-${userId}`);
+        if (hasValue(userInOtherTeam) && userInOtherTeam.parentElement.id !== `team-${teamId}`) {
+            userInOtherTeam.remove();
+        }
 
         const playerElement = document.createElement(`p`);
         playerElement.setAttribute(`class`, `fs-6`);
-        playerElement.setAttribute(`id`, userId);
+        playerElement.setAttribute(`id`, `user-${userId}`);
         playerElement.textContent = userName;
 
-        const team = document.getElementById(teamId);
-
-        if (@isAdmin.ToString().ToLower()) {
+        @if (isAdmin)
+        {
+            <text>
             const removeButton = buildIcon(`remove-${userId}`, `/images/remove_button.svg`);
-            removeButton.addEventListener(`click`, () => {
-                lobbyHubConnection.invoke(`RemovePlayerFromSessionAndLobby`, `@Model.Id`, userId);
+            removeButton.addEventListener(`click`, async () => {
+                const isRemoved = await fetchPostJSON(`${baseUrl}/remove-user`, JSON.stringify(userId));
+                if (isRemoved) await lobbyHubConnection.invoke(`RemoveUser`, gameSessionId, userId);
             });
             playerElement.appendChild(removeButton);
+            </text>
         }
 
-        team.appendChild(playerElement);
+        document.getElementById(`team-${teamId}`).appendChild(playerElement);
 
-        const teamName = document.getElementById(`headers-${teamId}`).innerText;
-        showMessage(`Игрок ${userName} присоединяется к команде "${teamName}"`, false);
-    });
-    lobbyHubConnection.on(`NotifyStarted`, () => {
-        window.location.href = @((currentTeam!.Name == "Ангелы").ToString().ToLower())
-            ? `/admin?sessionId=@Model.Id`
-            : `/@Model.Id/@currentTeam.Id/step/1`;
-    });
-    lobbyHubConnection.on(`NotifyRenamed`, (teamId, teamName) => {
-        teamNames[teamIds.indexOf(teamId)] = teamName;
-        refreshTeamsHeaders();
+        const teamName = document.getElementById(`team-header-${teamId}`).innerText;
+        showMessage(`Игрок ${userName} присоединяется к команде ${teamName}`, MessageType.NOTIFICATION);
     });
     
-    await lobbyHubConnection.start()
-    .then(() => {
-        let path = window.location.pathname.split(`session/`)[1];
-        path = path.split(`/lobby-menu`)[0];
-        const inviteCode = path.replace(`/`, `.`);
+    await lobbyHubConnection.start();
     
-        lobbyHubConnection.invoke(`CheckPlayerJoinedSession`, inviteCode);
-        lobbyHubConnection.on(`NotifyPlayerCheck`, (hasJoined, userId) => {
-            if (hasJoined) {return;}
-            fetch(`/session/join?inviteCode=${inviteCode}`, {redirect: `follow`})
-            .then(sessionId => sessionId.json())
-            .then(sessionId => {
-                if (sessionId.length === 0) {
-                    showMessage(`Невозможно присоединиться к сессии с данным кодом приглашения`);
-                    return;
-                }
-                window.location.href = `/session/${sessionId}`;
-            });
-        });
-    })
-    .then(() => {lobbyHubConnection.invoke(`JoinLobby`, `@Model.Id`);});
+    const user = await fetchPostJSON(`${baseUrl}/check-user-joined`);
+    if (!hasValue(user)) {window.location.href = `/`;}
+    await lobbyHubConnection.invoke(`JoinGame`, gameSessionId, currentTeamId, user[`id`], user[`name`]);
     
-    if (@isAdmin.ToString().ToLower()) {
+    @if (isAdmin)
+    {
+        <text>
         document.getElementById(`start`).addEventListener(`click`, async () => {
-            await lobbyHubConnection.invoke(`StartGame`, `@Model.Id`);
+            await fetchPostJSON(`${baseUrl}/start-game`);
+            await lobbyHubConnection.invoke(`StartGame`, gameSessionId);
         });
         document.getElementById(`close`).addEventListener(`click`, async () => {
-            await lobbyHubConnection.invoke(`CloseLobby`, `@Model.Id`)
-                .then(() => { window.location.href = `/` });
+            await fetchPostJSON(`${baseUrl}/close-game`);
+            await lobbyHubConnection.invoke(`CloseGame`, gameSessionId);
+            window.location.href = `/`;
         });
-    } else {
-        document.getElementById(`leave`).addEventListener(`click`, async () => {
-            await lobbyHubConnection.invoke(`LeaveLobby`, `@Model.Id`)
-                .then(() => { window.location.href = `/` });
-        });
+        </text>
     }
-
+    else
+    {
+        <text>
+        document.getElementById(`leave`).addEventListener(`click`, async () => {
+            const leftUserId = await fetchPostJSON(`${baseUrl}/leave-game`);
+            if (hasValue(leftUserId)) {
+                await lobbyHubConnection.invoke(`LeaveGame`, gameSessionId, leftUserId);
+                window.location.href = `/`;
+            } else {
+                showMessage(`Ошибка сервера при выходе из игры`, MessageType.ERROR);
+            }
+        });
+        </text>
+    }
+    
     refreshTeamsHeaders();
 
     function refreshTeamsHeaders() {
-        if (@isAdmin.ToString().ToLower()) {
-            @foreach (var id in allPlayerIds.Except([Model.RequesterId]))
+        @if (isAdmin)
+        {
+            <text>
+            placeRemoveUserButtons(otherUserIds);
+            recreateEditBlocks(allTeamIds);
+            placeTeamNames(allTeamIds, teamNames);
+            placeTeamNameEditButtons(allTeamIdsExceptAngels);
+            placeTeamLinks(teamNames, allTeamIds, teamLinks);
+            </text>
+        }
+        else
+        {
+            <text>
+            recreateEditBlocks(allTeamIds);
+            placeTeamNames(allTeamIds, teamNames);
+            </text>
+            @if (currentTeam.Id != Model.Angels.Id)
             {
                 <text>
-                    document.getElementById(`remove-@id`).addEventListener(`click`, () => {
-                        lobbyHubConnection.invoke(`RemovePlayerFromSessionAndLobby`, `@Model.Id`, `@id`);
-                    });
+                placeTeamNameEditButtons([currentTeamId]);
                 </text>
             }
-
-            for (let teamId of teamIds) recreateEditHeaderBlock(teamId);
-            placeTeamNames(teamIds, teamNames);
-            placeTeamNameEditButtons(teamIds.filter((x) => {return x !== `@Model.Angels.Id`}));
-            placeTeamLinks(teamNames, teamIds, teamLinks);
-        } else if (@((currentTeam is not null).ToString().ToLower())) {
-            for (let teamId of teamIds) recreateEditHeaderBlock(teamId);
-            placeTeamNames(teamIds, teamNames);
-            if (@((currentTeam is not null && currentTeam.Id != Model.Angels.Id).ToString().ToLower())) placeTeamNameEditButtons([`@currentTeam!.Id`]);
         }
-    }
 
-    function placeTeamNameEditButtons(teamIds) {
-        for (let teamId of teamIds) {
-            const icon = buildIcon(`edit-button-${teamId}`, `/images/edit_button.svg`);
-            icon.addEventListener(`click`, () => { replaceWithInput(teamId) });
-            document.getElementsByClassName(`manage-${teamId}`)[0].appendChild(icon);
+        function recreateEditBlocks(teamIds) {
+            for (let teamId of teamIds) {
+                let editBlock = document.getElementById(`team-header-${teamId}`);
+                if (hasValue(editBlock)) {
+                    editBlock.innerHTML = `<div class="teamManageButtons" id="team-manage-buttons-${teamId}"></div>`;
+                }
+            }
+        }
+
+        function placeRemoveUserButtons(userIds) {
+            for (let userId of userIds) {
+                document.getElementById(`remove-${userId}`).addEventListener(`click`, async () => {
+                    const isRemoved = await fetchPostJSON(`${baseUrl}/remove-user`, JSON.stringify(userId));
+                    if (isRemoved) {
+                        await lobbyHubConnection.invoke(`RemoveUser`, gameSessionId, userId);
+                    } else {
+                        showMessage(`Ошибка сервера при удалении пользователя`, MessageType.ERROR);
+                    }
+                });
+            }
+        }
+
+        function placeTeamNameEditButtons(teamIds) {
+            for (let teamId of teamIds) {
+                const icon = buildIcon(`edit-button-${teamId}`, `/images/edit_button.svg`);
+                icon.addEventListener(`click`, () => { replaceWithInput(teamId) });
+                document.getElementById(`team-manage-buttons-${teamId}`).appendChild(icon);
+            }
         }
 
         function replaceWithInput(teamId){
-            const headersBlock = document.getElementById(`headers-${teamId}`);
+            const headersBlock = document.getElementById(`team-header-${teamId}`);
             headersBlock.innerHTML = ``;
 
             const input = document.createElement(`input`);
             input.setAttribute(`id`, `edit-input-${teamId}`);
 
-            const saveButton = document.createElement(`button`);
-            saveButton.setAttribute(`id`, `edit-submit-${teamId}`);
-            saveButton.innerText = `Сохранить`;
-            saveButton.addEventListener(`click`, () => {
+            const saveButton = buildIcon(`edit-submit-${teamId}`, `/images/save_button.svg`);
+            saveButton.addEventListener(`click`, async () => {
                 const teamName = input.value;
-                if (teamName.length <= 0) return;
-                
-                lobbyHubConnection.invoke(`UpdateName`, `@Model.Id`, teamId, teamName)
-                .then(() => {
-                    teamNames[teamIds.indexOf(teamId)] = teamName;
-                    refreshTeamsHeaders();
-                });
+                if (teamName.length <= 0) {
+                    showMessage(`Название команды не может быть строкой длины 0`, MessageType.ERROR);
+                    return;
+                }
+                const isUpdated = await fetchPostJSON(`${baseUrl}/update-team-name`,
+                    JSON.stringify({teamId: teamId, teamName: teamName}));
+                if (isUpdated) {
+                    await lobbyHubConnection.invoke(`UpdateTeamName`, gameSessionId, teamId, teamName);
+                    teamNames[allTeamIds.indexOf(teamId)] = teamName;
+                    showMessage(`Название команды успешно обновлено`, MessageType.SUCCESS)
+                } else {
+                    showMessage(`Ошибка сервера при обновлении названия команды`, MessageType.ERROR);
+                }
+                refreshTeamsHeaders();
             });
-            
-            const backButton = document.createElement(`button`);
-            backButton.setAttribute(`id`, `edit-back-${teamId}`);
-            backButton.innerText = `Назад`;
+
+            const backButton = buildIcon(`edit-back-${teamId}`, `/images/exit_button.svg`);
             backButton.addEventListener(`click`, () => {refreshTeamsHeaders();});
-            
+
             headersBlock.appendChild(saveButton);
             headersBlock.appendChild(input);
             headersBlock.appendChild(backButton);
         }
-    }
 
-    function placeTeamNames(teamIds, teamNames) {
-        for (let i = 0; i < teamIds.length; i++) {
-            getOrCreateEditBlock(teamIds[i]).innerHTML = `${teamNames[i]}<div class="teamManageButtons manage-${teamIds[i]}"></div>`
+        function placeTeamNames(teamIds, teamNames) {
+            for (let i = 0; i < teamIds.length; i++) {
+                document.getElementById(`team-header-${teamIds[i]}`).innerHTML =
+                    `${teamNames[i]}<div class="teamManageButtons" id="team-manage-buttons-${teamIds[i]}"></div>`
+            }
         }
-    }
 
-    function placeTeamLinks(teamNames, teamIds, teamInviteLinks) {
-        for (let i = 0; i < teamIds.length; i++) {
-            const teamIcon = buildIcon(`link-${teamInviteLinks[i]}`, `/images/link_button.svg`);
-            teamIcon.addEventListener(`click`, () => {
-                navigator.clipboard.writeText(teamInviteLinks[i])
-                    .then(() => showMessage(`Код приглашения в команду ${teamNames[i]} скопирован`, false))
-            });
-            document.getElementsByClassName(`manage-${teamIds[i]}`)[0].appendChild(teamIcon);
+        function placeTeamLinks(teamNames, teamIds, teamInviteLinks) {
+            for (let i = 0; i < teamIds.length; i++) {
+                const teamIcon = buildIcon(`link-${teamInviteLinks[i]}`, `/images/link_button.svg`);
+                teamIcon.addEventListener(`click`, async () => {
+                    await navigator.clipboard.writeText(teamInviteLinks[i])
+                    showMessage(`Код приглашения в команду ${teamNames[i]} скопирован`, MessageType.NOTIFICATION);
+                });
+                document.getElementById(`team-manage-buttons-${teamIds[i]}`).appendChild(teamIcon);
+            }
         }
     }
 
@@ -284,21 +316,6 @@ else
         return image;
     }
 
-    function recreateEditHeaderBlock(teamId) {
-        let editHeaderBlock = document.getElementsByClassName(`edit-${teamId}`)[0];
-        if (editHeaderBlock !== null && editHeaderBlock !== undefined) {
-            editHeaderBlock.innerHTML = ``;
-            editHeaderBlock.textContent = `<div class="teamManageButtons manage-${teamId}"></div>`;
-            editHeaderBlock.innerHTML = `<div class="teamManageButtons manage-${teamId}"></div>`;
-        }
-        
-        return editHeaderBlock;
-    }
-
-    function getOrCreateEditBlock(teamId) {
-        let editBlock = document.getElementsByClassName(`edit-${teamId}`)[0];
-        return editBlock !== null && editBlock !== undefined ? editBlock : recreateEditHeaderBlock(teamId);
-    }
 </script>
 
 <script>

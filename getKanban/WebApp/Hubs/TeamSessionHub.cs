@@ -1,18 +1,10 @@
-﻿using Core.Services.Contracts;
-using Domain.Game.Tickets;
+﻿using Domain.Game.Tickets;
 using Microsoft.AspNetCore.SignalR;
 
 namespace WebApp.Hubs;
 
 public class TeamSessionHub : Hub
 {
-	private readonly ITeamService teamService;
-
-	public TeamSessionHub(ITeamService teamService)
-	{
-		this.teamService = teamService;
-	}
-
 	public async Task Join(Guid sessionId, Guid teamId)
 	{
 		await AddCurrentConnectionToLobbyGroupAsync(GetGroupId(sessionId, teamId));

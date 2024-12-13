@@ -23,7 +23,7 @@ public interface IGameSessionService
 
 	public Task<TeamDto> GetCurrentTeam(RequestContext requestContext, Guid gameSessionId);
 
-	public Task UpdateTeamName(Guid sessionId, Guid teamId, string name);
+	public Task<bool> UpdateTeamName(Guid sessionId, Guid teamId, string name);
 
 	public Task<string> GetTeamName(Guid sessionId, Guid teamId);
 

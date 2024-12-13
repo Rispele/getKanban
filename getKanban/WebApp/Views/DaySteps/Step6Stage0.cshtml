@@ -85,6 +85,7 @@
     </button>
 </div>
 
+<script src="~/js/fetchJSON.js"></script>
 <script src="~/js/page-switch.js"></script>
 <script src="~/js/setup-hub-connection.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
@@ -92,23 +93,15 @@
     const connection = setupHubConnection(new signalR.HubConnectionBuilder(), "@Model.GameSessionId", "@Model.TeamId");
     setRollbackEvent(connection);
 
-    const invocation = (rowId, value, valueName) => {
+    const invocation = async (rowId, value, valueName) => {
         const intValue = parseInt(value);
         if (intValue < 0) {
-            showMessage(`Поля таблицы должны принимать неотрицательные значения`);
+            showMessage(`Поля таблицы должны принимать неотрицательные значения`, MessageType.ERROR);
         } else if (value === null || value === undefined || value.length === 0) {
-            showMessage(`Все поля таблицы должны быть заполнены значением 0 или больше`);
+            showMessage(`Все поля таблицы должны быть заполнены значением 0 или больше`, MessageType.ERROR);
         } else {
-            fetch("/@Model.GameSessionId/@Model.TeamId/api/update-cfd", {
-                    method: 'POST',
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({PatchType: valueName, Value: intValue})
-                }
-            ).then(() => {
-                connection.invoke(`CfdTableUpdate`, `@Model.GameSessionId`, `@Model.TeamId`, rowId, parseInt(value));
-            });
+            await fetchPostJSON(`/@Model.GameSessionId/@Model.TeamId/api/update-cfd`, JSON.stringify({PatchType: valueName, Value: intValue}));
+            await connection.invoke(`CfdTableUpdate`, `@Model.GameSessionId`, `@Model.TeamId`, rowId, parseInt(value));
         }
     };
 
@@ -122,7 +115,7 @@
         document.getElementById(rowId).value = value;
     });
     
-    document.getElementById('save-cfd').addEventListener('click', () => {
+    document.getElementById('save-cfd').addEventListener('click', async () => {
         const released = document.getElementById('released').value;
         const toDeploy = document.getElementById('to-deploy').value;
         const withTesters = document.getElementById('with-testers').value;
@@ -134,21 +127,16 @@
             withTesters === null || withTesters === undefined || withTesters.length === 0 || parseInt(withTesters) < 0 ||
             withProgrammers === null || withProgrammers === undefined || withProgrammers.length === 0 || parseInt(withProgrammers) < 0 ||
             withAnalysts === null || withAnalysts === undefined || withAnalysts.length === 0 || parseInt(withAnalysts) < 0) {
-            showMessage(`Все поля таблицы должны быть заполнены значением 0 или больше`);
+            showMessage(`Все поля таблицы должны быть заполнены значением 0 или больше`, MessageType.ERROR);
             return;
         }
         
-        fetch(`/@Model.GameSessionId/@Model.TeamId/api/check-valid-cfd`)
-        .then(isValid => isValid.json())
-        .then(isValid => {
-            if (!isValid) {
-                showMessage(`Поля таблицы содержат невалидные значения. Кумулятивная диаграмма не может быть заполнена`);
-            } else {
-                connection.invoke("ChangePage", "@Model.GameSessionId", "@Model.TeamId", 6, 1)
-                    .then(() => {
-                        window.location.href = `/@Model.GameSessionId/@Model.TeamId/step/6/1`;
-                    });
-            }
-        });
+        const isValid = await fetchJSON(`/@Model.GameSessionId/@Model.TeamId/api/check-valid-cfd`);
+        if (isValid) {
+            await connection.invoke("ChangePage", "@Model.GameSessionId", "@Model.TeamId", 6, 1);
+            window.location.href = `/@Model.GameSessionId/@Model.TeamId/step/6/1`;
+        } else {
+            showMessage(`Поля таблицы содержат невалидные значения. Кумулятивная диаграмма не может быть заполнена`, MessageType.ERROR);
+        }
     });
 </script>

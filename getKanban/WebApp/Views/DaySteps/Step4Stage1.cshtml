@@ -74,6 +74,7 @@
     </button>
 </div>
 
+<script src="~/js/fetchJSON.js"></script>
 <script src="~/js/popup.js"></script>
 <script src="~/js/page-switch.js"></script>
 <script src="~/js/setup-hub-connection.js"></script>
@@ -95,19 +96,12 @@
 
     const checkboxes = document.getElementsByClassName('checkboxCardInput');
     for (let checkbox of checkboxes) {
-        checkbox.addEventListener('change', () => {
+        checkbox.addEventListener('change', async () => {
             const remove = !checkbox.checked;
             const ticketId = checkbox.parentElement.getElementsByClassName('checkboxCardNumber')[0].textContent;
             console.log(ticketId);
-            fetch("/@Model.GameSessionId/@Model.TeamId/api/update-release", {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ TicketId: ticketId, Remove: remove })
-            }).then(() => {
-                connection.invoke("NotifyTicketReleased", "@Model.GameSessionId", "@Model.TeamId", ticketId);
-            });
+            await fetchPostJSON("/@Model.GameSessionId/@Model.TeamId/api/update-release", JSON.stringify({ TicketId: ticketId, Remove: remove }))
+            await connection.invoke("NotifyTicketReleased", "@Model.GameSessionId", "@Model.TeamId", ticketId);
         });
     }
 </script>

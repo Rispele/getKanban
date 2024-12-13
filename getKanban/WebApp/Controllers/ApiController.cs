@@ -1,11 +1,10 @@
-﻿using Core.Services.Contracts;
+﻿using Core.Dtos;
+using Core.Services.Contracts;
 using Domain.Game.Days.Commands;
 using Domain.Game.Days.DayContainers;
 using Domain.Game.Days.DayContainers.TeamMembers;
 using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
-using WebApp.Hubs;
 using WebApp.Models;
 using WebApp.Models.DayStepModels;
 
@@ -28,6 +27,61 @@ public class ApiController : Controller
 		this.domainInteractionService = domainInteractionService;
 	}
 
+	[HttpPost("remove-user")]
+	public async Task<bool> RemoveUser(Guid gameSessionId, Guid teamId, [FromBody] Guid userId)
+	{
+		var requestContext = RequestContextFactory.Build(Request);
+		var removed = await gameSessionService.RemoveParticipantAsync(requestContext, gameSessionId, userId);
+		return removed;
+	}
+	
+	[HttpPost("update-team-name")]
+	public async Task<bool> UpdateTeamName(Guid gameSessionId, Guid teamId, [FromBody] TeamNameUpdateDto teamNameUpdateDto)
+	{
+		var requestContext = RequestContextFactory.Build(Request);
+		
+		var updated = await gameSessionService.UpdateTeamName(gameSessionId, teamNameUpdateDto.TeamId, teamNameUpdateDto.TeamName);
+		return updated;
+	}
+	
+	[HttpPost("start-game")]
+	public async Task StartGame(Guid gameSessionId, Guid teamId)
+	{
+		var requestContext = RequestContextFactory.Build(Request);
+		await gameSessionService.StartGameAsync(requestContext, gameSessionId);
+	}
+	
+	[HttpPost("close-game")]
+	public async Task CloseGame(Guid gameSessionId, Guid teamId)
+	{
+		var requestContext = RequestContextFactory.Build(Request);
+		await gameSessionService.CloseGameSession(gameSessionId);
+	}
+	
+	[HttpPost("check-user-joined")]
+	public async Task<UserDto?> CheckUserJoined(Guid gameSessionId, Guid teamId)
+	{
+		var requestContext = RequestContextFactory.Build(Request);
+		try
+		{
+			var currentUser = await gameSessionService.GetCurrentUser(requestContext);
+			var team = await gameSessionService.GetCurrentTeam(requestContext, gameSessionId);
+			return currentUser;
+		}
+		catch (InvalidOperationException e)
+		{
+			return null;
+		}
+	}
+	
+	[HttpPost("leave-game")]
+	public async Task<Guid?> LeaveGame(Guid gameSessionId, Guid teamId)
+	{
+		var requestContext = RequestContextFactory.Build(Request);
+		var isRemoved = await gameSessionService.RemoveParticipantAsync(requestContext, gameSessionId);
+		return isRemoved ? requestContext.GetUserId() : null;
+	}
+
 	[HttpPost("another-team-roll")]
 	public async Task<AnotherTeamDiceRollModel> AnotherTeamRoll(Guid gameSessionId, Guid teamId)
 	{
@@ -46,17 +100,18 @@ public class ApiController : Controller
 	}
 
 	[HttpPost("save-roles-transformation")]
-	public async Task SaveRolesTransformation(Guid gameSessionId, Guid teamId, [FromBody] string[] transformation)
+	public async Task SaveRolesTransformation(Guid gameSessionId, Guid teamId, [FromBody] RoleTransformationDto roleTransformationDto)
 	{
 		var requestContext = RequestContextFactory.Build(Request);
-		var teamMemberId = long.Parse(transformation[0]);
-		var roleTo = Enum.Parse<TeamRole>(transformation[1]);
-		
 		await teamService.PatchDayAsync(
 			requestContext,
 			gameSessionId,
 			teamId,
-			new UpdateTeamRolesCommand { TeamMemberId = teamMemberId, To = roleTo });
+			new UpdateTeamRolesCommand
+			{
+				TeamMemberId = roleTransformationDto.TeamMemberId,
+				To =  Enum.Parse<TeamRole>(roleTransformationDto.RoleTo)
+			});
 	}
 
 	[HttpGet("check-valid-cfd")]
@@ -79,7 +134,7 @@ public class ApiController : Controller
 	}
 
 	[HttpPost("update-release")]
-	public async Task UpdateRelease([FromBody] TicketModel ticketModel, Guid gameSessionId, Guid teamId)
+	public async Task UpdateRelease(Guid gameSessionId, Guid teamId, [FromBody] TicketModel ticketModel)
 	{
 		var requestContext = RequestContextFactory.Build(Request);
 		await teamService.PatchDayAsync(
@@ -90,7 +145,7 @@ public class ApiController : Controller
 	}
 
 	[HttpPost("update-sprint-backlog")]
-	public async Task UpdateSprintBacklog([FromBody] TicketModel ticketModel, Guid gameSessionId, Guid teamId)
+	public async Task UpdateSprintBacklog(Guid gameSessionId, Guid teamId, [FromBody] TicketModel ticketModel)
 	{
 		var requestContext = RequestContextFactory.Build(Request);
 
@@ -105,7 +160,7 @@ public class ApiController : Controller
 	}
 
 	[HttpPost("update-cfd")]
-	public async Task UpdateCfd([FromBody] CfdEntryModel cfdEntryModel, Guid gameSessionId, Guid teamId)
+	public async Task UpdateCfd(Guid gameSessionId, Guid teamId, [FromBody] CfdEntryModel cfdEntryModel)
 	{
 		var requestContext = RequestContextFactory.Build(Request);
 		var patchType = Enum.Parse<UpdateCfdContainerPatchType>(cfdEntryModel.PatchType);
@@ -238,11 +293,11 @@ public class ApiController : Controller
 				return Redirect($"/{gameSessionId}/{teamId}/step/{step}");
 			}
 
-			await UpdateCfd(new CfdEntryModel() { PatchType = "WithAnalysts", Value = i }, gameSessionId, teamId);
-			await UpdateCfd(new CfdEntryModel() { PatchType = "WithProgrammers", Value = i + 1 }, gameSessionId, teamId);
-			await UpdateCfd(new CfdEntryModel() { PatchType = "WithTesters", Value = i + 2 }, gameSessionId, teamId);
-			await UpdateCfd(new CfdEntryModel() { PatchType = "ToDeploy", Value = i + 3 }, gameSessionId, teamId);
-			await UpdateCfd(new CfdEntryModel() { PatchType = "Released", Value = i + 4 }, gameSessionId, teamId);
+			await UpdateCfd(gameSessionId, teamId, new CfdEntryModel() { PatchType = "WithAnalysts", Value = i });
+			await UpdateCfd(gameSessionId, teamId, new CfdEntryModel() { PatchType = "WithProgrammers", Value = i + 1 });
+			await UpdateCfd(gameSessionId, teamId, new CfdEntryModel() { PatchType = "WithTesters", Value = i + 2 });
+			await UpdateCfd(gameSessionId, teamId, new CfdEntryModel() { PatchType = "ToDeploy", Value = i + 3 });
+			await UpdateCfd(gameSessionId, teamId, new CfdEntryModel() { PatchType = "Released", Value = i + 4 });
 
 			if (i == dayTo && step == 7)
 			{

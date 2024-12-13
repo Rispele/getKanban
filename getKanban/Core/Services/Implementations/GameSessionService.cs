@@ -103,6 +103,7 @@ public class GameSessionService : IGameSessionService
 
 		var user = await context.GetUserAsync(requestContext.GetUserId());
 
+		await RemoveParticipantAsync(requestContext, gameSessionId, user.Id);
 		var (teamId, updated) = session.AddByInviteCode(user, inviteCode);
 		await context.TrySaveChangesAsync();
 
@@ -170,11 +171,12 @@ public class GameSessionService : IGameSessionService
 		};
 	}
 
-	public async Task UpdateTeamName(Guid sessionId, Guid teamId, string name)
+	public async Task<bool> UpdateTeamName(Guid sessionId, Guid teamId, string name)
 	{
 		var team = await context.GetTeamAsync(sessionId, teamId);
 		team.Name = name;
-		await context.TrySaveChangesAsync();
+		var result = await context.TrySaveChangesAsync();
+		return result > 0;
 	}
 
 	public async Task<string> GetTeamName(Guid sessionId, Guid teamId)

@@ -1,26 +1,18 @@
 using Core.RequestContexts;
-using Core.Services.Contracts;
 using Microsoft.AspNetCore.SignalR;
 
 namespace WebApp.Hubs;
 
 public class LobbyHub : Hub
 {
-	private readonly IGameSessionService gameSessionService;
-
-	public LobbyHub(IGameSessionService gameSessionService)
-	{
-		this.gameSessionService = gameSessionService;
-	}
-
 	public override async Task OnConnectedAsync()
 	{
 		var requestContext = RequestContextFactory.Build(Context);
-		var currentUser = await gameSessionService.GetCurrentUser(requestContext);
+		var currentUserId = requestContext.GetUserId();
 		if (requestContext.Headers.TryGetValue(RequestContextKeys.SessionId, out var sessionId))
 		{
 			var sessionToNotifyId = Guid.Parse(sessionId ?? throw new InvalidOperationException());
-			await Clients.Group(GetGroupId(sessionToNotifyId)).SendAsync("NotifyConnectionRestore", currentUser.Id);
+			await Clients.Group(GetGroupId(sessionToNotifyId)).SendAsync("NotifyConnectionUpdate", currentUserId, true);
 		}
 		await base.OnConnectedAsync();
 	}
@@ -28,91 +20,52 @@ public class LobbyHub : Hub
 	public override async Task OnDisconnectedAsync(Exception? exception)
 	{
 		var requestContext = RequestContextFactory.Build(Context);
-		var currentUser = await gameSessionService.GetCurrentUser(requestContext);
+		var currentUserId = requestContext.GetUserId();
 		if (requestContext.Headers.TryGetValue(RequestContextKeys.SessionId, out var sessionId))
 		{
 			var sessionToNotifyId = Guid.Parse(sessionId ?? throw new InvalidOperationException());
-			await Clients.Group(GetGroupId(sessionToNotifyId)).SendAsync("NotifyConnectionLost", currentUser.Id);
+			await Clients.Group(GetGroupId(sessionToNotifyId)).SendAsync("NotifyConnectionUpdate", currentUserId, false);
 		}
 		await base.OnDisconnectedAsync(exception);
 	}
 
-	public async Task CloseLobby(Guid gameSessionId)
+	public async Task JoinGame(Guid gameSessionId, Guid teamId, Guid joinedUserId, string joinedUserName)
 	{
-		await gameSessionService.CloseGameSession(gameSessionId);
-
 		var groupId = GetGroupId(gameSessionId);
-		await RemoveCurrentConnectionFromLobbyGroupAsync(groupId);
-		await Clients.OthersInGroup(groupId).SendAsync("NotifyClosed");
+		await AddCurrentConnectionToLobbyGroupAsync(groupId);
+		await Clients.OthersInGroup(groupId).SendAsync("NotifyJoinGame", teamId, joinedUserId, joinedUserName);
 	}
 	
-	public async Task LeaveLobby(Guid gameSessionId)
+	public async Task RemoveUser(Guid gameSessionId, Guid userId)
 	{
-		var requestContext = RequestContextFactory.Build(Context);
-		var currentUser = await gameSessionService.GetCurrentUser(requestContext);
-		await gameSessionService.RemoveParticipantAsync(requestContext, gameSessionId);
-
 		var groupId = GetGroupId(gameSessionId);
-		await RemoveCurrentConnectionFromLobbyGroupAsync(groupId);
-		await Clients.OthersInGroup(groupId).SendAsync("NotifyLeft", currentUser.Id);
-	}
-	
-	public async Task JoinLobby(Guid gameSessionId)
-	{
-		var requestContext = RequestContextFactory.Build(Context);
-		var currentUser = await gameSessionService.GetCurrentUser(requestContext);
-		try
-		{
-			var team = await gameSessionService.GetCurrentTeam(requestContext, gameSessionId);
-			var groupId = GetGroupId(gameSessionId);
-			await AddCurrentConnectionToLobbyGroupAsync(groupId);
-			await Clients.OthersInGroup(groupId).SendAsync("NotifyJoined", team.Id, currentUser.Id, currentUser.Name);
-		}
-		catch (InvalidOperationException e)
-		{
-		}
-	}
-	
-	public async Task CheckPlayerJoinedSession(string inviteCode)
-	{
-		var requestContext = RequestContextFactory.Build(Context);
-		var currentUser = await gameSessionService.GetCurrentUser(requestContext);
-		var session = await gameSessionService.FindGameSession(requestContext, inviteCode, true);
-		
-		if (session!.Angels.Participants.Users.All(x => x.Id != currentUser.Id)
-		    && session.Teams.All(x => x.Participants.Users.All(p => p.Id != currentUser.Id)))
-		{
-			await Clients.Caller.SendAsync("NotifyPlayerCheck", false, currentUser.Id);
-		}
-		await Clients.Caller.SendAsync("NotifyPlayerCheck", true, currentUser.Id);
+		await Clients.Group(groupId).SendAsync("NotifyLeaveGame", userId);
 	}
 
-	public async Task RemovePlayerFromSessionAndLobby(Guid sessionId, Guid userId)
+	public async Task UpdateTeamName(Guid gameSessionId, Guid teamId, string teamName)
 	{
-		var requestContext = RequestContextFactory.Build(Context);
-		var removed = await gameSessionService.RemoveParticipantAsync(requestContext, sessionId, userId);
-		if (removed)
-		{
-			await Clients.Group(GetGroupId(sessionId)).SendAsync("NotifyLeft", userId);
-		}
-	}
-
-	public async Task UpdateName(Guid sessionId, Guid teamId, string teamName)
-	{
-		await gameSessionService.UpdateTeamName(sessionId, teamId, teamName);
-		var groupId = GetGroupId(sessionId);
-
-		await Clients.Group(groupId).SendAsync("NotifyRenamed", teamId.ToString(), teamName);
+		var groupId = GetGroupId(gameSessionId);
+		await Clients.Group(groupId).SendAsync("NotifyUpdateTeamName", teamId.ToString(), teamName);
 	}
 
 	public async Task StartGame(Guid gameSessionId)
 	{
-		var requestContext = RequestContextFactory.Build(Context);
-
-		await gameSessionService.StartGameAsync(requestContext, gameSessionId);
-
 		var groupId = GetGroupId(gameSessionId);
-		await Clients.Group(groupId).SendAsync("NotifyStarted");
+		await Clients.Group(groupId).SendAsync("NotifyStartGame");
+	}
+	
+	public async Task CloseGame(Guid gameSessionId)
+	{
+		var groupId = GetGroupId(gameSessionId);
+		await RemoveCurrentConnectionFromLobbyGroupAsync(groupId);
+		await Clients.OthersInGroup(groupId).SendAsync("NotifyCloseGame");
+	}
+	
+	public async Task LeaveGame(Guid gameSessionId, Guid leftUserId)
+	{
+		var groupId = GetGroupId(gameSessionId);
+		await RemoveCurrentConnectionFromLobbyGroupAsync(groupId);
+		await Clients.OthersInGroup(groupId).SendAsync("NotifyLeaveGame", leftUserId);
 	}
 
 	public async Task TeamGameResultReveal(Guid gameSessionId, Guid teamId)
