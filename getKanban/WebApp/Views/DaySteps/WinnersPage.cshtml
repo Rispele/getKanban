@@ -1,11 +1,13 @@
 ﻿@model WebApp.Models.DayStepModels.GameResultModel
 
 @{
-    var clientWinnerTeamName = Model.TeamResultModels.MaxBy(x => x.ClientsCount)!.TeamName;
-    var moneyWinnerTeamName = Model.TeamResultModels.MaxBy(x => x.MoneyCount)!.TeamName;
+    var clientSorted = Model.TeamResultModels.OrderByDescending(x => x.ClientsCount).ToArray();
+    var clientWinnerTeamId = clientSorted[0].ClientsCount != clientSorted[1].ClientsCount ? clientSorted[0].TeamId : Guid.Empty;
+    var moneySorted = Model.TeamResultModels.OrderByDescending(x => x.MoneyCount).ToArray();
+    var moneyWinnerTeamId = moneySorted[0].MoneyCount != moneySorted[1].MoneyCount ? moneySorted[0].TeamId : Guid.Empty;
 
-    string GetTeamClassName(string teamName) =>
-        (clientWinnerTeamName == teamName, moneyWinnerTeamName == teamName) switch
+    string GetTeamClassName(Guid teamId) =>
+        (clientWinnerTeamId == teamId, moneyWinnerTeamId == teamId) switch
         {
             ((true, true)) => "finalMegaWinner",
             ((true, false)) => "finalClientWinnerStyle",
@@ -22,7 +24,7 @@
 
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/setup-hub-connection.js"></script>
-<script>
+<script type="module">
     showWaitMessage(@Model.TeamResultModels.Where(x => x.IsTeamSessionEnded).ToList().Count);
     
     const connection = new signalR.HubConnectionBuilder().withUrl(`/lobbyHub`).build();
@@ -48,8 +50,7 @@
     }
     
     function tryBuildResultElements() {
-        if (finishedTeams.length === @Model.TeamResultModels.Count &&
-            @(Model.TeamResultModels.All(x => x.IsTeamSessionEnded).ToString().ToLower())) {
+        if (finishedTeams.length === @Model.TeamResultModels.Count) {
             
             const container = document.getElementsByClassName(`container7`)[0];
             container.innerHTML = ``;
@@ -58,22 +59,22 @@
             {
                 <text>
                 let finalCommandContainer@(i) = document.createElement(`div`);
-                finalCommandContainer.className = `finalCommandContainer`;
+                finalCommandContainer@(i).className = `finalCommandContainer`;
 
                 let finalCommandResult@(i) = document.createElement(`div`);
-                finalCommandResult.className = `finalCommandResult`;
+                finalCommandResult@(i).className = `finalCommandResult`;
 
                 let finalCommand@(i) = document.createElement(`div`);
-                finalCommand.className = `finalCommand @Html.Raw(GetTeamClassName(teamResult.TeamName))`;
+                finalCommand@(i).className = `finalCommand @Html.Raw(GetTeamClassName(teamResult.TeamId))`;
                 let teamName@(i) = document.createElement(`h`);
-                teamName.className = `fs-5 fw-bold text-center`;
-                teamName.textContent = `@Html.Raw(teamResult.TeamName)`;
+                teamName@(i).className = `fs-5 fw-bold text-center`;
+                teamName@(i).textContent = `@Html.Raw(teamResult.TeamName)`;
                 let clientsCount@(i) = document.createElement(`h`);
-                clientsCount.className = `fs-6 fw-normal text-center`;
-                clientsCount.textContent = `Клиенты: @teamResult.ClientsCount`;
+                clientsCount@(i).className = `fs-6 fw-normal text-center`;
+                clientsCount@(i).textContent = `Клиенты: @teamResult.ClientsCount`;
                 let moneyCount@(i) = document.createElement(`h`);
-                moneyCount.className = `fs-6 fw-normal text-center`;
-                moneyCount.textContent = `Деньги: @teamResult.MoneyCount`;
+                moneyCount@(i).className = `fs-6 fw-normal text-center`;
+                moneyCount@(i).textContent = `Деньги: @teamResult.MoneyCount`;
 
                 finalCommand@(i).appendChild(teamName@(i));
                 finalCommand@(i).appendChild(clientsCount@(i));
@@ -88,19 +89,23 @@
             }
         }
     }
-    
-    connection.start()
-    .then(() => {
-        connection.invoke(`TeamGameResultReveal`, `@Model.SessionId`, `@Model.RequesterTeamId`);
-    });
-    
-    connection.on(`NotifyTeamGameResultAppeared`, (teamId) => {
+
+    connection.on(`NotifyResult`, (teamId) => {
         if (finishedTeams.indexOf(teamId) < 0) {
             finishedTeams.push(teamId);
         }
         showWaitMessage(finishedTeams.length);
         tryBuildResultElements();
     });
+    
+    await connection.start();
+    await connection.invoke(`ConnectExplicit`, `@Model.SessionId`);
+    @if (Model.TeamResultModels.Single(x => x.TeamId == Model.RequesterTeamId).IsTeamSessionEnded)
+    {
+        <text>
+        await connection.invoke(`TeamGameResultReveal`, `@Model.SessionId`, `@Model.RequesterTeamId`);
+        </text>
+    }
     
     document.getElementById(`next`).addEventListener(`click`, () => {
         window.location.href = `/`;

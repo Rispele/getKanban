@@ -208,6 +208,8 @@ public class GameSessionService : IGameSessionService
 	public async Task<bool> CheckValidCfd(RequestContext requestContext, Guid gameSessionId, Guid teamId)
 	{
 		var team = await context.GetTeamAsync(gameSessionId, teamId);
-		return team.CurrentlyAwaitedCommands.Any(x => x.CommandType is DayCommandType.EndDay);
+		//var isEndDayAwaited = team.CurrentlyAwaitedCommands.Any(x => x.CommandType is DayCommandType.EndDay);
+		var isCfdValid = team.IsCurrentDayCfdValid();
+		return isCfdValid;
 	}
 }

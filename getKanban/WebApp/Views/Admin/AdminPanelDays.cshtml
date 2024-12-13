@@ -10,7 +10,7 @@
     <hr class="divider">
     <div class="container2">
 
-        @for (var i = Model.StartDayNumber; i < Model.CurrentDay.Number; i++)
+        @for (var i = Model.StartDayNumber; i < Model.CurrentDay.Number + (Model.IsFinished ? 1 : 0); i++)
         {
             <div class="checkboxCardsMargin">
                 <div class="checkboxCardContainer previousDayStyle">
@@ -20,18 +20,20 @@
                 </div>
             </div>
         }
-
-        <div class="checkboxCardsMargin">
-            <div class="checkboxCardContainer currentDayStyle">
-                <div class="checkboxCardContent">
-                    <h2 class="checkboxCardNumber">День @Model.CurrentDay.Number</h2>
-                    <img class="restart" src="/images/restart_button.svg" alt="restart">
-                    @* <img class="settings" src="/images/settings_button.svg" alt="settings"> *@
+        @if (!Model.IsFinished)
+        {
+            <div class="checkboxCardsMargin">
+                <div class="checkboxCardContainer currentDayStyle">
+                    <div class="checkboxCardContent">
+                        <h2 class="checkboxCardNumber">День @Model.CurrentDay.Number</h2>
+                        <img class="restart" src="/images/restart_button.svg" alt="restart">
+                        @* <img class="settings" src="/images/settings_button.svg" alt="settings"> *@
+                    </div>
                 </div>
             </div>
-        </div>
+        }
 
-        @for (var i = Model.CurrentDay.Number + 1; i < Model.FinishDayNumber + 1; i++)
+        @for (var i = Model.CurrentDay.Number + 1; i <= Model.FinishDayNumber; i++)
         {
             <div class="checkboxCardsMargin">
                 <div class="checkboxCardContainer">

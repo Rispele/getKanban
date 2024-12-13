@@ -145,18 +145,26 @@ public class ApiController : Controller
 	}
 
 	[HttpPost("update-sprint-backlog")]
-	public async Task UpdateSprintBacklog(Guid gameSessionId, Guid teamId, [FromBody] TicketModel ticketModel)
+	public async Task<bool> UpdateSprintBacklog(Guid gameSessionId, Guid teamId, [FromBody] TicketModel ticketModel)
 	{
 		var requestContext = RequestContextFactory.Build(Request);
 
-		await teamService.PatchDayAsync(
-			requestContext,
-			gameSessionId,
-			teamId,
-			new UpdateSprintBacklogCommand
-			{
-				TicketIds = [ticketModel.TicketId], Remove = ticketModel.Remove
-			});
+		try
+		{
+			await teamService.PatchDayAsync(
+				requestContext,
+				gameSessionId,
+				teamId,
+				new UpdateSprintBacklogCommand
+				{
+					TicketIds = [ticketModel.TicketId], Remove = ticketModel.Remove
+				});
+			return true;
+		}
+		catch (Exception e)
+		{
+			return false;
+		}
 	}
 
 	[HttpPost("update-cfd")]

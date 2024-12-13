@@ -76,6 +76,7 @@
 </div>
 
 <script src="~/js/fetchJSON.js"></script>
+<script src="~/js/value-helper.js"></script>
 <script src="~/js/page-switch.js"></script>
 <script src="~/js/setup-hub-connection.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
@@ -126,11 +127,11 @@
             }
             
             console.log(ticketId);
-            const response = await fetchPostJSON("/@Model.GameSessionId/@Model.TeamId/api/update-sprint-backlog",
+            const updated = await fetchPostJSON("/@Model.GameSessionId/@Model.TeamId/api/update-sprint-backlog",
                 JSON.stringify({ ticketId: ticketId, remove: remove }));
-            if (!response.ok) {
-                console.log("Shit");
+            if (!hasValue(updated) || !updated) {
                 checkbox.checked = !checkbox.checked;
+                showMessage(`Ошибка сервера при выборе тикета`, MessageType.ERROR);
                 return;
             }
             await connection.invoke("NotifyTicketTakenToSpringBacklog", "@Model.GameSessionId", "@Model.TeamId", ticketId);

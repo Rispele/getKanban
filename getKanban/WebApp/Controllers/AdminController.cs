@@ -65,7 +65,8 @@ public class AdminController : Controller
 			CurrentDay = new DayDtoConverter().Convert(team, currentDay),
 			StartDayNumber = 9,
 			FinishDayNumber = 18,
-			TeamStatistic = teamStatistic
+			TeamStatistic = teamStatistic,
+			IsFinished = team.IsTeamSessionEnded
 		});
 	}
 

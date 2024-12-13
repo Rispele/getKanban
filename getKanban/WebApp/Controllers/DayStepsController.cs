@@ -311,7 +311,9 @@ public class DayStepsController : Controller
 			ignorePermissions: true);
 
 		var model = new GameResultModel() { TeamResultModels = [] };
-
+		model.RequesterTeamId = (await gameSessionService.GetCurrentTeam(requestContext, gameSessionId)).Id;
+		model.SessionId = gameSessionId;
+		
 		foreach (var team in session!.Teams)
 		{
 			var statistic = await statisticsService.CollectStatistic(gameSessionId, teamId);

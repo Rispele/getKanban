@@ -68,10 +68,16 @@ public class LobbyHub : Hub
 		await Clients.OthersInGroup(groupId).SendAsync("NotifyLeaveGame", leftUserId);
 	}
 
+	public async Task ConnectExplicit(Guid gameSessionId)
+	{
+		var groupId = GetGroupId(gameSessionId);
+		await AddCurrentConnectionToLobbyGroupAsync(groupId);
+	}
+
 	public async Task TeamGameResultReveal(Guid gameSessionId, Guid teamId)
 	{
 		var groupId = GetGroupId(gameSessionId);
-		await Clients.Group(groupId).SendAsync("NotifyTeamGameResultAppeared", teamId);
+		await Clients.Group(groupId).SendAsync("NotifyResult", teamId);
 	}
 	
 	private async Task AddCurrentConnectionToLobbyGroupAsync(string groupId)

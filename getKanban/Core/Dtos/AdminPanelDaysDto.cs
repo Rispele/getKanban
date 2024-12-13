@@ -17,4 +17,6 @@ public class AdminPanelDaysDto
 	public int FinishDayNumber { get; init; }
 	
 	public TeamStatisticDto? TeamStatistic { get; set; }
+
+	public bool IsFinished { get; set; }
 }

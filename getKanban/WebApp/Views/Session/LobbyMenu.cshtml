@@ -128,6 +128,8 @@ else
         }
     });
     lobbyHubConnection.on(`NotifyJoinGame`, (teamId, userId, userName) => {
+        const teamName = document.getElementById(`team-header-${teamId}`).innerText;
+    
         const teamBlock = document.getElementById(`team-${teamId}`);
         const teamUsers = teamBlock.getElementsByClassName(`fs-6`);
         for (let user of teamUsers) {if (user.id === `user-${userId}`) { return; }}
@@ -135,6 +137,7 @@ else
         const userInOtherTeam = document.getElementById(`user-${userId}`);
         if (hasValue(userInOtherTeam) && userInOtherTeam.parentElement.id !== `team-${teamId}`) {
             userInOtherTeam.remove();
+            showMessage(`Игрок ${userName} меняет команду`, MessageType.NOTIFICATION);
         }
 
         const playerElement = document.createElement(`p`);
@@ -155,8 +158,7 @@ else
         }
 
         document.getElementById(`team-${teamId}`).appendChild(playerElement);
-
-        const teamName = document.getElementById(`team-header-${teamId}`).innerText;
+        
         showMessage(`Игрок ${userName} присоединяется к команде ${teamName}`, MessageType.NOTIFICATION);
     });
     
