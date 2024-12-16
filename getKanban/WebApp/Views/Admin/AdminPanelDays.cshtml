@@ -2,7 +2,7 @@
 @model Core.Dtos.AdminPanelDaysDto
 
 <div class="stepHeader">
-    <h1 class="fs-1 text-center">Команда @Html.Raw(Model.TeamName)r</h1>
+    <h1 class="fs-1 text-center">Команда @Html.Raw(Model.TeamName)</h1>
 </div>
 
 <div class="container4">
@@ -54,12 +54,81 @@
     </div>
 </div>
 
+<div class="container8">
+    @{ RenderDayResult(); }
+</div>
+
 @{
     RenderDiagram();
 }
 
 @functions
 {
+    private void RenderDayResult()
+    {
+        if (Model.TeamStatistic is null)
+        {
+            return;
+        }
+        
+        var dayByNumber = Model.TeamStatistic.DayStatistics.ToDictionary(d => d.DayNumber);
+        <div class="allDayResults">
+            <div class="finishDayResult dayLineStyle text-center">
+                <h1 class="fs-6">Итого</h1>
+            </div>
+
+            <div class="finishDayResultContainer">
+                <div class="finishDayResult">
+                    <p class="fs-6">Всего клиентов: @Model.TeamStatistic.TotalClientsGained</p>
+                </div>
+            
+                <div class="finishDayResult moneyChangeLineStyle">
+                    <p class="fs-6">Штраф по клиентам составил: @Model.TeamStatistic.ClientsPenalty</p>
+                </div>
+
+                <div class="finishDayResult">
+                    <p class="fs-6">Всего денег: @Model.TeamStatistic.TotalProfitGained</p>
+                </div>
+
+                <div class="finishDayResult moneyChangeLineStyle">
+                    <p class="fs-6">Штраф по деньгам составил: @Model.TeamStatistic.Penalty</p>
+                </div>
+            </div>
+
+            <div class="scrollable-container">
+                @foreach (var data in Model.TeamStatistic.DayStatistics.OrderByDescending(t => t.DayNumber))
+                {
+                    <div class="finishDayResult dayLineStyle text-center">
+                        <h1 class="fs-6">День @(data.DayNumber) (@(data.DayNumber >= Model.CurrentDay.Number ? (Html.Raw("в процессе или еще не начат")) : (Html.Raw("закончен"))))</h1>
+                    </div>
+
+                    <div class="finishDayRe sultContainer">
+                        <div class="finishDayResult">
+                            <p class="fs-6">Получили клиентов: @data.ClientsGained</p>
+                        </div>
+
+                        @if (dayByNumber.TryGetValue(data.DayNumber - 1, out var prev) && prev.ProfitPerClient != data.ProfitPerClient)
+                        {
+                        <div class="finishDayResult monetChangeLineStyle">
+                            <p class="fs-6">Деньги за клиента: @(prev.ProfitPerClient)$ -> @(data.ProfitPerClient)$</p>
+                        </div>
+                        }
+                        else
+                        {
+                        <div class="finishDayResult monetChangeLineStyle">
+                            <p class="fs-6">Деньги за клиента: @(data.ProfitPerClient)$</p>
+                        </div>
+                        }
+
+                        <div class="finishDayResult">
+                            <p class="fs-6">Получили денег: @(data.ProfitGained)$</p>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    
     private void RenderDiagram()
     {
         if (Model.TeamStatistic is null)
@@ -76,11 +145,12 @@
             }
             .Concat(dayStatistics.Select(CfdStatisticToString))
             .ToList();
-
-        if (rowsForCfd.Select(x => x.Split(",").Where(x => !string.IsNullOrEmpty(x)).ToList().Count).ToHashSet().Count != 1)
-        {
-            return;
-        }
+        rowsForCfd = rowsForCfd
+            .Where(x => x
+                    .Split(",")
+                    .Where(el => !string.IsNullOrEmpty(el))
+                    .ToArray().Length == 6)
+            .ToList();
         
         var tableForCfd = $"[{string.Join(",", rowsForCfd)}]";
 
