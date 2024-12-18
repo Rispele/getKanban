@@ -14,9 +14,6 @@ public class Connection_Test
 	{
 		var db = new DomainContext();
 		db.Database.EnsureCreated();
-
-		var db1 = new ConnectionsContext();
-		db1.Database.EnsureCreated();
 	}
 
 	[Test]
