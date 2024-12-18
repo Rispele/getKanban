@@ -18,9 +18,17 @@
             @foreach (var ticket in tickets)
             {
                 var ticketId = ticket.id;
+                var t = ticketId[0] switch
+                {
+                    'S' => "checkboxCardStyle1",
+                    'I' => "checkboxCardStyle2",
+                    'F' => "checkboxCardStyle3", 
+                    'E' => "checkboxCardStyle4"
+                };
+                
                 <div class="checkboxCardsMargin">
                     <input type="checkbox" class="checkboxCardInput" id="@ticketId" checked="@ticket.IsReleased(Model.DayNumber)">
-                    <label for="@ticketId" class="checkboxCardContainer @cardStyle cursorPointer">
+                    <label for="@ticketId" class="checkboxCardContainer @t cursorPointer">
                         <div class="checkboxCardContent">
                             <h2 class="checkboxCardNumber">@ticketId</h2>
                             <div class="lines">

@@ -11,8 +11,16 @@
     <div class="container2">
         @foreach (var ticketId in Model.TicketIds.OrderBy(x => x))
         {
+            var t = ticketId[0] switch
+            {
+                'S' => "checkboxCardStyle1",
+                'I' => "checkboxCardStyle2",
+                'F' => "checkboxCardStyle3", 
+                'E' => "checkboxCardStyle4"
+            };
+            
             <div class="checkboxCardsMargin">
-                <div class="checkboxCardContainer">
+                <div class="checkboxCardContainer @t">
                     <div class="checkboxCardContent">
                         <h2 class="checkboxCardNumber">@ticketId</h2>
                         <div class="lines">

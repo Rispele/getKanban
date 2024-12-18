@@ -111,6 +111,12 @@
     min-height: 100px;
     height: fit-content;
     margin: 5px 5px;
+
+    border-radius: 20px;
+
+    -webkit-box-shadow: 6px 6px 20px -9px rgba(0, 0, 0, 0.17);
+    -moz-box-shadow: 6px 6px 20px -9px rgba(0, 0, 0, 0.17);
+    box-shadow: 6px 6px 20px -9px rgba(0, 0, 0, 0.17);
 }
 
 .checkboxCardContainer {
@@ -118,10 +124,9 @@
     min-height: 100px;
     height: fit-content;
 
-    background-color: white;
-
-    border-radius: 20px;
-    border-style: solid;
+    background: -webkit-linear-gradient(45deg, rgb(238, 238, 238) 4%, rgb(255, 255, 255) 81%);
+    background: -moz-linear-gradient(45deg, rgb(238, 238, 238) 4%, rgb(255, 255, 255) 81%);
+    background: linear-gradient(45deg, rgb(238, 238, 238) 4%, rgb(255, 255, 255) 81%);
 
     display: flex;
     flex-direction: column;
@@ -130,24 +135,50 @@
     padding-left: 10%;
 
     position: relative;
-
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .checkboxCardStyle1 {
-    border-color: forestgreen;
+    border-color: #228B22;
+
+    border-radius: 20px;
+    border-style: solid;
+
+    background: -webkit-linear-gradient(45deg, rgb(238, 255, 238) 4%, rgb(255, 255, 255) 81%);
+    background: -moz-linear-gradient(45deg, rgb(238, 255, 238) 4%, rgb(255, 255, 255) 81%);
+    background: linear-gradient(45deg, rgb(238, 255, 238) 4%, rgb(255, 255, 255) 81%);
 }
 
 .checkboxCardStyle2 {
-    border-color: dodgerblue;
+    border-color: #1E90FF;
+
+    border-radius: 20px;
+    border-style: solid;
+
+    background: -webkit-linear-gradient(45deg, rgb(230, 243, 255) 4%, rgb(255, 255, 255) 81%);
+    background: -moz-linear-gradient(45deg, rgb(230, 243, 255) 4%, rgb(255, 255, 255) 81%);
+    background: linear-gradient(45deg, rgb(230, 243, 255) 4%, rgb(255, 255, 255) 81%);
 }
 
 .checkboxCardStyle3 {
-    border-color: darkred;
+    border-color: #8B0000;
+
+    border-radius: 20px;
+    border-style: solid;
+
+    background: -webkit-linear-gradient(45deg, rgb(255, 242, 242) 4%, rgb(255, 255, 255) 81%);
+    background: -moz-linear-gradient(45deg, rgb(255, 242, 242) 4%, rgb(255, 255, 255) 81%);
+    background: linear-gradient(45deg, rgb(255, 242, 242) 4%, rgb(255, 255, 255) 81%);
 }
 
 .checkboxCardStyle4 {
-    border-color: darkorange;
+    border-color: #FFAA00;
+
+    border-radius: 20px;
+    border-style: solid;
+
+    background: -webkit-linear-gradient(45deg, rgb(255, 249, 238) 4%, rgb(255, 255, 255) 81%);
+    background: -moz-linear-gradient(45deg, rgb(255, 249, 238) 4%, rgb(255, 255, 255) 81%);
+    background: linear-gradient(45deg, rgb(255, 249, 238) 4%, rgb(255, 255, 255) 81%);
 }
 
 .cursorPointer {
@@ -173,12 +204,88 @@
     right: 10px;
 }
 
-.checkboxCardInput:checked ~ .checkboxCardContainer{
-    background-color: lightgray;
+.checkboxCardInput:checked ~ .checkboxCardStyle1{
+    /*-webkit-box-shadow: 0 9px 72px -3px rgba(34, 139, 34, 0.51) inset;*/
+    /*-moz-box-shadow: 0 9px 72px -3px rgba(34, 139, 34, 0.51) inset;*/
+    /*box-shadow: 0 9px 72px -3px rgba(34, 139, 34, 0.51) inset;*/
+    animation: shadowInset1  0.1s linear forwards;
+}
+
+.checkboxCardInput:checked ~ .checkboxCardStyle2{
+    /*-webkit-box-shadow: 0 9px 72px -3px rgba(30, 144, 255, 0.51) inset;*/
+    /*-moz-box-shadow: 0 9px 72px -3px rgba(30, 144, 255, 0.51) inset;*/
+    /*box-shadow: 0 9px 72px -3px rgba(30, 144, 255, 0.51) inset;*/
+    animation: shadowInset2  0.1s linear forwards;
+}
+
+.checkboxCardInput:checked ~ .checkboxCardStyle3{
+    /*-webkit-box-shadow: 0 9px 72px -3px rgba(139, 0, 0, 0.51) inset;*/
+    /*-moz-box-shadow: 0 9px 72px -3px rgba(139, 0, 0, 0.51) inset;*/
+    /*box-shadow: 0 9px 72px -3px rgba(139, 0, 0, 0.51) inset;*/
+    animation: shadowInset3  0.1s linear forwards;
+}
+
+.checkboxCardInput:checked ~ .checkboxCardStyle4{
+    /*-webkit-box-shadow: 0 9px 72px -3px rgba(255, 170, 0, 0.51) inset;*/
+    /*-moz-box-shadow: 0 9px 72px -3px rgba(255, 170, 0, 0.51) inset;*/
+    /*box-shadow: 0 9px 72px -3px rgba(255, 170, 0, 0.51) inset;*/
+    animation: shadowInset4  0.1s linear forwards;
 }
 
 .checkboxCardNumber {
     width: fit-content;
 
     margin-bottom: 5px;
+}
+
+@keyframes shadowInset1 {
+    from {
+        -webkit-box-shadow: 0 0 0 0 rgba(0, 0, 0, 0) inset;
+        -moz-box-shadow: 0 0 0 0 rgba(0, 0, 0, 0) inset;
+        box-shadow: 0 0 0 0 rgba(0, 0, 0, 0) inset;
+    }
+    to {
+        -webkit-box-shadow: 0 9px 72px -3px rgba(34, 139, 34, 0.51) inset;
+        -moz-box-shadow: 0 9px 72px -3px rgba(34, 139, 34, 0.51) inset;
+        box-shadow: 0 9px 72px -3px rgba(34, 139, 34, 0.51) inset;
+    }
+}
+
+@keyframes shadowInset2 {
+    from {
+        -webkit-box-shadow: 0 0 0 0 rgba(0, 0, 0, 0) inset;
+        -moz-box-shadow: 0 0 0 0 rgba(0, 0, 0, 0) inset;
+        box-shadow: 0 0 0 0 rgba(0, 0, 0, 0) inset;
+    }
+    to {
+        -webkit-box-shadow: 0 9px 72px -3px rgba(30, 144, 255, 0.51) inset;
+        -moz-box-shadow: 0 9px 72px -3px rgba(30, 144, 255, 0.51) inset;
+        box-shadow: 0 9px 72px -3px rgba(30, 144, 255, 0.51) inset;
+    }
+}
+
+@keyframes shadowInset3 {
+    from {
+        -webkit-box-shadow: 0 0 0 0 rgba(0, 0, 0, 0) inset;
+        -moz-box-shadow: 0 0 0 0 rgba(0, 0, 0, 0) inset;
+        box-shadow: 0 0 0 0 rgba(0, 0, 0, 0) inset;
+    }
+    to {
+        -webkit-box-shadow: 0 9px 72px -3px rgba(139, 0, 0, 0.51) inset;
+        -moz-box-shadow: 0 9px 72px -3px rgba(139, 0, 0, 0.51) inset;
+        box-shadow: 0 9px 72px -3px rgba(139, 0, 0, 0.51) inset;
+    }
+}
+
+@keyframes shadowInset4 {
+    from {
+        -webkit-box-shadow: 0 0 0 0 rgba(0, 0, 0, 0) inset;
+        -moz-box-shadow: 0 0 0 0 rgba(0, 0, 0, 0) inset;
+        box-shadow: 0 0 0 0 rgba(0, 0, 0, 0) inset;
+    }
+    to {
+        -webkit-box-shadow: 0 9px 72px -3px rgba(255, 170, 0, 0.51) inset;
+        -moz-box-shadow: 0 9px 72px -3px rgba(255, 170, 0, 0.51) inset;
+        box-shadow: 0 9px 72px -3px rgba(255, 170, 0, 0.51) inset;
+    }
 }

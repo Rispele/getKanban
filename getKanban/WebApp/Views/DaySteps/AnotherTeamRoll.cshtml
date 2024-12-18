@@ -4,8 +4,10 @@
     <h1 class="fs-1 text-center">Команда @Html.Raw(Model.TeamName). День @Model.DayNumber</h1>
 </div>
 
-<div class="infoContainer height-large centered-100">
-    <h1 class="fs-4 text-center"></h1>
+<div class="infoContainer height-small centered-100 creative-border-4 creative-border-rad-40">
+    <h1 class="fs-4 fw-normal text-center">
+        Пора кидать кубик за Петю!
+    </h1>
 </div>
 
 <button class="stepControlButtons rightButton" id="roll">Кинуть за петю</button>
@@ -24,7 +26,53 @@
     
     connection.on('NotifyAnotherTeamDiceRolled', (diceNumber, scoresNumber) => {
         document.getElementsByClassName(`fs-4`)[0].textContent = `Значение на кубике: ${diceNumber}\nЧисло очков: ${scoresNumber}`
+        const container = document.getElementsByClassName('infoContainer')[0];
+        container.removeAttribute("class");
+        container.setAttribute("class", "infoContainer height-small centered-100 creative-border-5 creative-border-rad-40");
+        
         document.getElementById(`roll`).remove();
+        const dice = document.createElement('div');
+        dice.setAttribute("class", "cont");
+        dice.innerHTML = 
+            "<div class=\"dice-container\">\n" +
+            "        <div class=\"dice\">\n" +
+            "            <div class=\"face one\">\n" +
+            "                <div class=\"dot center\"></div>\n" +
+            "            </div>\n" +
+            "            <div class=\"face two\">\n" +
+            "                <div class=\"dot top-left\"></div>\n" +
+            "                <div class=\"dot bottom-right\"></div>\n" +
+            "            </div>\n" +
+            "            <div class=\"face three\">\n" +
+            "                <div class=\"dot top-left\"></div>\n" +
+            "                <div class=\"dot center\"></div>\n" +
+            "                <div class=\"dot bottom-right\"></div>\n" +
+            "            </div>\n" +
+            "            <div class=\"face four\">\n" +
+            "                <div class=\"dot top-left\"></div>\n" +
+            "                <div class=\"dot top-right\"></div>\n" +
+            "                <div class=\"dot bottom-left\"></div>\n" +
+            "                <div class=\"dot bottom-right\"></div>\n" +
+            "            </div>\n" +
+            "            <div class=\"face five\">\n" +
+            "                <div class=\"dot top-left\"></div>\n" +
+            "                <div class=\"dot top-right\"></div>\n" +
+            "                <div class=\"dot center\"></div>\n" +
+            "                <div class=\"dot bottom-left\"></div>\n" +
+            "                <div class=\"dot bottom-right\"></div>\n" +
+            "            </div>\n" +
+            "            <div class=\"face six\">\n" +
+            "                <div class=\"dot top-left\"></div>\n" +
+            "                <div class=\"dot top-right\"></div>\n" +
+            "                <div class=\"dot middle-left\"></div>\n" +
+            "                <div class=\"dot middle-right\"></div>\n" +
+            "                <div class=\"dot bottom-left\"></div>\n" +
+            "                <div class=\"dot bottom-right\"></div>\n" +
+            "            </div>\n" +
+            "        </div>\n" +
+            "    </div>"
+            
+        document.body.appendChild(dice);
         const nextButton = document.createElement(`button`);
         nextButton.setAttribute(`class`, `stepControlButtons rightButton`);
         nextButton.setAttribute(`id`, `next`);

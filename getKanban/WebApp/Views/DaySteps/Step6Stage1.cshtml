@@ -11,54 +11,58 @@
     {
         var dayByNumber = Model.TeamStatistic.DayStatistics.ToDictionary(d => d.DayNumber);
         <div class="allDayResults">
-            <div class="finishDayResult dayLineStyle text-center">
+            <div class="finishDayResult headerLineStyle text-center">
                 <h1 class="fs-6">Итого</h1>
             </div>
 
             <div class="finishDayResultContainer">
-                <div class="finishDayResult">
+                <div class="finishDayResult clientLineStyle">
                     <p class="fs-6">Всего клиентов: @Model.TeamStatistic.TotalClientsGained</p>
                 </div>
             
-                <div class="finishDayResult moneyChangeLineStyle">
+                <div class="finishDayResult otherLineStyle">
                     <p class="fs-6">Штраф по клиентам составил: @Model.TeamStatistic.ClientsPenalty</p>
                 </div>
 
-                <div class="finishDayResult">
-                    <p class="fs-6">Всего денег: @Model.TeamStatistic.TotalProfitGained</p>
+                <div class="finishDayResult moneyLineStyle">
+                    <p class="fs-6">Всего денег: @(Model.TeamStatistic.TotalProfitGained)$</p>
                 </div>
 
-                <div class="finishDayResult moneyChangeLineStyle">
-                    <p class="fs-6">Штраф по деньгам составил: @Model.TeamStatistic.Penalty</p>
+                <div class="finishDayResult otherLineStyle">
+                    <p class="fs-6">Штраф по деньгам составил: @(Model.TeamStatistic.Penalty)$</p>
                 </div>
             </div>
 
             <div class="scrollable-container">
+                <div class="finishDayResult headerLineStyle text-center">
+                    <h1 class="fs-6">По дням</h1>
+                </div>
+                
                 @foreach (var data in Model.TeamStatistic.DayStatistics.OrderByDescending(t => t.DayNumber))
                 {
                     <div class="finishDayResult dayLineStyle text-center">
                         <h1 class="fs-6">День @data.DayNumber</h1>
                     </div>
 
-                    <div class="finishDayRe sultContainer">
-                        <div class="finishDayResult">
+                    <div class="finishDayResultContainer">
+                        <div class="finishDayResult clientLineStyle">
                             <p class="fs-6">Получили клиентов: @data.ClientsGained</p>
                         </div>
 
                         @if (dayByNumber.TryGetValue(data.DayNumber - 1, out var prev) && prev.ProfitPerClient != data.ProfitPerClient)
                         {
-                        <div class="finishDayResult monetChangeLineStyle">
-                            <p class="fs-6">Деньги за клиента: @(prev.ProfitPerClient)$ -> @(data.ProfitPerClient)$</p>
-                        </div>
+                            <div class="finishDayResult otherLineStyle">
+                                <p class="fs-6">Деньги за клиента: @(prev.ProfitPerClient)$ -> @(data.ProfitPerClient)$</p>
+                            </div>
                         }
                         else
                         {
-                        <div class="finishDayResult monetChangeLineStyle">
-                            <p class="fs-6">Деньги за клиента: @(data.ProfitPerClient)$</p>
-                        </div>
+                            <div class="finishDayResult otherLineStyle">
+                                <p class="fs-6">Деньги за клиента: @(data.ProfitPerClient)$</p>
+                            </div>
                         }
 
-                        <div class="finishDayResult">
+                        <div class="finishDayResult moneyLineStyle">
                             <p class="fs-6">Получили денег: @(data.ProfitGained)$</p>
                         </div>
                     </div>

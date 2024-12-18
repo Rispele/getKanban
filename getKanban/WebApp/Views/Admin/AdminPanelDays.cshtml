@@ -13,7 +13,7 @@
         @for (var i = Model.StartDayNumber; i < Model.CurrentDay.Number + (Model.IsFinished ? 1 : 0); i++)
         {
             <div class="checkboxCardsMargin">
-                <div class="checkboxCardContainer previousDayStyle">
+                <div class="checkboxCardContainer creative-border-5 creative-border-rad-20 previousDayStyle">
                     <div class="checkboxCardContent">
                         <h2 class="checkboxCardNumber">День @i</h2>
                     </div>
@@ -23,7 +23,7 @@
         @if (!Model.IsFinished)
         {
             <div class="checkboxCardsMargin">
-                <div class="checkboxCardContainer currentDayStyle">
+                <div class="checkboxCardContainer creative-border-4 creative-border-rad-20 currentDayStyle">
                     <div class="checkboxCardContent">
                         <h2 class="checkboxCardNumber">День @Model.CurrentDay.Number</h2>
                         <img class="restart" src="/images/restart_button.svg" alt="restart">
@@ -36,7 +36,7 @@
         @for (var i = Model.CurrentDay.Number + 1; i <= Model.FinishDayNumber; i++)
         {
             <div class="checkboxCardsMargin">
-                <div class="checkboxCardContainer">
+                <div class="checkboxCardContainer creative-border-1 creative-border-rad-20">
                     <div class="checkboxCardContent">
                         <h2 class="checkboxCardNumber">День @i</h2>
                     </div>
@@ -46,21 +46,17 @@
     </div>
 </div>
 
-<div class="centered-100" style="display: flex; flex-direction: row; flex-wrap: wrap; position: relative;">
-    <div class="diagram-container" style="width: 50%; height: 100%; display: flex; flex-direction: column;">
-        <div id="cfd" style="width: 90%; height: 33%;"></div>
-        <div id="control-diagram" style="width: 90%; height: 33%;"></div>
-        <div id="distribution-diagram" style="width: 90%; height: 33%;"></div>
+<div class="container8 centered-100">
+    <hr class="divider">
+    <div class="diagram-container">
+        <div class="diagram" id="cfd"></div>
+        <div class="diagram" id="control-diagram"></div>
+        <div class="diagram" id="distribution-diagram"></div>
     </div>
-</div>
-
-<div class="container8">
     @{ RenderDayResult(); }
 </div>
 
-@{
-    RenderDiagram();
-}
+@{ RenderDiagram(); }
 
 @functions
 {
@@ -73,54 +69,58 @@
         
         var dayByNumber = Model.TeamStatistic.DayStatistics.ToDictionary(d => d.DayNumber);
         <div class="allDayResults">
-            <div class="finishDayResult dayLineStyle text-center">
+            <div class="finishDayResult headerLineStyle text-center">
                 <h1 class="fs-6">Итого</h1>
             </div>
 
             <div class="finishDayResultContainer">
-                <div class="finishDayResult">
+                <div class="finishDayResult clientLineStyle">
                     <p class="fs-6">Всего клиентов: @Model.TeamStatistic.TotalClientsGained</p>
                 </div>
             
-                <div class="finishDayResult moneyChangeLineStyle">
+                <div class="finishDayResult otherLineStyle">
                     <p class="fs-6">Штраф по клиентам составил: @Model.TeamStatistic.ClientsPenalty</p>
                 </div>
 
-                <div class="finishDayResult">
-                    <p class="fs-6">Всего денег: @Model.TeamStatistic.TotalProfitGained</p>
+                <div class="finishDayResult moneyLineStyle">
+                    <p class="fs-6">Всего денег: @(Model.TeamStatistic.TotalProfitGained)$</p>
                 </div>
 
-                <div class="finishDayResult moneyChangeLineStyle">
-                    <p class="fs-6">Штраф по деньгам составил: @Model.TeamStatistic.Penalty</p>
+                <div class="finishDayResult otherLineStyle">
+                    <p class="fs-6">Штраф по деньгам составил: @(Model.TeamStatistic.Penalty)$</p>
                 </div>
             </div>
 
             <div class="scrollable-container">
+                <div class="finishDayResult headerLineStyle text-center">
+                    <h1 class="fs-6">По дням</h1>
+                </div>
+                
                 @foreach (var data in Model.TeamStatistic.DayStatistics.OrderByDescending(t => t.DayNumber))
                 {
                     <div class="finishDayResult dayLineStyle text-center">
                         <h1 class="fs-6">День @(data.DayNumber) (@(data.DayNumber >= Model.CurrentDay.Number ? (Html.Raw("в процессе или еще не начат")) : (Html.Raw("закончен"))))</h1>
                     </div>
 
-                    <div class="finishDayRe sultContainer">
-                        <div class="finishDayResult">
+                    <div class="finishDayResultContainer">
+                        <div class="finishDayResult clientLineStyle">
                             <p class="fs-6">Получили клиентов: @data.ClientsGained</p>
                         </div>
 
                         @if (dayByNumber.TryGetValue(data.DayNumber - 1, out var prev) && prev.ProfitPerClient != data.ProfitPerClient)
                         {
-                        <div class="finishDayResult monetChangeLineStyle">
-                            <p class="fs-6">Деньги за клиента: @(prev.ProfitPerClient)$ -> @(data.ProfitPerClient)$</p>
-                        </div>
+                            <div class="finishDayResult otherLineStyle">
+                                <p class="fs-6">Деньги за клиента: @(prev.ProfitPerClient)$ -> @(data.ProfitPerClient)$</p>
+                            </div>
                         }
                         else
                         {
-                        <div class="finishDayResult monetChangeLineStyle">
-                            <p class="fs-6">Деньги за клиента: @(data.ProfitPerClient)$</p>
-                        </div>
+                            <div class="finishDayResult otherLineStyle">
+                                <p class="fs-6">Деньги за клиента: @(data.ProfitPerClient)$</p>
+                            </div>
                         }
 
-                        <div class="finishDayResult">
+                        <div class="finishDayResult moneyLineStyle">
                             <p class="fs-6">Получили денег: @(data.ProfitGained)$</p>
                         </div>
                     </div>

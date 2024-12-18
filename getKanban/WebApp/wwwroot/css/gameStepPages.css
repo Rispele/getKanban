@@ -16,11 +16,10 @@
     max-width: 1000px;
 
     background-color: #E6E6E6;
-
-    border-color: black;
-    border-style: solid;
-    border-width: 2px;
-    border-radius: 50px;
+    
+    position: relative;
+    
+    padding-top: 15px;
 }
 
 .infoContainer2 {
@@ -28,10 +27,7 @@
 
     background-color: #E6E6E6;
 
-    border-color: black;
-    border-style: solid;
-    border-width: 2px;
-    border-radius: 50px;
+    position: relative;
 }
 
 .info {
@@ -45,7 +41,7 @@
     bottom: 50px;
 
     width: 20%;
-    min-width: 50px;
+    min-width: 150px;
     max-width: 100px;
     height: 40px;
 

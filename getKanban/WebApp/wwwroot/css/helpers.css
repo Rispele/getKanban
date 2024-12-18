@@ -33,6 +33,7 @@
 .container4 {
     width: 90%;
     max-width: 1000px;
+    min-height: 450px;
     height: fit-content;
 
     margin: 50px auto;
@@ -60,7 +61,7 @@
     min-height: 500px;
     height: fit-content;
 
-    margin-right: 25px;
+    margin-right: 4%;
 }
 
 .container6:last-child {
@@ -68,11 +69,11 @@
 }
 
 .currentDayStyle {
-    background-color: yellow;
+    /*background-color: yellow;*/
 }
 
 .previousDayStyle {
-    background-color: greenyellow;
+    /*background-color: greenyellow;*/
 }
 
 .roleTable {

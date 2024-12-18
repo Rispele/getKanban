@@ -59,9 +59,6 @@ table tr:last-child td:first-child {
     width: 90%;
     height: 80px;
     background-color: #E6E6E6;
-    border-radius: 20px;
-    border-style: solid;
-    border-color: black;
     display: flex;
     flex-direction: column;
     justify-content: center;

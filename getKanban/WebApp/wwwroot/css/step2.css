@@ -6,9 +6,10 @@
 
 .main-container2 {
     width: 100%;
+    min-width: 400px;
     min-height: 300px;
     height: fit-content;
-    
+
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -19,11 +20,15 @@
 /* Таблица через div */
 .role-table {
     width: 40%;
+    min-width: 200px;
     min-height: 300px;
     height: fit-content;
 
+    position: absolute;
+    right: 0;
+
     background-color: #E6E6E6;
-    border-radius: 25px 25px 0 0;
+    /*border-radius: 25px 25px 0 0;*/
 
     overflow: hidden;
 
@@ -34,13 +39,12 @@
 /* Заголовок таблицы */
 .role-table-header {
     display: flex;
+
     font-weight: bold;
     height: 58px;
     line-height: 58px;
 
-    border-radius: 25px 25px 0 0;
-
-    border: 1px solid black;
+    /*border-radius: 25px 25px 0 0;*/
 }
 
 .role-table-header-cell {
@@ -48,6 +52,10 @@
     text-align: center;
 
     border-right: 1px solid black;
+
+    -webkit-box-shadow: 0px 9px 72px -50px rgba(0, 0, 0, 0.51) inset;
+    -moz-box-shadow: 0px 9px 72px -50px rgba(0, 0, 0, 0.51) inset;
+    box-shadow: 0px 9px 72px -50px rgba(0, 0, 0, 0.51) inset;
 }
 
 .role-table-header .role-table-header-cell:last-child {
@@ -59,21 +67,20 @@
     display: flex;
     min-height: 80px;
     height: fit-content;
-    line-height: 20px;
+    line-height: 80px;
 
-    border: 1px solid black;
+    border-top: 1px solid black;
 }
 
 .role-table-cell {
     flex: 1;
     text-align: center;
-    
-    display: flex;
-
-    justify-content: center;
-    align-items: center;
 
     border-right: 1px solid black;
+
+    -webkit-box-shadow: 0px 9px 72px -50px rgba(0, 0, 0, 0.51) inset;
+    -moz-box-shadow: 0px 9px 72px -50px rgba(0, 0, 0, 0.51) inset;
+    box-shadow: 0px 9px 72px -50px rgba(0, 0, 0, 0.51) inset;
 }
 
 .role-table-cell:last-child {
@@ -86,10 +93,12 @@
     min-height: 300px;
     height: fit-content;
 
-    border-radius: 25px;
-    border: 1px solid black;
+    background-color: #E6E6E6;
+
+    padding-top: 5px;
+    padding-bottom: 5px;
 
     position: absolute;
 
-    right: 0;
+    left: 0;
 }
