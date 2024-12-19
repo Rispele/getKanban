@@ -1,7 +1,10 @@
 ﻿.commandEditorContainer {
     display: flex;
     flex-direction: row;
-    column-gap: 20%;
+    column-gap: 15%;
+    
+    padding-left: 2.5%;
+    padding-right: 2.5%;
 
     width: 90%;
     max-width: 1200px;
@@ -22,17 +25,24 @@
 }
 
 .commandEditorSWindow {
-    width: 20%;
+    width: calc((100% - 35%) / 3 - 20px);
+    min-width: 200px;
     max-width: 400px;
+
+    border: 1px solid #CAC4D0;
+
+    box-shadow: 0 0 16px 10px rgba(0, 0, 0, 0.1);
 }
 
 .commandEditorLWindow {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
+    
+    gap: 10px;
 
-    width: 60%;
-    max-width: 800px;
+    width: 65%;
+    max-width: 840px;
     min-width: 200px;
 }
 
@@ -73,11 +83,13 @@
 }
 
 .commandEditorCommandContainer {
-    width: calc(100% / 3);
+    width: calc(100% / 3 - 20px);
     max-width: calc(800px / 3);
+    min-width: 200px;
     height: 400px;
-
-    border-bottom: 1px dashed #CAC4D0;
+    
+    border: 1px solid #CAC4D0;
+    box-shadow: 0 0 16px 10px rgba(0, 0, 0, 0.1);
 }
 
 
@@ -99,19 +111,6 @@
     .commandEditorButtonsTemplate {
         margin-top: 20px;
     }
-}
-
-.commandEditorBorderStyle {
-    border-color: black;
-    border-style: solid;
-}
-
-.commandEditorBorderWidth {
-    border-width: 2px;
-}
-
-.commandEditorBorderRadius {
-    border-radius: 15px;
 }
 
 .commandEditorBorderTopWidth {

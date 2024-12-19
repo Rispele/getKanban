@@ -27,10 +27,10 @@
 </div>
 
 <div class="commandEditorContainer centered-100">
-    <div class="commandEditorLWindow commandEditorWindowsHeight commandEditorBorderStyle commandEditorBorderWidth commandEditorBorderRadius">
+    <div class="commandEditorLWindow commandEditorWindowsHeight">
         @foreach (var team in Model.Teams)
         {
-            <div class="commandEditorCommandContainer commandEditorBorderRadius">
+            <div class="commandEditorCommandContainer">
                 <div class="commandEditorHeaders text-center" id="team-header-@team.Id"></div>
                 <div class="commandEditorNamesContainer text-center" id="team-@team.Id">
                     @foreach (var player in team.Participants.Users)
@@ -47,7 +47,7 @@
             </div>
         }
     </div>
-    <div class="commandEditorSWindow commandEditorWindowsHeight commandEditorBorderStyle commandEditorBorderWidth commandEditorBorderRadius">
+    <div class="commandEditorSWindow commandEditorWindowsHeight">
         <div class="commandEditorHeaders text-center" id="team-header-@Model.Angels.Id"></div>
         <div class="commandEditorNamesContainer angelsEditor text-center" id="team-@Model.Angels.Id">
             @foreach (var player in Model.Angels.Participants.Users)
@@ -318,28 +318,4 @@ else
         return image;
     }
 
-</script>
-
-<script>
-    const container = document.querySelector('.commandEditorLWindow');
-    
-    function updateLastInColumn() {
-        const items = Array.from(container.children);
-
-        const itemWidth = items[0].offsetWidth;
-        const itemsPerRow = Math.floor(container.offsetWidth / itemWidth);
-
-        items.forEach((item, index) => {
-            if ((index + 1) % itemsPerRow === 0) {
-                item.style.borderRight = "none";
-            }
-            else {
-                item.style.borderRight = "1px dashed #CAC4D0"
-            }
-        });
-    }
-
-    updateLastInColumn();
-
-    window.addEventListener('resize', updateLastInColumn);
 </script>
