@@ -6,7 +6,6 @@
 </div>
 
 <h1 class="fs-3 fw-normal text-center centered-100">Выберите команду, которой нужна помощь</h1>
-
 @* <div class="text-center authorizationContainer centered-100"> *@
 @* *@
 @*     <div class="authorizationButtons"> *@
@@ -17,8 +16,7 @@
 @*     </div> *@
 @* </div> *@
 
-<div class="helpersCommandsContainer centered-50">
-
+<div class="helpersCommandsContainer centered-25">
     @foreach (var team in Model.Teams)
     {
         <div id="@team.Id" class="helpersCommand">
