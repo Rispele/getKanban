@@ -27,6 +27,7 @@ else
 	var connectionString = await connectionStringProvider.GetConnectionString();
 	builder.Services.AddDbContext<DomainContext>(optionsBuilder => optionsBuilder
 		.UseNpgsql(connectionString)
+		.LogTo(Console.WriteLine, LogLevel.Error)
 		.UseSnakeCaseNamingConvention());
 }
 builder.Services.AddScoped<DomainContext>();
