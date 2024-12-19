@@ -144,7 +144,7 @@ public class Concurrency_Test
 
 	private static DomainContext ConfigureDbContext()
 	{
-		var context = new DomainContext();
+		var context = TestDomainContextProvider.Get();
 		context.Database.EnsureCreated();
 		return context;
 	}

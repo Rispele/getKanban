@@ -12,19 +12,13 @@ public sealed class DomainContext : DbContext
 	public DbSet<Team> Teams { get; set; }
 	public DbSet<User> Users { get; set; }
 
-	public DomainContext()
+	public DomainContext(DbContextOptions<DomainContext> options)
+		: base(options)
 	{
 		var registry = new ExtendedTrackerRegistry(typeof(DomainContext).Assembly);
 		var extendedTrackerService = new ExtendedTrackerService(registry);
 
 		ChangeTracker.StateChanged += (_, e) => extendedTrackerService.SetModifiedIfUpdated(e);
 		ChangeTracker.Tracked += (_, e) => extendedTrackerService.SetModifiedIfUpdated(e);
-	}
-	
-	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-	{
-		optionsBuilder
-			.UseNpgsql("Host=localhost;Port=5432;Database=db;Username=usr;Password=pwd")
-			.UseSnakeCaseNamingConvention();
 	}
 }

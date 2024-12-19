@@ -1,6 +1,4 @@
-﻿using Core.DbContexts;
-using Domain;
-using Domain.DbContexts;
+﻿using Domain;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 
@@ -9,17 +7,18 @@ namespace Tests.DbContexts;
 [TestFixture]
 public class Connection_Test
 {
-	[Test]
-	public void Connect_EnsureCreate_ShouldSuccessfullyCreate()
+	[TestCase(null)]
+	public void Connect_EnsureCreate_ShouldSuccessfullyCreate(string? connectionString)
 	{
-		var db = new DomainContext();
+		
+		var db = TestDomainContextProvider.Get(connectionString);
 		db.Database.EnsureCreated();
 	}
 
-	[Test]
-	public void Remove_Created()
+	[TestCase(null)]
+	public void Remove_Created(string? connectionString)
 	{
-		var db = new DomainContext();
+		var db = TestDomainContextProvider.Get(connectionString);
 		db.Model
 			.GetEntityTypes()
 			.Select(t => t.GetTableName()!)

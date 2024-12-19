@@ -1,13 +1,9 @@
-using System.Text.Encodings.Web;
-using System.Text.Unicode;
-using Core.DbContexts;
-using Core.Dtos;
 using Core.Dtos.Converters;
-using Core.Helpers;
 using Core.Services.Contracts;
 using Core.Services.Implementations;
 using Domain.DbContexts;
-using Microsoft.Extensions.WebEncoders;
+using Microsoft.EntityFrameworkCore;
+using WebApp.Connection;
 using WebApp.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,9 +15,21 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddRazorPages();
 builder.Services.AddSignalR();
 
-
+if (builder.Environment.IsDevelopment())
+{
+	builder.Services.AddDbContext<DomainContext>(optionsBuilder => optionsBuilder
+		.UseNpgsql("Host=localhost;Port=5432;Database=db;Username=usr;Password=pwd")
+		.UseSnakeCaseNamingConvention());
+}
+else
+{
+	var connectionStringProvider = new ConnectionStringProvider();
+	var connectionString = await connectionStringProvider.GetConnectionString();
+	builder.Services.AddDbContext<DomainContext>(optionsBuilder => optionsBuilder
+		.UseNpgsql(connectionString)
+		.UseSnakeCaseNamingConvention());
+}
 builder.Services.AddScoped<DomainContext>();
-builder.Services.AddScoped<ConnectionsContext>();
 builder.Services.AddScoped<DayDtoConverter>();
 builder.Services.AddScoped<IGameSessionService, GameSessionService>();
 builder.Services.AddScoped<IDomainInteractionService, DomainInteractionService>();
