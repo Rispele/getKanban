@@ -16,6 +16,8 @@
     height: 60px;
 
     border-bottom: #CAC4D0 1px solid;
+    
+    cursor: pointer;
 }
 
 .helpersCommand:last-child {
@@ -190,6 +192,10 @@
 
 .text-top-margin-5 {
     margin-top: 5px;
+}
+
+.text-top-margin-15 {
+    margin-top: 15px;
 }
 
 .text-top-margin-25 {

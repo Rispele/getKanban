@@ -5,7 +5,7 @@
 </div>
 
 <div class="infoContainer height-small centered-100 creative-border-4 creative-border-rad-40">
-    <h1 class="fs-4 fw-normal text-center">
+    <h1 class="fs-4 fw-normal text-center text-top-margin-15">
         Пора кидать кубик за Петю!
     </h1>
 </div>
@@ -25,7 +25,14 @@
     });
     
     connection.on('NotifyAnotherTeamDiceRolled', (diceNumber, scoresNumber) => {
-        document.getElementsByClassName(`fs-4`)[0].textContent = `Значение на кубике: ${diceNumber}\nЧисло очков: ${scoresNumber}`
+        document.getElementsByClassName('fs-4')[0].remove();
+        document.getElementsByClassName(`infoContainer`)[0].innerHTML =
+            '<p class=\"fs-4 fw-normal text-center text-top-margin-15\">\n' +
+            `   Значение на кубике: ${diceNumber}\n` +
+            '</p>' +
+            '<p class=\"fs-4 fw-normal text-center text-top-margin-15\">\n' +
+            `   Число очков: ${scoresNumber}\n` +
+            '</p>';
         const container = document.getElementsByClassName('infoContainer')[0];
         container.removeAttribute("class");
         container.setAttribute("class", "infoContainer height-small centered-100 creative-border-5 creative-border-rad-40");

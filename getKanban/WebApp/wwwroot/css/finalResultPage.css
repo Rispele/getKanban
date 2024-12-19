@@ -1,12 +1,12 @@
 .allDayResults {
     width: 40%;
     min-width: 400px;
-    min-height: 240px;
+    max-width: 500px;
     height: fit-content;
 
     max-height: 900px;
-
-    margin-left: 5%;
+    
+    margin-left: 100px;
 
     display: flex;
     flex-direction: row;
@@ -20,16 +20,17 @@
     overflow-x: hidden;
     
     width: 100%;
-    min-height: 240px;
-    height: calc(50vw / 2 - 120px);
+    height: fit-content;
+    /*height: calc(50vw / 2 - 120px);*/
 
-    max-height: 680px;
+    max-height: 500px;
 }
 
 .finishDayResultContainer {
     width: 100%;
     min-height: 90px;
     height: fit-content;
+    max-height: 360px;
 
     display: flex;
     flex-direction: row;
@@ -97,10 +98,13 @@
 .diagram-container {
     width: 50vw;
     min-width: 600px;
+    max-width: 600px;
     height: fit-content;
 
     display: flex;
     flex-direction: column;
+    
+    margin-bottom: 20px;
 }
 
 .diagram {
@@ -109,6 +113,7 @@
     max-width: 600px;
     min-height: 300px;
     height: calc(50vw / 2);
+    max-height: 300px;
     
     box-shadow: 0 0 16px 10px rgba(0, 0, 0, 0.1);
 

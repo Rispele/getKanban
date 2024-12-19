@@ -21,8 +21,8 @@
 
     @foreach (var team in Model.Teams)
     {
-        <div class="helpersCommand">
-            <p id="@team.Id" class="fs-5 fw-normal text-center text-top-margin user-select-none">@team.Name</p>
+        <div id="@team.Id" class="helpersCommand">
+            <p class="fs-5 fw-normal text-center text-top-margin user-select-none">@team.Name</p>
         </div>
     }
 

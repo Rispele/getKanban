@@ -3,7 +3,6 @@ using Core.Services.Contracts;
 using Core.Services.Implementations;
 using Domain.DbContexts;
 using Microsoft.EntityFrameworkCore;
-using WebApp.Connection;
 using WebApp.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
