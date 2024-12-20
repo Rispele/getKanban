@@ -10,7 +10,10 @@
     </h1>
 
     <div class="info height-small centered-50">
-        <p class="fs-5 fw-normal">@Model.EndDayEventMessage</p>
+        @foreach (var par in Model.EndDayEventMessage.Split("\n"))
+        {
+            <p class="fs-5 fw-normal">@Html.Raw(par)</p>
+        }
     </div>
 </div>
 
