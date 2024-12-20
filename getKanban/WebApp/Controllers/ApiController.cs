@@ -92,10 +92,11 @@ public class ApiController : Controller
 			teamId,
 			new WorkAnotherTeamDayCommand());
 		var currentDay = await teamService.GetCurrentDayAsync(requestContext, gameSessionId, teamId);
-		return new AnotherTeamDiceRollModel()
+		return new AnotherTeamDiceRollModel
 		{
 			DiceNumber = currentDay.WorkAnotherTeamContainer!.DiceNumber,
-			ScoresNumber = currentDay.WorkAnotherTeamContainer.ScoresNumber
+			ScoresNumber = currentDay.WorkAnotherTeamContainer.ScoresNumber,
+			TotalScores = currentDay.WorkAnotherTeamTotalScores
 		};
 	}
 

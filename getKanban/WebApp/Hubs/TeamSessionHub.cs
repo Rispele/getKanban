@@ -85,10 +85,11 @@ public class TeamSessionHub : Hub
 		Guid gameSessionId,
 		Guid teamId,
 		int diceNumber,
-		int scoresNumber)
+		int scoresNumber,
+		int totalScores)
 	{
 		var groupId = GetGroupId(gameSessionId, teamId);
-		await Clients.Group(groupId).SendAsync("NotifyAnotherTeamDiceRolled", diceNumber, scoresNumber);
+		await Clients.Group(groupId).SendAsync("NotifyAnotherTeamDiceRolled", diceNumber, scoresNumber, totalScores);
 	}
 
 	private async Task AddCurrentConnectionToLobbyGroupAsync(string groupId)

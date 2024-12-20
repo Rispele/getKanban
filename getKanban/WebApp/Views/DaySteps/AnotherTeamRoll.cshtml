@@ -21,10 +21,10 @@
     
     document.getElementById('roll').addEventListener('click', async () => {
         const dice = await fetchPostJSON(`/@Model.GameSessionId/@Model.TeamId/api/another-team-roll`);
-        connection.invoke(`AnotherTeamDiceRoll`, `@Model.GameSessionId`, `@Model.TeamId`, dice[`diceNumber`], dice[`scoresNumber`]);
+        connection.invoke(`AnotherTeamDiceRoll`, `@Model.GameSessionId`, `@Model.TeamId`, dice[`diceNumber`], dice[`scoresNumber`], dice['totalScores']);
     });
     
-    connection.on('NotifyAnotherTeamDiceRolled', (diceNumber, scoresNumber) => {
+    connection.on('NotifyAnotherTeamDiceRolled', (diceNumber, scoresNumber, totalScores) => {
         document.getElementsByClassName('fs-4')[0].remove();
         document.getElementsByClassName(`infoContainer`)[0].innerHTML =
             '<p class=\"fs-4 fw-normal text-center text-top-margin-15\">\n' +
@@ -32,6 +32,9 @@
             '</p>' +
             '<p class=\"fs-4 fw-normal text-center text-top-margin-15\">\n' +
             `   Число очков: ${scoresNumber}\n` +
+            '</p>' +
+            '<p class=\"fs-4 fw-normal text-center text-top-margin-15\">\n' +
+            `   Всего очков: ${totalScores}\n` +
             '</p>';
         const container = document.getElementsByClassName('infoContainer')[0];
         container.removeAttribute("class");

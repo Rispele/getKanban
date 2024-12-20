@@ -1,5 +1,4 @@
-﻿
-using Core.Dtos.Containers;
+﻿using Core.Dtos.Containers;
 using Core.Dtos.Containers.RollDice;
 using Core.Dtos.Containers.TeamMembers;
 using Domain.Game.Days;
@@ -14,6 +13,7 @@ public class DayDto
 	public int AnalystsNumber { get; }
 	public int ProgrammersNumber { get; }
 	public int TestersNumber { get; }
+	public int WorkAnotherTeamTotalScores { get; }
 	public string EndDayEventMessage { get; }
 	public WorkAnotherTeamContainerDto? WorkAnotherTeamContainer { get; }
 	public TeamMembersContainerDto TeamMembersContainer { get; }
@@ -33,6 +33,7 @@ public class DayDto
 		int analystsNumber,
 		int programmersNumber,
 		int testersNumber,
+		int workAnotherTeamTotalScores,
 		WorkAnotherTeamContainerDto? workAnotherTeamContainer,
 		TeamMembersContainerDto teamMembersContainer,
 		RollDiceContainerDto? rollDiceContainer,
@@ -48,6 +49,7 @@ public class DayDto
 		AnalystsNumber = analystsNumber;
 		ProgrammersNumber = programmersNumber;
 		TestersNumber = testersNumber;
+		WorkAnotherTeamTotalScores = workAnotherTeamTotalScores;
 		WorkAnotherTeamContainer = workAnotherTeamContainer;
 		TeamMembersContainer = teamMembersContainer;
 		RollDiceContainer = rollDiceContainer;

@@ -19,6 +19,7 @@ public class DayDtoConverter
 			day.DaySettings.AnalystsCount,
 			day.DaySettings.ProgrammersCount,
 			day.DaySettings.TestersCount,
+			team.BuildAnotherTeamScores(),
 			Convert(day.WorkAnotherTeamContainer),
 			Convert(day.TeamMembersContainer),
 			Convert(day.DiceRollContainer, day.TeamMembersContainer),
