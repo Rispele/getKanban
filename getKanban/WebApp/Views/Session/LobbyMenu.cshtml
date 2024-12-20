@@ -80,6 +80,7 @@ else
     </form>
 }
 
+<script src="~/js/confirm-popup.js"></script>
 <script src="~/js/fetchJSON.js"></script>
 <script src="~/js/value-helper.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
@@ -175,10 +176,19 @@ else
             await fetchPostJSON(`${baseUrl}/start-game`);
             await lobbyHubConnection.invoke(`StartGame`, gameSessionId);
         });
-        document.getElementById(`close`).addEventListener(`click`, async () => {
-            await fetchPostJSON(`${baseUrl}/close-game`);
-            await lobbyHubConnection.invoke(`CloseGame`, gameSessionId);
-            window.location.href = `/`;
+
+        const closeButton = document.getElementById(`close`);
+        javascriptConfirm(closeButton, {
+            title: `Закрыть игру`,
+            message: `Вы уверены, что хотите удалить данную игру для всех участников?`,
+            confirmText: "Да",
+            cancelText: "Нет",
+            cancelOnBackdropClick: true,
+            onConfirm: async function() {
+                await fetchPostJSON(`${baseUrl}/close-game`);
+                await lobbyHubConnection.invoke(`CloseGame`, gameSessionId);
+                window.location.href = `/`;
+            }
         });
         </text>
     }
@@ -260,6 +270,9 @@ else
 
             const input = document.createElement(`input`);
             input.setAttribute(`id`, `edit-input-${teamId}`);
+            input.style.width = `calc(100% / 3 - 50px)`;
+            input.style.maxWidth = `calc(800px / 4)`;
+            input.style.minWidth = `150px`;
 
             const saveButton = buildIcon(`edit-submit-${teamId}`, `/images/save_button.svg`);
             saveButton.addEventListener(`click`, async () => {
