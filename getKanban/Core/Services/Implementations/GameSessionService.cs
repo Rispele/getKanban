@@ -21,6 +21,31 @@ public class GameSessionService : IGameSessionService
 		this.context = context;
 	}
 
+	public async Task<List<GameSessionInfoDto>> GetUserRelatedSessions(Guid userId)
+	{
+		var sessions = context.GameSessions.ToList()
+			.Select(x => GameSessionDtoConverter.For(ParticipantRole.Player).Convert(x)).ToList();
+		var userRelatedSessions = sessions
+			.Where(
+				x => x.Teams.Any(t => t.Participants.Users.Any(u => u.Id == userId))
+				     || x.Angels.Participants.Users.Any(u => u.Id == userId))
+			.ToList();
+		return userRelatedSessions.Select(
+				x =>
+					new GameSessionInfoDto()
+					{
+						GameSessionName = x.Name,
+						TeamsCount = x.Teams.Count,
+						GameSessionStatus = x.IsRecruitmentFinished
+							? x.Teams.All(t => t.IsTeamSessionEnded) ? "Завершена" : "В процессе"
+							: "Набор игроков",
+						RequesterParticipantRole = x.Teams.Any(t => t.Participants.Users.Any(u => u.Id == userId))
+							? ParticipantRole.Player
+							: ParticipantRole.Angel
+					})
+			.ToList();
+	}
+
 	public async Task<Guid> CreateGameSession(
 		RequestContext requestContext,
 		string name,

@@ -6,6 +6,8 @@ namespace Core.Services.Contracts;
 
 public interface IGameSessionService
 {
+	public Task<List<GameSessionInfoDto>> GetUserRelatedSessions(Guid userId);
+	
 	public Task<Guid> CreateGameSession(RequestContext requestContext, string name, long teamsCount);
 
 	public Task CloseGameSession(Guid sessionId);

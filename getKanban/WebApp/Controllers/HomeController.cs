@@ -1,16 +1,19 @@
 ﻿using Core.RequestContexts;
 using Core.Services.Contracts;
 using Microsoft.AspNetCore.Mvc;
+using WebApp.Models;
 
 namespace WebApp.Controllers;
 
 public class HomeController : Controller
 {
 	private readonly IUserService userService;
+	private readonly IGameSessionService gameSessionService;
 
-	public HomeController(IUserService userService)
+	public HomeController(IUserService userService, IGameSessionService gameSessionService)
 	{
 		this.userService = userService;
+		this.gameSessionService = gameSessionService;
 	}
 
 	[HttpGet]
@@ -23,15 +26,31 @@ public class HomeController : Controller
 
 		try
 		{
-			var user = await userService.GetUserById(requestContext!.GetUserId());
-			return View((object)user!.Name);
+			return await BuildViewModel(requestContext);
 		}
 		catch (InvalidOperationException e)
 		{
 			var recreatedRequestContext = await ProvideNewUser(new RequestContext());
-			var user = await userService.GetUserById(recreatedRequestContext!.GetUserId());
-			return View((object)user!.Name);
+			return await BuildViewModel(recreatedRequestContext);
 		}
+	}
+
+	private async Task<IActionResult> BuildViewModel(RequestContext? requestContext)
+	{
+		var user = await userService.GetUserById(requestContext!.GetUserId());
+		var userRelatedSessionDtos = await gameSessionService.GetUserRelatedSessions(user.Id);
+		var model = new MainMenuModel()
+		{
+			UserName = user.Name,
+			UserGames = userRelatedSessionDtos.Select(x => new MainMenuGameModel()
+			{
+				GameSessionName = x.GameSessionName,
+				GameSessionStatus = x.GameSessionStatus,
+				ParticipantRole = x.RequesterParticipantRole,
+				TeamsCount = x.TeamsCount
+			}).ToList()
+		};
+		return View(model);
 	}
 
 	private async Task<RequestContext> ProvideNewUser(RequestContext? requestContext)
