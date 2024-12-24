@@ -10,10 +10,10 @@ public static class DomainContextExtensions
 {
 	public static async Task<GameSession> GetGameSessionsAsync(this DomainContext context, Guid gameSessionId)
 	{
-		return await FindGameSessionsAsync(context, gameSessionId) 
-		       ?? throw new InvalidOperationException($"Game session with id {gameSessionId} not found");
+		return await FindGameSessionsAsync(context, gameSessionId)
+		    ?? throw new InvalidOperationException($"Game session with id {gameSessionId} not found");
 	}
-	
+
 	public static Task<GameSession?> FindGameSessionsAsync(this DomainContext context, Guid gameSessionId)
 	{
 		return context.GameSessions
@@ -43,7 +43,7 @@ public static class DomainContextExtensions
 		var user = await usersContext.Users.Where(t => t.Id == userId).FirstOrDefaultAsync();
 		return user ?? throw new InvalidOperationException("User not found");
 	}
-	
+
 	public static async Task CloseRecruitmentAsync(this DomainContext gameSessionContext, Guid sessionId)
 	{
 		var session = await gameSessionContext.GetGameSessionsAsync(sessionId);

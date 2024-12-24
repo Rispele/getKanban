@@ -9,8 +9,7 @@ namespace Domain.Game.Days.DayContainers;
 [EntityTypeConfiguration(typeof(ReleaseTicketContainerEntityTypeConfiguration))]
 public class ReleaseTicketContainer : FreezableDayContainer
 {
-	[Tracking("is_updated_tracker")]
-	private readonly List<string> ticketIds;
+	[Tracking("is_updated_tracker")] private readonly List<string> ticketIds;
 
 	public IReadOnlyList<string> TicketIds => ticketIds;
 
@@ -26,7 +25,7 @@ public class ReleaseTicketContainer : FreezableDayContainer
 	{
 		CanReleaseNotImmediatelyTickets = canReleaseNotImmediatelyTickets;
 	}
-	
+
 	internal void Update(TicketDescriptor ticket)
 	{
 		EnsureNotFrozen();
@@ -39,11 +38,11 @@ public class ReleaseTicketContainer : FreezableDayContainer
 		{
 			return;
 		}
-		
+
 		ticketIds.Add(ticket.Id);
 		SetUpdated();
 	}
-	
+
 	internal void Remove(TicketDescriptor ticket)
 	{
 		EnsureNotFrozen();
@@ -52,7 +51,7 @@ public class ReleaseTicketContainer : FreezableDayContainer
 		{
 			return;
 		}
-		
+
 		ticketIds.Remove(ticket.Id);
 		SetUpdated();
 	}

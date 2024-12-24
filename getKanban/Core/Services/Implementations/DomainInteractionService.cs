@@ -15,7 +15,7 @@ public class DomainInteractionService : IDomainInteractionService
 	{
 		this.context = context;
 	}
-	
+
 	public async Task<List<Ticket>> GetTicketsToRelease(Guid sessionId, Guid teamId)
 	{
 		var team = await context.GetTeamAsync(sessionId, teamId);
@@ -26,7 +26,7 @@ public class DomainInteractionService : IDomainInteractionService
 			.Where(x => x.IsInWork(previousDayNumber))
 			.Where(
 				x => team.CurrentDay.ReleaseTicketContainer.CanReleaseNotImmediatelyTickets
-				     || TicketDescriptors.GetByTicketId(x.id).CanBeReleasedImmediately)
+				  || TicketDescriptors.GetByTicketId(x.id).CanBeReleasedImmediately)
 			.ToList();
 	}
 

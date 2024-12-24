@@ -14,6 +14,7 @@ public class LobbyHub : Hub
 			var sessionToNotifyId = Guid.Parse(sessionId ?? throw new InvalidOperationException());
 			await Clients.Group(GetGroupId(sessionToNotifyId)).SendAsync("NotifyConnectionUpdate", currentUserId, true);
 		}
+
 		await base.OnConnectedAsync();
 	}
 
@@ -24,18 +25,28 @@ public class LobbyHub : Hub
 		if (requestContext.Headers.TryGetValue(RequestContextKeys.SessionId, out var sessionId))
 		{
 			var sessionToNotifyId = Guid.Parse(sessionId ?? throw new InvalidOperationException());
-			await Clients.Group(GetGroupId(sessionToNotifyId)).SendAsync("NotifyConnectionUpdate", currentUserId, false);
+			await Clients.Group(GetGroupId(sessionToNotifyId))
+				.SendAsync("NotifyConnectionUpdate", currentUserId, false);
 		}
+
 		await base.OnDisconnectedAsync(exception);
 	}
 
-	public async Task JoinGame(Guid gameSessionId, Guid teamId, Guid joinedUserId, string joinedUserName)
+	public async Task JoinGame(
+		Guid gameSessionId,
+		Guid teamId,
+		Guid joinedUserId,
+		string joinedUserName)
 	{
 		var groupId = GetGroupId(gameSessionId);
 		await AddCurrentConnectionToLobbyGroupAsync(groupId);
-		await Clients.OthersInGroup(groupId).SendAsync("NotifyJoinGame", teamId, joinedUserId, joinedUserName);
+		await Clients.OthersInGroup(groupId).SendAsync(
+			"NotifyJoinGame",
+			teamId,
+			joinedUserId,
+			joinedUserName);
 	}
-	
+
 	public async Task RemoveUser(Guid gameSessionId, Guid userId)
 	{
 		var groupId = GetGroupId(gameSessionId);
@@ -53,14 +64,14 @@ public class LobbyHub : Hub
 		var groupId = GetGroupId(gameSessionId);
 		await Clients.Group(groupId).SendAsync("NotifyStartGame");
 	}
-	
+
 	public async Task CloseGame(Guid gameSessionId)
 	{
 		var groupId = GetGroupId(gameSessionId);
 		await RemoveCurrentConnectionFromLobbyGroupAsync(groupId);
 		await Clients.OthersInGroup(groupId).SendAsync("NotifyCloseGame");
 	}
-	
+
 	public async Task LeaveGame(Guid gameSessionId, Guid leftUserId)
 	{
 		var groupId = GetGroupId(gameSessionId);
@@ -79,19 +90,19 @@ public class LobbyHub : Hub
 		var groupId = GetGroupId(gameSessionId);
 		await Clients.Group(groupId).SendAsync("NotifyResult", teamId);
 	}
-	
-	private async Task AddCurrentConnectionToLobbyGroupAsync(string groupId)
-	{
-		await Groups.AddToGroupAsync(Context.ConnectionId, groupId);
-	}
-	
-	private async Task RemoveCurrentConnectionFromLobbyGroupAsync(string groupId)
-	{
-		await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupId);
-	}
 
 	public static string GetGroupId(Guid gameSessionId)
 	{
 		return $"lobby-{gameSessionId}";
+	}
+
+	private async Task AddCurrentConnectionToLobbyGroupAsync(string groupId)
+	{
+		await Groups.AddToGroupAsync(Context.ConnectionId, groupId);
+	}
+
+	private async Task RemoveCurrentConnectionFromLobbyGroupAsync(string groupId)
+	{
+		await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupId);
 	}
 }

@@ -19,9 +19,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Core\Core.csproj" />
+        <ProjectReference Include="..\Core\Core.csproj"/>
         <ProjectReference Include="..\Domain\Domain.csproj"/>
-        <ProjectReference Include="..\WebApp\WebApp.csproj" />
+        <ProjectReference Include="..\WebApp\WebApp.csproj"/>
     </ItemGroup>
 
 </Project>

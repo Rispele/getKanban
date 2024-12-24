@@ -1,5 +1,4 @@
-﻿using Core.Helpers;
-using Core.RequestContexts;
+﻿using Core.RequestContexts;
 using Core.Services.Contracts;
 using Domain.Game.Days.Commands;
 using Microsoft.AspNetCore.Mvc;
@@ -98,11 +97,11 @@ public class DayStepsController : Controller
 		{
 			(true, true) =>
 				View(
-					$"Step4Stage0",
+					"Step4Stage0",
 					await FillWithCredentialsAsync<StepModel>(requestContext, gameSessionId, teamId)),
 			(true, false) =>
 				View(
-					$"Step4Stage0",
+					"Step4Stage0",
 					await FillWithCredentialsAsync<StepModel>(requestContext, gameSessionId, teamId)),
 			(false, true) =>
 				View(
@@ -111,7 +110,7 @@ public class DayStepsController : Controller
 						requestContext,
 						gameSessionId,
 						teamId,
-						dayNumber: currentDay.Number)),
+						currentDay.Number)),
 			(false, false) =>
 				Redirect($"/{gameSessionId}/{teamId}/step/6/0")
 		};
@@ -134,13 +133,13 @@ public class DayStepsController : Controller
 					requestContext,
 					gameSessionId,
 					teamId,
-					dayNumber: currentDay.Number));
+					currentDay.Number));
 		}
 
 		var ticketIds = await domainInteractionService.GetTicketsToRelease(gameSessionId, teamId);
 		var pageTypeNumber = (ticketIds.Any(x => x.id.Contains('S')) ? 1 : 0)
-		                     + (ticketIds.Any(x => x.id.Contains('I')) ? 1 : 0)
-		                     + (ticketIds.Any(x => x.id.Contains('E') || x.id.Contains('F')) ? 1 : 0);
+		                   + (ticketIds.Any(x => x.id.Contains('I')) ? 1 : 0)
+		                   + (ticketIds.Any(x => x.id.Contains('E') || x.id.Contains('F')) ? 1 : 0);
 
 		if (pageTypeNumber == 0)
 		{
@@ -150,7 +149,7 @@ public class DayStepsController : Controller
 					requestContext,
 					gameSessionId,
 					teamId,
-					dayNumber: currentDay.Number));
+					currentDay.Number));
 		}
 
 		var pageType = pageTypeNumber switch
@@ -165,7 +164,7 @@ public class DayStepsController : Controller
 			requestContext,
 			gameSessionId,
 			teamId,
-			dayNumber: currentDay.Number);
+			currentDay.Number);
 		stepModel.TicketIds = ticketIds;
 		stepModel.PageType = pageType;
 		return View(stepModel);
@@ -183,7 +182,7 @@ public class DayStepsController : Controller
 			requestContext,
 			gameSessionId,
 			teamId,
-			dayNumber: currentDay.Number);
+			currentDay.Number);
 		ticketCheckStepModel.TicketIds = ticketIds;
 		return View(ticketCheckStepModel);
 	}
@@ -221,7 +220,7 @@ public class DayStepsController : Controller
 			requestContext,
 			gameSessionId,
 			teamId,
-			dayNumber: currentDay.Number);
+			currentDay.Number);
 		stepModel.TicketIds = ticketIds;
 		stepModel.PageType = pageType;
 		return View(stepModel);
@@ -238,7 +237,7 @@ public class DayStepsController : Controller
 			requestContext,
 			gameSessionId,
 			teamId,
-			dayNumber: currentDay.Number);
+			currentDay.Number);
 		ticketCheckStepModel.TicketIds = ticketIds;
 		return View(ticketCheckStepModel);
 	}
@@ -268,7 +267,6 @@ public class DayStepsController : Controller
 		}
 
 		return View(stepModel);
-		
 	}
 
 	[HttpGet("6/1")]

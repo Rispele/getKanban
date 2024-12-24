@@ -1,4 +1,4 @@
-﻿const MessageType = { ERROR: 'error', NOTIFICATION: 'notification', SUCCESS: 'success', WARNING: 'warning' };
+﻿const MessageType = {ERROR: 'error', NOTIFICATION: 'notification', SUCCESS: 'success', WARNING: 'warning'};
 
 
 function showMessage(message, messageType) {

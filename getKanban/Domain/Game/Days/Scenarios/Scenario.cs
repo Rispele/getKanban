@@ -9,9 +9,9 @@ public class Scenario
 {
 	[JsonProperty] private readonly Dictionary<DayCommandType, ScenarioItem[]> scenario;
 
-	[JsonProperty] public DayCommandType[] InitiallyAwaitedCommands { get; init; }
-
 	[JsonIgnore] private readonly IScenarioService scenarioService;
+
+	[JsonProperty] public DayCommandType[] InitiallyAwaitedCommands { get; init; }
 
 	public Scenario(
 		Dictionary<DayCommandType, ScenarioItem[]> scenario,

@@ -17,7 +17,7 @@ public class ExtendedTrackerService
 		{
 			return;
 		}
-		
+
 		memberNames!.ForEach(memberName => args.Entry.Property(memberName).IsModified = true);
 	}
 }

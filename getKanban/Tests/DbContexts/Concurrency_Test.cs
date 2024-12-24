@@ -1,5 +1,4 @@
-﻿using Core.DbContexts;
-using Core.DbContexts.Helpers;
+﻿using Core.DbContexts.Helpers;
 using Domain;
 using Domain.DbContexts;
 using Domain.Game;
@@ -29,12 +28,12 @@ public class Concurrency_Test
 		await ShouldNotThrowOnSave(context1);
 		await ShouldThrowOnSave<DbUpdateConcurrencyException>(context2);
 	}
-	
+
 	[Test]
 	public async Task UpdateTeamRoles_ConcurrentUpdate_ShouldThrowOnConflict()
 	{
 		var (context1, context2, session1, session2) = await SetupGameSessionInDifferentContexts();
-		
+
 		var (team1, team2) = (session1.Teams.Single(), session2.Teams.Single());
 		var member = team1.CurrentDay!.TeamMembersContainer.TeamMembers
 			.First(t => t.InitialRole == TeamRole.Programmer);
@@ -43,7 +42,7 @@ public class Concurrency_Test
 			TeamMemberId = member.Id,
 			To = TeamRole.Programmer
 		};
-		
+
 		team1.ExecuteCommand(command);
 		team2.ExecuteCommand(command);
 
@@ -55,17 +54,17 @@ public class Concurrency_Test
 	public async Task Day_ConcurrentUpdate_ShouldThrowOnConflict()
 	{
 		var (context1, context2, session1, session2) = await SetupGameSessionInDifferentContexts();
-		
+
 		var (team1, team2) = (session1.Teams.Single(), session2.Teams.Single());
 		var rollDiceCommand = new RollDiceCommand();
-		
+
 		team1.ExecuteCommand(rollDiceCommand);
 		team2.ExecuteCommand(rollDiceCommand);
 
 		await ShouldNotThrowOnSave(context1);
 		await ShouldThrowOnSave<DbUpdateException>(context2);
 	}
-	
+
 	[Test]
 	public async Task UpdateCfdContainer_ConcurrentUpdate_ShouldThrowOnConflict()
 	{
@@ -78,14 +77,14 @@ public class Concurrency_Test
 			PatchType = UpdateCfdContainerPatchType.ToDeploy,
 			Value = 1
 		};
-		
+
 		team1.ExecuteCommand(command);
 		team2.ExecuteCommand(command);
 
 		await ShouldNotThrowOnSave(context1);
 		await ShouldThrowOnSave<DbUpdateConcurrencyException>(context2);
 	}
-	
+
 	[Test]
 	public async Task ReleaseTicketsContainer_ConcurrentUpdate_ShouldThrowOnConflict()
 	{
@@ -94,7 +93,7 @@ public class Concurrency_Test
 		var (team1, team2) = (session1.Teams.Single(), session2.Teams.Single());
 
 		var command = ReleaseTicketsCommand.Create("S01", false);
-		
+
 		team1.ExecuteCommand(command);
 		team2.ExecuteCommand(command);
 
@@ -127,7 +126,7 @@ public class Concurrency_Test
 
 		return (context1, context2, session1, session2!);
 	}
-	
+
 	private static async Task<GameSession> SetupSessionAsync(
 		DomainContext context,
 		params Action<DomainContext, GameSession>[] actions)

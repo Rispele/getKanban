@@ -15,9 +15,11 @@
         return [sum.ToString()];
     }
 
-    private IEnumerable<DiceRollResultDto> GetDiceRollResultsByCurrentRole(TeamRoleDto currentRole) =>
-        Model.RollDiceContainerDto.DiceRollResults
+    private IEnumerable<DiceRollResultDto> GetDiceRollResultsByCurrentRole(TeamRoleDto currentRole)
+    {
+        return Model.RollDiceContainerDto.DiceRollResults
             .Where(t => t.CurrentRole == currentRole);
+    }
 }
 
 <div class="cont">

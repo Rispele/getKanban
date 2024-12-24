@@ -28,7 +28,6 @@ public class WorkAnotherTeamContainer : DayContainer
 		int diceNumber,
 		int scoresNumber)
 	{
-
 		return new WorkAnotherTeamContainer(
 			diceNumber,
 			scoresNumber);

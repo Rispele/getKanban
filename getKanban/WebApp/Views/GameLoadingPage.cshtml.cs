@@ -6,6 +6,5 @@ public class GameLoadingPage : PageModel
 {
 	public void OnGet()
 	{
-		
 	}
 }

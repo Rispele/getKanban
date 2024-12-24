@@ -1,5 +1,4 @@
-﻿using Domain.DomainExceptions;
-using Domain.Game.Days.DayContainers.TeamMembers;
+﻿using Domain.Game.Days.DayContainers.TeamMembers;
 using Domain.Game.Teams;
 
 namespace Domain.Game.Days.Commands;
@@ -14,7 +13,7 @@ public class UpdateTeamRolesCommand : DayCommand
 	internal override void Execute(Team _, Day day)
 	{
 		day.EnsureCanPostEvent(CommandType);
-		
+
 		day.TeamMembersContainer.UpdateTeamMemberRole(TeamMemberId, To);
 
 		day.PostDayEvent(CommandType, null);

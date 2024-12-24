@@ -1,6 +1,5 @@
 ﻿using Domain.Game;
 using Domain.Game.Teams;
-using Domain.Users;
 
 namespace Core.Dtos.Converters;
 
@@ -13,28 +12,31 @@ public class TeamDtoConverter
 		this.requesterRole = requesterRole;
 	}
 
-	public static TeamDtoConverter For(ParticipantRole role) => new(role);
+	public static TeamDtoConverter For(ParticipantRole role)
+	{
+		return new TeamDtoConverter(role);
+	}
 
 	public TeamDto Convert(Team team)
 	{
 		return new TeamDto
-			{
-				Id = team.Id,
-				Name = team.Name,
-				Participants = Convert(team.Players),
-				IsTeamSessionEnded = team.IsTeamSessionEnded,
-				IsLastDay = team.IsLastDay
-			};
+		{
+			Id = team.Id,
+			Name = team.Name,
+			Participants = Convert(team.Players),
+			IsTeamSessionEnded = team.IsTeamSessionEnded,
+			IsLastDay = team.IsLastDay
+		};
 	}
 
 	public TeamDto ConvertAngels(ParticipantsContainer angels)
 	{
 		return new TeamDto
-			{
-				Id = angels.PublicId,
-				Name = "Ангелы",
-				Participants = Convert(angels)
-			};
+		{
+			Id = angels.PublicId,
+			Name = "Ангелы",
+			Participants = Convert(angels)
+		};
 	}
 
 	private ParticipantsDto Convert(ParticipantsContainer participantsContainer)

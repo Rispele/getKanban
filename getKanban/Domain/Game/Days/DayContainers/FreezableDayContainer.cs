@@ -13,7 +13,7 @@ public class FreezableDayContainer : DayContainer
 			throw new DomainException("Cannot update frozen container");
 		}
 	}
-	
+
 	internal void Freeze()
 	{
 		Frozen = true;

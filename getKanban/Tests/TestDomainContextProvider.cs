@@ -12,7 +12,7 @@ public static class TestDomainContextProvider
 		dbContextOptionsBuilder
 			.UseNpgsql(connectionString ?? "Host=localhost;Port=5432;Database=db;Username=usr;Password=pwd")
 			.UseSnakeCaseNamingConvention();
-		
+
 		return new DomainContext(dbContextOptionsBuilder.Options);
 	}
 }

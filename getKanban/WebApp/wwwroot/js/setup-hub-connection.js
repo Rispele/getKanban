@@ -1,4 +1,4 @@
-﻿function setupHubConnection(builder, sessionId, teamId, redirect=true) {
+﻿function setupHubConnection(builder, sessionId, teamId, redirect = true) {
     const connection = builder.withUrl("/teamSessionHub").build();
     connection.start()
         .then(function () {

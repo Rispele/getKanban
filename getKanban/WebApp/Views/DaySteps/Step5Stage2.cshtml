@@ -5,8 +5,10 @@
 </div>
 
 <div class="container1">
-    <h1 class="title">Проверьте корректность заполнения.
-        Если вы ошиблись, вернитесь назад и скорректируйте выбор.</h1>
+    <h1 class="title">
+        Проверьте корректность заполнения.
+        Если вы ошиблись, вернитесь назад и скорректируйте выбор.
+    </h1>
     <hr class="divider">
     <div class="container2">
         @foreach (var ticketId in Model.TicketIds.OrderBy(x => x))
@@ -15,10 +17,10 @@
             {
                 'S' => "checkboxCardStyle1",
                 'I' => "checkboxCardStyle2",
-                'F' => "checkboxCardStyle3", 
+                'F' => "checkboxCardStyle3",
                 'E' => "checkboxCardStyle4"
             };
-            
+
             <div class="checkboxCardsMargin">
                 <div class="checkboxCardContainer @t2">
                     <div class="checkboxCardContent">
@@ -33,7 +35,7 @@
             </div>
         }
     </div>
-    
+
     <button class="stepControlButtons rightButton" id="prev">
         Назад
     </button>

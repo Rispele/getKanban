@@ -4,7 +4,7 @@
     height: auto;
     overflow: hidden;
     border: none;
-    
+
     margin: 50px auto;
 }
 
@@ -79,7 +79,7 @@ table tr:last-child td:first-child {
 }
 
 .text {
-    width:fit-content;
+    width: fit-content;
 
     margin-bottom: 5px;
 }

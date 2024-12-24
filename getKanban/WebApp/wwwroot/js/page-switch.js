@@ -16,5 +16,7 @@ function setRollbackEvent(connection) {
 async function checkPageAvailable(sessionId, teamId, event) {
     return await fetch(`/${sessionId}/${teamId}/api/check-available?event=${event}`)
         .then(available => available.json())
-        .then(available => { return available; });
+        .then(available => {
+            return available;
+        });
 }

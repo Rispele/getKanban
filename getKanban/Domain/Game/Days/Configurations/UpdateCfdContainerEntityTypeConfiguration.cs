@@ -9,7 +9,7 @@ public class UpdateCfdContainerEntityTypeConfiguration : IEntityTypeConfiguratio
 	public void Configure(EntityTypeBuilder<UpdateCfdContainer> builder)
 	{
 		builder.ConfigureAsFreezableDayContainer();
-		
+
 		builder.Property(t => t.Released);
 		builder.Property(t => t.ToDeploy);
 		builder.Property(t => t.WithTesters);

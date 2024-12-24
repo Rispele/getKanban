@@ -5,7 +5,7 @@
     height: fit-content;
 
     max-height: 900px;
-    
+
     margin-left: 100px;
 
     display: flex;
@@ -18,7 +18,7 @@
 .scrollable-container {
     overflow-y: scroll;
     overflow-x: hidden;
-    
+
     width: 100%;
     height: fit-content;
     /*height: calc(50vw / 2 - 120px);*/
@@ -103,7 +103,7 @@
 
     display: flex;
     flex-direction: column;
-    
+
     margin-bottom: 20px;
 }
 
@@ -114,7 +114,7 @@
     min-height: 300px;
     height: calc(50vw / 2);
     max-height: 300px;
-    
+
     box-shadow: 0 0 16px 10px rgba(0, 0, 0, 0.1);
 
     margin-bottom: 20px;

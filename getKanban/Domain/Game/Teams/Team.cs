@@ -55,7 +55,7 @@ public partial class Team
 		Id = Guid.NewGuid();
 		GameSessionId = gameSessionId;
 		Settings = TeamSessionSettings.Default();
-		
+
 		Name = name;
 		Players = new ParticipantsContainer(gameSessionId, Id);
 		days = [];

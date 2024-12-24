@@ -1,9 +1,7 @@
 ﻿using Core.DbContexts.Extensions;
-using Core.Dtos;
 using Core.Dtos.DayStatistics;
 using Core.Dtos.Statistics;
 using Core.Services.Contracts;
-using Domain;
 using Domain.DbContexts;
 using Domain.Game;
 using Domain.Game.Days;
@@ -75,12 +73,12 @@ public class StatisticsService : IStatisticsService
 		return team.Days
 			.Select(
 				day => DayStatisticDto.Create(
-					dayNumber: day.Number,
-					clientsGained: clientsGainedPerDay.GetValueOrDefault(day.Number),
-					profitGained: profitGainedPerDay.GetValueOrDefault(day.Number),
-					profitPerClient: profitPerClientPerDay.GetValueOrDefault(day.Number),
-					cfdStatistic: CollectCfdStatistic(day),
-					ticketsReleased: releasedTickets.GetValueOrDefault(day.Number) ?? []))
+					day.Number,
+					clientsGainedPerDay.GetValueOrDefault(day.Number),
+					profitGainedPerDay.GetValueOrDefault(day.Number),
+					profitPerClientPerDay.GetValueOrDefault(day.Number),
+					CollectCfdStatistic(day),
+					releasedTickets.GetValueOrDefault(day.Number) ?? []))
 			.ToList();
 	}
 

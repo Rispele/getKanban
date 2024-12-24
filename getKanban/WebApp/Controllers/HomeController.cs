@@ -35,20 +35,28 @@ public class HomeController : Controller
 		}
 	}
 
+	[HttpGet("add-username")]
+	public async Task AddUserName(string name)
+	{
+		var userId = Guid.Parse(Request.Cookies[RequestContextKeys.UserId] ?? throw new InvalidOperationException());
+		await userService.SetUserName(userId, name);
+	}
+
 	private async Task<IActionResult> BuildViewModel(RequestContext? requestContext)
 	{
 		var user = await userService.GetUserById(requestContext!.GetUserId());
 		var userRelatedSessionDtos = await gameSessionService.GetUserRelatedSessions(user.Id);
-		var model = new MainMenuModel()
+		var model = new MainMenuModel
 		{
 			UserName = user.Name,
-			UserGames = userRelatedSessionDtos.Select(x => new MainMenuGameModel()
-			{
-				GameSessionName = x.GameSessionName,
-				GameSessionStatus = x.GameSessionStatus,
-				ParticipantRole = x.RequesterParticipantRole,
-				TeamsCount = x.TeamsCount
-			}).ToList()
+			UserGames = userRelatedSessionDtos.Select(
+				x => new MainMenuGameModel
+				{
+					GameSessionName = x.GameSessionName,
+					GameSessionStatus = x.GameSessionStatus,
+					ParticipantRole = x.RequesterParticipantRole,
+					TeamsCount = x.TeamsCount
+				}).ToList()
 		};
 		return View(model);
 	}
@@ -59,15 +67,8 @@ public class HomeController : Controller
 
 		requestContext = new RequestContext();
 		requestContext.AddHeader(RequestContextKeys.UserId, userId.ToString());
-			
+
 		Response.Cookies.Append(RequestContextKeys.UserId, userId.ToString());
 		return requestContext;
-	}
-
-	[HttpGet("add-username")]
-	public async Task AddUserName(string name)
-	{
-		var userId = Guid.Parse(Request.Cookies[RequestContextKeys.UserId] ?? throw new InvalidOperationException());
-		await userService.SetUserName(userId, name);
 	}
 }

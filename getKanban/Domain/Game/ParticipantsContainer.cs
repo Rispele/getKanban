@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using Core.Helpers;
+﻿using Core.Helpers;
 using Domain.Game.Configuration;
 using Domain.Users;
 using JetBrains.Annotations;
@@ -13,7 +12,7 @@ public class ParticipantsContainer
 	private readonly List<Participant> participants = null!;
 
 	public long Id { get; }
-	
+
 	public Guid PublicId { get; private set; }
 
 	public string InviteCode { get; } = null!;
@@ -30,16 +29,6 @@ public class ParticipantsContainer
 		var providedChildId = childId ?? Guid.NewGuid();
 		PublicId = providedChildId;
 		InviteCode = InviteCodeHelper.ConcatInviteCode(parentId, providedChildId);
-	}
-
-	internal (bool matched, bool updated) AddParticipantIfMatchInviteCode(
-		string inviteCode,
-		User user,
-		ParticipantRole participantRole)
-	{
-		return MatchInviteCode(inviteCode)
-			? (true, AddParticipant(user, participantRole))
-			: (false, false);
 	}
 
 	public Participant GetParticipant(Guid userId)
@@ -72,5 +61,15 @@ public class ParticipantsContainer
 	private bool MatchInviteCode(string inviteCode)
 	{
 		return InviteCode == inviteCode;
+	}
+
+	internal (bool matched, bool updated) AddParticipantIfMatchInviteCode(
+		string inviteCode,
+		User user,
+		ParticipantRole participantRole)
+	{
+		return MatchInviteCode(inviteCode)
+			? (true, AddParticipant(user, participantRole))
+			: (false, false);
 	}
 }

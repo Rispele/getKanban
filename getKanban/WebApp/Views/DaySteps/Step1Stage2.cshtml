@@ -22,12 +22,12 @@
                     @foreach (var member in Model.TeamMemberDtos.Where(x => x.CurrentRole == role))
                     {
                         var t = member.InitialRole switch
-                            {
-                                TeamRoleDto.Analyst => "creative-border-2",
-                                TeamRoleDto.Programmer => "creative-border-3",
-                                TeamRoleDto.Tester => "creative-border-5"
-                            };
-                    
+                        {
+                            TeamRoleDto.Analyst => "creative-border-2",
+                            TeamRoleDto.Programmer => "creative-border-3",
+                            TeamRoleDto.Tester => "creative-border-5"
+                        };
+
                         <div class="draggable @t creative-border-rad-20" draggable="true" id="@member.Id">
                             <div class="rolesTextContainer">
                                 <div class="text fs-6 fw-bolder">

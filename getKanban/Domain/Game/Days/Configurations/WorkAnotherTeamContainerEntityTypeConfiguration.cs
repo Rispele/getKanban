@@ -12,6 +12,5 @@ public class WorkAnotherTeamContainerEntityTypeConfiguration : IEntityTypeConfig
 
 		builder.Property(x => x.DiceNumber);
 		builder.Property(x => x.ScoresNumber);
-
 	}
 }

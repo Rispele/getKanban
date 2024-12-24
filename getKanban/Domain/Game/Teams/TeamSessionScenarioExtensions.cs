@@ -1,5 +1,4 @@
-﻿using Domain.Game.Days;
-using Domain.Game.Days.Commands;
+﻿using Domain.Game.Days.Commands;
 using Domain.Game.Days.Scenarios;
 using Domain.Game.Days.Scenarios.Services;
 

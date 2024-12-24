@@ -39,7 +39,7 @@ public class ScenarioBuilder
 		scenarioService = service;
 		return this;
 	}
-	
+
 	public Scenario Build()
 	{
 		return new Scenario(scenario, initiallyAwaitedCommands, scenarioService);

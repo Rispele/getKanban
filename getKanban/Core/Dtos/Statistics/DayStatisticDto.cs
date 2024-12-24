@@ -14,7 +14,7 @@ public class DayStatisticDto
 	public int ProfitPerClient { get; }
 
 	public CfdStatisticDto CfdStatistic { get; }
-	
+
 	public IReadOnlyList<Ticket> TicketsReleased { get; }
 
 	private DayStatisticDto(

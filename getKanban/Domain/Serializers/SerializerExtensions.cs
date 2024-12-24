@@ -20,7 +20,7 @@ public static class SerializerExtensions
 		Console.WriteLine(l);
 		return l;
 	}
-	
+
 	public static string ToJson<T>(this T value)
 	{
 		return JsonConvert.SerializeObject(value, Settings);

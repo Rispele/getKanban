@@ -204,32 +204,32 @@
     right: 10px;
 }
 
-.checkboxCardInput:checked ~ .checkboxCardStyle1{
+.checkboxCardInput:checked ~ .checkboxCardStyle1 {
     /*-webkit-box-shadow: 0 9px 72px -3px rgba(34, 139, 34, 0.51) inset;*/
     /*-moz-box-shadow: 0 9px 72px -3px rgba(34, 139, 34, 0.51) inset;*/
     /*box-shadow: 0 9px 72px -3px rgba(34, 139, 34, 0.51) inset;*/
-    animation: shadowInset1  0.1s linear forwards;
+    animation: shadowInset1 0.1s linear forwards;
 }
 
-.checkboxCardInput:checked ~ .checkboxCardStyle2{
+.checkboxCardInput:checked ~ .checkboxCardStyle2 {
     /*-webkit-box-shadow: 0 9px 72px -3px rgba(30, 144, 255, 0.51) inset;*/
     /*-moz-box-shadow: 0 9px 72px -3px rgba(30, 144, 255, 0.51) inset;*/
     /*box-shadow: 0 9px 72px -3px rgba(30, 144, 255, 0.51) inset;*/
-    animation: shadowInset2  0.1s linear forwards;
+    animation: shadowInset2 0.1s linear forwards;
 }
 
-.checkboxCardInput:checked ~ .checkboxCardStyle3{
+.checkboxCardInput:checked ~ .checkboxCardStyle3 {
     /*-webkit-box-shadow: 0 9px 72px -3px rgba(139, 0, 0, 0.51) inset;*/
     /*-moz-box-shadow: 0 9px 72px -3px rgba(139, 0, 0, 0.51) inset;*/
     /*box-shadow: 0 9px 72px -3px rgba(139, 0, 0, 0.51) inset;*/
-    animation: shadowInset3  0.1s linear forwards;
+    animation: shadowInset3 0.1s linear forwards;
 }
 
-.checkboxCardInput:checked ~ .checkboxCardStyle4{
+.checkboxCardInput:checked ~ .checkboxCardStyle4 {
     /*-webkit-box-shadow: 0 9px 72px -3px rgba(255, 170, 0, 0.51) inset;*/
     /*-moz-box-shadow: 0 9px 72px -3px rgba(255, 170, 0, 0.51) inset;*/
     /*box-shadow: 0 9px 72px -3px rgba(255, 170, 0, 0.51) inset;*/
-    animation: shadowInset4  0.1s linear forwards;
+    animation: shadowInset4 0.1s linear forwards;
 }
 
 .checkboxCardNumber {

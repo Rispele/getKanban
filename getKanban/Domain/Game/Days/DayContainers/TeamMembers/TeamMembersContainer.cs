@@ -38,14 +38,14 @@ public class TeamMembersContainer : DayContainer
 		{
 			throw new DomainException("Could not change role, because testers are locked");
 		}
-		
+
 		var teamMember = teamMembers.Single(t => t.Id == teamMemberId);
-		
+
 		if (teamMember.InitialRole == TeamRole.Tester && LockTesters)
 		{
 			throw new DomainException("Could not change role, because testers are locked");
 		}
-		
+
 		teamMember.UpdateTeamRole(to);
 		SetUpdated();
 	}

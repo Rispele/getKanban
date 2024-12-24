@@ -13,16 +13,16 @@ public static class ConfigurationExtensions
 		where T : FreezableDayContainer
 	{
 		builder.Property(e => e.Frozen);
-		
+
 		builder.ConfigureAsDayContainer();
 	}
 
-	
+
 	public static void ConfigureAsDayContainer<T>(this EntityTypeBuilder<T> builder)
 		where T : DayContainer
 	{
 		builder.HasKey(dc => dc.Id);
-		
+
 		builder.Property(e => e.Version).IsConcurrencyToken();
 		builder.Property(t => t.Timestamp).ConfigureAsRowVersion();
 

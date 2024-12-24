@@ -6,6 +6,5 @@ public class Step4Stage1TripleVersion : PageModel
 {
 	public void OnGet()
 	{
-		
 	}
 }

@@ -34,30 +34,36 @@ public class ApiController : Controller
 		var removed = await gameSessionService.RemoveParticipantAsync(requestContext, gameSessionId, userId);
 		return removed;
 	}
-	
+
 	[HttpPost("update-team-name")]
-	public async Task<bool> UpdateTeamName(Guid gameSessionId, Guid teamId, [FromBody] TeamNameUpdateDto teamNameUpdateDto)
+	public async Task<bool> UpdateTeamName(
+		Guid gameSessionId,
+		Guid teamId,
+		[FromBody] TeamNameUpdateDto teamNameUpdateDto)
 	{
 		var requestContext = RequestContextFactory.Build(Request);
-		
-		var updated = await gameSessionService.UpdateTeamName(gameSessionId, teamNameUpdateDto.TeamId, teamNameUpdateDto.TeamName);
+
+		var updated = await gameSessionService.UpdateTeamName(
+			gameSessionId,
+			teamNameUpdateDto.TeamId,
+			teamNameUpdateDto.TeamName);
 		return updated;
 	}
-	
+
 	[HttpPost("start-game")]
 	public async Task StartGame(Guid gameSessionId, Guid teamId)
 	{
 		var requestContext = RequestContextFactory.Build(Request);
 		await gameSessionService.StartGameAsync(requestContext, gameSessionId);
 	}
-	
+
 	[HttpPost("close-game")]
 	public async Task CloseGame(Guid gameSessionId, Guid teamId)
 	{
 		var requestContext = RequestContextFactory.Build(Request);
 		await gameSessionService.CloseGameSession(gameSessionId);
 	}
-	
+
 	[HttpPost("check-user-joined")]
 	public async Task<UserDto?> CheckUserJoined(Guid gameSessionId, Guid teamId)
 	{
@@ -73,7 +79,7 @@ public class ApiController : Controller
 			return null;
 		}
 	}
-	
+
 	[HttpPost("leave-game")]
 	public async Task<Guid?> LeaveGame(Guid gameSessionId, Guid teamId)
 	{
@@ -101,7 +107,10 @@ public class ApiController : Controller
 	}
 
 	[HttpPost("save-roles-transformation")]
-	public async Task SaveRolesTransformation(Guid gameSessionId, Guid teamId, [FromBody] RoleTransformationDto roleTransformationDto)
+	public async Task SaveRolesTransformation(
+		Guid gameSessionId,
+		Guid teamId,
+		[FromBody] RoleTransformationDto roleTransformationDto)
 	{
 		var requestContext = RequestContextFactory.Build(Request);
 		await teamService.PatchDayAsync(
@@ -111,7 +120,7 @@ public class ApiController : Controller
 			new UpdateTeamRolesCommand
 			{
 				TeamMemberId = roleTransformationDto.TeamMemberId,
-				To =  Enum.Parse<TeamRole>(roleTransformationDto.RoleTo)
+				To = Enum.Parse<TeamRole>(roleTransformationDto.RoleTo)
 			});
 	}
 
@@ -173,7 +182,7 @@ public class ApiController : Controller
 	{
 		var requestContext = RequestContextFactory.Build(Request);
 		var patchType = Enum.Parse<UpdateCfdContainerPatchType>(cfdEntryModel.PatchType);
-		
+
 		await teamService.PatchDayAsync(
 			requestContext,
 			gameSessionId,
@@ -302,11 +311,11 @@ public class ApiController : Controller
 				return Redirect($"/{gameSessionId}/{teamId}/step/{step}");
 			}
 
-			await UpdateCfd(gameSessionId, teamId, new CfdEntryModel() { PatchType = "WithAnalysts", Value = i });
-			await UpdateCfd(gameSessionId, teamId, new CfdEntryModel() { PatchType = "WithProgrammers", Value = i + 1 });
-			await UpdateCfd(gameSessionId, teamId, new CfdEntryModel() { PatchType = "WithTesters", Value = i + 2 });
-			await UpdateCfd(gameSessionId, teamId, new CfdEntryModel() { PatchType = "ToDeploy", Value = i + 3 });
-			await UpdateCfd(gameSessionId, teamId, new CfdEntryModel() { PatchType = "Released", Value = i + 4 });
+			await UpdateCfd(gameSessionId, teamId, new CfdEntryModel { PatchType = "WithAnalysts", Value = i });
+			await UpdateCfd(gameSessionId, teamId, new CfdEntryModel { PatchType = "WithProgrammers", Value = i + 1 });
+			await UpdateCfd(gameSessionId, teamId, new CfdEntryModel { PatchType = "WithTesters", Value = i + 2 });
+			await UpdateCfd(gameSessionId, teamId, new CfdEntryModel { PatchType = "ToDeploy", Value = i + 3 });
+			await UpdateCfd(gameSessionId, teamId, new CfdEntryModel { PatchType = "Released", Value = i + 4 });
 
 			if (i == dayTo && step == 7)
 			{

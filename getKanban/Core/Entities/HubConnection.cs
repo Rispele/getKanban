@@ -12,7 +12,7 @@ public class HubConnection
 	public string LobbyId { get; set; } = null!;
 
 	public string HubConnectionId { get; set; } = null!;
-	
+
 	[UsedImplicitly]
 	public HubConnection()
 	{

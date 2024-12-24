@@ -1,10 +1,10 @@
 ﻿.popup-card {
     position: relative;
-    
+
     box-sizing: content-box;
-    
+
     margin-bottom: 1rem;
-    
+
     top: 20px;
     right: 20px;
     padding: 10px;
@@ -22,16 +22,19 @@
     color: #9c4c4c;
     border: 1px solid #f5c6cb;
 }
+
 .notification {
     background-color: #97e3e8;
     color: #1d696e;
     border: 1px solid #6fc1c6;
 }
+
 .warning {
     background-color: #ffcb70;
     color: #a1772d;
     border: 1px solid #efb44e;
 }
+
 .success {
     background-color: #c5fcc8;
     color: #537d62;
@@ -44,6 +47,6 @@
     top: 1rem;
     margin-left: 1rem;
     z-index: 100;
-    
-    
+
+
 }

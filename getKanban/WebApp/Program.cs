@@ -3,7 +3,6 @@ using Core.Services.Contracts;
 using Core.Services.Implementations;
 using Domain.DbContexts;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using WebApp.Connection;
 using WebApp.Hubs;
 
@@ -18,18 +17,21 @@ builder.Services.AddSignalR();
 
 if (builder.Environment.IsDevelopment())
 {
-	builder.Services.AddDbContext<DomainContext>(optionsBuilder => optionsBuilder
-		.UseNpgsql("Host=localhost;Port=5432;Database=db;Username=usr;Password=pwd")
-		.UseSnakeCaseNamingConvention());
+	builder.Services.AddDbContext<DomainContext>(
+		optionsBuilder => optionsBuilder
+			.UseNpgsql("Host=localhost;Port=5432;Database=db;Username=usr;Password=pwd")
+			.UseSnakeCaseNamingConvention());
 }
 else
 {
 	var connectionStringProvider = new ConnectionStringProvider();
 	var connectionString = await connectionStringProvider.GetConnectionString();
-	builder.Services.AddDbContext<DomainContext>(optionsBuilder => optionsBuilder
-		.UseNpgsql(connectionString)
-		.UseSnakeCaseNamingConvention());
+	builder.Services.AddDbContext<DomainContext>(
+		optionsBuilder => optionsBuilder
+			.UseNpgsql(connectionString)
+			.UseSnakeCaseNamingConvention());
 }
+
 builder.Services.AddScoped<DayDtoConverter>();
 builder.Services.AddScoped<IGameSessionService, GameSessionService>();
 builder.Services.AddScoped<IDomainInteractionService, DomainInteractionService>();
@@ -53,8 +55,8 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapControllerRoute(
-	name: "default",
-	pattern: "{controller=Home}/{action=Index}");
+	"default",
+	"{controller=Home}/{action=Index}");
 app.MapRazorPages();
 app.MapHub<LobbyHub>("/lobbyHub");
 app.MapHub<TeamSessionHub>("/teamSessionHub");

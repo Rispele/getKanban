@@ -19,7 +19,7 @@ public partial class Team
 	public IReadOnlyList<Day> Days => days;
 
 	public bool IsTeamSessionEnded => IsLastDay && CurrentDay.CurrentlyAwaitedCommands.Count == 0;
-	
+
 	public bool IsLastDay => currentDayNumber == Settings.MaxDayNumber;
 
 	public Day CurrentDay
@@ -37,8 +37,6 @@ public partial class Team
 
 	public IReadOnlyList<AwaitedCommands> CurrentlyAwaitedCommands => CurrentDay.CurrentlyAwaitedCommands;
 
-	internal Day? PreviousDay => days.SingleOrDefault(d => d.Number == currentDayNumber - 1);
-
 	public IReadOnlyList<TeamMember> CurrentDayTeamRoleUpdates => CurrentDay.TeamMembersContainer.TeamMembers;
 
 	public IReadOnlyList<UpdateCfdContainer> CfdContainers => days
@@ -49,12 +47,6 @@ public partial class Team
 	public void ExecuteCommand(DayCommand command)
 	{
 		command.Execute(this, CurrentDay);
-	}
-
-	internal void AddNextDay()
-	{
-		currentDayNumber++;
-		days.Add(ConfigureDay(currentDayNumber, days));
 	}
 
 	public HashSet<Ticket> BuildTakenTickets()
@@ -100,28 +92,22 @@ public partial class Team
 		return CurrentDay.IsCfdValid(PreviousDay?.UpdateCfdContainer ?? UpdateCfdContainer.None);
 	}
 
-	internal int BuildAnotherTeamScores(IReadOnlyCollection<Day> daysToProcess)
+	public bool RollbackToDay(int dayNumber)
 	{
-		return daysToProcess.Select(d => d.WorkAnotherTeamContainer?.ScoresNumber ?? 0).Sum();
-	}
+		if (days.IsNullOrEmpty())
+		{
+			return false;
+		}
 
-	internal HashSet<string> GetTakenTicketIds(IReadOnlyList<Day> daysToProcess)
-	{
-		return Settings.InitiallyTakenTickets.Select(t => t.id)
-			.Concat(daysToProcess.SelectMany(d => d.UpdateSprintBacklogContainer.TicketIds))
-			.ToHashSet();
-	}
+		if (dayNumber > days.MaxBy(x => x.Number)!.Number)
+		{
+			return false;
+		}
 
-	internal HashSet<string> GetTicketsInWorkIds(IReadOnlyList<Day> daysToProcess)
-	{
-		var takenTickets = GetTakenTicketIds(daysToProcess);
-		takenTickets.ExceptWith(GetReleasedTicketIds(daysToProcess));
-		return takenTickets;
-	}
-
-	internal HashSet<string> GetReleasedTicketIds(IReadOnlyList<Day> daysToProcess)
-	{
-		return daysToProcess.SelectMany(d => d.ReleaseTicketContainer.TicketIds).ToHashSet();
+		days.RemoveAll(x => x.Number >= dayNumber);
+		currentDayNumber = dayNumber;
+		days.Add(ConfigureDay(currentDayNumber, days));
+		return true;
 	}
 
 	private Day ConfigureDay(int dayNumber, List<Day> daysToProcess)
@@ -140,7 +126,7 @@ public partial class Team
 		var scenario = ScenarioBuilder.Create()
 			.DefaultScenario(
 				anotherTeamAppeared,
-				shouldRelease: isReleaseDay || somethingToReleaseImmediately,
+				isReleaseDay || somethingToReleaseImmediately,
 				shouldUpdateSpringBacklog)
 			.Build();
 
@@ -166,21 +152,35 @@ public partial class Team
 		return new Day(daySettings, scenario);
 	}
 
-	public bool RollbackToDay(int dayNumber)
+	internal Day? PreviousDay => days.SingleOrDefault(d => d.Number == currentDayNumber - 1);
+
+	internal void AddNextDay()
 	{
-		if (days.IsNullOrEmpty())
-		{
-			return false;
-		}
-
-		if (dayNumber > days.MaxBy(x => x.Number)!.Number)
-		{
-			return false;
-		}
-
-		days.RemoveAll(x => x.Number >= dayNumber);
-		currentDayNumber = dayNumber;
+		currentDayNumber++;
 		days.Add(ConfigureDay(currentDayNumber, days));
-		return true;
+	}
+
+	internal int BuildAnotherTeamScores(IReadOnlyCollection<Day> daysToProcess)
+	{
+		return daysToProcess.Select(d => d.WorkAnotherTeamContainer?.ScoresNumber ?? 0).Sum();
+	}
+
+	internal HashSet<string> GetTakenTicketIds(IReadOnlyList<Day> daysToProcess)
+	{
+		return Settings.InitiallyTakenTickets.Select(t => t.id)
+			.Concat(daysToProcess.SelectMany(d => d.UpdateSprintBacklogContainer.TicketIds))
+			.ToHashSet();
+	}
+
+	internal HashSet<string> GetTicketsInWorkIds(IReadOnlyList<Day> daysToProcess)
+	{
+		var takenTickets = GetTakenTicketIds(daysToProcess);
+		takenTickets.ExceptWith(GetReleasedTicketIds(daysToProcess));
+		return takenTickets;
+	}
+
+	internal HashSet<string> GetReleasedTicketIds(IReadOnlyList<Day> daysToProcess)
+	{
+		return daysToProcess.SelectMany(d => d.ReleaseTicketContainer.TicketIds).ToHashSet();
 	}
 }

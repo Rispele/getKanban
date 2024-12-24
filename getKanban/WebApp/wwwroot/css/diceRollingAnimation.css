@@ -96,22 +96,27 @@
     transform: rotateY(0deg) translateZ(75px);
     animation: fade 3s forwards;
 }
+
 .two {
     transform: rotateY(90deg) translateZ(75px);
     animation: fade 3s forwards;
 }
+
 .three {
     transform: rotateY(180deg) translateZ(75px);
     animation: fade 3s forwards;
 }
+
 .four {
     transform: rotateY(-90deg) translateZ(75px);
     animation: fade 3s forwards;
 }
+
 .five {
     transform: rotateX(90deg) translateZ(75px);
     animation: fade 3s forwards;
 }
+
 .six {
     transform: rotateX(-90deg) translateZ(75px);
     animation: fade 3s forwards;

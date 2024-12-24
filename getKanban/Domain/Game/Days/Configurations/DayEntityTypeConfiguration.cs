@@ -38,7 +38,7 @@ public class DayEntityTypeConfiguration : IEntityTypeConfiguration<Day>
 			.WithOne()
 			.HasForeignKey<Day>()
 			.OnDelete(DeleteBehavior.Cascade);
-		
+
 		builder
 			.HasMany<AwaitedCommands>("awaitedCommands")
 			.WithOne()

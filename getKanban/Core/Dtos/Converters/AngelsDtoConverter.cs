@@ -12,7 +12,10 @@ public class AngelsDtoConverter
 		this.requesterRole = requesterRole;
 	}
 
-	public static AngelsDtoConverter For(ParticipantRole role) => new(role);
+	public static AngelsDtoConverter For(ParticipantRole role)
+	{
+		return new AngelsDtoConverter(role);
+	}
 
 	public AngelsDto Convert(ParticipantsContainer participantsContainer)
 	{

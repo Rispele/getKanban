@@ -11,7 +11,7 @@ public class TeamMember
 
 	public TeamRole InitialRole { get; init; }
 	public TeamRole CurrentRole { get; private set; }
-	
+
 	public long Version { get; [UsedImplicitly] private set; }
 
 	[UsedImplicitly]

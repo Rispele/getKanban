@@ -1,12 +1,11 @@
 using Core.Dtos;
-using Domain.Users;
 
 namespace Core.Services.Contracts;
 
 public interface IUserService
 {
 	public Task<Guid> CreateNewUser(string name);
-	
+
 	public Task<UserDto> GetUserById(Guid id);
 
 	public Task DeleteUserById(Guid id);

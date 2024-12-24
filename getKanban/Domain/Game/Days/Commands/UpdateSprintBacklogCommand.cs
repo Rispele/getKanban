@@ -12,6 +12,14 @@ public class UpdateSprintBacklogCommand : DayCommand
 
 	public bool Remove { get; init; }
 
+	private void EnsureCanTakeTickets(Team team)
+	{
+		if (team.GetTakenTicketIds(team.Days).Overlaps(TicketIds))
+		{
+			throw new DayActionIsProhibitedException("You cannot take already taken tickets");
+		}
+	}
+
 	internal override void Execute(Team team, Day day)
 	{
 		day.EnsureCanPostEvent(CommandType);
@@ -38,13 +46,5 @@ public class UpdateSprintBacklogCommand : DayCommand
 		}
 
 		day.PostDayEvent(CommandType, null);
-	}
-
-	private void EnsureCanTakeTickets(Team team)
-	{
-		if (team.GetTakenTicketIds(team.Days).Overlaps(TicketIds))
-		{
-			throw new DayActionIsProhibitedException("You cannot take already taken tickets");
-		}
 	}
 }

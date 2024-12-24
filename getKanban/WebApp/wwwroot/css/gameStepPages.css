@@ -16,9 +16,9 @@
     max-width: 1000px;
 
     background-color: #E6E6E6;
-    
+
     position: relative;
-    
+
     padding-top: 15px;
 }
 
@@ -128,7 +128,7 @@
     .infoContainer {
         width: 80%;
     }
-    
+
     .stepControlButtonsNonGlobal {
         width: 40%;
     }

@@ -4,8 +4,9 @@ namespace Core.Dtos;
 
 public class GameSessionDto
 {
+	public bool IsRecruitmentFinished = false;
 	public Guid Id { get; init; }
-	
+
 	public string Name { get; init; }
 
 	public TeamDto Angels { get; init; } = null!;
@@ -15,6 +16,4 @@ public class GameSessionDto
 	public ParticipantRole RequesterRole { get; init; }
 
 	public Guid RequesterId { get; set; }
-
-	public bool IsRecruitmentFinished = false;
 }

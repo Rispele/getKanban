@@ -62,7 +62,7 @@ public class Scenario_Test
 
 		nextAwaited.toAdd.Should().BeEmpty();
 	}
-	
+
 	[Test]
 	public void SingleEvent_WithSeveralConditions_MatchesFirst_ShouldReturnEmpty()
 	{
@@ -82,7 +82,7 @@ public class Scenario_Test
 
 		nextAwaited.toAdd.Should().ContainSingle(t => t == DayCommandType.EndDay);
 	}
-	
+
 	[Test]
 	public void SingleEvent_WithSeveralConditions_MatchesSecond_ShouldReturnEmpty()
 	{
@@ -102,7 +102,7 @@ public class Scenario_Test
 
 		nextAwaited.toAdd.Should().ContainSingle(t => t == DayCommandType.UpdateCfd);
 	}
-	
+
 	[Test]
 	public void SingleEvent_WithSeveralConditions_MatchesNone_ShouldReturnEmpty()
 	{

@@ -26,6 +26,7 @@
     flex-wrap: wrap;
     border: 1px solid black;
 }
+
 @media (max-width: 1000px) {
     .mine_table {
         width: 80%;
@@ -82,21 +83,25 @@ input::-webkit-inner-spin-button {
     background: -moz-linear-gradient(45deg, rgb(201, 165, 206) 4%, rgb(249, 201, 255) 81%);
     background: linear-gradient(45deg, rgb(201, 165, 206) 4%, rgb(249, 201, 255) 81%);
 }
+
 .rowStyle2 {
     background: -webkit-linear-gradient(45deg, rgb(202, 98, 98) 4%, rgb(255, 132, 132) 81%);
     background: -moz-linear-gradient(45deg, rgb(202, 98, 98) 4%, rgb(255, 132, 132) 81%);
     background: linear-gradient(45deg, rgb(202, 98, 98) 4%, rgb(255, 132, 132) 81%);
 }
+
 .rowStyle3 {
     background: -webkit-linear-gradient(45deg, rgb(125, 165, 200) 4%, rgb(159, 210, 255) 81%);
     background: -moz-linear-gradient(45deg, rgb(125, 165, 200) 4%, rgb(159, 210, 255) 81%);
     background: linear-gradient(45deg, rgb(125, 165, 200) 4%, rgb(159, 210, 255) 81%);
 }
+
 .rowStyle4 {
     background: -webkit-linear-gradient(45deg, rgb(150, 202, 154) 4%, rgb(190, 255, 195) 81%);
     background: -moz-linear-gradient(45deg, rgb(150, 202, 154) 4%, rgb(190, 255, 195) 81%);
     background: linear-gradient(45deg, rgb(150, 202, 154) 4%, rgb(190, 255, 195) 81%);
 }
+
 .rowStyle5 {
     background: -webkit-linear-gradient(45deg, rgb(178, 176, 176) 4%, rgb(222, 222, 222) 81%);
     background: -moz-linear-gradient(45deg, rgb(178, 176, 176) 4%, rgb(222, 222, 222) 81%);

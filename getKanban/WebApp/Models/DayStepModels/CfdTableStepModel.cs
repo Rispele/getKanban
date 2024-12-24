@@ -1,6 +1,6 @@
 ﻿namespace WebApp.Models.DayStepModels;
 
-public class CfdTableStepModel : StepModel 
+public class CfdTableStepModel : StepModel
 {
 	public int? Released { get; set; }
 	public int? ToDeploy { get; set; }

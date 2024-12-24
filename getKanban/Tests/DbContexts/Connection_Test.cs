@@ -10,7 +10,6 @@ public class Connection_Test
 	[TestCase(null)]
 	public void Connect_EnsureCreate_ShouldSuccessfullyCreate(string? connectionString)
 	{
-		
 		var db = TestDomainContextProvider.Get(connectionString);
 		db.Database.EnsureCreated();
 	}

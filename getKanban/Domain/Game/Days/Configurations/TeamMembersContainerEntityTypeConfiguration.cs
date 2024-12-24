@@ -1,5 +1,4 @@
-﻿using Domain.Game.Days.DayContainers;
-using Domain.Game.Days.DayContainers.TeamMembers;
+﻿using Domain.Game.Days.DayContainers.TeamMembers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,7 +9,7 @@ public class TeamMembersContainerEntityTypeConfiguration : IEntityTypeConfigurat
 	public void Configure(EntityTypeBuilder<TeamMembersContainer> builder)
 	{
 		builder.ConfigureAsDayContainer();
-		
+
 		builder
 			.HasMany<TeamMember>("teamMembers")
 			.WithOne();

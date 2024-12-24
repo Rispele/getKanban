@@ -9,7 +9,7 @@ public class ReleaseTicketContainerEntityTypeConfiguration : IEntityTypeConfigur
 	public void Configure(EntityTypeBuilder<ReleaseTicketContainer> builder)
 	{
 		builder.Ignore(e => e.TicketIds);
-		
+
 		builder.ConfigureAsFreezableDayContainer();
 
 		builder.Property(t => t.CanReleaseNotImmediatelyTickets);

@@ -18,7 +18,18 @@ public class ReleaseTicketsCommand : DayCommand
 		Remove = remove;
 	}
 
-	public static ReleaseTicketsCommand Create(string ticketId, bool remove) => new(ticketId, remove);
+	public static ReleaseTicketsCommand Create(string ticketId, bool remove)
+	{
+		return new ReleaseTicketsCommand(ticketId, remove);
+	}
+
+	private void EnsureCanReleaseTickets(Team team)
+	{
+		if (!team.GetTicketsInWorkIds(team.Days).Contains(TicketId))
+		{
+			throw new DayActionIsProhibitedException("You cannot release not in work tickets");
+		}
+	}
 
 	internal override void Execute(Team team, Day day)
 	{
@@ -34,19 +45,11 @@ public class ReleaseTicketsCommand : DayCommand
 		else
 		{
 			EnsureCanReleaseTickets(team);
-			
+
 			ticket.OnRelease?.Invoke(team);
 			day.ReleaseTicketContainer.Update(ticket);
 		}
 
 		day.PostDayEvent(CommandType, null);
-	}
-
-	private void EnsureCanReleaseTickets(Team team)
-	{
-		if (!team.GetTicketsInWorkIds(team.Days).Contains(TicketId))
-		{
-			throw new DayActionIsProhibitedException("You cannot release not in work tickets");
-		}
 	}
 }

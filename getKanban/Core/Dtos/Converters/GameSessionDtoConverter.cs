@@ -13,7 +13,10 @@ public class GameSessionDtoConverter
 		this.requesterRole = requesterRole;
 	}
 
-	public static GameSessionDtoConverter For(ParticipantRole role) => new(role);
+	public static GameSessionDtoConverter For(ParticipantRole role)
+	{
+		return new GameSessionDtoConverter(role);
+	}
 
 	public GameSessionDto Convert(GameSession gameSession)
 	{

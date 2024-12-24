@@ -6,6 +6,5 @@ public class FinalResultTemplate : PageModel
 {
 	public void OnGet()
 	{
-		
 	}
 }

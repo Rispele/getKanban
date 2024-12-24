@@ -6,6 +6,5 @@ public class WinnersPage : PageModel
 {
 	public void OnGet()
 	{
-		
 	}
 }

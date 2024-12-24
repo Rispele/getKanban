@@ -15,14 +15,14 @@ public class RequestContext
 	{
 		return FindUserId() ?? throw new KeyNotFoundException();
 	}
-	
+
 	public Guid? FindUserId()
 	{
 		if (headers.TryGetValue(RequestContextKeys.UserId, out var header))
 		{
 			return Guid.Parse(header);
 		}
-		
+
 		return null;
 	}
 }

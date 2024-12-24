@@ -14,7 +14,7 @@ public class ConnectionStringProvider
 		httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
 		secretId = Environment.GetEnvironmentVariable("CONNECTION_STRING_SECRET_ID")
-			?? throw new InvalidOperationException("CONNECTION_STRING_SECRET_ID is missing");
+		        ?? throw new InvalidOperationException("CONNECTION_STRING_SECRET_ID is missing");
 	}
 
 	public async Task<string> GetConnectionString()

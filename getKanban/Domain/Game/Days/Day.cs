@@ -31,7 +31,7 @@ public class Day
 	public long Id { get; }
 
 	public DaySettings DaySettings { get; } = null!;
-	
+
 	public int Number => DaySettings.Number;
 
 	public long Timestamp { get; [UsedImplicitly] private set; }
@@ -59,6 +59,11 @@ public class Day
 		UpdateCfdContainer = new UpdateCfdContainer();
 		ReleaseTicketContainer = new ReleaseTicketContainer(settings.CanReleaseNotImmediately);
 		UpdateSprintBacklogContainer = new UpdateSprintBacklogContainer();
+	}
+
+	private bool CanPostEvent(DayCommandType commandType)
+	{
+		return CurrentlyAwaitedCommands.Any(e => e.CommandType == commandType);
 	}
 
 	internal void PostDayEvent(DayCommandType dayCommandType, object? parameters)
@@ -137,10 +142,5 @@ public class Day
 		{
 			return !(currentSumToValidate < previousSumToValidate);
 		}
-	}
-
-	private bool CanPostEvent(DayCommandType commandType)
-	{
-		return CurrentlyAwaitedCommands.Any(e => e.CommandType == commandType);
 	}
 }

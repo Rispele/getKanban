@@ -8,8 +8,6 @@ namespace Domain.Game.Days;
 [EntityTypeConfiguration(typeof(AwaitedEventEntityTypeConfiguration))]
 public class AwaitedCommands
 {
-	internal long Id { get; }
-
 	public bool Removed { get; private set; }
 
 	public DayCommandType CommandType { get; }
@@ -24,6 +22,8 @@ public class AwaitedCommands
 	{
 		CommandType = commandType;
 	}
+
+	internal long Id { get; }
 
 	internal void MarkRemoved()
 	{

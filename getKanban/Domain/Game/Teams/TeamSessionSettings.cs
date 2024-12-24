@@ -53,7 +53,7 @@ public class TeamSessionSettings
 			.SelectMany(t => t.Value)
 			.ToList();
 	}
-	
+
 	public int GetProfitPerDay(int dayNumber)
 	{
 		return ProfitPerClientPerDay

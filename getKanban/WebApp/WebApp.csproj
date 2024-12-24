@@ -8,72 +8,72 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Breakdance.AspNetCore.SignalR" Version="6.0.0" />
-      <PackageReference Include="EFCore.NamingConventions" Version="8.0.3" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.10" />
+        <PackageReference Include="Breakdance.AspNetCore.SignalR" Version="6.0.0"/>
+        <PackageReference Include="EFCore.NamingConventions" Version="8.0.3"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.10"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Core\Core.csproj" />
-      <ProjectReference Include="..\Domain\Domain.csproj" />
+        <ProjectReference Include="..\Core\Core.csproj"/>
+        <ProjectReference Include="..\Domain\Domain.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <_ContentIncludedByDefault Remove="Views\GameLobby\Lobby.cshtml" />
-      <_ContentIncludedByDefault Remove="Views\Home\Index.cshtml" />
-      <_ContentIncludedByDefault Remove="Views\JoinGame\JoinGame.cshtml" />
-      <_ContentIncludedByDefault Remove="Views\TeamsCreation\Menu.cshtml" />
-      <_ContentIncludedByDefault Remove="Pages\TeamsCreation\Menu.cshtml" />
-      <_ContentIncludedByDefault Remove="Pages\JoinGame\JoinGame.cshtml" />
-      <_ContentIncludedByDefault Remove="Pages\DaySteps\Step1Stage0.cshtml" />
-      <_ContentIncludedByDefault Remove="Pages\DaySteps\Step1Stage1.cshtml" />
-      <_ContentIncludedByDefault Remove="Pages\DaySteps\Step1Stage2.cshtml" />
-      <_ContentIncludedByDefault Remove="Pages\DaySteps\Step2Stage0.cshtml" />
-      <_ContentIncludedByDefault Remove="Pages\DaySteps\Step3Stage0.cshtml" />
-      <_ContentIncludedByDefault Remove="Pages\DaySteps\Step4Stage0.cshtml" />
-      <_ContentIncludedByDefault Remove="Pages\DaySteps\Step4Stage1.cshtml" />
-      <_ContentIncludedByDefault Remove="Pages\DaySteps\Step4Stage2.cshtml" />
-      <_ContentIncludedByDefault Remove="Pages\DaySteps\Step5Stage0.cshtml" />
-      <_ContentIncludedByDefault Remove="Pages\DaySteps\Step5Stage1.cshtml" />
-      <_ContentIncludedByDefault Remove="Pages\DaySteps\Step5Stage2.cshtml" />
-      <_ContentIncludedByDefault Remove="Pages\Session\CreateSession.cshtml" />
-      <_ContentIncludedByDefault Remove="Pages\Session\EditSession.cshtml" />
-      <_ContentIncludedByDefault Remove="Pages\Session\JoinSession.cshtml" />
-      <_ContentIncludedByDefault Remove="Pages\Shared\Error.cshtml" />
-      <_ContentIncludedByDefault Remove="Pages\Shared\Index.cshtml" />
-      <_ContentIncludedByDefault Remove="Pages\Shared\_Layout.cshtml" />
-      <_ContentIncludedByDefault Remove="Pages\Shared\_ValidationScriptsPartial.cshtml" />
-      <_ContentIncludedByDefault Remove="Pages\Templates\Step1-1PageTemplate.cshtml" />
-      <_ContentIncludedByDefault Remove="Pages\Templates\Step1-2PageTemplate.cshtml" />
-      <_ContentIncludedByDefault Remove="Pages\Templates\Step4PageTemplate.cshtml" />
-      <_ContentIncludedByDefault Remove="wwwroot\js\dygraph\dygraph.min.js" />
+        <_ContentIncludedByDefault Remove="Views\GameLobby\Lobby.cshtml"/>
+        <_ContentIncludedByDefault Remove="Views\Home\Index.cshtml"/>
+        <_ContentIncludedByDefault Remove="Views\JoinGame\JoinGame.cshtml"/>
+        <_ContentIncludedByDefault Remove="Views\TeamsCreation\Menu.cshtml"/>
+        <_ContentIncludedByDefault Remove="Pages\TeamsCreation\Menu.cshtml"/>
+        <_ContentIncludedByDefault Remove="Pages\JoinGame\JoinGame.cshtml"/>
+        <_ContentIncludedByDefault Remove="Pages\DaySteps\Step1Stage0.cshtml"/>
+        <_ContentIncludedByDefault Remove="Pages\DaySteps\Step1Stage1.cshtml"/>
+        <_ContentIncludedByDefault Remove="Pages\DaySteps\Step1Stage2.cshtml"/>
+        <_ContentIncludedByDefault Remove="Pages\DaySteps\Step2Stage0.cshtml"/>
+        <_ContentIncludedByDefault Remove="Pages\DaySteps\Step3Stage0.cshtml"/>
+        <_ContentIncludedByDefault Remove="Pages\DaySteps\Step4Stage0.cshtml"/>
+        <_ContentIncludedByDefault Remove="Pages\DaySteps\Step4Stage1.cshtml"/>
+        <_ContentIncludedByDefault Remove="Pages\DaySteps\Step4Stage2.cshtml"/>
+        <_ContentIncludedByDefault Remove="Pages\DaySteps\Step5Stage0.cshtml"/>
+        <_ContentIncludedByDefault Remove="Pages\DaySteps\Step5Stage1.cshtml"/>
+        <_ContentIncludedByDefault Remove="Pages\DaySteps\Step5Stage2.cshtml"/>
+        <_ContentIncludedByDefault Remove="Pages\Session\CreateSession.cshtml"/>
+        <_ContentIncludedByDefault Remove="Pages\Session\EditSession.cshtml"/>
+        <_ContentIncludedByDefault Remove="Pages\Session\JoinSession.cshtml"/>
+        <_ContentIncludedByDefault Remove="Pages\Shared\Error.cshtml"/>
+        <_ContentIncludedByDefault Remove="Pages\Shared\Index.cshtml"/>
+        <_ContentIncludedByDefault Remove="Pages\Shared\_Layout.cshtml"/>
+        <_ContentIncludedByDefault Remove="Pages\Shared\_ValidationScriptsPartial.cshtml"/>
+        <_ContentIncludedByDefault Remove="Pages\Templates\Step1-1PageTemplate.cshtml"/>
+        <_ContentIncludedByDefault Remove="Pages\Templates\Step1-2PageTemplate.cshtml"/>
+        <_ContentIncludedByDefault Remove="Pages\Templates\Step4PageTemplate.cshtml"/>
+        <_ContentIncludedByDefault Remove="wwwroot\js\dygraph\dygraph.min.js"/>
     </ItemGroup>
 
     <ItemGroup>
-      <AdditionalFiles Include="Views\Admin\AdminPanelDays.cshtml" />
-      <AdditionalFiles Include="Views\Admin\AdminPanelEditing.cshtml" />
-      <AdditionalFiles Include="Views\Admin\AdminPanelStart.cshtml" />
-      <AdditionalFiles Include="Views\DaySteps\Step1Stage0.cshtml" />
-      <AdditionalFiles Include="Views\DaySteps\Step1Stage1.cshtml" />
-      <AdditionalFiles Include="Views\DaySteps\Step1Stage2.cshtml" />
-      <AdditionalFiles Include="Views\DaySteps\Step2Stage0.cshtml" />
-      <AdditionalFiles Include="Views\DaySteps\Step3Stage0.cshtml" />
-      <AdditionalFiles Include="Views\DaySteps\Step4Stage0.cshtml" />
-      <AdditionalFiles Include="Views\DaySteps\Step4Stage1.cshtml" />
-      <AdditionalFiles Include="Views\DaySteps\Step4Stage2.cshtml" />
-      <AdditionalFiles Include="Views\DaySteps\Step5Stage0.cshtml" />
-      <AdditionalFiles Include="Views\DaySteps\Step5Stage1.cshtml" />
-      <AdditionalFiles Include="Views\DaySteps\Step5Stage2.cshtml" />
-      <AdditionalFiles Include="Views\Shared\Error.cshtml" />
-      <AdditionalFiles Include="Views\Shared\Index.cshtml" />
-      <AdditionalFiles Include="Views\Shared\_Layout.cshtml" />
-      <AdditionalFiles Include="Views\Shared\_ValidationScriptsPartial.cshtml" />
+        <AdditionalFiles Include="Views\Admin\AdminPanelDays.cshtml"/>
+        <AdditionalFiles Include="Views\Admin\AdminPanelEditing.cshtml"/>
+        <AdditionalFiles Include="Views\Admin\AdminPanelStart.cshtml"/>
+        <AdditionalFiles Include="Views\DaySteps\Step1Stage0.cshtml"/>
+        <AdditionalFiles Include="Views\DaySteps\Step1Stage1.cshtml"/>
+        <AdditionalFiles Include="Views\DaySteps\Step1Stage2.cshtml"/>
+        <AdditionalFiles Include="Views\DaySteps\Step2Stage0.cshtml"/>
+        <AdditionalFiles Include="Views\DaySteps\Step3Stage0.cshtml"/>
+        <AdditionalFiles Include="Views\DaySteps\Step4Stage0.cshtml"/>
+        <AdditionalFiles Include="Views\DaySteps\Step4Stage1.cshtml"/>
+        <AdditionalFiles Include="Views\DaySteps\Step4Stage2.cshtml"/>
+        <AdditionalFiles Include="Views\DaySteps\Step5Stage0.cshtml"/>
+        <AdditionalFiles Include="Views\DaySteps\Step5Stage1.cshtml"/>
+        <AdditionalFiles Include="Views\DaySteps\Step5Stage2.cshtml"/>
+        <AdditionalFiles Include="Views\Shared\Error.cshtml"/>
+        <AdditionalFiles Include="Views\Shared\Index.cshtml"/>
+        <AdditionalFiles Include="Views\Shared\_Layout.cshtml"/>
+        <AdditionalFiles Include="Views\Shared\_ValidationScriptsPartial.cshtml"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="..\.dockerignore">
-        <Link>.dockerignore</Link>
-      </Content>
+        <Content Include="..\.dockerignore">
+            <Link>.dockerignore</Link>
+        </Content>
     </ItemGroup>
 
 </Project>

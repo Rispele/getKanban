@@ -19,7 +19,7 @@
                 <div class="finishDayResult clientLineStyle">
                     <p class="fs-6">Всего клиентов: @Model.TeamStatistic.TotalClientsGained</p>
                 </div>
-            
+
                 <div class="finishDayResult otherLineStyle">
                     <p class="fs-6">Штраф по клиентам составил: @Model.TeamStatistic.ClientsPenalty</p>
                 </div>
@@ -37,7 +37,7 @@
                 <div class="finishDayResult headerLineStyle text-center">
                     <h1 class="fs-6">По дням</h1>
                 </div>
-                
+
                 @foreach (var data in Model.TeamStatistic.DayStatistics.OrderByDescending(t => t.DayNumber))
                 {
                     <div class="finishDayResult dayLineStyle text-center">

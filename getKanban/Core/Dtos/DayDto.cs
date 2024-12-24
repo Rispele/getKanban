@@ -9,7 +9,7 @@ namespace Core.Dtos;
 public class DayDto
 {
 	public DayFullIdDto FullId { get; }
-	
+
 	public int AnalystsNumber { get; }
 	public int ProgrammersNumber { get; }
 	public int TestersNumber { get; }
@@ -27,7 +27,7 @@ public class DayDto
 	public DayStatus Status { get; }
 
 	public int Number { get; }
-	
+
 	public DayDto(
 		DayFullIdDto fullId,
 		int analystsNumber,

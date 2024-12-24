@@ -5,15 +5,15 @@
 
 @{
     Context.Response.Cookies.Append(RequestContextKeys.SessionId, Model.Id.ToString());
-    
-    var isAdmin = ((Model.RequesterRole & ParticipantRole.Creator) == ParticipantRole.Creator);
+
+    var isAdmin = (Model.RequesterRole & ParticipantRole.Creator) == ParticipantRole.Creator;
     var currentTeam = Model.Angels.Participants.Users.SingleOrDefault(x => x.Id == Model.RequesterId) != default
-       ? Model.Angels
-       : Model.Teams.Single(x => x.Participants.Users.SingleOrDefault(u => u.Id == Model.RequesterId) != default);
+        ? Model.Angels
+        : Model.Teams.Single(x => x.Participants.Users.SingleOrDefault(u => u.Id == Model.RequesterId) != default);
     var allTeams = Model.Teams.Concat([Model.Angels]).ToArray();
     var isCurrentTeamAngels = currentTeam.Name == "Ангелы";
     var pageToRedirectWhenGameStarted = isCurrentTeamAngels ? $"/admin?sessionId={Model.Id}" : $"/{Model.Id}/{currentTeam.Id}/step/1";
-    
+
     var allPlayerIds = Model.Teams
         .SelectMany(x => x.Participants.Users)
         .Select(x => x.Id)

@@ -9,13 +9,13 @@ public class AdminPanelDaysDto
 	public Guid TeamId { get; set; }
 
 	public string TeamName { get; set; } = null!;
-	
+
 	public DayDto CurrentDay { get; init; } = null!;
 
 	public int StartDayNumber { get; init; }
-	
+
 	public int FinishDayNumber { get; init; }
-	
+
 	public TeamStatisticDto? TeamStatistic { get; set; }
 
 	public bool IsFinished { get; set; }

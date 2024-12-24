@@ -136,7 +136,7 @@ public class DayDtoConverter
 	private IReadOnlyList<AwaitedEventsDto> Convert(IReadOnlyList<AwaitedCommands> awaitedCommandsList)
 	{
 		return awaitedCommandsList.Select(
-			x => new AwaitedEventsDto()
+			x => new AwaitedEventsDto
 			{
 				CommandType = x.CommandType
 			}).ToList();

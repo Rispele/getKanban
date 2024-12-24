@@ -1,15 +1,10 @@
-﻿using Core.DbContexts;
-using Core.DbContexts.Helpers;
+﻿using Core.DbContexts.Helpers;
 using Domain;
 using Domain.DbContexts;
 using Domain.Game;
 using Domain.Game.Days.Commands;
-using Domain.Game.Days.Configurations;
-using Domain.Game.Days.DayContainers;
 using Domain.Users;
 using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using NUnit.Framework;
 
 namespace Tests.DbContexts.SaveTests;
@@ -25,7 +20,7 @@ public class UpdateSpringBacklogSaveTicketsTests
 		var session = await SetupGameSession(
 			context,
 			session => session.Teams.Single().ExecuteCommand(new RollDiceCommand()));
-		
+
 		var command = new UpdateSprintBacklogCommand
 		{
 			TicketIds = ["S12"],
@@ -33,7 +28,7 @@ public class UpdateSpringBacklogSaveTicketsTests
 		};
 		session.Teams.Single().ExecuteCommand(command);
 		await context.TrySaveChangesAsync();
-		
+
 		var context2 = ConfigureDbContext();
 		var sessionFromDb = context2.Find<GameSession>(session.Id);
 

@@ -31,7 +31,7 @@ public class UserService : IUserService
 	public async Task<UserDto> GetUserById(Guid id)
 	{
 		var user = await context.GetUserAsync(id);
-		
+
 		return UserDtoConverter.Convert(user);
 	}
 

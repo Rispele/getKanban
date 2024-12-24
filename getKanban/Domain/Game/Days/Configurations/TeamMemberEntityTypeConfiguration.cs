@@ -9,7 +9,7 @@ public class TeamMemberEntityTypeConfiguration : IEntityTypeConfiguration<TeamMe
 	public void Configure(EntityTypeBuilder<TeamMember> builder)
 	{
 		builder.HasKey(x => x.Id);
-		
+
 		builder.Property(t => t.InitialRole).IsRequired();
 		builder.Property(t => t.CurrentRole).IsRequired();
 

@@ -1,7 +1,9 @@
-﻿async function fetchJSON(url, parameters=null, isText=false) {
+﻿async function fetchJSON(url, parameters = null, isText = false) {
     const response = await fetch(url, parameters);
     const responseText = await response.text();
-    if (isText) { return responseText; }
+    if (isText) {
+        return responseText;
+    }
     return responseText.length > 0 ? JSON.parse(responseText) : null;
 }
 

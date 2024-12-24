@@ -9,7 +9,7 @@ public static class UserDtoConverter
 		return new UserDto
 		{
 			Id = user.Id,
-			Name = user.Name,
+			Name = user.Name
 		};
 	}
 }

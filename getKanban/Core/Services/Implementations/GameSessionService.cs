@@ -5,10 +5,8 @@ using Core.Dtos.Converters;
 using Core.Helpers;
 using Core.RequestContexts;
 using Core.Services.Contracts;
-using Domain;
 using Domain.DbContexts;
 using Domain.Game;
-using Domain.Game.Days.Commands;
 
 namespace Core.Services.Implementations;
 
@@ -28,11 +26,11 @@ public class GameSessionService : IGameSessionService
 		var userRelatedSessions = sessions
 			.Where(
 				x => x.Teams.Any(t => t.Participants.Users.Any(u => u.Id == userId))
-				     || x.Angels.Participants.Users.Any(u => u.Id == userId))
+				  || x.Angels.Participants.Users.Any(u => u.Id == userId))
 			.ToList();
 		return userRelatedSessions.Select(
 				x =>
-					new GameSessionInfoDto()
+					new GameSessionInfoDto
 					{
 						GameSessionName = x.Name,
 						TeamsCount = x.Teams.Count,
@@ -90,25 +88,6 @@ public class GameSessionService : IGameSessionService
 			: session.EnsureHasAnyAccess(userId, inviteCode);
 
 		return GameSessionDtoConverter.For(participantRole).Convert(session);
-	}
-
-	public async Task<GameSessionDto?> FindGameSession(
-		RequestContext requestContext,
-		Guid sessionId,
-		bool ignorePermissions)
-	{
-		var userId = requestContext.GetUserId();
-		var session = await context.FindGameSessionsAsync(sessionId);
-		if (session?.EnsureHasAccess(userId) is null)
-		{
-			return null;
-		}
-
-		var participantRole = ignorePermissions
-			? ParticipantRole.Creator
-			: session.EnsureHasAccess(userId);
-
-		return GameSessionDtoConverter.For(participantRole!.Value).Convert(session);
 	}
 
 	public async Task<AddParticipantResult?> AddParticipantAsync(RequestContext requestContext, string inviteCode)
@@ -236,5 +215,24 @@ public class GameSessionService : IGameSessionService
 		//var isEndDayAwaited = team.CurrentlyAwaitedCommands.Any(x => x.CommandType is DayCommandType.EndDay);
 		var isCfdValid = team.IsCurrentDayCfdValid();
 		return isCfdValid;
+	}
+
+	public async Task<GameSessionDto?> FindGameSession(
+		RequestContext requestContext,
+		Guid sessionId,
+		bool ignorePermissions)
+	{
+		var userId = requestContext.GetUserId();
+		var session = await context.FindGameSessionsAsync(sessionId);
+		if (session?.EnsureHasAccess(userId) is null)
+		{
+			return null;
+		}
+
+		var participantRole = ignorePermissions
+			? ParticipantRole.Creator
+			: session.EnsureHasAccess(userId);
+
+		return GameSessionDtoConverter.For(participantRole!.Value).Convert(session);
 	}
 }

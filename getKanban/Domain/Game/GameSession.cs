@@ -10,15 +10,14 @@ namespace Domain.Game;
 [EntityTypeConfiguration(typeof(GameSessionEntityTypeConfiguration))]
 public class GameSession
 {
+	public bool IsRecruitmentFinished = false;
+	private List<Team> teams { get; } = null!;
 	public Guid Id { get; }
 	public string Name { get; } = null!;
 
 	public ParticipantsContainer Angels { get; } = null!;
-	private List<Team> teams { get; } = null!;
 
 	public IReadOnlyList<Team> Teams => teams;
-
-	public bool IsRecruitmentFinished = false;
 
 	[UsedImplicitly]
 	private GameSession()
@@ -74,8 +73,8 @@ public class GameSession
 
 	public ParticipantRole? EnsureHasAccess(Guid userId)
 	{
-		return Angels.Contains(userId) 
-			? Angels.GetParticipant(userId).Role 
+		return Angels.Contains(userId)
+			? Angels.GetParticipant(userId).Role
 			: FindUserTeam(userId)?.Players.GetParticipant(userId).Role;
 	}
 

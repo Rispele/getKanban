@@ -15,13 +15,13 @@ public static class InviteCodeHelper
 		var inviteCode = $"{sessionId}.{teamId}";
 		return inviteCode;
 	}
-	
+
 	public static Guid ResolveGameSessionId(string inviteCode)
 	{
 		var (gameSessionId, _) = SplitInviteCode(inviteCode);
 		return gameSessionId;
 	}
-	
+
 	public static Guid ResolveTeamId(string inviteCode)
 	{
 		var (_, teamId) = SplitInviteCode(inviteCode);
