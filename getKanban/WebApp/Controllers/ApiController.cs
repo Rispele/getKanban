@@ -315,6 +315,11 @@ public class ApiController : Controller
 			return "6/1";
 		}
 
+		if (currentDay.Number == 18)
+		{
+			return "game-result";
+		}
+
 		throw new InvalidOperationException();
 	}
 

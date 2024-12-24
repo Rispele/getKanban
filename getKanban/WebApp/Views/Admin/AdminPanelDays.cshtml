@@ -240,29 +240,31 @@
         }
     });
     
-    const button = document.getElementsByClassName(`restart`)[0];
-    javascriptConfirm(button, {
-        title: `Перезапустить день`,
-        message: `Вы уверены, что хотите перезапустить день @Model.CurrentDay.Number для команды @Model.TeamName?`,
-        confirmText: "Да",
-        cancelText: "Нет",
-        cancelOnBackdropClick: true,
-        onConfirm: async function() {
-            await fetch("/@Model.SessionId/@Model.TeamId/api/restart-day", {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    SessionId: "@Model.SessionId",
-                    TeamId: "@Model.TeamId",
-                    DayNumber: @Model.CurrentDay.Number,
-                })
-            });
-            await connection.invoke("RollbackToDay", "@Model.SessionId", "@Model.TeamId", @Model.CurrentDay.Number);
-            window.location.href = `/admin?sessionId=@Model.SessionId`;
-        }
-    });
+    const button = document.getElementsByClassName(`restart`);
+    if (button.length > 0) {
+        javascriptConfirm(button[0], {
+            title: `Перезапустить день`,
+            message: `Вы уверены, что хотите перезапустить день @Model.CurrentDay.Number для команды @Model.TeamName?`,
+            confirmText: "Да",
+            cancelText: "Нет",
+            cancelOnBackdropClick: true,
+            onConfirm: async function() {
+                await fetch("/@Model.SessionId/@Model.TeamId/api/restart-day", {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        SessionId: "@Model.SessionId",
+                        TeamId: "@Model.TeamId",
+                        DayNumber: @Model.CurrentDay.Number,
+                    })
+                });
+                await connection.invoke("RollbackToDay", "@Model.SessionId", "@Model.TeamId", @Model.CurrentDay.Number);
+                window.location.href = `/admin?sessionId=@Model.SessionId`;
+            }
+        });
+    }
     
     document.getElementById(`prev`).addEventListener(`click`, () => {
         window.location.href = `/admin?sessionId=@Model.SessionId`;

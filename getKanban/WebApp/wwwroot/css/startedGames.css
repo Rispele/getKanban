@@ -84,6 +84,13 @@
     right: 0;
 }
 
+.right-position {
+    width: 10%;
+    height: 40px;
+    right: 0;
+    top: 50%;
+}
+
 .startedGameStyle1 {
     background: -webkit-linear-gradient(45deg, rgb(106, 208, 7), rgb(130, 255, 9));
     background: -moz-linear-gradient(45deg, rgb(106, 208, 7), rgb(130, 255, 9));

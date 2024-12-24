@@ -32,6 +32,10 @@ public class GameSessionService : IGameSessionService
 				x =>
 					new GameSessionInfoDto
 					{
+						GameSessionId = x.Id,
+						TeamId = x.Teams.Any(t => t.Participants.Users.Any(u => u.Id == userId))
+							? x.Teams.First(t => t.Participants.Users.Any(u => u.Id == userId)).Id
+							: x.Angels.Id,
 						GameSessionName = x.Name,
 						TeamsCount = x.Teams.Count,
 						GameSessionStatus = x.IsRecruitmentFinished

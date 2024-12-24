@@ -1,4 +1,5 @@
 ﻿@using Domain
+@using Domain.Game
 @model WebApp.Models.MainMenuModel
 
 <script>
@@ -68,9 +69,20 @@
                         <p class="startedGameInfo left-bottom-position">Число команд: @game.TeamsCount</p>
                         <p class="startedGameInfo right-top-position">Ваша роль: @game.ParticipantRole</p>
                         <p class="startedGameInfo right-bottom-position">Статус игры: @game.GameSessionStatus</p>
+                        <img src="~/images/enter.svg" width="40" height="40" id="@game.GameSessionId/@game.TeamId" class="startedGameInfo right-position @(game.ParticipantRole is ParticipantRole.Angel ? "angel" : "player")">
                     </div>
                 }
             </div>
         </div>
     }
 </div>
+
+<script>
+    const gameLinks = @Html.Raw(Json.Serialize(Model.UserGames.Select(x => $"{x.GameSessionId}/{x.TeamId}")));
+    for (let link of gameLinks) {
+        let button = document.getElementById(link);
+        button.addEventListener('click', () => {
+            window.location.href = button.className.indexOf(`angel`) === -1 ? `/${link}/step/1/0` : `/admin?sessionId=${link.split("/")[0]}`
+        });
+    }
+</script>

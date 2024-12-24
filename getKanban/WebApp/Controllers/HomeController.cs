@@ -52,6 +52,8 @@ public class HomeController : Controller
 			UserGames = userRelatedSessionDtos.Select(
 				x => new MainMenuGameModel
 				{
+					GameSessionId = x.GameSessionId,
+					TeamId = x.TeamId,
 					GameSessionName = x.GameSessionName,
 					GameSessionStatus = x.GameSessionStatus,
 					ParticipantRole = x.RequesterParticipantRole,
