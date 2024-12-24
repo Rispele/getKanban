@@ -3,6 +3,7 @@ using Core.Services.Contracts;
 using Core.Services.Implementations;
 using Domain.DbContexts;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using WebApp.Connection;
 using WebApp.Hubs;
 
@@ -27,10 +28,8 @@ else
 	var connectionString = await connectionStringProvider.GetConnectionString();
 	builder.Services.AddDbContext<DomainContext>(optionsBuilder => optionsBuilder
 		.UseNpgsql(connectionString)
-		.LogTo(Console.WriteLine, LogLevel.Error)
 		.UseSnakeCaseNamingConvention());
 }
-builder.Services.AddScoped<DomainContext>();
 builder.Services.AddScoped<DayDtoConverter>();
 builder.Services.AddScoped<IGameSessionService, GameSessionService>();
 builder.Services.AddScoped<IDomainInteractionService, DomainInteractionService>();
