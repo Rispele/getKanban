@@ -35,13 +35,6 @@ public class UserService : IUserService
 		return UserDtoConverter.Convert(user);
 	}
 
-	public async Task DeleteUserById(Guid id)
-	{
-		var user = await context.GetUserAsync(id);
-
-		context.Users.Remove(user);
-	}
-
 	public async Task SetUserName(Guid userId, string userName)
 	{
 		var user = await context.GetUserAsync(userId);

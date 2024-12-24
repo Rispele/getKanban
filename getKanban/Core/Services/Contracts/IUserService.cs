@@ -8,7 +8,5 @@ public interface IUserService
 
 	public Task<UserDto> GetUserById(Guid id);
 
-	public Task DeleteUserById(Guid id);
-
 	public Task SetUserName(Guid userId, string userName);
 }
