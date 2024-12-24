@@ -1,4 +1,5 @@
-﻿@model WebApp.Models.MainMenuModel
+﻿@using Domain
+@model WebApp.Models.MainMenuModel
 
 <script>
     function redirectCreate() {
@@ -21,22 +22,55 @@
     }
 </script>
 
-<div class="text-center authorizationContainer centered-100">
-    <div class="authorizationHeader">
-        <h1 class="display-3">getKanban</h1>
+@* <script> *@
+@*     document.addEventListener("resize", () => { *@
+@*         const pageContainer = document.getElementsByClassName("authorizationContainer2")[0]; *@
+@*         const authContainer = document.getElementsByClassName("authorizationContainer")[0]; *@
+@*         const gamesContainer = document.getElementsByClassName("startedGamesContainer")[0]; *@
+@*          *@
+@*         if (pageContainer.style("width") <= 800) { *@
+@*             authContainer.setAttribute("class", "centered"); *@
+@*             gamesContainer.setAttribute("class", "centered"); *@
+@*         } else if (authContainer.hasClass("centered")) { *@
+@*             authContainer.removeClass("centered"); *@
+@*             gamesContainer.removeClass("centered"); *@
+@*         } *@
+@*     }) *@
+@* </script> *@
+
+<div class="authorizationContainer2 centered-100">
+    <div class="text-center authorizationContainer centered">
+        <div class="authorizationHeader">
+            <h1 class="display-3">getKanban</h1>
+        </div>
+        <div class="authorizationButtons">
+            <input type="text" class="text-center authorizationButtonsTemplate authorizationCommandName" value="@Model.UserName" placeholder="Ваше имя"/>
+            <button class="authorizationButtonsTemplate authorizationButton" onclick="redirectCreate()">Создать игру</button>
+            <button class="authorizationButtonsTemplate authorizationButton" onclick="redirectJoin()">Присоединиться к игре</button>
+        </div>
     </div>
-    <div class="authorizationButtons">
-        <input type="text" class="text-center authorizationButtonsTemplate authorizationCommandName" value="@Model.UserName" placeholder="Ваше имя"/>
-        <button class="authorizationButtonsTemplate authorizationButton" onclick="redirectCreate()">Создать игру</button>
-        <button class="authorizationButtonsTemplate authorizationButton" onclick="redirectJoin()">Присоединиться к игре</button>
-    </div>
-    <div>
-        @foreach (var game in Model.UserGames)
-        {
-            <p>@game.GameSessionName</p>
-            <p>Число команд: @game.TeamsCount</p>
-            <p>Ваша роль: @game.ParticipantRole</p>
-            <p>Статус игры: @game.GameSessionStatus</p>
-        }
-    </div>
+
+    @if (!Model.UserGames.IsNullOrEmpty())
+    {
+        <div class="startedGamesContainer centered">
+            <h1 class="startedGamesHeader text-center fs-2">Ваши игры</h1>
+            <div class="startedGamesScrollable">
+                @foreach (var game in Model.UserGames)
+                {
+                    var gameStatus = game.GameSessionStatus switch
+                    {
+                        "Набор игроков" => "startedGameStyle1",
+                        "В процессе" => "startedGameStyle2",
+                        "Завершена" => "startedGameStyle3"
+                    }; 
+                    <div class="startedGame @gameStatus">
+                        <p class="startedGameInfo left-top-position">@game.GameSessionName</p>
+                        <p class="startedGameInfo left-bottom-position">Число команд: @game.TeamsCount</p>
+                        <p class="startedGameInfo right-top-position">Ваша роль: @game.ParticipantRole</p>
+                        <p class="startedGameInfo right-bottom-position">Статус игры: @game.GameSessionStatus</p>
+                    </div>
+                }
+            </div>
+        </div>
+    }
 </div>

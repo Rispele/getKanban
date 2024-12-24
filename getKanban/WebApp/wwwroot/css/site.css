@@ -25,9 +25,22 @@ body {
     background-color: black;
 }
 
+.authorizationContainer2 {
+  width: 80%;
+  max-width: 850px;
+  height: fit-content;
+  
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  
+  gap: 100px;
+}
+
 .authorizationContainer {
     width: 300px;
-    height: 400px;
+    min-height: 400px;
+    height: fit-content;
 }
 
 .authorizationHeader {

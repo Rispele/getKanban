@@ -64,10 +64,14 @@
 
 /* Строки таблицы */
 .role-table-row {
+    width: calc(100% - 10px);
+    
+    margin: 0 auto;
+    
     display: flex;
-    min-height: 80px;
+    min-height: calc((240px - 5px) / 3);
     height: fit-content;
-    line-height: 80px;
+    line-height: calc((240px - 5px) / 3);
 
     border-top: 1px solid black;
 }
@@ -77,10 +81,6 @@
     text-align: center;
 
     border-right: 1px solid black;
-
-    -webkit-box-shadow: 0px 9px 72px -50px rgba(0, 0, 0, 0.51) inset;
-    -moz-box-shadow: 0px 9px 72px -50px rgba(0, 0, 0, 0.51) inset;
-    box-shadow: 0px 9px 72px -50px rgba(0, 0, 0, 0.51) inset;
 }
 
 .role-table-cell:last-child {
@@ -101,4 +101,22 @@
     position: absolute;
 
     left: 0;
+}
+
+.analystStyle {
+    background: -webkit-linear-gradient(45deg, rgb(202, 98, 98) 4%, rgb(255, 132, 132) 81%);
+    background: -moz-linear-gradient(45deg, rgb(202, 98, 98) 4%, rgb(255, 132, 132) 81%);
+    background: linear-gradient(45deg, rgb(202, 98, 98) 4%, rgb(255, 132, 132) 81%);
+}
+
+.programmerStyle {
+    background: -webkit-linear-gradient(45deg, rgb(125, 165, 200) 4%, rgb(159, 210, 255) 81%);
+    background: -moz-linear-gradient(45deg, rgb(125, 165, 200) 4%, rgb(159, 210, 255) 81%);
+    background: linear-gradient(45deg, rgb(125, 165, 200) 4%, rgb(159, 210, 255) 81%);
+}
+
+.testerStyle {
+    background: -webkit-linear-gradient(45deg, rgb(125, 200, 124), rgb(147, 238, 146));
+    background: -moz-linear-gradient(45deg, rgb(125, 200, 124), rgb(147, 238, 146));
+    background: linear-gradient(45deg, rgb(125, 200, 124), rgb(147, 238, 146));
 }

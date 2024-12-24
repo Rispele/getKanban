@@ -77,7 +77,7 @@
                 <div class="role-table-header-cell">Сумма работ</div>
             </div>
             <!-- Строки таблицы -->
-            <div class="role-table-row">
+            <div class="role-table-row analystStyle">
                 <div class="role-table-cell">Аналитики</div>
                 <div class="role-table-cell">
                     @foreach (var s in SelectScores(TeamRoleDto.Analyst))
@@ -86,7 +86,7 @@
                     }
                 </div>
             </div>
-            <div class="role-table-row">
+            <div class="role-table-row programmerStyle">
                 <div class="role-table-cell">Разработчики</div>
                 <div class="role-table-cell">
                     @foreach (var s in SelectScores(TeamRoleDto.Programmer))
@@ -95,7 +95,7 @@
                     }
                 </div>
             </div>
-            <div class="role-table-row">
+            <div class="role-table-row testerStyle">
                 <div class="role-table-cell">Тестировщики</div>
                 <div class="role-table-cell">
                     @foreach (var s in SelectScores(TeamRoleDto.Tester))
