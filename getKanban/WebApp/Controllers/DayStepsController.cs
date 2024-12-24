@@ -187,6 +187,21 @@ public class DayStepsController : Controller
 		return View(ticketCheckStepModel);
 	}
 
+	[HttpGet("5/0")]
+	public async Task<IActionResult> Step5Stage0(Guid gameSessionId, Guid teamId)
+	{
+		var requestContext = RequestContextFactory.Build(Request);
+
+		await teamService.RemoveCurrentlyAwaitedCommandsOfType(
+			DayCommandType.ReleaseTickets,
+			requestContext,
+			gameSessionId,
+			teamId);
+		
+		var model = await FillWithCredentialsAsync<StepModel>(requestContext, gameSessionId, teamId);
+		return View(model);
+	}
+
 	[HttpGet("5/1")]
 	public async Task<IActionResult> Step5Stage1(Guid gameSessionId, Guid teamId)
 	{
@@ -247,6 +262,12 @@ public class DayStepsController : Controller
 	public async Task<IActionResult> Step6Stage0(Guid gameSessionId, Guid teamId)
 	{
 		var requestContext = RequestContextFactory.Build(Request);
+		
+		await teamService.RemoveCurrentlyAwaitedCommandsOfType(
+			DayCommandType.UpdateSprintBacklog,
+			requestContext,
+			gameSessionId,
+			teamId);
 
 		var currentDay = await teamService.GetCurrentDayAsync(requestContext, gameSessionId, teamId);
 		var teamStatistic = await statisticsService.CollectStatistic(gameSessionId, teamId);
@@ -273,6 +294,12 @@ public class DayStepsController : Controller
 	public async Task<IActionResult> Step6Stage1(Guid gameSessionId, Guid teamId)
 	{
 		var requestContext = RequestContextFactory.Build(Request);
+		
+		await teamService.RemoveCurrentlyAwaitedCommandsOfType(
+			DayCommandType.UpdateCfd,
+			requestContext,
+			gameSessionId,
+			teamId);
 
 		var teamStatistic = await statisticsService.CollectStatistic(gameSessionId, teamId);
 

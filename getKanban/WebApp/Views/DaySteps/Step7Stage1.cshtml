@@ -17,7 +17,7 @@
     </div>
 </div>
 
-<button class="stepControlButtons rightButton" id="prev">
+<button class="stepControlButtons leftButton" id="prev">
     Назад
 </button>
 
@@ -34,12 +34,16 @@ else
     </button>
 }
 
+<script src="~/js/current-page-resolution.js"></script>
 <script src="~/js/fetchJSON.js"></script>
 <script src="~/js/page-switch.js"></script>
 <script src="~/js/setup-hub-connection.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
-<script>
+<script type="module">
     const connection = setupHubConnection(new signalR.HubConnectionBuilder(), "@Model.GameSessionId", "@Model.TeamId");
+
+    await resolveCurrentPage(connection, `@Model.GameSessionId`, `@Model.TeamId`, `end-day`);
+
     setSwitchEvent("prev", connection, "@Model.GameSessionId", "@Model.TeamId", 7, 0);
     setRollbackEvent(connection);
     
@@ -51,7 +55,11 @@ else
         const nextDayButton = document.getElementById("next-day");
         if (nextDayButton !== null && nextDayButton !== undefined) {
             nextDayButton.addEventListener('click', async () => {
-                await fetchPostJSON(`/@Model.GameSessionId/@Model.TeamId/api/end-day`);
+                const day = await fetchPostJSON(`/@Model.GameSessionId/@Model.TeamId/api/end-day`);
+                if (day === null) {
+                    showMessage("Ошибка сервера при завершении дня.\nПопробуйте обновить страницу", MessageType.ERROR)
+                    return;
+                }
                 await connection.invoke("FinishDay", "@Model.GameSessionId", "@Model.TeamId");
                 await connection.invoke("ChangePage", "@Model.GameSessionId", "@Model.TeamId", 1, 0)
                 window.location.href = `/@Model.GameSessionId/@Model.TeamId/step/1`;
@@ -61,7 +69,11 @@ else
         const finishGameButton = document.getElementById("finish-game");
         if (finishGameButton !== null && finishGameButton !== undefined) {
             finishGameButton.addEventListener('click', async () => {
-                await fetchPostJSON(`/@Model.GameSessionId/@Model.TeamId/api/end-day`);
+                const day = await fetchPostJSON(`/@Model.GameSessionId/@Model.TeamId/api/end-day`);
+                if (day === null) {
+                    showMessage("Ошибка сервера при завершении игры.\nПопробуйте обновить страницу", MessageType.ERROR)
+                    return;
+                }
                 await connection.invoke("ShowGameResult", "@Model.GameSessionId", "@Model.TeamId")
                 window.location.href = `/@Model.GameSessionId/@Model.TeamId/step/game-result`;
             });

@@ -154,6 +154,11 @@ public partial class Team
 
 	internal Day? PreviousDay => days.SingleOrDefault(d => d.Number == currentDayNumber - 1);
 
+	public void RemoveCurrentlyAwaitedCommandsOfType(DayCommandType type)
+	{
+		CurrentDay.RemoveCurrentlyAwaitedCommandsOfType(type);
+	}
+
 	internal void AddNextDay()
 	{
 		currentDayNumber++;

@@ -64,27 +64,24 @@
     <p class="fs-6">Бросить кубики</p>
 </button>
 
+<script src="~/js/current-page-resolution.js"></script>
 <script src="~/js/fetchJSON.js"></script>
 <script src="~/js/page-switch.js"></script>
 <script src="~/js/setup-hub-connection.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script type="module">
     const connection = setupHubConnection(new signalR.HubConnectionBuilder(), "@Model.GameSessionId", "@Model.TeamId");
-    
-    if (await checkPageAvailable("@Model.GameSessionId", "@Model.TeamId", "roll") !== true ||
-        await checkPageAvailable("@Model.GameSessionId", "@Model.TeamId", "update-role") !== true
-    ) {
-        const response = await fetchJSON(`/@Model.GameSessionId/@Model.TeamId/api/get-current-step`, null, true);
-        const pageNumber = parseInt(response.split('/')[0]);
-        const stageNumber = parseInt(response.split('/')[1]);
-        await connection.invoke("ChangePage", "@Model.GameSessionId", "@Model.TeamId", pageNumber, stageNumber);
-        window.location.href = `/@Model.GameSessionId/@Model.TeamId/step/${response}`;
-    }
+
+    await resolveCurrentPage(connection, `@Model.GameSessionId`, `@Model.TeamId`, `roll`);
     
     setRollbackEvent(connection);
     
-    document.getElementById("roll").addEventListener('click', async () => { 
-        await fetchJSON(`/@Model.GameSessionId/@Model.TeamId/api/roll`);
+    document.getElementById("roll").addEventListener('click', async () => {
+        const roll = await fetchJSON(`/@Model.GameSessionId/@Model.TeamId/api/roll`);
+        if (roll === null) {
+            showMessage("Ошибка сервера при броске кубика.\nПопробуйте обновить страницу", MessageType.ERROR)
+            return;
+        }
         await connection.invoke("ChangePage", "@Model.GameSessionId", "@Model.TeamId", 2, 0);
         window.location.href = `/@Model.GameSessionId/@Model.TeamId/step/2/0`;
     });
@@ -105,8 +102,12 @@
             if (shouldLockTesters && (testerMemberIds.indexOf(teamMemberId) >= 0 || roleTo === `Tester`)) {
                 showMessage(`В этот день тестировщики не могут менять свою роль и другие роли не могут меняться на роль тестировщиков`, MessageType.ERROR);
             } else {
-                await fetchPostJSON("/@Model.GameSessionId/@Model.TeamId/api/save-roles-transformation", JSON.stringify({teamMemberId: teamMemberId, roleTo: roleTo}))
-                await connection.invoke("UpdateRole", "@Model.GameSessionId", "@Model.TeamId", parseInt(teamMemberId), roleTo);
+                const day = await fetchPostJSON("/@Model.GameSessionId/@Model.TeamId/api/save-roles-transformation", JSON.stringify({teamMemberId: teamMemberId, roleTo: roleTo}));
+                if (day === null) {
+                    showMessage("Ошибка сервера при обновлении ролей.\nПопробуйте обновить страницу", MessageType.ERROR);
+                } else {
+                    await connection.invoke("UpdateRole", "@Model.GameSessionId", "@Model.TeamId", parseInt(teamMemberId), roleTo);
+                }
             }
         });
     }

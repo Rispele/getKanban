@@ -12,16 +12,23 @@
 
 <button class="stepControlButtons rightButton" id="roll">Кинуть за петю</button>
 
+<script src="~/js/current-page-resolution.js"></script>
 <script src="~/js/fetchJSON.js"></script>
 <script src="~/js/page-switch.js"></script>
 <script src="~/js/setup-hub-connection.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script type="module">
     const connection = setupHubConnection(new signalR.HubConnectionBuilder(), "@Model.GameSessionId", "@Model.TeamId");
-    
+
+    await resolveCurrentPage(connection, `@Model.GameSessionId`, `@Model.TeamId`, `work-another-team`);
+
     document.getElementById('roll').addEventListener('click', async () => {
         const dice = await fetchPostJSON(`/@Model.GameSessionId/@Model.TeamId/api/another-team-roll`);
-        connection.invoke(`AnotherTeamDiceRoll`, `@Model.GameSessionId`, `@Model.TeamId`, dice[`diceNumber`], dice[`scoresNumber`], dice['totalScores']);
+        if (dice === null) {
+            showMessage("Ошибка сервера при броске кубика.\nПопробуйте обновить страницу", MessageType.ERROR);
+        } else {
+            connection.invoke(`AnotherTeamDiceRoll`, `@Model.GameSessionId`, `@Model.TeamId`, dice[`diceNumber`], dice[`scoresNumber`], dice['totalScores']);
+        }
     });
     
     connection.on('NotifyAnotherTeamDiceRolled', (diceNumber, scoresNumber, totalScores) => {

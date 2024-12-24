@@ -19,25 +19,17 @@
     Далее
 </button>
 
+<script src="~/js/current-page-resolution.js"></script>
 <script src="~/js/fetchJSON.js"></script>
 <script src="~/js/page-switch.js"></script>
 <script src="~/js/setup-hub-connection.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script type="module">
     const connection = setupHubConnection(new signalR.HubConnectionBuilder(), "@Model.GameSessionId", "@Model.TeamId");
+
+    await resolveCurrentPage(connection, `@Model.GameSessionId`, `@Model.TeamId`, `roll`);
     
-    if (await checkPageAvailable("@Model.GameSessionId", "@Model.TeamId", "roll") !== true ||
-        await checkPageAvailable("@Model.GameSessionId", "@Model.TeamId", "update-role") !== true
-    ) {
-        const response = await fetch(`/@Model.GameSessionId/@Model.TeamId/api/get-current-step`);
-        const page = await response.text();
-        console.log(page);
-        const pageNumber = parseInt(page.split('/')[0]);
-        const stageNumber = parseInt(page.split('/')[1]);
-        await connection.invoke("ChangePage", "@Model.GameSessionId", "@Model.TeamId", pageNumber, stageNumber);
-        window.location.href = `/@Model.GameSessionId/@Model.TeamId/step/${page}`;
-    }
-    
+    await resolveCurrentPage(connection, `@Model.GameSessionId`, `@Model.TeamId`, `roll`, `update-role`);
     setSwitchEvent("next", connection, "@Model.GameSessionId", "@Model.TeamId", 1, 1);
     setRollbackEvent(connection);
 

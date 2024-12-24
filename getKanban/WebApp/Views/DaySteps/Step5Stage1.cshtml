@@ -74,7 +74,7 @@
         }
     </div>
 
-    <button class="stepControlButtons rightButton" id="prev">
+    <button class="stepControlButtons leftButton" id="prev">
         Назад
     </button>
 
@@ -83,13 +83,17 @@
     </button>
 </div>
 
+<script src="~/js/current-page-resolution.js"></script>
 <script src="~/js/fetchJSON.js"></script>
 <script src="~/js/value-helper.js"></script>
 <script src="~/js/page-switch.js"></script>
 <script src="~/js/setup-hub-connection.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
-<script>
+<script type="module">
     const connection = setupHubConnection(new signalR.HubConnectionBuilder(), "@Model.GameSessionId", "@Model.TeamId");
+
+    await resolveCurrentPage(connection, `@Model.GameSessionId`, `@Model.TeamId`, `update-sprint-backlog`);
+
     setSwitchEvent("prev", connection, "@Model.GameSessionId", "@Model.TeamId", 5, 0);
     setSwitchEvent("next", connection, "@Model.GameSessionId", "@Model.TeamId", 5, 2);
     setRollbackEvent(connection);
@@ -137,12 +141,12 @@
             console.log(ticketId);
             const updated = await fetchPostJSON("/@Model.GameSessionId/@Model.TeamId/api/update-sprint-backlog",
                 JSON.stringify({ ticketId: ticketId, remove: remove }));
-            if (!hasValue(updated) || !updated) {
+            if (updated === null || !hasValue(updated) || !updated) {
                 checkbox.checked = !checkbox.checked;
-                showMessage(`Ошибка сервера при выборе тикета`, MessageType.ERROR);
-                return;
+                showMessage("Ошибка сервера при выборе тикета.\nПопробуйте обновить страницу", MessageType.ERROR)
+            } else {
+                await connection.invoke("NotifyTicketTakenToSpringBacklog", "@Model.GameSessionId", "@Model.TeamId", ticketId);
             }
-            await connection.invoke("NotifyTicketTakenToSpringBacklog", "@Model.GameSessionId", "@Model.TeamId", ticketId);
         });
     }
 </script>

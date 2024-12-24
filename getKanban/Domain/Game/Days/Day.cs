@@ -61,6 +61,11 @@ public class Day
 		UpdateSprintBacklogContainer = new UpdateSprintBacklogContainer();
 	}
 
+	public void RemoveCurrentlyAwaitedCommandsOfType(DayCommandType type)
+	{
+		awaitedCommands.Where(x => x.CommandType == type).ForEach(x => x.MarkRemoved());
+	}
+
 	private bool CanPostEvent(DayCommandType commandType)
 	{
 		return CurrentlyAwaitedCommands.Any(e => e.CommandType == commandType);

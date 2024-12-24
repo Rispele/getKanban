@@ -1,4 +1,5 @@
-﻿using Core.Dtos;
+﻿using System.Data;
+using Core.Dtos;
 using Core.RequestContexts;
 using Domain.Game.Days.Commands;
 
@@ -13,4 +14,10 @@ public interface ITeamService
 		DayCommand dayCommand);
 
 	public Task<DayDto> GetCurrentDayAsync(RequestContext requestContext, Guid gameSessionId, Guid teamId);
+
+	public Task RemoveCurrentlyAwaitedCommandsOfType(
+		DayCommandType type,
+		RequestContext requestContext,
+		Guid gameSessionId,
+		Guid teamId);
 }

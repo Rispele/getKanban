@@ -169,11 +169,17 @@
 <button class="stepControlButtons rightButton" id="next">
     <p class="fs-6">Далее</p>
 </button>
+
+<script src="~/js/current-page-resolution.js"></script>
+<script src="~/js/fetchJSON.js"></script>
 <script src="~/js/page-switch.js"></script>
 <script src="~/js/setup-hub-connection.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
-<script>
+<script type="module">
     const connection = setupHubConnection(new signalR.HubConnectionBuilder(), "@Model.GameSessionId", "@Model.TeamId");
+
+    await resolveCurrentPage(connection, `@Model.GameSessionId`, `@Model.TeamId`, `end-day`);
+
     setSwitchEvent("next", connection, "@Model.GameSessionId", "@Model.TeamId", 7, 0);
     setRollbackEvent(connection);
 </script>

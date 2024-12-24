@@ -4,6 +4,7 @@ using Core.Dtos;
 using Core.Dtos.Converters;
 using Core.RequestContexts;
 using Core.Services.Contracts;
+using Domain;
 using Domain.DbContexts;
 using Domain.Game.Days.Commands;
 
@@ -48,5 +49,16 @@ public class TeamService : ITeamService
 		team.EnsureHasAccess(requestContext.GetUserId());
 
 		return dayDtoConverter.Convert(team, team.CurrentDay);
+	}
+
+	public async Task RemoveCurrentlyAwaitedCommandsOfType(DayCommandType type, RequestContext requestContext, Guid gameSessionId, Guid teamId)
+	{
+		var team = await context.GetTeamAsync(gameSessionId, teamId);
+
+		team.EnsureHasAccess(requestContext.GetUserId());
+		
+		team.RemoveCurrentlyAwaitedCommandsOfType(type);
+
+		await context.TrySaveChangesAsync();
 	}
 }

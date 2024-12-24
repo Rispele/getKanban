@@ -85,12 +85,16 @@
     </button>
 </div>
 
+<script src="~/js/current-page-resolution.js"></script>
 <script src="~/js/fetchJSON.js"></script>
 <script src="~/js/page-switch.js"></script>
 <script src="~/js/setup-hub-connection.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script type="module">
     const connection = setupHubConnection(new signalR.HubConnectionBuilder(), "@Model.GameSessionId", "@Model.TeamId");
+
+    window.onload = async () => { await resolveCurrentPage(connection, `@Model.GameSessionId`, `@Model.TeamId`, `update-cfd`) };
+
     setRollbackEvent(connection);
 
     const invocation = async (rowId, value, valueName) => {
@@ -100,8 +104,12 @@
         } else if (value === null || value === undefined || value.length === 0) {
             showMessage(`Все поля таблицы должны быть заполнены значением 0 или больше`, MessageType.ERROR);
         } else {
-            await fetchPostJSON(`/@Model.GameSessionId/@Model.TeamId/api/update-cfd`, JSON.stringify({PatchType: valueName, Value: intValue}));
-            await connection.invoke(`CfdTableUpdate`, `@Model.GameSessionId`, `@Model.TeamId`, rowId, parseInt(value));
+            const day = await fetchPostJSON(`/@Model.GameSessionId/@Model.TeamId/api/update-cfd`, JSON.stringify({PatchType: valueName, Value: intValue}));
+            if (day === null) {
+                showMessage("Ошибка сервера при обновлении диаграммы.\nПопробуйте обновить страницу", MessageType.ERROR);
+            } else {
+                await connection.invoke(`CfdTableUpdate`, `@Model.GameSessionId`, `@Model.TeamId`, rowId, parseInt(value));
+            }
         }
     };
 
@@ -132,6 +140,12 @@
         }
         
         const isValid = await fetchJSON(`/@Model.GameSessionId/@Model.TeamId/api/check-valid-cfd`);
+        
+        if (isValid === null) {
+            showMessage("Ошибка сервера при сохранении данных.\nПопробуйте обновить страницу", MessageType.ERROR)
+            return;
+        }
+        
         if (isValid) {
             await connection.invoke("ChangePage", "@Model.GameSessionId", "@Model.TeamId", 6, 1);
             window.location.href = `/@Model.GameSessionId/@Model.TeamId/step/6/1`;

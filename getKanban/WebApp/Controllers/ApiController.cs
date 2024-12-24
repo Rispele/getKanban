@@ -89,15 +89,21 @@ public class ApiController : Controller
 	}
 
 	[HttpPost("another-team-roll")]
-	public async Task<AnotherTeamDiceRollModel> AnotherTeamRoll(Guid gameSessionId, Guid teamId)
+	public async Task<AnotherTeamDiceRollModel?> AnotherTeamRoll(Guid gameSessionId, Guid teamId)
 	{
 		var requestContext = RequestContextFactory.Build(Request);
+		var currentDay = await teamService.GetCurrentDayAsync(requestContext, gameSessionId, teamId);
+		if (currentDay.AwaitedCommands.All(x => x.CommandType != DayCommandType.WorkAnotherTeam))
+		{
+			return null;
+		}
+		
 		await teamService.PatchDayAsync(
 			requestContext,
 			gameSessionId,
 			teamId,
 			new WorkAnotherTeamDayCommand());
-		var currentDay = await teamService.GetCurrentDayAsync(requestContext, gameSessionId, teamId);
+		currentDay = await teamService.GetCurrentDayAsync(requestContext, gameSessionId, teamId);
 		return new AnotherTeamDiceRollModel
 		{
 			DiceNumber = currentDay.WorkAnotherTeamContainer!.DiceNumber,
@@ -107,13 +113,17 @@ public class ApiController : Controller
 	}
 
 	[HttpPost("save-roles-transformation")]
-	public async Task SaveRolesTransformation(
-		Guid gameSessionId,
-		Guid teamId,
-		[FromBody] RoleTransformationDto roleTransformationDto)
+	public async Task<DayDto?> SaveRolesTransformation(Guid gameSessionId, Guid teamId, [FromBody] RoleTransformationDto roleTransformationDto)
 	{
 		var requestContext = RequestContextFactory.Build(Request);
-		await teamService.PatchDayAsync(
+		
+		var currentDay = await teamService.GetCurrentDayAsync(requestContext, gameSessionId, teamId);
+		if (currentDay.AwaitedCommands.All(x => x.CommandType != DayCommandType.UpdateTeamRoles))
+		{
+			return null;
+		}
+		
+		return await teamService.PatchDayAsync(
 			requestContext,
 			gameSessionId,
 			teamId,
@@ -125,18 +135,32 @@ public class ApiController : Controller
 	}
 
 	[HttpGet("check-valid-cfd")]
-	public async Task<bool> CheckValidCfd(Guid gameSessionId, Guid teamId)
+	public async Task<bool?> CheckValidCfd(Guid gameSessionId, Guid teamId)
 	{
 		var requestContext = RequestContextFactory.Build(Request);
+		
+		var currentDay = await teamService.GetCurrentDayAsync(requestContext, gameSessionId, teamId);
+		if (currentDay.AwaitedCommands.All(x => x.CommandType != DayCommandType.UpdateCfd))
+		{
+			return null;
+		}
+		
 		var isValid = await gameSessionService.CheckValidCfd(requestContext, gameSessionId, teamId);
 		return isValid;
 	}
 
 	[HttpGet("roll")]
-	public async Task RollDices(Guid gameSessionId, Guid teamId)
+	public async Task<DayDto?> RollDices(Guid gameSessionId, Guid teamId)
 	{
 		var requestContext = RequestContextFactory.Build(Request);
-		await teamService.PatchDayAsync(
+		
+		var currentDay = await teamService.GetCurrentDayAsync(requestContext, gameSessionId, teamId);
+		if (currentDay.AwaitedCommands.All(x => x.CommandType != DayCommandType.RollDice))
+		{
+			return null;
+		}
+		
+		return await teamService.PatchDayAsync(
 			requestContext,
 			gameSessionId,
 			teamId,
@@ -144,10 +168,17 @@ public class ApiController : Controller
 	}
 
 	[HttpPost("update-release")]
-	public async Task UpdateRelease(Guid gameSessionId, Guid teamId, [FromBody] TicketModel ticketModel)
+	public async Task<DayDto?> UpdateRelease(Guid gameSessionId, Guid teamId, [FromBody] TicketModel ticketModel)
 	{
 		var requestContext = RequestContextFactory.Build(Request);
-		await teamService.PatchDayAsync(
+		
+		var currentDay = await teamService.GetCurrentDayAsync(requestContext, gameSessionId, teamId);
+		if (currentDay.AwaitedCommands.All(x => x.CommandType != DayCommandType.ReleaseTickets))
+		{
+			return null;
+		}
+		
+		return await teamService.PatchDayAsync(
 			requestContext,
 			gameSessionId,
 			teamId,
@@ -155,10 +186,16 @@ public class ApiController : Controller
 	}
 
 	[HttpPost("update-sprint-backlog")]
-	public async Task<bool> UpdateSprintBacklog(Guid gameSessionId, Guid teamId, [FromBody] TicketModel ticketModel)
+	public async Task<bool?> UpdateSprintBacklog(Guid gameSessionId, Guid teamId, [FromBody] TicketModel ticketModel)
 	{
 		var requestContext = RequestContextFactory.Build(Request);
 
+		var currentDay = await teamService.GetCurrentDayAsync(requestContext, gameSessionId, teamId);
+		if (currentDay.AwaitedCommands.All(x => x.CommandType != DayCommandType.UpdateSprintBacklog))
+		{
+			return null;
+		}
+		
 		try
 		{
 			await teamService.PatchDayAsync(
@@ -178,12 +215,18 @@ public class ApiController : Controller
 	}
 
 	[HttpPost("update-cfd")]
-	public async Task UpdateCfd(Guid gameSessionId, Guid teamId, [FromBody] CfdEntryModel cfdEntryModel)
+	public async Task<DayDto?> UpdateCfd(Guid gameSessionId, Guid teamId, [FromBody] CfdEntryModel cfdEntryModel)
 	{
 		var requestContext = RequestContextFactory.Build(Request);
 		var patchType = Enum.Parse<UpdateCfdContainerPatchType>(cfdEntryModel.PatchType);
-
-		await teamService.PatchDayAsync(
+		
+		var currentDay = await teamService.GetCurrentDayAsync(requestContext, gameSessionId, teamId);
+		if (currentDay.AwaitedCommands.All(x => x.CommandType != DayCommandType.UpdateCfd))
+		{
+			return null;
+		}
+		
+		return await teamService.PatchDayAsync(
 			requestContext,
 			gameSessionId,
 			teamId,
@@ -191,11 +234,17 @@ public class ApiController : Controller
 	}
 
 	[HttpPost("end-day")]
-	public async Task EndDay(Guid gameSessionId, Guid teamId)
+	public async Task<DayDto?> EndDay(Guid gameSessionId, Guid teamId)
 	{
 		var requestContext = RequestContextFactory.Build(Request);
 
-		await teamService.PatchDayAsync(
+		var currentDay = await teamService.GetCurrentDayAsync(requestContext, gameSessionId, teamId);
+		if (currentDay.AwaitedCommands.All(x => x.CommandType != DayCommandType.EndDay))
+		{
+			return null;
+		}
+		
+		return await teamService.PatchDayAsync(
 			requestContext,
 			gameSessionId,
 			teamId,
@@ -221,7 +270,11 @@ public class ApiController : Controller
 		{
 			"roll" => currentDay.AwaitedCommands.Any(t => t.CommandType == DayCommandType.RollDice),
 			"update-role" => currentDay.AwaitedCommands.Any(t => t.CommandType == DayCommandType.UpdateTeamRoles),
-			"another-team-roll" => currentDay.AwaitedCommands.Any(t => t.CommandType == DayCommandType.WorkAnotherTeam),
+			"work-another-team" => currentDay.AwaitedCommands.Any(t => t.CommandType == DayCommandType.WorkAnotherTeam),
+			"release-tickets" => currentDay.AwaitedCommands.Any(t => t.CommandType == DayCommandType.ReleaseTickets),
+			"update-sprint-backlog" => currentDay.AwaitedCommands.Any(t => t.CommandType == DayCommandType.UpdateSprintBacklog),
+			"update-cfd" => currentDay.AwaitedCommands.Any(t => t.CommandType == DayCommandType.UpdateCfd),
+			"end-day" => currentDay.AwaitedCommands.Any(t => t.CommandType == DayCommandType.EndDay),
 			_ => false
 		};
 	}
@@ -255,6 +308,11 @@ public class ApiController : Controller
 		if (awaitedCommands.Any(t => t.CommandType == DayCommandType.UpdateCfd))
 		{
 			return "6/0";
+		}
+		
+		if (awaitedCommands.Any(t => t.CommandType == DayCommandType.EndDay))
+		{
+			return "6/1";
 		}
 
 		throw new InvalidOperationException();
