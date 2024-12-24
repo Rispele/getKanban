@@ -1,22 +1,167 @@
-﻿@model WebApp.Models.DayStepModels.GameResultModel
+﻿@using Core.Dtos.DayStatistics
+@model WebApp.Models.DayStepModels.CfdGraphStepModel
 
-@{
-    var clientSorted = Model.TeamResultModels.OrderByDescending(x => x.ClientsCount).ToArray();
-    var clientWinnerTeamId = clientSorted[0].ClientsCount != clientSorted[1].ClientsCount ? clientSorted[0].TeamId : Guid.Empty;
-    var moneySorted = Model.TeamResultModels.OrderByDescending(x => x.MoneyCount).ToArray();
-    var moneyWinnerTeamId = moneySorted[0].MoneyCount != moneySorted[1].MoneyCount ? moneySorted[0].TeamId : Guid.Empty;
+@functions
+{
+    private void RenderDayResult()
+    {
+        var dayByNumber = Model.TeamStatistic.DayStatistics.ToDictionary(d => d.DayNumber);
+        <div class="allDayResults">
+            <div class="finishDayResult headerLineStyle text-center">
+                <h1 class="fs-6">Итого</h1>
+            </div>
 
-    string GetTeamClassName(Guid teamId) =>
-        (clientWinnerTeamId == teamId, moneyWinnerTeamId == teamId) switch
-        {
-            ((true, true)) => "finalMegaWinner",
-            ((true, false)) => "finalClientWinnerStyle",
-            ((false, true)) => "finalMoneyWinnerStyle",
-            ((false, false)) => "finalLooserStyle"
+            <div class="finishDayResultContainer">
+                <div class="finishDayResult clientLineStyle">
+                    <p class="fs-6">Всего клиентов: @Model.TeamStatistic.TotalClientsGained</p>
+                </div>
+
+                <div class="finishDayResult otherLineStyle">
+                    <p class="fs-6">Штраф по клиентам составил: @Model.TeamStatistic.ClientsPenalty</p>
+                </div>
+
+                <div class="finishDayResult moneyLineStyle">
+                    <p class="fs-6">Всего денег: @(Model.TeamStatistic.TotalProfitGained)$</p>
+                </div>
+
+                <div class="finishDayResult otherLineStyle">
+                    <p class="fs-6">Штраф по деньгам составил: @(Model.TeamStatistic.Penalty)$</p>
+                </div>
+            </div>
+
+            <div class="scrollable-container">
+                <div class="finishDayResult headerLineStyle text-center">
+                    <h1 class="fs-6">По дням</h1>
+                </div>
+
+                @foreach (var data in Model.TeamStatistic.DayStatistics.OrderByDescending(t => t.DayNumber))
+                {
+                    <div class="finishDayResult dayLineStyle text-center">
+                        <h1 class="fs-6">День @data.DayNumber</h1>
+                    </div>
+
+                    <div class="finishDayResultContainer">
+                        <div class="finishDayResult clientLineStyle">
+                            <p class="fs-6">Получили клиентов: @data.ClientsGained</p>
+                        </div>
+
+                        @if (dayByNumber.TryGetValue(data.DayNumber - 1, out var prev) && prev.ProfitPerClient != data.ProfitPerClient)
+                        {
+                            <div class="finishDayResult otherLineStyle">
+                                <p class="fs-6">Деньги за клиента: @(prev.ProfitPerClient)$ -> @(data.ProfitPerClient)$</p>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="finishDayResult otherLineStyle">
+                                <p class="fs-6">Деньги за клиента: @(data.ProfitPerClient)$</p>
+                            </div>
+                        }
+
+                        <div class="finishDayResult moneyLineStyle">
+                            <p class="fs-6">Получили денег: @(data.ProfitGained)$</p>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    private void RenderDiagram()
+    {
+        var dayStatistics = Model.TeamStatistic.DayStatistics;
+        var maxDayNumber = dayStatistics.Select(t => t.DayNumber).Max();
+        var rowsForCfd = new[]
+            {
+                "[\"День\", \"Поставлено\", \"Готово к поставке\", \"В тестировании\", \"В разработке\", \"В аналитике\"]",
+                "[8,0,1,4,4,2]"
+            }
+            .Concat(dayStatistics.Select(CfdStatisticToString));
+        var tableForCfd = $"[{string.Join(",", rowsForCfd)}]";
+
+        var ticketsReleased = dayStatistics.SelectMany(d => d.TicketsReleased).ToArray();
+        var rowsForControlDiagram = new[] { $"[\"Номер задачи\", \"За сколько поставили\"]{(ticketsReleased.Length > 0 ? "" : ", [0, 0]")}" }
+            .Concat(ticketsReleased.Select((ticket, i) => $"[{i}, {ticket.releaseDay - ticket.takingDay}]"))
+            .ToList();
+        var tableForControlDiagram = $"[{string.Join(",", rowsForControlDiagram)}]";
+
+        var ticketsCountPerWorkDaysCount = dayStatistics
+            .SelectMany(d => d.TicketsReleased)
+            .GroupBy(t => t.releaseDay!.Value - t.takingDay)
+            .Select(t => (t.Key, t.Count()))
+            .ToArray();
+        var keys = ticketsCountPerWorkDaysCount.Select(t => t.Key).ToList();
+        var maxWorkDays = keys.Count > 0 ? keys.Max() : 9;
+        var rowsForDistributionDiagram = new[] { "[\"Дней в работе\"", $"\"Кол-во задач\"]{(ticketsCountPerWorkDaysCount.Length > 0 ? "" : ", [0, 0]")}" }
+            .Concat(ticketsCountPerWorkDaysCount.Select(g => $"[{g.Key}, {g.Item2}]"));
+        var tableForDistributionDiagram = $"[{string.Join(",", rowsForDistributionDiagram)}]";
+
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script type="text/javascript">
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(drawCharts);
+
+    function drawCharts() {
+        const dataForCfd = google.visualization.arrayToDataTable(@Html.Raw(tableForCfd));
+        const optionsForCfd = {
+            title: 'Кумулятивная диаграмма',
+            hAxis: {title: 'День', ticks: @Html.Raw($"[{string.Join(",", Enumerable.Range(8, Math.Max(18, maxDayNumber) - 7))}]"), minValue: 8, maxValue: @Math.Max(18, maxDayNumber) },
+            vAxis: {minValue: 0},
+            isStacked: true
         };
+
+        const dataForControlDiagram = google.visualization.arrayToDataTable(@Html.Raw(tableForControlDiagram));
+        const optionsForControlDiagram = {
+            title: 'Контрольная диагамма',
+            hAxis: {title: 'Поставленные задачи (в порядке релиза)', ticks: @Html.Raw($"[{string.Join(",", Enumerable.Range(0, Math.Max(10, ticketsReleased.Length) + 1))}]"), minValue: 0, maxValue: @Math.Max(10, ticketsReleased.Length)},
+            vAxis: {title: 'За сколько поставили', minValue: 0},
+            legend: { position: "none" },
+        };
+
+        const dataForDistributionDiagram = google.visualization.arrayToDataTable(@Html.Raw(tableForDistributionDiagram));
+        const optionsForDistributionDiagram = {
+            title: 'Распределение времени выполнения',
+            hAxis: {title: 'За сколько поставили', ticks: @Html.Raw($"[{string.Join(",", Enumerable.Range(0, Math.Max(10, maxWorkDays) + 1))}]"), minValue: 0, maxValue: @Math.Max(10, maxWorkDays)},
+            vAxis: {title: 'Кол-во поставленных задач', minValue: 0},
+            legend: { position: "none" },
+        };
+
+        const cfdChart = new google.visualization.AreaChart(document.getElementById('cfd'));
+        cfdChart.draw(dataForCfd, optionsForCfd);
+
+        const controlChar = new google.visualization.AreaChart(document.getElementById('control-diagram'));
+        controlChar.draw(dataForControlDiagram, optionsForControlDiagram);
+
+        const distributionDiagram = new google.visualization.ColumnChart(document.getElementById('distribution-diagram'));
+        distributionDiagram.draw(dataForDistributionDiagram, optionsForDistributionDiagram);
+    }
+</script>
+    }
+
+    private static string CfdStatisticToString(DayStatisticDto t)
+    {
+        return $"[{t.DayNumber}," +
+               $"{t.CfdStatistic.Released}," +
+               $"{t.CfdStatistic.ToDeploy}," +
+               $"{t.CfdStatistic.WithTesters}," +
+               $"{t.CfdStatistic.WithProgrammers}," +
+               $"{t.CfdStatistic.WithAnalysts}]";
+    }
 }
 
-<div class="container7"></div>
+<div class="container8 centered-100">
+    <h1 class="title">Итоги игры!</h1>
+    <hr class="divider">
+    <div class="diagram-container">
+        <div class="diagram" id="cfd"></div>
+        <div class="diagram" id="control-diagram"></div>
+        <div class="diagram" id="distribution-diagram"></div>
+    </div>
+    @{ RenderDayResult(); }
+</div>
+@{
+    RenderDiagram();
+}
 
 <button class="stepControlButtons rightButton" id="next">
     Выйти в меню
@@ -25,87 +170,7 @@
 <script src="/js/signalr/dist/browser/signalr.js"></script>
 <script src="~/js/setup-hub-connection.js"></script>
 <script type="module">
-    showWaitMessage(@Model.TeamResultModels.Where(x => x.IsTeamSessionEnded).ToList().Count);
-    
     const connection = new signalR.HubConnectionBuilder().withUrl(`/lobbyHub`).build();
-    
-    const finishedTeams = @(
-                          Html.Raw(
-                              Json.Serialize(
-                                  Model.TeamResultModels
-                                      .Where(x => x.IsTeamSessionEnded)
-                                      .Select(x => x.TeamId))));
-        
-    function showWaitMessage(finishedTeamsCount) {
-        const container = document.getElementsByClassName(`container7`)[0];
-        container.innerHTML = ``;
-        
-        const waitMessage = document.createElement(`p`);
-        waitMessage.textContent = `Ожидаем завершения игры всеми командами...`;
-        const teamsToWaitMessage = document.createElement(`p`);
-        teamsToWaitMessage.textContent = `Команд, завершивших игру: ${finishedTeamsCount}/@Model.TeamResultModels.Count`;
-        
-        container.appendChild(waitMessage);
-        container.appendChild(teamsToWaitMessage);
-    }
-    
-    function tryBuildResultElements() {
-        if (finishedTeams.length === @Model.TeamResultModels.Count) {
-            
-            const container = document.getElementsByClassName(`container7`)[0];
-            container.innerHTML = ``;
-            @{ var i = 0; }
-            @foreach (var teamResult in Model.TeamResultModels)
-            {
-                <text>
-                let finalCommandContainer@(i) = document.createElement(`div`);
-                finalCommandContainer@(i).className = `finalCommandContainer`;
-
-                let finalCommandResult@(i) = document.createElement(`div`);
-                finalCommandResult@(i).className = `finalCommandResult`;
-
-                let finalCommand@(i) = document.createElement(`div`);
-                finalCommand@(i).className = `finalCommand @Html.Raw(GetTeamClassName(teamResult.TeamId))`;
-                let teamName@(i) = document.createElement(`h`);
-                teamName@(i).className = `fs-5 fw-bold text-center`;
-                teamName@(i).textContent = `@Html.Raw(teamResult.TeamName)`;
-                let clientsCount@(i) = document.createElement(`h`);
-                clientsCount@(i).className = `fs-6 fw-normal text-center`;
-                clientsCount@(i).textContent = `Клиенты: @teamResult.ClientsCount`;
-                let moneyCount@(i) = document.createElement(`h`);
-                moneyCount@(i).className = `fs-6 fw-normal text-center`;
-                moneyCount@(i).textContent = `Деньги: @teamResult.MoneyCount`;
-
-                finalCommand@(i).appendChild(teamName@(i));
-                finalCommand@(i).appendChild(clientsCount@(i));
-                finalCommand@(i).appendChild(moneyCount@(i));
-                finalCommandContainer@(i).appendChild(finalCommandResult@(i));
-                finalCommandContainer@(i).appendChild(finalCommand@(i));
-                container.appendChild(finalCommandContainer@(i));
-                @{
-                i++;
-                }
-                </text>
-            }
-        }
-    }
-
-    connection.on(`NotifyResult`, (teamId) => {
-        if (finishedTeams.indexOf(teamId) < 0) {
-            finishedTeams.push(teamId);
-        }
-        showWaitMessage(finishedTeams.length);
-        tryBuildResultElements();
-    });
-    
-    await connection.start();
-    await connection.invoke(`ConnectExplicit`, `@Model.SessionId`);
-    @if (Model.TeamResultModels.Single(x => x.TeamId == Model.RequesterTeamId).IsTeamSessionEnded)
-    {
-        <text>
-        await connection.invoke(`TeamGameResultReveal`, `@Model.SessionId`, `@Model.RequesterTeamId`);
-        </text>
-    }
     
     document.getElementById(`next`).addEventListener(`click`, () => {
         window.location.href = `/`;

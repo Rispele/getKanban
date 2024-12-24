@@ -1,5 +1,4 @@
-﻿using Core.Dtos;
-using Core.Dtos.DayStatistics;
+﻿using Core.Dtos.DayStatistics;
 
 namespace WebApp.Models.DayStepModels;
 

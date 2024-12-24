@@ -305,30 +305,16 @@ public class DayStepsController : Controller
 	public async Task<IActionResult> WinnersPage(Guid gameSessionId, Guid teamId)
 	{
 		var requestContext = RequestContextFactory.Build(Request);
-		var session = await gameSessionService.FindGameSession(
+
+		var teamStatistic = await statisticsService.CollectStatistic(gameSessionId, teamId);
+
+		var stepModel = await FillWithCredentialsAsync<CfdGraphStepModel>(
 			requestContext,
-			InviteCodeHelper.ConcatInviteCode(gameSessionId, teamId),
-			ignorePermissions: true);
+			gameSessionId,
+			teamId);
+		stepModel.TeamStatistic = teamStatistic;
 
-		var model = new GameResultModel() { TeamResultModels = [] };
-		model.RequesterTeamId = (await gameSessionService.GetCurrentTeam(requestContext, gameSessionId)).Id;
-		model.SessionId = gameSessionId;
-		
-		foreach (var team in session!.Teams)
-		{
-			var statistic = await statisticsService.CollectStatistic(gameSessionId, teamId);
-			model.TeamResultModels.Add(
-				new TeamResultModel()
-				{
-					TeamId = team.Id,
-					TeamName = team.Name,
-					ClientsCount = statistic.TotalClientsGained,
-					MoneyCount = statistic.TotalProfitGained,
-					IsTeamSessionEnded = team.IsTeamSessionEnded
-				});
-		}
-
-		return View(model);
+		return View(stepModel);
 	}
 
 	private async Task<T> FillWithCredentialsAsync<T>(
