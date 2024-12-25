@@ -79,10 +79,16 @@
 
 <script>
     const gameLinks = @Html.Raw(Json.Serialize(Model.UserGames.Select(x => $"{x.GameSessionId}/{x.TeamId}")));
-    for (let link of gameLinks) {
-        let button = document.getElementById(link);
+    const statuses = @Html.Raw(Json.Serialize(Model.UserGames.Select(x => x.GameSessionStatus)));
+    for (let i = 0; i < gameLinks.length; i++) {
+        let button = document.getElementById(gameLinks[i]);
+        let status = statuses[i];
         button.addEventListener('click', () => {
-            window.location.href = button.className.indexOf(`angel`) === -1 ? `/${link}/step/1/0` : `/admin?sessionId=${link.split("/")[0]}`
+            if (status === `Набор игроков`) {
+                window.location.href = `session/${gameLinks[i]}/lobby-menu`;
+            } else {
+                window.location.href = button.className.indexOf(`angel`) === -1 ? `/${gameLinks[i]}/step/1/0` : `/admin?sessionId=${gameLinks[i].split("/")[0]}`
+            }
         });
     }
 </script>
