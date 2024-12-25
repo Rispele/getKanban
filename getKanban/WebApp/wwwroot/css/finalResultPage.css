@@ -48,9 +48,9 @@
 }
 
 .headerLineStyle {
-    background: -webkit-linear-gradient(45deg, rgb(238, 238, 238), rgb(255, 255, 255));
-    background: -moz-linear-gradient(45deg, rgb(238, 238, 238), rgb(255, 255, 255));
-    background: linear-gradient(45deg, rgb(238, 238, 238), rgb(255, 255, 255));
+    background: -webkit-linear-gradient(45deg, rgb(225, 225, 225), rgb(241, 241, 241));
+    background: -moz-linear-gradient(45deg, rgb(225, 225, 225), rgb(241, 241, 241));
+    background: linear-gradient(45deg, rgb(225, 225, 225), rgb(241, 241, 241));
 }
 
 .clientLineStyle {
