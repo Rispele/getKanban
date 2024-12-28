@@ -7,7 +7,7 @@
 <div class="container3">
     <h1 class="title">Заполните таблицу, отметив сколько тикетов на доске на данный момент</h1>
     <h1 class="title">Цвет колонки соответствует цвету стрелки.</h1>
-    <hr class="divider">
+    <hr class="divider margin-bottom-20">
 
     <div class="mine_table">
         <div class="row-60 rowStyle1">
@@ -100,9 +100,9 @@
     const invocation = async (rowId, value, valueName) => {
         const intValue = parseInt(value);
         if (intValue < 0) {
-            showMessage(`Поля таблицы должны принимать неотрицательные значения`, MessageType.ERROR);
+            showMessage(`Поля таблицы должны принимать неотрицательные значения`, MessageType.WARNING);
         } else if (value === null || value === undefined || value.length === 0) {
-            showMessage(`Все поля таблицы должны быть заполнены значением 0 или больше`, MessageType.ERROR);
+            showMessage(`Все поля таблицы должны быть заполнены значением 0 или больше`, MessageType.WARNING);
         } else {
             const day = await fetchPostJSON(`/@Model.GameSessionId/@Model.TeamId/api/update-cfd`, JSON.stringify({PatchType: valueName, Value: intValue}));
             if (day === null) {
@@ -135,7 +135,7 @@
             withTesters === null || withTesters === undefined || withTesters.length === 0 || parseInt(withTesters) < 0 ||
             withProgrammers === null || withProgrammers === undefined || withProgrammers.length === 0 || parseInt(withProgrammers) < 0 ||
             withAnalysts === null || withAnalysts === undefined || withAnalysts.length === 0 || parseInt(withAnalysts) < 0) {
-            showMessage(`Все поля таблицы должны быть заполнены значением 0 или больше`, MessageType.ERROR);
+            showMessage(`Все поля таблицы должны быть заполнены значением 0 или больше`, MessageType.WARNING);
             return;
         }
         
@@ -150,7 +150,7 @@
             await connection.invoke("ChangePage", "@Model.GameSessionId", "@Model.TeamId", 6, 1);
             window.location.href = `/@Model.GameSessionId/@Model.TeamId/step/6/1`;
         } else {
-            showMessage(`Поля таблицы содержат невалидные значения. Кумулятивная диаграмма не может быть заполнена`, MessageType.ERROR);
+            showMessage(`Поля таблицы содержат невалидные значения. Кумулятивная диаграмма не может быть заполнена`, MessageType.WARNING);
         }
     });
 </script>
