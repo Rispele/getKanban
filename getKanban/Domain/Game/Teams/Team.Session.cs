@@ -74,7 +74,7 @@ public partial class Team
 	public bool IsTicketDeadlineNotExceededAtReleaseDay(string ticketId, int deadlineInclusive)
 	{
 		var ticket = BuildTakenTickets().SingleOrDefault(t => t.id == ticketId);
-		if (ticket == null || ticket.IsInWork(deadlineInclusive))
+		if (ticket == null || ticket.IsInWork(currentDayNumber))
 		{
 			return currentDayNumber <= deadlineInclusive;
 		}

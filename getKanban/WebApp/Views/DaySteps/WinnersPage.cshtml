@@ -34,34 +34,67 @@
                     <h1 class="fs-6">По дням</h1>
                 </div>
 
-                @foreach (var data in Model.TeamStatistic.DayStatistics.OrderByDescending(t => t.DayNumber))
+                @foreach (var grouping in Model.TeamStatistic.DayStatistics
+                              .GroupBy(t => (int)Math.Ceiling(t.DayNumber / 3.0))
+                              .OrderByDescending(t => t.Key))
                 {
+                    if (grouping.Count() != 3)
+                    {
+                        @foreach (var data in grouping.OrderByDescending(t => t.DayNumber))
+                        {
+                            <div class="finishDayResult dayLineStyle text-center">
+                                <h1 class="fs-6">День @data.DayNumber</h1>
+                            </div>
+
+                            <div class="finishDayResultContainer">
+                                <div class="finishDayResult clientLineStyle">
+                                    <p class="fs-6">Получили клиентов: @data.ClientsGained</p>
+                                </div>
+
+                                @if (dayByNumber.TryGetValue(data.DayNumber - 1, out var prev) && prev.ProfitPerClient != data.ProfitPerClient)
+                                {
+                                    <div class="finishDayResult otherLineStyle">
+                                        <p class="fs-6">Деньги за клиента: @(prev.ProfitPerClient)$ -> @(data.ProfitPerClient)$</p>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="finishDayResult otherLineStyle">
+                                        <p class="fs-6">Деньги за клиента: @(data.ProfitPerClient)$</p>
+                                    </div>
+                                }
+
+                                <div class="finishDayResult moneyLineStyle">
+                                    <p class="fs-6">Получили денег: @(data.ProfitGained)$</p>
+                                </div>
+                            </div>
+
+                            <div class="finishDayResult dayLineStyle"></div>
+                        }
+                        continue;;
+                    }
+                    
+                    var dayNumber = grouping.Select(t => t.DayNumber).Max();
+                    var clientsGained = grouping.Sum(t => t.ClientsGained);
+                    var moneyGained = grouping.Sum(t => t.ProfitGained);
+                    var moneyPerClient = (int) grouping.Average(t => t.ProfitPerClient);
                     <div class="finishDayResult dayLineStyle text-center">
-                        <h1 class="fs-6">День @data.DayNumber</h1>
+                        <h1 class="fs-6">День @dayNumber</h1>
                     </div>
 
                     <div class="finishDayResultContainer">
                         <div class="finishDayResult clientLineStyle">
-                            <p class="fs-6">Получили клиентов: @data.ClientsGained</p>
+                            <p class="fs-6">Получили клиентов: @clientsGained</p>
                         </div>
-
-                        @if (dayByNumber.TryGetValue(data.DayNumber - 1, out var prev) && prev.ProfitPerClient != data.ProfitPerClient)
-                        {
-                            <div class="finishDayResult otherLineStyle">
-                                <p class="fs-6">Деньги за клиента: @(prev.ProfitPerClient)$ -> @(data.ProfitPerClient)$</p>
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="finishDayResult otherLineStyle">
-                                <p class="fs-6">Деньги за клиента: @(data.ProfitPerClient)$</p>
-                            </div>
-                        }
-
+                        <div class="finishDayResult otherLineStyle">
+                            <p class="fs-6">Деньги за клиента: @moneyPerClient</p>
+                        </div>
                         <div class="finishDayResult moneyLineStyle">
-                            <p class="fs-6">Получили денег: @(data.ProfitGained)$</p>
+                            <p class="fs-6">Получили денег: @moneyGained$</p>
                         </div>
                     </div>
+
+                    <div class="finishDayResult dayLineStyle"></div>
                 }
             </div>
         </div>
