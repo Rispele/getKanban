@@ -61,9 +61,10 @@ public class DayStepsController : Controller
 	{
 		var requestContext = RequestContextFactory.Build(Request);
 		var currentDay = await teamService.GetCurrentDayAsync(requestContext, gameSessionId, teamId);
-
+		
 		var stepModel = await FillWithCredentialsAsync<RoleUpdateStepModel>(requestContext, gameSessionId, teamId);
 		stepModel.TeamMemberDtos = currentDay.TeamMembersContainer.TeamRoleUpdates.ToList();
+		stepModel.ShouldLockTesters = currentDay.TeamMembersContainer.LockTesters;
 
 		return View(stepModel);
 	}

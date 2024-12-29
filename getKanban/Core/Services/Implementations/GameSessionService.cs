@@ -202,17 +202,7 @@ public class GameSessionService : IGameSessionService
 			Name = user.Name
 		};
 	}
-
-	public async Task<bool> ShouldLockTestersForTeam(
-		RequestContext requestContext,
-		Guid gameSessionId,
-		Guid teamId,
-		int dayNumber)
-	{
-		var team = await context.GetTeamAsync(gameSessionId, teamId);
-		return team.Settings.ShouldLockTesters(dayNumber);
-	}
-
+	
 	public async Task<bool> CheckValidCfd(RequestContext requestContext, Guid gameSessionId, Guid teamId)
 	{
 		var team = await context.GetTeamAsync(gameSessionId, teamId);

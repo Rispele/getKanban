@@ -9,7 +9,7 @@
 <h1 class="title">Имейте в виду, что член команды не в своей роли работает хуже</h1>
 <div class="divider"></div>
 
-<div class="table-container">
+<div class="table-container centered">
     <table>
         <thead>
         <tr>
@@ -32,7 +32,15 @@
                             TeamRoleDto.Tester => "creative-border-5"
                         };
 
-                        <div class="draggable @t creative-border-rad-20" draggable="true" id="@member.Id">
+                        var isDraggable = member.InitialRole switch
+                        {
+                            TeamRoleDto.Analyst => "true",
+                            TeamRoleDto.Programmer => "true",
+                            TeamRoleDto.Tester => Model.ShouldLockTesters ? "false" : "true",
+                            _ => throw new ArgumentOutOfRangeException()
+                        };
+
+                        <div class="draggable @t creative-border-rad-20" draggable=@isDraggable id="@member.Id">
                             <div class="rolesTextContainer">
                                 <div class="text fs-6 fw-bolder">
                                     @{
@@ -73,6 +81,48 @@
 <script src="~/js/page-switch.js"></script>
 <script src="~/js/setup-hub-connection.js"></script>
 <script src="/js/signalr/dist/browser/signalr.js"></script>
+<script>
+    const draggables = document.querySelectorAll(".draggable");
+    const dropzones = document.querySelectorAll(".dropzone");
+
+    draggables.forEach(draggable => {
+        draggable.addEventListener("dragstart", handleDragStart);
+        draggable.addEventListener("dragend", handleDragEnd);
+    });
+
+    dropzones.forEach(dropzone => {
+        if (dropzone.id === "Tester" && @(Model.ShouldLockTesters ? "true" : "false")){
+            return;
+        }
+        dropzone.addEventListener("dragover", handleDragOver);
+        dropzone.addEventListener("drop", handleDrop);
+    });
+
+    function handleDragStart(event) {
+        event.target.classList.add("dragging");
+    }
+
+    function handleDragEnd(event) {
+        event.target.classList.remove("dragging");
+    }
+
+    function handleDragOver(event) {
+        event.preventDefault();
+        const draggingElement = document.querySelector(".dragging");
+        if (draggingElement) {
+            const dropzone = event.currentTarget;
+            dropzone.appendChild(draggingElement);
+        }
+    }
+
+    function handleDrop(event) {
+        event.preventDefault();
+        const draggingElement = document.querySelector(".dragging");
+        if (draggingElement) {
+            event.currentTarget.appendChild(draggingElement);
+        }
+    }
+</script>
 <script type="module">
     const connection = setupHubConnection(new signalR.HubConnectionBuilder(), "@Model.GameSessionId", "@Model.TeamId");
 
@@ -96,7 +146,7 @@
     });
     
     const testerMemberIds = @Html.Raw(Json.Serialize(Model.TeamMemberDtos.Where(x => x.CurrentRole == TeamRoleDto.Tester).Select(x => x.Id.ToString())));
-    const shouldLockTesters = await fetchJSON(`/@Model.GameSessionId/@Model.TeamId/api/should-lock-testers`);
+    const shouldLockTesters = @(Model.ShouldLockTesters ? "true" : "false");
     
     const draggables = document.getElementsByClassName('draggable');
     for (let draggable of draggables) {

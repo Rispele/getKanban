@@ -323,19 +323,6 @@ public class ApiController : Controller
 		throw new InvalidOperationException();
 	}
 
-	[HttpGet("should-lock-testers")]
-	public async Task<bool> ShouldLockTesters(Guid gameSessionId, Guid teamId)
-	{
-		var requestContext = RequestContextFactory.Build(Request);
-		var currentDay = await teamService.GetCurrentDayAsync(requestContext, gameSessionId, teamId);
-		var shouldLockTesters = await gameSessionService.ShouldLockTestersForTeam(
-			requestContext,
-			gameSessionId,
-			teamId,
-			currentDay.Number);
-		return shouldLockTesters;
-	}
-
 	[HttpGet("skip")]
 	public async Task<IActionResult> Skip(
 		Guid gameSessionId,

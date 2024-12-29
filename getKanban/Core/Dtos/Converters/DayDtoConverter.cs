@@ -52,7 +52,8 @@ public class DayDtoConverter
 		return new TeamMembersContainerDto
 		{
 			Version = container.Version,
-			TeamRoleUpdates = container.TeamMembers.Select(Convert).ToList()
+			TeamRoleUpdates = container.TeamMembers.Select(Convert).ToList(),
+			LockTesters = container.LockTesters
 		};
 	}
 

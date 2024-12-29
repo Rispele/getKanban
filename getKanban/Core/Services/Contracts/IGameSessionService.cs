@@ -31,11 +31,5 @@ public interface IGameSessionService
 
 	public Task<UserDto> GetCurrentUser(RequestContext requestContext);
 
-	public Task<bool> ShouldLockTestersForTeam(
-		RequestContext requestContext,
-		Guid gameSessionId,
-		Guid teamId,
-		int dayNumber);
-
 	public Task<bool> CheckValidCfd(RequestContext requestContext, Guid gameSessionId, Guid teamId);
 }
