@@ -66,6 +66,8 @@
                             <p class="fs-6">Получили денег: @(data.ProfitGained)$</p>
                         </div>
                     </div>
+                    
+                    <div class="finishDayResult dayLineStyle"></div>
                 }
             </div>
         </div>
@@ -162,6 +164,49 @@
         <div class="diagram" id="distribution-diagram"></div>
     </div>
     @{ RenderDayResult(); }
+</div>
+
+<div class="divider margin-bottom-20"></div>
+<h1 class="title">Информация по тикетам</h1>
+<div class="divider margin-bottom-20"></div>
+
+<div class="container1">
+    
+    <div class="container2">
+        @for (var i = 0; i < 10; i++)
+        {
+            // var t = ticketId[0] switch
+            // {
+            //     'S' => "checkboxCardStyle1",
+            //     'I' => "checkboxCardStyle2",
+            //     'F' => "checkboxCardStyle3",
+            //     'E' => "checkboxCardStyle4"
+            // };
+
+            <div class="checkboxCardsMargin">
+                @* <div class="checkboxCardContainer @t"> *@
+                <div class="checkboxCardContainer checkboxCardStyle1">
+                    <div class="checkboxCardContent">
+                        @* <h2 class="checkboxCardNumber">@ticketId</h2> *@
+                        <h2 class="checkboxCardNumber">S01</h2>
+                        <div class="line full"></div>
+
+                        <div class="checkboxCardDay fs-6 fw-bolder">
+                            <p>
+                                День взятия: @i
+                            </p>
+                            <p>
+                                День поставки: @i
+                            </p>
+                            <p>
+                                Клиентов: @i
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
 </div>
 @{
     RenderDiagram();
