@@ -1,4 +1,6 @@
-﻿namespace Core.Dtos.DayStatistics;
+﻿using Domain.Game;
+
+namespace Core.Dtos.DayStatistics;
 
 public class TeamStatisticDto
 {
@@ -9,6 +11,7 @@ public class TeamStatisticDto
 	public int ClientsPenalty { get; }
 	public int Penalty { get; }
 	public int BonusProfit { get; }
+	public IReadOnlyDictionary<Ticket, int> TicketStatistics { get; }
 
 	public int TotalProfitGained => DayStatistics.Select(t => t.ProfitGained).Sum() - Penalty + BonusProfit;
 	public int TotalClientsGained => DayStatistics.Select(t => t.ClientsGained).Sum() - ClientsPenalty;
@@ -18,13 +21,15 @@ public class TeamStatisticDto
 		IReadOnlyList<DayStatisticDto> dayStatistics,
 		int clientsPenalty,
 		int penalty,
-		int bonusProfit)
+		int bonusProfit,
+		IReadOnlyDictionary<Ticket, int> ticketStatistics)
 	{
 		TeamId = teamId;
 		DayStatistics = dayStatistics;
 		ClientsPenalty = clientsPenalty;
 		Penalty = penalty;
 		BonusProfit = bonusProfit;
+		TicketStatistics = ticketStatistics;
 	}
 
 	internal static TeamStatisticDto Create(
@@ -32,13 +37,15 @@ public class TeamStatisticDto
 		IReadOnlyList<DayStatisticDto> dayStatistics,
 		int penalty,
 		int clientsPenalty,
-		int bonusProfit)
+		int bonusProfit,
+		IReadOnlyDictionary<Ticket, int> ticketStatistics)
 	{
 		return new TeamStatisticDto(
 			teamId,
 			dayStatistics,
 			clientsPenalty,
 			penalty,
-			bonusProfit);
+			bonusProfit,
+			ticketStatistics);
 	}
 }

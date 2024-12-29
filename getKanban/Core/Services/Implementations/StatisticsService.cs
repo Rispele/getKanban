@@ -24,7 +24,9 @@ public class StatisticsService : IStatisticsService
 		var team = await context.GetTeamAsync(gameSessionId, teamId);
 
 		var takenTickets = team.BuildTakenTickets();
-		var clientsGainedPerDay = EvaluateClientsGainedPerDay(takenTickets, team.CurrentDay.Number);
+		var currentDayNumber = team.CurrentDay.Number;
+		var clientsGainedPerTicket = EvaluateClientsGainedPerTickets(takenTickets, currentDayNumber);
+		var clientsGainedPerDay = EvaluateClientsGainedPerDay(clientsGainedPerTicket);
 		var profitPerClientPerDay = team.Days.ToDictionary(day => day.Number, day => day.DaySettings.ProfitPerClient);
 
 		var clientsPerDay = EvaluateClientPerDay(team, clientsGainedPerDay);
@@ -44,7 +46,8 @@ public class StatisticsService : IStatisticsService
 			dayStats,
 			profitPenalty,
 			clientsPenalty,
-			EvaluateBonusProfit(takenTickets, team));
+			EvaluateBonusProfit(takenTickets, team),
+			clientsGainedPerTicket);
 	}
 
 	public CfdStatisticDto CollectCfdStatistic(Day day)
@@ -140,20 +143,25 @@ public class StatisticsService : IStatisticsService
 		return clientsPerDay;
 	}
 
-	private static Dictionary<int, int> EvaluateClientsGainedPerDay(HashSet<Ticket> takenTickets, int currentDayNumber)
+	private static Dictionary<int, int> EvaluateClientsGainedPerDay(Dictionary<Ticket, int> clientsGainedPerTicket)
 	{
-		var ticketDescriptors = TicketDescriptors.AllTicketDescriptors.ToDictionary(d => d.Id, t => t);
-
-		return takenTickets
-			.Where(ticket => ticket.IsReleased(currentDayNumber))
-			.OrderBy(ticket => ticket.releaseDay!)
-			.Select(ticket => (releaseDay: ticket.releaseDay!.Value, clientsGained: GetClientsGainedByTicket(ticket)))
+		return clientsGainedPerTicket
+			.Select(pair => (releaseDay: pair.Key.releaseDay!.Value, clientsGained: pair.Value))
 			.GroupBy(ticket => ticket.releaseDay)
 			.ToDictionary(grouping => grouping.Key, grouping => grouping.Select(tuple => tuple.clientsGained).Sum());
+	}
+
+	private static Dictionary<Ticket, int> EvaluateClientsGainedPerTickets(
+		HashSet<Ticket> takenTickets,
+		int currentDayNumber)
+	{
+		return takenTickets
+			.Where(ticket => ticket.IsReleased(currentDayNumber))
+			.ToDictionary(t => t, GetClientsGainedByTicket);
 
 		int GetClientsGainedByTicket(Ticket ticket)
 		{
-			var descriptor = ticketDescriptors[ticket.id];
+			var descriptor = TicketDescriptors.GetByTicketId(ticket.id);
 			var clientsLost = descriptor.ClientOffRate * (ticket.releaseDay!.Value - ticket.takingDay);
 			return descriptor.ClientsProvides - clientsLost;
 		}

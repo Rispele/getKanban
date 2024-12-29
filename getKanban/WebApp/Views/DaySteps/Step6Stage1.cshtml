@@ -204,33 +204,35 @@
 <div class="container1">
 
     <div class="container2">
-        @for (var i = 0; i < 10; i++)
+        @foreach(var (ticket, clientsGained) in Model.TeamStatistic.TicketStatistics
+                     .OrderByDescending(t => t.Key.releaseDay)
+                     .ThenByDescending(t => t.Key.id))
         {
-            // var t = ticketId[0] switch
-            // {
-            //     'S' => "checkboxCardStyle1",
-            //     'I' => "checkboxCardStyle2",
-            //     'F' => "checkboxCardStyle3",
-            //     'E' => "checkboxCardStyle4"
-            // };
+            var t = ticket.id[0] switch
+            {
+                'S' => "checkboxCardStyle1",
+                'I' => "checkboxCardStyle2",
+                'F' => "checkboxCardStyle3",
+                'E' => "checkboxCardStyle4"
+            };
 
             <div class="checkboxCardsMargin">
                 @* <div class="checkboxCardContainer @t"> *@
-                <div class="checkboxCardContainer checkboxCardStyle1">
+                <div class="checkboxCardContainer @t">
                     <div class="checkboxCardContent">
                         @* <h2 class="checkboxCardNumber">@ticketId</h2> *@
-                        <h2 class="checkboxCardNumber">S01</h2>
+                        <h2 class="checkboxCardNumber">@ticket.id</h2>
                         <div class="line full"></div>
 
                         <div class="checkboxCardDay fs-6 fw-bolder">
                             <p>
-                                День взятия: @i
+                                День взятия: @ticket.takingDay
                             </p>
                             <p>
-                                День поставки: @i
+                                День поставки: @ticket.releaseDay
                             </p>
                             <p>
-                                Клиентов: @i
+                                Клиентов: @clientsGained
                             </p>
                         </div>
                     </div>
