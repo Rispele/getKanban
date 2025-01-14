@@ -46,7 +46,6 @@
     position: absolute;
     width: 10px;
     height: 16px;
-    background-color: hsl(calc(360 * var(--hue)), 100%, 50%);
     animation: confetti-fall 5s ease-in-out infinite;
     opacity: 0;
     z-index: 1000;
