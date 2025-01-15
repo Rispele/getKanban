@@ -44,19 +44,19 @@
     }
 }
 
-@* <div class="infoContainer height-small creative-border-3 creative-border-rad-40 centered-100"> *@
-@*     <div class="info centered-50"> *@
-@*         <p class="fs-5 fw-normal"> *@
-@*             Ура! Теперь у вас есть полный комплект для автоматизированного регрессионного тестирования. *@
-@*         </p> *@
-@*         <p class="fs-5 fw-normal"> *@
-@*             Ваши затраты на ручное тестирование снизились. *@
-@*         </p> *@
-@*         <p class="fs-5 fw-normal"> *@
-@*             Вычеркивайте по 2 пункта по тестированию из всех оставшихся тикетов (в том числе вновь приходящих на доску). *@
-@*         </p> *@
-@*     </div> *@
-@* </div> *@
+<div class="infoContainer height-small creative-border-3 creative-border-rad-40 centered-100" hidden="hidden">
+    <div class="info centered-50">
+        <p class="fs-5 fw-normal">
+            Ура! Теперь у вас есть полный комплект для автоматизированного регрессионного тестирования.
+        </p>
+        <p class="fs-5 fw-normal">
+            Ваши затраты на ручное тестирование снизились.
+        </p>
+        <p class="fs-5 fw-normal">
+            Вычеркивайте по 2 пункта по тестированию из всех оставшихся тикетов (в том числе вновь приходящих на доску).
+        </p>
+    </div>
+</div>
 
 <div class="container1">
     <h1 class="title">Выберите тикеты, которые были сегодня поставлены</h1>
@@ -111,6 +111,14 @@
     setSwitchEvent("next", connection, "@Model.GameSessionId", "@Model.TeamId", 4, 2);
     setRollbackEvent(connection);
     
+    @{
+        var ticketI02 = Model.TicketIds.FirstOrDefault(x => x.id == "I02");
+        if (ticketI02 != null && ticketI02.IsReleased(Model.DayNumber))
+        {
+            @:document.getElementsByClassName("infoContainer")[0].removeAttribute("hidden");
+        }
+    }
+    
     connection.on("NotifyTicketReleased", (ticketId) => {
         const ticket = document.getElementById(ticketId);
         ticket.checked = !ticket.checked;
@@ -132,6 +140,13 @@
                 checkbox.checked = !checkbox.checked;
             } else {
                 await connection.invoke("NotifyTicketReleased", "@Model.GameSessionId", "@Model.TeamId", ticketId);
+                if (ticketId === "I02") {
+                    if (checkbox.checked) {
+                        document.getElementsByClassName("infoContainer")[0].removeAttribute("hidden")
+                    } else {
+                        document.getElementsByClassName("infoContainer")[0].setAttribute("hidden", "hidden")
+                    }
+                }
             }
         });
     }
